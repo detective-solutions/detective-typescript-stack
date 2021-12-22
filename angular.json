@@ -98,7 +98,8 @@
           }
         }
       },
-      "tags": []
+      "tags": [],
+      "implicitDependencies": ["shared-assets", "shared-styles"]
     },
     "detective-client-e2e": {
       "root": "apps/detective-client-e2e",
