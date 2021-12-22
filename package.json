@@ -64,7 +64,7 @@
     "*": [
       "nx format --uncommitted",
       "nx affected:lint --uncommitted",
-      "nx affected:test --uncommitted"
+      "nx affected:test --uncommitted --parallel --maxParallel=5"
     ]
   }
 }
