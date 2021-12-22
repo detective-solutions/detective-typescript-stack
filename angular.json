@@ -17,7 +17,18 @@
             "polyfills": "apps/detective-client/src/polyfills.ts",
             "tsConfig": "apps/detective-client/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["apps/detective-client/src/favicon.ico", "apps/detective-client/src/assets"],
+            "assets": [
+              {
+                "glob": "favicon.ico",
+                "input": "libs/shared/assets/src",
+                "output": "./"
+              },
+              {
+                "glob": "**/*",
+                "input": "libs/shared/assets/src/assets",
+                "output": "assets"
+              }
+            ],
             "styles": ["apps/detective-client/src/styles.scss"],
             "scripts": []
           },
@@ -116,6 +127,14 @@
       },
       "tags": [],
       "implicitDependencies": ["detective-client"]
+    },
+    "shared-assets": {
+      "projectType": "library",
+      "root": "libs/shared/assets",
+      "sourceRoot": "libs/shared/assets/src",
+      "prefix": "detective-frontend",
+      "architect": {},
+      "tags": ["scope:shared", "type:assets"]
     }
   }
 }
