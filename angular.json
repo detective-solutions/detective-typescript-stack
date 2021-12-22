@@ -29,7 +29,7 @@
                 "output": "assets"
               }
             ],
-            "styles": ["apps/detective-client/src/styles.scss"],
+            "styles": ["libs/shared/styles/src/index.scss"],
             "scripts": []
           },
           "configurations": {
@@ -135,6 +135,14 @@
       "prefix": "detective-frontend",
       "architect": {},
       "tags": ["scope:shared", "type:assets"]
+    },
+    "shared-styles": {
+      "projectType": "library",
+      "root": "libs/shared/styles",
+      "sourceRoot": "libs/shared/styles/src",
+      "prefix": "detective-frontend",
+      "architect": {},
+      "tags": ["scope:shared", "type:styles"]
     }
   }
 }
