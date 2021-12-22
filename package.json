@@ -58,16 +58,11 @@
     "ts-jest": "27.0.5",
     "typescript": "~4.4.3"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "npx --no -- commitlint --edit $1",
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*": [
       "nx format --uncommitted",
-      "nx lint --fix"
+      "nx affected:lint --uncommitted",
+      "nx affected:test --uncommitted"
     ]
   }
 }
