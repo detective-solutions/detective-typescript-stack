@@ -1,0 +1,13 @@
+{
+  // List of extensions which should be recommended for users of this workspace.
+  "recommendations": [
+    "angular.ng-template",
+    "esbenp.prettier-vscode",
+    "amatiasq.sort-imports",
+    "sonarsource.sonarlint-vscode",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker",
+    "aaron-bond.better-comments"
+  ]
+}
