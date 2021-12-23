@@ -31,6 +31,13 @@
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nrwl/nx/javascript"],
       "rules": {}
+    },
+    {
+      "files": ["*.ts"],
+      "extends": ["plugin:ngrx/recommended"],
+      "parserOptions": {
+        "project": ["**./tsconfig.json"]
+      }
     }
   ]
 }
