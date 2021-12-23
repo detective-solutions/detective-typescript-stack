@@ -48,8 +48,8 @@
               ],
               "fileReplacements": [
                 {
-                  "replace": "apps/detective-client/src/environments/environment.ts",
-                  "with": "apps/detective-client/src/environments/environment.prod.ts"
+                  "replace": "libs/shared/environments/src/lib/environment.ts",
+                  "with": "libs/shared/environments/src/lib/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
@@ -136,6 +136,21 @@
       "prefix": "detective-frontend",
       "architect": {},
       "tags": ["scope:shared", "type:assets"]
+    },
+    "shared-environments": {
+      "projectType": "library",
+      "root": "libs/shared/environments",
+      "sourceRoot": "libs/shared/environments/src",
+      "prefix": "detective-frontend",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/shared/environments/src/**/*.ts", "libs/shared/environments/src/**/*.html"]
+          }
+        }
+      },
+      "tags": ["scope:shared", "type:environments"]
     },
     "shared-styles": {
       "projectType": "library",
