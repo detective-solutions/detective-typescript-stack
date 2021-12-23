@@ -8,6 +8,7 @@
     "eamodio.gitlens",
     "mhutchie.git-graph",
     "streetsidesoftware.code-spell-checker",
-    "aaron-bond.better-comments"
+    "aaron-bond.better-comments",
+    "firsttris.vscode-jest-runner"
   ]
 }
