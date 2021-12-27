@@ -194,6 +194,29 @@
       },
       "tags": ["scope:shared", "type:environments"]
     },
+    "shared-interfaces": {
+      "projectType": "library",
+      "root": "libs/shared/interfaces",
+      "sourceRoot": "libs/shared/interfaces/src",
+      "prefix": "detective-frontend",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/interfaces"],
+          "options": {
+            "jestConfig": "libs/shared/interfaces/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/shared/interfaces/src/**/*.ts", "libs/shared/interfaces/src/**/*.html"]
+          }
+        }
+      },
+      "tags": ["scope:shared", "type:interfaces"]
+    },
     "shared-styles": {
       "projectType": "library",
       "root": "libs/shared/styles",
