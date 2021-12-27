@@ -1,0 +1,20 @@
+@import '../palettes';
+
+$default-primary: mat.define-palette($default-primary-palette, 900);
+$default-accent: mat.define-palette($default-accent-palette);
+$default-warn: mat.define-palette(mat.$red-palette, 400);
+
+$default-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $default-primary,
+      accent: $default-accent,
+      warn: $default-warn,
+    ),
+  )
+);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($default-theme);
