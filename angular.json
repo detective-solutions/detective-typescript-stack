@@ -135,6 +135,29 @@
       "architect": {},
       "tags": ["scope:shared", "type:assets"]
     },
+    "shared-components": {
+      "projectType": "library",
+      "root": "libs/shared/components",
+      "sourceRoot": "libs/shared/components/src",
+      "prefix": "detective-frontend",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/shared/components"],
+          "options": {
+            "jestConfig": "libs/shared/components/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/shared/components/src/**/*.ts", "libs/shared/components/src/**/*.html"]
+          }
+        }
+      },
+      "tags": ["scope:shared", "type:components"]
+    },
     "shared-data-access": {
       "projectType": "library",
       "root": "libs/shared/data-access",
