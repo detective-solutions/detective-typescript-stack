@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'detective-frontend-root',
+  selector: 'detective-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

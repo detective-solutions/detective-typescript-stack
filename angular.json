@@ -5,7 +5,6 @@
       "projectType": "application",
       "root": "apps/detective-client",
       "sourceRoot": "apps/detective-client/src",
-      "prefix": "detective-frontend",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -133,7 +132,6 @@
       "projectType": "library",
       "root": "libs/shared/assets",
       "sourceRoot": "libs/shared/assets/src",
-      "prefix": "detective-frontend",
       "architect": {},
       "tags": ["scope:shared", "type:assets"]
     },
@@ -141,7 +139,6 @@
       "projectType": "library",
       "root": "libs/shared/data-access",
       "sourceRoot": "libs/shared/data-access/src",
-      "prefix": "detective-frontend",
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -164,7 +161,6 @@
       "projectType": "library",
       "root": "libs/shared/environments",
       "sourceRoot": "libs/shared/environments/src",
-      "prefix": "detective-frontend",
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
@@ -179,7 +175,6 @@
       "projectType": "library",
       "root": "libs/shared/styles",
       "sourceRoot": "libs/shared/styles/src",
-      "prefix": "detective-frontend",
       "architect": {},
       "tags": ["scope:shared", "type:styles"]
     }
