@@ -1,6 +1,6 @@
 import { AppModule } from './app/app.module';
 import { enableProdMode } from '@angular/core';
-import { environment } from '@detective-frontend/shared/environments';
+import { environment } from '@detective.solutions/shared/environments';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 if (environment.production) {

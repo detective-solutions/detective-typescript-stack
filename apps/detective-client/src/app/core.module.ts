@@ -1,5 +1,5 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { SharedDataAccessModule } from '@detective-frontend/shared/data-access';
+import { SharedDataAccessModule } from '@detective.solutions/shared/data-access';
 
 @NgModule({
   imports: [SharedDataAccessModule.forRoot()],

@@ -3,7 +3,7 @@ import { metaReducers, reducers } from './reducers';
 
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
-import { environment } from '@detective-frontend/shared/environments';
+import { environment } from '@detective.solutions/shared/environments';
 
 @NgModule({
   imports: [
