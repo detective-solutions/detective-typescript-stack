@@ -139,7 +139,6 @@
       "projectType": "library",
       "root": "libs/shared/components",
       "sourceRoot": "libs/shared/components/src",
-      "prefix": "detective-frontend",
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -198,7 +197,6 @@
       "projectType": "library",
       "root": "libs/shared/interfaces",
       "sourceRoot": "libs/shared/interfaces/src",
-      "prefix": "detective-frontend",
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
