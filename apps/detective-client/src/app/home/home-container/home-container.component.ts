@@ -5,11 +5,13 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'portal',
-  templateUrl: './portal-container.component.html',
-  styleUrls: ['./portal-container.component.css'],
+  selector: 'home',
+  templateUrl: './home-container.component.html',
+  styleUrls: ['./home-container.component.scss'],
 })
-export class PortalContainerComponent {
+export class HomeContainerComponent {
+  value = 'Clear me';
+
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
     shareReplay()

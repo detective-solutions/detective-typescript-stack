@@ -1,23 +1,27 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import { HomeContainerComponent } from './home-container.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { PortalContainerComponent } from './portal-container.component';
 import { RouterTestingModule } from '@angular/router/testing';
 
-describe('PortalComponent', () => {
-  let component: PortalContainerComponent;
-  let fixture: ComponentFixture<PortalContainerComponent>;
+describe('HomeContainerComponent', () => {
+  let component: HomeContainerComponent;
+  let fixture: ComponentFixture<HomeContainerComponent>;
 
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [PortalContainerComponent],
+        declarations: [HomeContainerComponent],
         imports: [
           RouterTestingModule,
           NoopAnimationsModule,
@@ -27,13 +31,17 @@ describe('PortalComponent', () => {
           MatListModule,
           MatSidenavModule,
           MatToolbarModule,
+          MatMenuModule,
+          MatInputModule,
+          MatFormFieldModule,
+          MatSlideToggleModule,
         ],
       }).compileComponents();
     })
   );
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PortalContainerComponent);
+    fixture = TestBed.createComponent(HomeContainerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

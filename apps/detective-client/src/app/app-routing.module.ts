@@ -6,8 +6,8 @@ import { PageNotFoundComponent } from '@detective.solutions/shared/components';
 import { RegisterComponent } from './auth/register/register.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/portal/my-casefiles', pathMatch: 'full' },
-  { path: 'portal', loadChildren: () => import('./portal/portal.module').then((m) => m.PortalModule) },
+  { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },
+  { path: 'home', loadChildren: () => import('./home/home.module').then((m) => m.HomeModule) },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: '**', component: PageNotFoundComponent },

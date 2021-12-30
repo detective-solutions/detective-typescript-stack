@@ -18,8 +18,8 @@ const modules = [
   MatIconModule,
   MatListModule,
   MatMenuModule,
-  MatInputModule,
   MatFormFieldModule,
+  MatInputModule,
   MatSlideToggleModule,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ] as any[];
@@ -27,4 +27,4 @@ const modules = [
 @NgModule({
   exports: modules,
 })
-export class PortalMaterialModule {}
+export class HomeMaterialModule {}
