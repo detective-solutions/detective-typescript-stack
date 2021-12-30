@@ -1,0 +1,18 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@import '../themes/themes';
+
+$color-config: mat.get-color-config($light-theme);
+$default-primary: map.get($color-config, 'primary');
+$default-accent: map.get($color-config, 'accent');
+$default-warn: map.get($color-config, 'warn');
+
+$primary: mat.get-color-from-palette($default-primary, 'default');
+$primary-hover: mat.get-color-from-palette($default-primary, 900);
+$primary-contrast: mat.get-color-from-palette($default-primary, 'default-contrast');
+
+$accent: mat.get-color-from-palette($default-accent, 'default');
+$accent-contrast: mat.get-color-from-palette($default-accent, 'default-contrast');
+
+$warn: mat.get-color-from-palette($default-warn, 'default');
+$warn: mat.get-color-from-palette($default-warn, 'default-contrast');
