@@ -92,7 +92,7 @@
           <span>Testuser</span>
           <mat-icon>expand_more</mat-icon>
         </button>
-        <mat-menu #profileMenu="matMenu" yPosition="below">
+        <mat-menu #profileMenu="matMenu" xPosition="before">
           <button mat-menu-item>Edit Account</button>
           <button mat-menu-item>API & Documentation</button>
           <button mat-menu-item>Logout</button>
@@ -103,7 +103,7 @@
         <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
           <mat-icon>more_vert</mat-icon>
         </button>
-        <mat-menu #mobileMenu="matMenu" yPosition="below">
+        <mat-menu #mobileMenu="matMenu" xPosition="before">
           <button mat-menu-item>Invite</button>
           <button mat-menu-item>Edit Account</button>
           <button mat-menu-item>API & Documentation</button>
