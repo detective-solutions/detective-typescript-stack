@@ -13,7 +13,7 @@
     </mat-toolbar>
 
     <div id="home-sidebar-toggle">
-      <mat-icon (click)="toggleSidebar()" title="Close sidebar">chevron_left</mat-icon>
+      <mat-icon (click)="drawer.toggle()" title="Close sidebar">chevron_left</mat-icon>
     </div>
 
     <mat-nav-list id="home-sidebar-list" fxLayout="column">
@@ -69,8 +69,8 @@
       <div class="search-input" fxFlex="auto" fxLayoutAlign="center center">
         <mat-form-field appearance="outline">
           <mat-label>Search casefiles</mat-label>
-          <input matInput type="text" [(ngModel)]="value" />
-          <button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value = ''">
+          <input matInput type="text" [(ngModel)]="searchValue" />
+          <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue = ''">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>

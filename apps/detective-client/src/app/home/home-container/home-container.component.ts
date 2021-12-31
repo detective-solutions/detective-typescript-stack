@@ -1,11 +1,10 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, ViewChild } from '@angular/core';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { MatSidenav } from '@angular/material/sidenav';
+import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 
-interface HomeSidenavItem {
+interface IHomeSidenavItem {
   icon: string;
   displayValue: string;
   route: string;
@@ -18,10 +17,9 @@ interface HomeSidenavItem {
   styleUrls: ['./home-container.component.scss'],
 })
 export class HomeContainerComponent {
-  @ViewChild('drawer') drawer!: MatSidenav;
-  value = '';
+  searchValue = '';
 
-  sidenavItems: HomeSidenavItem[] = [
+  sidenavItems: IHomeSidenavItem[] = [
     {
       icon: 'insert_chart_outlined',
       displayValue: 'My Casefiles',
@@ -42,7 +40,7 @@ export class HomeContainerComponent {
     },
   ];
 
-  adminSidenavItem: HomeSidenavItem = {
+  adminSidenavItem: IHomeSidenavItem = {
     icon: 'manage_accounts',
     displayValue: 'Admin',
     route: '/admin',
@@ -55,8 +53,4 @@ export class HomeContainerComponent {
   );
 
   constructor(private breakpointObserver: BreakpointObserver) {}
-
-  toggleSidebar() {
-    this.drawer.toggle();
-  }
 }
