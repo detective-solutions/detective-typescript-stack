@@ -58,7 +58,7 @@
         <mat-icon aria-label="Home sidebar toggle">menu</mat-icon>
       </button>
 
-      <span fxLayoutAlign="center center" fxHide fxShow.lg fxShow.md>
+      <span fxLayoutAlign="center center" fxHide.md fxHide.sm fxHide.xs>
         <span class="view-toggle" fxLayoutAlign="center center">
           <mat-icon>view_module</mat-icon>
           <mat-slide-toggle color="primary"></mat-slide-toggle>
@@ -86,7 +86,7 @@
         </button>
       </span>
 
-      <span fxLayoutAlign="center center" fxHide fxShow.lg>
+      <span fxLayoutAlign="center center" fxHide.md fxHide.sm fxHide.xs>
         <button mat-icon-button class="account-button" [matMenuTriggerFor]="profileMenu" aria-label="Profile">
           <mat-icon>account_circle</mat-icon>
           <span>Testuser</span>
@@ -99,7 +99,7 @@
         </mat-menu>
       </span>
 
-      <span class="portal-mobile-menu" fxLayoutAlign="center center" fxHide fxShow.md fxShow.sm fxShow.xs>
+      <span class="portal-mobile-menu" fxLayoutAlign="center center" fxHide.lg fxHide.xl>
         <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
           <mat-icon>more_vert</mat-icon>
         </button>
