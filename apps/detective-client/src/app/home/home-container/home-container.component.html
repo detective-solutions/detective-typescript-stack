@@ -1,85 +1,92 @@
-<mat-sidenav-container class="home-sidenav-container">
+<mat-sidenav-container>
   <mat-sidenav
     #drawer
-    class="sidenav"
     fixedInViewport
     [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar class="sidenav-header" fxLayout="row"
-      ><a routerLink="/" fxLayoutAlign="center center"
-        ><img class="logo" src="assets/images/detective-logo.png" />detective</a
-      ></mat-toolbar
-    >
-    <mat-nav-list fxLayout="column">
-      <a mat-list-item routerLink="/home/my-casefiles" routerLinkActive="route-active"
-        ><mat-icon>insert_chart_outlined</mat-icon>My Casefiles</a
+    <mat-toolbar id="home-sidenav-header" fxLayoutAlign="start center"
+      ><a routerLink="/" fxLayoutAlign="center center" id="home-sidenav-logo"
+        ><img src="assets/images/detective-logo.png" /><span>detective</span></a
       >
-      <a mat-list-item routerLink="/home/all-casefiles" routerLinkActive="route-active"
-        ><mat-icon>apps</mat-icon>All Casefiles</a
+    </mat-toolbar>
+
+    <div id="home-sidebar-toggle">
+      <mat-icon (click)="toggleSidebar()" title="Close sidebar">chevron_left</mat-icon>
+    </div>
+
+    <mat-nav-list id="home-sidebar-list" fxLayout="column">
+      <a
+        *ngFor="let item of sidenavItems"
+        mat-list-item
+        class="home-sidebar-item"
+        [routerLink]="item.route"
+        routerLinkActive="route-active"
+        title="{{ item.title }}"
+        ><span fxLayoutAlign="start center"
+          ><mat-icon>{{ item.icon }}</mat-icon> {{ item.displayValue }}</span
+        ></a
       >
-      <a mat-list-item routerLink="/home/data-sources" routerLinkActive="route-active"
-        ><mat-icon>storage</mat-icon>Data Sources</a
+
+      <a
+        mat-list-item
+        class="home-sidebar-admin-item"
+        [routerLink]="adminSidenavItem.route"
+        title="{{ adminSidenavItem.title }}"
+        ><span fxLayoutAlign="center center"
+          ><mat-icon>{{ adminSidenavItem.icon }}</mat-icon
+          >{{ adminSidenavItem.displayValue }}</span
+        ></a
       >
-      <a mat-list-item routerLink="/home/admin"><mat-icon>manage_accounts</mat-icon>Admin</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content
     [ngClass]="{
-      'close-home-toolbar-gap': (isHandset$ | async) === false
+      'close-home-toolbar-gap': drawer.opened
     }"
   >
     <mat-toolbar class="custom-header-bar" fxLayout="row">
       <button
         type="button"
-        aria-label="Toggle Sidebar"
+        aria-label="Toggle sidebar"
+        title="Toggle sidebar"
         mat-icon-button
         (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async"
+        *ngIf="!drawer.opened"
       >
         <mat-icon aria-label="Home sidebar toggle">menu</mat-icon>
       </button>
 
-      <span class="view-toggle" fxFlex="1 1 15%" fxLayoutAlign="center center" fxHide.sm fxHide.xs>
-        <mat-icon>view_module</mat-icon>
-        <mat-slide-toggle color="primary"></mat-slide-toggle>
-        <mat-icon>list</mat-icon>
+      <span fxLayoutAlign="center center" fxHide fxShow.lg fxShow.md>
+        <span class="view-toggle" fxLayoutAlign="center center">
+          <mat-icon>view_module</mat-icon>
+          <mat-slide-toggle color="primary"></mat-slide-toggle>
+          <mat-icon>list</mat-icon>
+        </span>
       </span>
 
-      <div class="search-input" fxFlex="3 1 auto" fxLayoutAlign="center center" fxHide.xs>
+      <div class="search-input" fxFlex="auto" fxLayoutAlign="center center">
         <mat-form-field appearance="outline">
           <mat-label>Search casefiles</mat-label>
-          <input matInput type="text" />
+          <input matInput type="text" [(ngModel)]="value" />
           <button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value = ''">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
       </div>
 
-      <button
-        fxFlex="1 1 12%"
-        fxLayoutAlign="center center"
-        fxHide.xs
-        mat-raised-button
-        color="accent"
-        class="invite-button"
-      >
-        Invite
-      </button>
-
-      <span fxFlex="1 1 30px" fxLayoutAlign="center center" fxHide.sm fxHide.xs>
-        <button mat-icon-button [matMenuTriggerFor]="helpMenu" aria-label="Help">
-          <mat-icon>help_outline</mat-icon>
-        </button>
-        <mat-menu #helpMenu="matMenu" yPosition="below">
-          <button mat-menu-item>User Documentation</button>
-          <button mat-menu-item>API Documentation</button>
-          <button mat-menu-item>About</button>
-        </mat-menu>
+      <span fxLayoutAlign="center center" fxHide.sm fxHide.xs>
+        <button mat-raised-button color="accent" class="invite-button">Invite</button>
       </span>
 
-      <span fxFlex="2 1 150px" fxLayoutAlign="center center" fxHide.sm fxHide.xs>
+      <span fxLayoutAlign="center center">
+        <button mat-icon-button class="notifications-button" aria-label="Notifications" [disabled]="true">
+          <mat-icon>notifications</mat-icon>
+        </button>
+      </span>
+
+      <span fxLayoutAlign="center center" fxHide fxShow.lg>
         <button mat-icon-button class="account-button" [matMenuTriggerFor]="profileMenu" aria-label="Profile">
           <mat-icon>account_circle</mat-icon>
           <span>Testuser</span>
@@ -87,15 +94,20 @@
         </button>
         <mat-menu #profileMenu="matMenu" yPosition="below">
           <button mat-menu-item>Edit Account</button>
+          <button mat-menu-item>API & Documentation</button>
+          <button mat-menu-item>Logout</button>
         </mat-menu>
       </span>
 
-      <span class="portal-mobile-menu" fxLayoutAlign="center center" fxHide fxShow.sm fxShow.xs>
+      <span class="portal-mobile-menu" fxLayoutAlign="center center" fxHide fxShow.md fxShow.sm fxShow.xs>
         <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #mobileMenu="matMenu" yPosition="below">
+          <button mat-menu-item>Invite</button>
           <button mat-menu-item>Edit Account</button>
+          <button mat-menu-item>API & Documentation</button>
+          <button mat-menu-item>Logout</button>
         </mat-menu>
       </span>
     </mat-toolbar>

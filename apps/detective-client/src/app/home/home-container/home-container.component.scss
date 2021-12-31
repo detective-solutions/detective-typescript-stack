@@ -1,6 +1,6 @@
 @import '~@detective.solutions/styles/color-utils';
 
-$sidebar-width: 240px;
+$sidebar-width: 220px;
 $toolbar-height: 85px;
 
 // Close visual gap caused by border-radius on the top right corner of the sidenav
@@ -9,52 +9,82 @@ $toolbar-height: 85px;
   margin-left: calc($sidebar-width - 10px) !important;
 }
 
-.home-sidenav-container {
+mat-sidenav-container {
   height: 100%;
 
-  .sidenav,
-  .sidenav-header {
+  mat-sidenav {
     background: $primary;
     color: $primary-contrast;
     width: $sidebar-width;
     border-top-right-radius: 12px;
 
-    .logo {
-      width: 50px;
-      height: 50px;
-      padding-right: 10px;
+    #home-sidenav-header {
+      background: $primary;
+      color: $primary-contrast;
+      margin-left: 5px;
     }
 
-    mat-nav-list {
-      height: calc(100vh - $toolbar-height - 25px);
-      margin-top: 25px;
+    #home-sidenav-logo {
+      img {
+        width: 50px;
+        height: 50px;
+        padding-right: 10px;
+      }
+    }
+
+    #home-sidebar-toggle {
+      position: absolute;
+      right: 15px;
+      cursor: pointer;
+
+      &:hover {
+        color: $accent;
+      }
+    }
+
+    #home-sidebar-list {
+      margin-top: 45px;
 
       .route-active {
+        font-weight: bold;
         background: $primary-hover;
         border-left: 3px solid $accent;
       }
 
       a {
         height: 70px;
+      }
 
+      .home-sidebar-item {
         &:hover {
           background: $primary-hover;
+        }
+
+        span {
+          margin-left: 12px;
+        }
+
+        mat-icon {
+          padding-right: 15px;
+        }
+      }
+
+      .home-sidebar-admin-item {
+        position: absolute;
+        bottom: 0;
+        background: $primary-hover;
+
+        &:hover {
+          background: $accent;
+        }
+
+        span {
+          width: 100%;
         }
 
         mat-icon {
           padding-right: 10px;
         }
-        .mat-list-item-content {
-          justify-content: center !important;
-        }
-      }
-
-      a:last-of-type {
-        margin-top: auto;
-        background: $primary-hover;
-      }
-      a:last-of-type:hover {
-        background: $accent;
       }
     }
   }
@@ -83,27 +113,36 @@ $toolbar-height: 85px;
       text-decoration: none;
     }
 
-    .view-toggle mat-icon {
-      padding: 0 8px;
+    .view-toggle {
+      margin: 0 20px;
+
+      mat-icon {
+        padding: 0 8px;
+      }
     }
 
     .search-input {
       height: 50px;
-      width: 75px;
+      width: inherit;
 
       mat-form-field {
+        font-size: 12px;
+        width: 75%;
         height: inherit;
-        width: 80%;
-        padding: 0 25px;
       }
     }
 
     .invite-button {
-      width: 150px;
-      margin: 0 50px;
+      margin: 0 15px;
+      width: 175px;
+    }
+
+    .notifications-button {
+      margin: 0 15px;
     }
 
     .account-button {
+      margin: 0 15px;
       width: inherit;
       height: inherit;
 

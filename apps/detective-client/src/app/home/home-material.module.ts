@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,6 +22,7 @@ const modules = [
   MatFormFieldModule,
   MatInputModule,
   MatSlideToggleModule,
+  FormsModule,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ] as any[];
 
