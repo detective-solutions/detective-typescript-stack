@@ -58,6 +58,5 @@ export class HomeContainerComponent {
 
   toggleSidebar() {
     this.drawer.toggle();
-    console.log(this.drawer.mode);
   }
 }
