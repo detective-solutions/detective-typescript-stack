@@ -8,6 +8,7 @@ import { RegisterComponent } from './auth/register/register.component';
 const routes: Routes = [
   { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },
   { path: 'home', loadChildren: () => import('./home/home.module').then((m) => m.HomeModule) },
+  { path: 'casefile/:id', loadChildren: () => import('./casefile/casefile.module').then((m) => m.CasefileModule) },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: '**', component: PageNotFoundComponent },

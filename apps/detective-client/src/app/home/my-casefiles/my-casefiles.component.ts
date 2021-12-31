@@ -10,6 +10,6 @@ export class MyCasefilesComponent {
   constructor(private router: Router) {}
 
   navigateToCasefileView() {
-    this.router.navigateByUrl('/casefile');
+    this.router.navigateByUrl('/casefile/123');
   }
 }

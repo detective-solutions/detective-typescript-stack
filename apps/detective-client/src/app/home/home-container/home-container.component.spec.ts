@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import { FormsModule } from '@angular/forms';
 import { HomeContainerComponent } from './home-container.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,6 +36,7 @@ describe('HomeContainerComponent', () => {
           MatInputModule,
           MatFormFieldModule,
           MatSlideToggleModule,
+          FormsModule,
         ],
       }).compileComponents();
     })
