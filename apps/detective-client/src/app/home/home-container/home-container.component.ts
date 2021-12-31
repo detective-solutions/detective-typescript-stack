@@ -45,7 +45,7 @@ export class HomeContainerComponent {
   adminSidenavItem: HomeSidenavItem = {
     icon: 'manage_accounts',
     displayValue: 'Admin',
-    route: '/home/admin',
+    route: '/admin',
     title: 'Navigate to the admin section',
   };
 

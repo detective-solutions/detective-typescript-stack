@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'casefile/:id', loadChildren: () => import('./casefile/casefile.module').then((m) => m.CasefileModule) },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'admin', loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule) },
   { path: '**', component: PageNotFoundComponent },
 ];
 
