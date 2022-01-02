@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AdminContainerComponent } from './admin-container.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { UiModule } from '@detective.solutions/detective-client/ui';
 
 describe('AdminContainerComponent', () => {
   let component: AdminContainerComponent;
@@ -10,7 +12,7 @@ describe('AdminContainerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AdminContainerComponent],
-      imports: [RouterTestingModule],
+      imports: [UiModule, RouterTestingModule, NoopAnimationsModule],
     }).compileComponents();
   });
 
