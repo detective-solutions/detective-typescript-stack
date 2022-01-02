@@ -40,7 +40,7 @@ export class HomeContainerComponent {
     },
   ];
 
-  adminSidenavItem: IHomeSidenavItem = {
+  sidenavBottomItem: IHomeSidenavItem = {
     icon: 'manage_accounts',
     displayValue: 'Admin',
     route: '/admin',
