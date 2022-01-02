@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@detective.solutions/detective-client/ui": ["libs/detective-client/ui/src/index.ts"],
       "@detective.solutions/shared/components": ["libs/shared/components/src/index.ts"],
       "@detective.solutions/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@detective.solutions/shared/environments": ["libs/shared/environments/src/index.ts"],

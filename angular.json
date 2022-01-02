@@ -221,6 +221,28 @@
       "sourceRoot": "libs/shared/styles/src",
       "architect": {},
       "tags": ["scope:shared", "type:styles"]
+    },
+    "ui": {
+      "projectType": "library",
+      "root": "libs/detective-client/ui",
+      "sourceRoot": "libs/detective-client/ui/src",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/detective-client/ui"],
+          "options": {
+            "jestConfig": "libs/detective-client/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/detective-client/ui/src/**/*.ts", "libs/detective-client/ui/src/**/*.html"]
+          }
+        }
+      },
+      "tags": []
     }
   }
 }
