@@ -152,7 +152,29 @@
           }
         }
       },
-      "tags": []
+      "tags": ["scope:detective-client", "type:feature"]
+    },
+    "detective-client-ui": {
+      "projectType": "library",
+      "root": "libs/detective-client/ui",
+      "sourceRoot": "libs/detective-client/ui/src",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/detective-client/ui"],
+          "options": {
+            "jestConfig": "libs/detective-client/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/detective-client/ui/src/**/*.ts", "libs/detective-client/ui/src/**/*.html"]
+          }
+        }
+      },
+      "tags": ["scope:detective-client", "type:ui"]
     },
     "shared-assets": {
       "projectType": "library",
@@ -160,28 +182,6 @@
       "sourceRoot": "libs/shared/assets/src",
       "architect": {},
       "tags": ["scope:shared", "type:assets"]
-    },
-    "shared-components": {
-      "projectType": "library",
-      "root": "libs/shared/components",
-      "sourceRoot": "libs/shared/components/src",
-      "architect": {
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/shared/components"],
-          "options": {
-            "jestConfig": "libs/shared/components/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/shared/components/src/**/*.ts", "libs/shared/components/src/**/*.html"]
-          }
-        }
-      },
-      "tags": ["scope:shared", "type:components"]
     },
     "shared-data-access": {
       "projectType": "library",
@@ -248,27 +248,27 @@
       "architect": {},
       "tags": ["scope:shared", "type:styles"]
     },
-    "ui": {
+    "shared-ui": {
       "projectType": "library",
-      "root": "libs/detective-client/ui",
-      "sourceRoot": "libs/detective-client/ui/src",
+      "root": "libs/shared/ui",
+      "sourceRoot": "libs/shared/ui/src",
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/detective-client/ui"],
+          "outputs": ["coverage/libs/shared/ui"],
           "options": {
-            "jestConfig": "libs/detective-client/ui/jest.config.js",
+            "jestConfig": "libs/shared/ui/jest.config.js",
             "passWithNoTests": true
           }
         },
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/detective-client/ui/src/**/*.ts", "libs/detective-client/ui/src/**/*.html"]
+            "lintFilePatterns": ["libs/shared/ui/src/**/*.ts", "libs/shared/ui/src/**/*.html"]
           }
         }
       },
-      "tags": []
+      "tags": ["scope:shared", "type:ui"]
     }
   }
 }
