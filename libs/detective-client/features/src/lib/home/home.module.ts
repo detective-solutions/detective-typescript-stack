@@ -5,11 +5,11 @@ import { HomeContainerComponent } from './home-container/home-container.componen
 import { HomeMaterialModule } from './home-material.module';
 import { HomeRoutingModule } from './home-routing.module';
 import { MyCasefilesComponent } from './my-casefiles/my-casefiles.component';
+import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NgModule } from '@angular/core';
-import { UiModule } from '@detective.solutions/detective-client/ui';
 
 @NgModule({
   declarations: [HomeContainerComponent, MyCasefilesComponent, AllCasefilesComponent, DataSourcesComponent],
-  imports: [CommonModule, HomeRoutingModule, HomeMaterialModule, UiModule],
+  imports: [CommonModule, HomeRoutingModule, HomeMaterialModule, NavigationModule],
 })
 export class HomeModule {}

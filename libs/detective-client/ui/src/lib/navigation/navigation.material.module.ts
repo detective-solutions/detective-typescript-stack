@@ -31,4 +31,4 @@ const modules = [
 @NgModule({
   exports: modules,
 })
-export class UiMaterialModule {}
+export class NavigationMaterialModule {}

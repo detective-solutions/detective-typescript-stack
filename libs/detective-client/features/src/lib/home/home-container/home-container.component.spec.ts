@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HomeContainerComponent } from './home-container.component';
+import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { UiModule } from '@detective.solutions/detective-client/ui';
 
 describe('HomeContainerComponent', () => {
   let component: HomeContainerComponent;
@@ -13,7 +13,7 @@ describe('HomeContainerComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [HomeContainerComponent],
-        imports: [UiModule, RouterTestingModule, NoopAnimationsModule],
+        imports: [NavigationModule, RouterTestingModule, NoopAnimationsModule],
       }).compileComponents();
     })
   );
