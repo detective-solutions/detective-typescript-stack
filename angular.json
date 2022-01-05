@@ -28,7 +28,10 @@
                 "output": "assets"
               }
             ],
-            "styles": ["libs/shared/styles/src/index.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/shared/styles/src/lib/themes"]
+            },
+            "styles": ["libs/detective-client/theme/themes.scss", "libs/shared/styles/src/index.scss"],
             "scripts": []
           },
           "configurations": {

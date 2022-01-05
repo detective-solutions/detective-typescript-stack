@@ -1,0 +1,22 @@
+@use '@angular/material' as mat;
+
+@import 'shared-themes';
+@import './custom-component-themes';
+
+@mixin custom-components-theme($theme) {
+  @include navigation-component-theme($theme);
+}
+
+// Declare classes for additional themes here
+// Take care to only import theming for components that are used
+.default-theme {
+  @include mat.core-theme($default-theme);
+  @include mat.toolbar-theme($default-theme);
+  @include mat.sidenav-theme($default-theme);
+  @include mat.menu-theme($default-theme);
+  @include mat.input-theme($default-theme);
+  @include mat.form-field-theme($default-theme);
+  @include mat.slide-toggle-theme($default-theme);
+  @include mat.button-theme($default-theme);
+  @include custom-components-theme($default-theme);
+}

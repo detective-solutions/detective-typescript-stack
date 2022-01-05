@@ -1,4 +1,4 @@
-@import '~@detective.solutions/styles/color-utils';
+@import './navigation.component-theme';
 
 $sidebar-width: 220px;
 $toolbar-height: 85px;
@@ -13,14 +13,10 @@ mat-sidenav-container {
   height: 100%;
 
   mat-sidenav {
-    background: $primary;
-    color: $primary-contrast;
     width: $sidebar-width;
     border-top-right-radius: 12px;
 
     #home-sidenav-header {
-      background: $primary;
-      color: $primary-contrast;
       margin-left: 5px;
     }
 
@@ -36,10 +32,6 @@ mat-sidenav-container {
       position: absolute;
       right: 15px;
       cursor: pointer;
-
-      &:hover {
-        color: $accent;
-      }
     }
 
     #home-sidebar-list {
@@ -47,8 +39,6 @@ mat-sidenav-container {
 
       .route-active {
         font-weight: bold;
-        background: $primary-hover;
-        border-left: 3px solid $accent;
       }
 
       a {
@@ -56,10 +46,6 @@ mat-sidenav-container {
       }
 
       .home-sidebar-item {
-        &:hover {
-          background: $primary-hover;
-        }
-
         span {
           margin-left: 12px;
         }
@@ -72,11 +58,6 @@ mat-sidenav-container {
       .home-sidebar-admin-item {
         position: absolute;
         bottom: 0;
-        background: $primary-hover;
-
-        &:hover {
-          background: $accent;
-        }
 
         span {
           width: 100%;

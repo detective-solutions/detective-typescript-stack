@@ -1,0 +1,19 @@
+// Hint: This file is imported by the individual apps to bootstrap theming
+
+@use '@angular/material' as mat;
+
+@import './color-palettes';
+
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define additional themes here
+$default-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $default-primary,
+      accent: $default-accent,
+      warn: $default-warn,
+    ),
+  )
+);
