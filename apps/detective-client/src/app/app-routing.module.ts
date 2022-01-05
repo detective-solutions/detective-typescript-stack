@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { LoginComponent } from '@detective.solutions/detective-client/features';
 import { NgModule } from '@angular/core';
-import { PageNotFoundComponent } from '@detective.solutions/shared/components';
+import { PageNotFoundComponent } from '@detective.solutions/shared/ui';
 import { RegisterComponent } from '@detective.solutions/detective-client/features';
 
 const routes: Routes = [

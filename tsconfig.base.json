@@ -17,10 +17,10 @@
     "paths": {
       "@detective.solutions/detective-client/features": ["libs/detective-client/features/src/index.ts"],
       "@detective.solutions/detective-client/ui": ["libs/detective-client/ui/src/index.ts"],
-      "@detective.solutions/shared/components": ["libs/shared/components/src/index.ts"],
       "@detective.solutions/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@detective.solutions/shared/environments": ["libs/shared/environments/src/index.ts"],
-      "@detective.solutions/shared/interfaces": ["libs/shared/interfaces/src/index.ts"]
+      "@detective.solutions/shared/interfaces": ["libs/shared/interfaces/src/index.ts"],
+      "@detective.solutions/shared/ui": ["libs/shared/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
