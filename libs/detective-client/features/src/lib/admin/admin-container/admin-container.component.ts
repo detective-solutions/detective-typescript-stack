@@ -3,8 +3,12 @@ import { ISidenavItem } from '@detective.solutions/detective-client/ui';
 
 @Component({
   selector: 'admin-container',
-  templateUrl: './admin-container.component.html',
-  styleUrls: ['./admin-container.component.scss'],
+  template: ` <main-navigation
+    [sidenavItems]="sidenavItems"
+    [sidenavBottomItem]="sidenavBottomItem"
+    [showTileToggle]="false"
+    [showSearchInput]="false"
+  ></main-navigation>`,
 })
 export class AdminContainerComponent {
   sidenavItems: ISidenavItem[] = [

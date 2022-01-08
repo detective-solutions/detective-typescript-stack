@@ -3,8 +3,9 @@ import { ISidenavItem } from '@detective.solutions/detective-client/ui';
 
 @Component({
   selector: 'home',
-  templateUrl: './home-container.component.html',
-  styleUrls: ['./home-container.component.scss'],
+  template: `
+    <main-navigation [sidenavItems]="sidenavItems" [sidenavBottomItem]="sidenavBottomItem"></main-navigation>
+  `,
 })
 export class HomeContainerComponent {
   searchValue = '';
