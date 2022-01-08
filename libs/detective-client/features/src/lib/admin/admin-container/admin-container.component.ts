@@ -1,11 +1,5 @@
 import { Component } from '@angular/core';
-
-interface ISidenavItem {
-  icon: string;
-  translationKey: string;
-  route: string;
-  title: string;
-}
+import { ISidenavItem } from '@detective.solutions/detective-client/ui';
 
 @Component({
   selector: 'admin-container',

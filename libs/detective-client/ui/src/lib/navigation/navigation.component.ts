@@ -2,12 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Input } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
 
-interface ISidenavItem {
-  icon: string;
-  translationKey: string;
-  route: string;
-  title: string;
-}
+import { ISidenavItem } from './ISidenavItem.interface';
 
 @Component({
   selector: 'main-navigation',

@@ -1,11 +1,5 @@
 import { Component } from '@angular/core';
-
-interface IHomeSidenavItem {
-  icon: string;
-  translationKey: string;
-  route: string;
-  title: string;
-}
+import { ISidenavItem } from '@detective.solutions/detective-client/ui';
 
 @Component({
   selector: 'home',
@@ -15,7 +9,7 @@ interface IHomeSidenavItem {
 export class HomeContainerComponent {
   searchValue = '';
 
-  sidenavItems: IHomeSidenavItem[] = [
+  sidenavItems: ISidenavItem[] = [
     {
       icon: 'insert_chart_outlined',
       translationKey: 'home.sidenavItems.myCasefiles',
@@ -36,7 +30,7 @@ export class HomeContainerComponent {
     },
   ];
 
-  sidenavBottomItem: IHomeSidenavItem = {
+  sidenavBottomItem: ISidenavItem = {
     icon: 'manage_accounts',
     translationKey: 'Admin',
     route: '/admin',
