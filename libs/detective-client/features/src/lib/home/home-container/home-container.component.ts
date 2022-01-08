@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 interface IHomeSidenavItem {
   icon: string;
-  displayValue: string;
+  translationKey: string;
   route: string;
   title: string;
 }
@@ -22,19 +22,19 @@ export class HomeContainerComponent {
   sidenavItems: IHomeSidenavItem[] = [
     {
       icon: 'insert_chart_outlined',
-      displayValue: 'My Casefiles',
+      translationKey: 'home.sidenavItems.myCasefiles',
       route: '/home/my-casefiles',
       title: 'Show all casefiles you participated in',
     },
     {
       icon: 'apps',
-      displayValue: 'All Casefiles',
+      translationKey: 'home.sidenavItems.allCasefiles',
       route: '/home/all-casefiles',
       title: 'Show all available casefiles',
     },
     {
       icon: 'storage',
-      displayValue: 'Data Sources',
+      translationKey: 'home.sidenavItems.dataSources',
       route: '/home/data-sources',
       title: 'Show all available data sources',
     },
@@ -42,7 +42,7 @@ export class HomeContainerComponent {
 
   sidenavBottomItem: IHomeSidenavItem = {
     icon: 'manage_accounts',
-    displayValue: 'Admin',
+    translationKey: 'Admin',
     route: '/admin',
     title: 'Navigate to the admin section',
   };

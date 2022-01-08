@@ -20,7 +20,7 @@ describe('NavigationComponent', () => {
     fixture = TestBed.createComponent(NavigationComponent);
     component = fixture.componentInstance;
     component.sidenavItems = [];
-    component.sidenavBottomItem = { icon: '', displayValue: '', route: '', title: '' };
+    component.sidenavBottomItem = { icon: '', translationKey: '', route: '', title: '' };
     fixture.detectChanges();
   });
 

@@ -4,7 +4,7 @@ import { Observable, map, shareReplay } from 'rxjs';
 
 interface ISidenavItem {
   icon: string;
-  displayValue: string;
+  translationKey: string;
   route: string;
   title: string;
 }

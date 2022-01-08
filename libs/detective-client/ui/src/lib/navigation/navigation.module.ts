@@ -3,9 +3,10 @@ import { NavigationComponent } from './navigation.component';
 import { NavigationMaterialModule } from './navigation.material.module';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { TranslocoModule } from '@ngneat/transloco';
 
 @NgModule({
-  imports: [CommonModule, NavigationMaterialModule, RouterModule],
+  imports: [CommonModule, TranslocoModule, NavigationMaterialModule, RouterModule],
   declarations: [NavigationComponent],
   exports: [NavigationComponent],
 })

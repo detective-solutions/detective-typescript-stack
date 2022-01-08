@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 interface ISidenavItem {
   icon: string;
-  displayValue: string;
+  translationKey: string;
   route: string;
   title: string;
 }
@@ -16,19 +16,19 @@ export class AdminContainerComponent {
   sidenavItems: ISidenavItem[] = [
     {
       icon: 'settings_input_component',
-      displayValue: 'Connections',
+      translationKey: 'admin.sidebarItems.connections',
       route: '/admin/connections',
       title: '',
     },
     {
       icon: 'groups',
-      displayValue: 'Groups',
+      translationKey: 'admin.sidebarItems.groups',
       route: '/admin/groups',
       title: '',
     },
     {
       icon: 'gradient',
-      displayValue: 'Masks',
+      translationKey: 'admin.sidebarItems.masks',
       route: '/admin/masks',
       title: '',
     },
@@ -36,7 +36,7 @@ export class AdminContainerComponent {
 
   sidenavBottomItem: ISidenavItem = {
     icon: 'arrow_back',
-    displayValue: 'Home',
+    translationKey: 'Home',
     route: '/home',
     title: 'Go back to the home view',
   };

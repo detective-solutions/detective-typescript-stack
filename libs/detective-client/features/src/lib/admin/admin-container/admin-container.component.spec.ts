@@ -4,6 +4,9 @@ import { AdminContainerComponent } from './admin-container.component';
 import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import de from '../i18n/de.json';
+import en from '../i18n/en.json';
+import { getTranslocoModule } from '@detective.solutions/shared/i18n';
 
 describe('AdminContainerComponent', () => {
   let component: AdminContainerComponent;
@@ -12,7 +15,12 @@ describe('AdminContainerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AdminContainerComponent],
-      imports: [NavigationModule, RouterTestingModule, NoopAnimationsModule],
+      imports: [
+        NavigationModule,
+        RouterTestingModule,
+        NoopAnimationsModule,
+        getTranslocoModule({ 'admin/en': en, 'admin/de': de }),
+      ],
     }).compileComponents();
   });
 

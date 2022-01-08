@@ -8,6 +8,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "target": "es2015",
     "module": "esnext",
     "lib": ["es2017", "dom"],
@@ -19,6 +21,7 @@
       "@detective.solutions/detective-client/ui": ["libs/detective-client/ui/src/index.ts"],
       "@detective.solutions/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@detective.solutions/shared/environments": ["libs/shared/environments/src/index.ts"],
+      "@detective.solutions/shared/i18n": ["libs/shared/i18n/src/index.ts"],
       "@detective.solutions/shared/interfaces": ["libs/shared/interfaces/src/index.ts"],
       "@detective.solutions/shared/ui": ["libs/shared/ui/src/index.ts"]
     }

@@ -4,6 +4,9 @@ import { HomeContainerComponent } from './home-container.component';
 import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import de from '../i18n/de.json';
+import en from '../i18n/en.json';
+import { getTranslocoModule } from '@detective.solutions/shared/i18n';
 
 describe('HomeContainerComponent', () => {
   let component: HomeContainerComponent;
@@ -13,7 +16,13 @@ describe('HomeContainerComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [HomeContainerComponent],
-        imports: [NavigationModule, RouterTestingModule, NoopAnimationsModule],
+        imports: [
+          NavigationModule,
+          RouterTestingModule,
+          NoopAnimationsModule,
+
+          getTranslocoModule({ 'admin/en': en, 'admin/de': de }),
+        ],
       }).compileComponents();
     })
   );

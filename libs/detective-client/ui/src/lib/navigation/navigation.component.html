@@ -25,7 +25,7 @@
         routerLinkActive="route-active"
         title="{{ item.title }}"
         ><span fxLayoutAlign="start center"
-          ><mat-icon>{{ item.icon }}</mat-icon> {{ item.displayValue }}</span
+          ><mat-icon>{{ item.icon }}</mat-icon> {{ item.translationKey | transloco }}</span
         ></a
       >
 
@@ -36,7 +36,7 @@
         title="{{ sidenavBottomItem.title }}"
         ><span fxLayoutAlign="center center"
           ><mat-icon>{{ sidenavBottomItem.icon }}</mat-icon
-          >{{ sidenavBottomItem.displayValue }}</span
+          >{{ sidenavBottomItem.translationKey }}</span
         ></a
       >
     </mat-nav-list>
