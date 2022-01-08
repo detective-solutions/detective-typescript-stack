@@ -25,8 +25,7 @@ const modules = [
   MatSlideToggleModule,
   FormsModule,
   FlexLayoutModule,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-] as any[];
+];
 
 @NgModule({
   exports: modules,
