@@ -2,10 +2,10 @@ import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
 import { AuthMaterialModule } from './auth-material.module';
 import { CommonModule } from '@angular/common';
-import { LoginComponent } from './login/login.component';
-import { LogoutComponent } from './logout/logout.component';
+import { LoginComponent } from './components/login/login.component';
+import { LogoutComponent } from './components/logout/logout.component';
 import { NgModule } from '@angular/core';
-import { RegisterComponent } from './register/register.component';
+import { RegisterComponent } from './components/register/register.component';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({

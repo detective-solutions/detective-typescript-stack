@@ -1,10 +1,10 @@
-import { AllCasefilesComponent } from './all-casefiles/all-casefiles.component';
+import { AllCasefilesComponent } from './components/all-casefiles/all-casefiles.component';
 import { CommonModule } from '@angular/common';
-import { DataSourcesComponent } from './data-sources/data-sources.component';
-import { HomeContainerComponent } from './home-container/home-container.component';
+import { DataSourcesComponent } from './components/data-sources/data-sources.component';
+import { HomeContainerComponent } from './components/home-container.component';
 import { HomeMaterialModule } from './home-material.module';
 import { HomeRoutingModule } from './home-routing.module';
-import { MyCasefilesComponent } from './my-casefiles/my-casefiles.component';
+import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';
 import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NgModule } from '@angular/core';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';

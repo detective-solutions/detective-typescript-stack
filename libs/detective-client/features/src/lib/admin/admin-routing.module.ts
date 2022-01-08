@@ -1,9 +1,9 @@
 import { RouterModule, Routes } from '@angular/router';
 
-import { AdminContainerComponent } from './admin-container/admin-container.component';
-import { ConnectionsComponent } from './connections/connections.component';
-import { GroupsComponent } from './groups/groups.component';
-import { MasksComponent } from './masks/masks.component';
+import { AdminContainerComponent } from './components/admin-container.component';
+import { ConnectionsComponent } from './components/connections/connections.component';
+import { GroupsComponent } from './components/groups/groups.component';
+import { MasksComponent } from './components/masks/masks.component';
 import { NgModule } from '@angular/core';
 
 const routes: Routes = [

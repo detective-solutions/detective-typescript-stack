@@ -1,9 +1,9 @@
 import { RouterModule, Routes } from '@angular/router';
 
-import { AllCasefilesComponent } from './all-casefiles/all-casefiles.component';
-import { DataSourcesComponent } from './data-sources/data-sources.component';
-import { HomeContainerComponent } from './home-container/home-container.component';
-import { MyCasefilesComponent } from './my-casefiles/my-casefiles.component';
+import { AllCasefilesComponent } from './components/all-casefiles/all-casefiles.component';
+import { DataSourcesComponent } from './components/data-sources/data-sources.component';
+import { HomeContainerComponent } from './components/home-container.component';
+import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';
 import { NgModule } from '@angular/core';
 
 const routes: Routes = [

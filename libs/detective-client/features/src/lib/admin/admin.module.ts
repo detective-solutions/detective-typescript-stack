@@ -1,10 +1,10 @@
-import { AdminContainerComponent } from './admin-container/admin-container.component';
+import { AdminContainerComponent } from './components/admin-container.component';
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
-import { ConnectionsComponent } from './connections/connections.component';
-import { GroupsComponent } from './groups/groups.component';
-import { MasksComponent } from './masks/masks.component';
+import { ConnectionsComponent } from './components/connections/connections.component';
+import { GroupsComponent } from './components/groups/groups.component';
+import { MasksComponent } from './components/masks/masks.component';
 import { NavigationModule } from '@detective.solutions/detective-client/ui';
 import { NgModule } from '@angular/core';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
