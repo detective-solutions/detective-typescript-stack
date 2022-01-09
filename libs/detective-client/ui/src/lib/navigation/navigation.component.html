@@ -94,9 +94,18 @@
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #profileMenu="matMenu" xPosition="before">
-          <button mat-menu-item>{{ t('userMenu.account') }}</button>
-          <button mat-menu-item>{{ t('userMenu.documentation') }}</button>
-          <button mat-menu-item>{{ t('userMenu.logout') }}</button>
+          <button mat-menu-item>
+            <mat-icon>settings</mat-icon>
+            {{ t('userMenu.account') }}
+          </button>
+          <button mat-menu-item>
+            <mat-icon>description</mat-icon>
+            {{ t('userMenu.documentation') }}
+          </button>
+          <button mat-menu-item>
+            <mat-icon>logout</mat-icon>
+            {{ t('userMenu.logout') }}
+          </button>
         </mat-menu>
       </span>
 
@@ -105,10 +114,22 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #mobileMenu="matMenu" xPosition="before">
-          <button mat-menu-item>{{ t('inviteButtonText') }}</button>
-          <button mat-menu-item>{{ t('userMenu.account') }}</button>
-          <button mat-menu-item>{{ t('userMenu.documentation') }}</button>
-          <button mat-menu-item>{{ t('userMenu.logout') }}</button>
+          <button fxHide.md mat-menu-item>
+            <mat-icon>meeting_room</mat-icon>
+            {{ t('inviteButtonText') }}
+          </button>
+          <button mat-menu-item>
+            <mat-icon>settings</mat-icon>
+            {{ t('userMenu.account') }}
+          </button>
+          <button mat-menu-item>
+            <mat-icon>description</mat-icon>
+            {{ t('userMenu.documentation') }}
+          </button>
+          <button mat-menu-item>
+            <mat-icon>logout</mat-icon>
+            {{ t('userMenu.logout') }}
+          </button>
         </mat-menu>
       </span>
     </mat-toolbar>
