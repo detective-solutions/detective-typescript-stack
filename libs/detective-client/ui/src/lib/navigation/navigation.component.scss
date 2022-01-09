@@ -74,14 +74,10 @@ mat-sidenav-container {
     position: sticky;
     top: 0;
     z-index: 1;
-
-    .portal-mobile-menu {
-      margin-left: auto;
-    }
   }
 
   .mat-toolbar {
-    min-height: $toolbar-height;
+    height: $toolbar-height;
 
     &.custom-header-bar {
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0, rgba(0, 0, 0, 0) 100%);
