@@ -76,5 +76,15 @@
       "nx affected:lint --uncommitted",
       "nx affected:test --uncommitted --parallel --maxParallel=5"
     ]
-  }
+  },
+  "browserslist": [
+    "last 1 Chrome version",
+    "last 1 Firefox version",
+    "last 2 Edge major versions",
+    "last 2 Safari major version",
+    "last 2 iOS major version",
+    "last 2 Android major version",
+    "Firefox ESR",
+    "not IE 9-11"
+  ]
 }
