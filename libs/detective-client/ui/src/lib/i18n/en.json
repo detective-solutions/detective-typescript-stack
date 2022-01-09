@@ -1,0 +1,7 @@
+{
+  "navigation": {
+    "searchbarPlaceholder": "Search Casefiles",
+    "inviteButtonText": "Invite",
+    "userMenu": { "account": "Edit Account", "documentation": "API & Documentation", "logout": "Logout" }
+  }
+}

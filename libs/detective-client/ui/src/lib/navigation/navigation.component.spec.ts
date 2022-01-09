@@ -4,6 +4,9 @@ import { NavigationComponent } from './navigation.component';
 import { NavigationMaterialModule } from './navigation.material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import de from '../i18n/de.json';
+import en from '../i18n/en.json';
+import { getTranslocoModule } from '@detective.solutions/shared/i18n';
 
 describe('NavigationComponent', () => {
   let component: NavigationComponent;
@@ -11,7 +14,12 @@ describe('NavigationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavigationMaterialModule, NoopAnimationsModule, RouterTestingModule],
+      imports: [
+        NavigationMaterialModule,
+        NoopAnimationsModule,
+        RouterTestingModule,
+        getTranslocoModule({ 'navigation/en': en, 'navigation/de': de }),
+      ],
       declarations: [NavigationComponent],
     }).compileComponents();
   });

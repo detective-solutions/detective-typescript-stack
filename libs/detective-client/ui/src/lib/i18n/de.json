@@ -1,0 +1,7 @@
+{
+  "navigation": {
+    "searchbarPlaceholder": "Nach Casefiles suchen",
+    "inviteButtonText": "Einladen",
+    "userMenu": { "account": "Konto verwalten", "documentation": "API & Dokumentation", "logout": "Abmelden" }
+  }
+}
