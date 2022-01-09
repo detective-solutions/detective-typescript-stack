@@ -11,6 +11,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
 @NgModule({
   declarations: [LoginComponent, LogoutComponent, RegisterComponent],
   imports: [CommonModule, TranslocoModule, AuthMaterialModule],
+  exports: [LoginComponent, RegisterComponent],
   providers: [
     {
       provide: TRANSLOCO_SCOPE,

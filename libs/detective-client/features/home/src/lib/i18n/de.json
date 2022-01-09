@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "sidenavItems": {
+      "myCasefiles": "Meine Casefiles",
+      "allCasefiles": "Alle Casefiles",
+      "dataSources": "Datenquellen"
+    },
+    "sidenavBottomItem": "Admin"
+  }
+}

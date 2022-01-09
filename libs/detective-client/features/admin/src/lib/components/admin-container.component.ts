@@ -14,19 +14,19 @@ export class AdminContainerComponent {
   sidenavItems: ISidenavItem[] = [
     {
       icon: 'settings_input_component',
-      translationKey: 'admin.sidebarItems.connections',
+      translationKey: 'admin.navigation.sidenavItems.connections',
       route: '/admin/connections',
       title: '',
     },
     {
       icon: 'groups',
-      translationKey: 'admin.sidebarItems.groups',
+      translationKey: 'admin.navigation.sidenavItems.groups',
       route: '/admin/groups',
       title: '',
     },
     {
       icon: 'gradient',
-      translationKey: 'admin.sidebarItems.masks',
+      translationKey: 'admin.navigation.sidenavItems.masks',
       route: '/admin/masks',
       title: '',
     },
@@ -34,7 +34,7 @@ export class AdminContainerComponent {
 
   sidenavBottomItem: ISidenavItem = {
     icon: 'arrow_back',
-    translationKey: 'Home',
+    translationKey: 'admin.navigation.sidenavBottomItem',
     route: '/home',
     title: 'Go back to the home view',
   };

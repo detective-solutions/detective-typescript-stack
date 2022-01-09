@@ -1,0 +1,6 @@
+{
+  "navigation": {
+    "sidenavItems": { "connections": "Connections", "groups": "Groups", "masks": "Masks" },
+    "sidenavBottomItem": "Home"
+  }
+}

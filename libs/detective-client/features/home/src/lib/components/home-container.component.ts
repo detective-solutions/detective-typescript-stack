@@ -13,19 +13,19 @@ export class HomeContainerComponent {
   sidenavItems: ISidenavItem[] = [
     {
       icon: 'insert_chart_outlined',
-      translationKey: 'home.sidenavItems.myCasefiles',
+      translationKey: 'home.navigation.sidenavItems.myCasefiles',
       route: '/home/my-casefiles',
       title: 'Show all casefiles you participated in',
     },
     {
       icon: 'apps',
-      translationKey: 'home.sidenavItems.allCasefiles',
+      translationKey: 'home.navigation.sidenavItems.allCasefiles',
       route: '/home/all-casefiles',
       title: 'Show all available casefiles',
     },
     {
       icon: 'storage',
-      translationKey: 'home.sidenavItems.dataSources',
+      translationKey: 'home.navigation.sidenavItems.dataSources',
       route: '/home/data-sources',
       title: 'Show all available data sources',
     },
@@ -33,7 +33,7 @@ export class HomeContainerComponent {
 
   sidenavBottomItem: ISidenavItem = {
     icon: 'manage_accounts',
-    translationKey: 'Admin',
+    translationKey: 'home.navigation.sidenavBottomItem',
     route: '/admin',
     title: 'Navigate to the admin section',
   };
