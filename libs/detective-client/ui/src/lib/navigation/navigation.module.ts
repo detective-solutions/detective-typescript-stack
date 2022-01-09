@@ -6,8 +6,8 @@ import { RouterModule } from '@angular/router';
 import { TranslocoModule } from '@ngneat/transloco';
 
 @NgModule({
-  imports: [CommonModule, TranslocoModule, NavigationMaterialModule, RouterModule],
   declarations: [NavigationComponent],
+  imports: [CommonModule, TranslocoModule, NavigationMaterialModule, RouterModule],
   exports: [NavigationComponent],
 })
 export class NavigationModule {}
