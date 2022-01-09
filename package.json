@@ -6,10 +6,11 @@
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
     "start": "nx serve",
-    "build": "nx build",
+    "build": "nx build && npm run transloco:optimize",
     "test": "nx test",
     "prepare": "husky install",
-    "test:a11y:ci": "pa11y-ci"
+    "test:a11y:ci": "pa11y-ci",
+    "transloco:optimize": "transloco-optimize dist/apps/detective-client/assets/i18n"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +26,7 @@
     "@angular/platform-browser-dynamic": "~13.1.0",
     "@angular/router": "~13.1.0",
     "@ngneat/transloco": "3.1.1",
+    "@ngneat/transloco-persist-translations": "3.0.1",
     "@ngrx/store": "13.0.2",
     "@ngrx/store-devtools": "13.0.2",
     "@nrwl/angular": "13.3.12",
@@ -42,6 +44,7 @@
     "@angular/language-service": "~13.1.0",
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-angular": "^15.0.0",
+    "@ngneat/transloco-optimize": "3.0.2",
     "@nrwl/cli": "13.3.12",
     "@nrwl/cypress": "13.3.12",
     "@nrwl/eslint-plugin-nx": "13.3.12",

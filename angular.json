@@ -26,6 +26,11 @@
                 "glob": "**/*",
                 "input": "libs/shared/assets/src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "libs/detective-client/ui/src/lib/i18n",
+                "output": "assets/i18n"
               }
             ],
             "stylePreprocessorOptions": {
@@ -131,28 +136,74 @@
       "tags": [],
       "implicitDependencies": ["detective-client"]
     },
-    "detective-client-features": {
-      "root": "libs/detective-client/features",
-      "sourceRoot": "libs/detective-client/features/src",
+    "detective-client-feature-admin": {
+      "root": "libs/detective-client/features/admin",
+      "sourceRoot": "libs/detective-client/features/admin/src",
       "projectType": "library",
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "outputs": ["{options.outputFile}"],
           "options": {
-            "lintFilePatterns": ["libs/detective-client/features/**/*.ts"]
+            "lintFilePatterns": ["libs/detective-client/features/admin/**/*.ts"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/detective-client/features"],
+          "outputs": ["coverage/libs/detective-client/features/admin"],
           "options": {
-            "jestConfig": "libs/detective-client/features/jest.config.js",
+            "jestConfig": "libs/detective-client/features/admin/jest.config.js",
             "passWithNoTests": true
           }
         }
       },
       "tags": ["scope:detective-client", "type:feature"]
+    },
+    "detective-client-feature-auth": {
+      "root": "libs/detective-client/features/auth",
+      "sourceRoot": "libs/detective-client/features/auth/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/detective-client/features/auth/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/detective-client/features/auth"],
+          "options": {
+            "jestConfig": "libs/detective-client/features/auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": ["scope:detective-client", "type:feature-auth"]
+    },
+    "detective-client-feature-home": {
+      "root": "libs/detective-client/features/home",
+      "sourceRoot": "libs/detective-client/features/home/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/detective-client/features/home/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/detective-client/features/home"],
+          "options": {
+            "jestConfig": "libs/detective-client/features/home/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": ["scope:detective-client", "type:feature-home"]
     },
     "detective-client-ui": {
       "projectType": "library",

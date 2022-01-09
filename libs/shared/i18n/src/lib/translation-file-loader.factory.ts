@@ -5,7 +5,7 @@ export function langScopeLoader(
   importer: (lang: string, root: string) => Promise<Record<string, unknown>>,
   root = 'i18n'
 ) {
-  return AVAILABLE_LANGS.reduce((acc: Translation, lang) => {
+  return AVAILABLE_LANGS.reduce((acc: Translation, lang: string) => {
     acc[lang] = () => importer(lang, root);
     return acc;
   }, {});
