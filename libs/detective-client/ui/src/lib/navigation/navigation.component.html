@@ -12,15 +12,15 @@
       >
     </mat-toolbar>
 
-    <div id="home-sidebar-toggle">
+    <div id="home-sidenav-toggle">
       <mat-icon (click)="drawer.toggle()" title="Close sidebar">chevron_left</mat-icon>
     </div>
 
-    <mat-nav-list id="home-sidebar-list" fxLayout="column">
+    <mat-nav-list id="home-sidenav-list" fxLayout="column">
       <a
         *ngFor="let item of sidenavItems"
         mat-list-item
-        class="home-sidebar-item"
+        class="home-sidenav-item"
         [routerLink]="item.route"
         routerLinkActive="route-active"
         title="{{ item.title }}"
@@ -31,7 +31,7 @@
 
       <a
         mat-list-item
-        class="home-sidebar-admin-item"
+        class="home-sidenav-admin-item"
         [routerLink]="sidenavBottomItem.route"
         title="{{ sidenavBottomItem.title }}"
         ><span fxLayoutAlign="center center"
@@ -88,12 +88,12 @@
       </span>
 
       <span fxLayoutAlign="center center" fxHide.md fxHide.sm fxHide.xs>
-        <button mat-icon-button class="account-button" [matMenuTriggerFor]="profileMenu" aria-label="Profile">
+        <button mat-icon-button class="account-button" [matMenuTriggerFor]="userMenu" aria-label="User Menu">
           <mat-icon>account_circle</mat-icon>
           <span>Testuser</span>
           <mat-icon>expand_more</mat-icon>
         </button>
-        <mat-menu #profileMenu="matMenu" xPosition="before">
+        <mat-menu #userMenu="matMenu" xPosition="before">
           <button mat-menu-item>
             <mat-icon>settings</mat-icon>
             {{ t('userMenu.account') }}

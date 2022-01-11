@@ -24,25 +24,25 @@
       background: $primary-default;
     }
 
-    #home-sidebar-toggle:hover {
+    #home-sidenav-toggle:hover {
       color: $accent-default;
     }
 
-    #home-sidebar-toggle {
+    #home-sidenav-toggle {
       color: $primary-contrast;
     }
 
-    #home-sidebar-list {
+    #home-sidenav-list {
       .route-active {
         background: $primary-lighter;
         border-left: 3px solid $accent-default;
       }
 
-      .home-sidebar-item:hover {
+      .home-sidenav-item:hover {
         background: $primary-lighter;
       }
 
-      .home-sidebar-admin-item {
+      .home-sidenav-admin-item {
         background: $primary-lighter;
 
         &:hover {

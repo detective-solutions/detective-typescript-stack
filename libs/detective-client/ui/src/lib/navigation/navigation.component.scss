@@ -1,19 +1,19 @@
 @import './navigation.component-theme';
 
-$sidebar-width: 220px;
+$sidenav-width: 220px;
 $toolbar-height: 85px;
 
 // Close visual gap caused by border-radius on the top right corner of the sidenav
 // Class is applied only when isHandset$ is false (see template).
 .close-home-toolbar-gap {
-  margin-left: calc($sidebar-width - 10px) !important;
+  margin-left: calc($sidenav-width - 10px) !important;
 }
 
 mat-sidenav-container {
   height: 100%;
 
   mat-sidenav {
-    width: $sidebar-width;
+    width: $sidenav-width;
     border-top-right-radius: 12px;
 
     #home-sidenav-header {
@@ -28,13 +28,13 @@ mat-sidenav-container {
       }
     }
 
-    #home-sidebar-toggle {
+    #home-sidenav-toggle {
       position: absolute;
       right: 15px;
       cursor: pointer;
     }
 
-    #home-sidebar-list {
+    #home-sidenav-list {
       margin-top: 45px;
 
       .route-active {
@@ -45,7 +45,7 @@ mat-sidenav-container {
         height: 70px;
       }
 
-      .home-sidebar-item {
+      .home-sidenav-item {
         span {
           margin-left: 12px;
         }
@@ -55,7 +55,7 @@ mat-sidenav-container {
         }
       }
 
-      .home-sidebar-admin-item {
+      .home-sidenav-admin-item {
         position: absolute;
         bottom: 0;
 
