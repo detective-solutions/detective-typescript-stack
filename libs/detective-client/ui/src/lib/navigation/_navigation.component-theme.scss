@@ -28,6 +28,10 @@
       color: $accent-default;
     }
 
+    #home-sidebar-toggle {
+      color: $primary-contrast;
+    }
+
     #home-sidebar-list {
       .route-active {
         background: $primary-lighter;
