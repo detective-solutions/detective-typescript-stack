@@ -1,0 +1,26 @@
+@function override-theme-background-color($theme, $color) {
+  $theme-color: map_get($theme, 'color');
+  $background-palette: map_get($theme-color, 'background');
+  $background-palette: map_merge(
+    $background-palette,
+    (
+      'background': $color,
+      'card': $color,
+      'dialog': $color,
+      'raised-button': $color,
+    )
+  );
+  $theme-color: map_merge(
+    $theme-color,
+    (
+      'background': $background-palette,
+    )
+  );
+  $theme: map_merge(
+    $theme,
+    (
+      'color': $theme-color,
+    )
+  );
+  @return $theme;
+}
