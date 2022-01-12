@@ -3,10 +3,6 @@
 @import 'shared-themes';
 @import './custom-component-themes';
 
-@mixin custom-components-theme($theme) {
-  @include navigation-component-theme($theme);
-}
-
 // Declare classes for additional themes here
 // Take care to only import theming for components that are used
 .default-theme {
