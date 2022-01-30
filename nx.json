@@ -1,5 +1,5 @@
 {
-  "npmScope": "detective-frontend",
+  "npmScope": "detective-typescript-stack",
   "affected": {
     "defaultBase": "main"
   },
