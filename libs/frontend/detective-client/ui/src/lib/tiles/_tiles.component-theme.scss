@@ -1,0 +1,37 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin tile-component-theme($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $background-palette: map.get($color-config, 'background');
+  $background-color: mat.get-color-from-palette($background-palette, 'background');
+
+  $primary-palette: map.get($color-config, 'primary');
+  $primary-contrast: mat.get-color-from-palette($primary-palette, '50-contrast');
+
+  $accent-palette: map.get($color-config, 'accent');
+  $accent-default: mat.get-color-from-palette($accent-palette);
+  $accent-hover: mat.get-color-from-palette($accent-palette, 700);
+  $accent-contrast: mat.get-color-from-palette($accent-palette, 'default-contrast');
+
+  .component-wrapper {
+    .tile-wrapper {
+      .new-casefile-tile {
+        color: $accent-contrast;
+        background-color: $accent-default;
+      }
+
+      .new-casefile-tile:hover {
+        color: $accent-contrast;
+        background-color: $accent-hover;
+      }
+
+      .tile {
+        p {
+          color: lighten($primary-contrast, 60%);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+.component-wrapper .table-container {
+  mat-header-cell,
+  mat-cell {
+    &:nth-child(2) {
+      min-width: 17%;
+    }
+
+    .access-icon {
+      margin-right: 7px;
+    }
+  }
+}

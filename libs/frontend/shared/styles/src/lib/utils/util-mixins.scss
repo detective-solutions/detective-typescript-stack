@@ -1,0 +1,13 @@
+@mixin flex-ellipsis($allowedLines: 1) {
+  -webkit-line-clamp: $allowedLines;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin break-words {
+  word-wrap: break-word;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}

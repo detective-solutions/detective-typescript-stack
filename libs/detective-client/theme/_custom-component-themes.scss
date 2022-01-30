@@ -1,6 +1,0 @@
-@import '../ui/src/lib/navigation/navigation.component-theme';
-
-@mixin custom-components-theme($theme) {
-  @include navigation-component-theme($theme);
-  @include table-component-theme($theme);
-}

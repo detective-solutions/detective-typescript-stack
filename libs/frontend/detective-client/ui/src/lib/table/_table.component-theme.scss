@@ -1,0 +1,20 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin table-component-theme($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $background-palette: map.get($color-config, 'background');
+  $background-color: mat.get-color-from-palette($background-palette, 'background');
+  $hover-background-color: darken($background-color, 4%);
+
+  .table-container {
+    mat-header-row {
+      background: $background-color;
+    }
+
+    mat-table {
+      background: transparent;
+    }
+  }
+}

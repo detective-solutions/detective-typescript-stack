@@ -1,0 +1,16 @@
+.avatar-list-wrapper {
+  :not(:first-child) {
+    margin-left: -10px;
+  }
+
+  img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.3);
+    }
+  }
+}

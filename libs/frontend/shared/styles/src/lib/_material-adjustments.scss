@@ -1,0 +1,20 @@
+.mat-paginator-container {
+  padding: 0 !important;
+
+  .mat-paginator-page-size-label {
+    margin: 0 !important;
+    margin-right: 4px !important;
+  }
+
+  .mat-paginator-page-size {
+    margin-right: 0 !important;
+  }
+
+  .mat-paginator-page-size-select {
+    width: 40px !important;
+  }
+
+  .mat-paginator-range-label {
+    margin: 0 15px !important;
+  }
+}

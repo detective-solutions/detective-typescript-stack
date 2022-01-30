@@ -3,7 +3,7 @@
     transform: rotate(360deg);
   }
 }
-#app-init-spinner:before {
+.loading-spinner:before {
   content: '';
   box-sizing: border-box;
   position: absolute;

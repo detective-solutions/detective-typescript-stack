@@ -1,0 +1,8 @@
+<table-view
+  *ngIf="showTableView$ | async; else showTileView"
+  [tableRows$]="tableItems$"
+  [tableCellEvents$]="tableCellEvents$"
+></table-view>
+<ng-template #showTileView>
+  <tiles-view [tileItems$]="tileItems$"></tiles-view>
+</ng-template>

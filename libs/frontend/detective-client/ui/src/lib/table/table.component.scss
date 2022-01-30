@@ -1,0 +1,75 @@
+@import 'variables';
+
+$row-height: 120px;
+
+.component-wrapper {
+  height: calc(100vh - $navigation-toolbar-height - 20px);
+  padding: 0 40px;
+
+  .table-container {
+    margin-top: 20px;
+    height: 90%;
+    overflow: auto;
+
+    mat-cell {
+      height: $row-height;
+    }
+  }
+
+  &.isMobile {
+    padding: 0 25px;
+
+    .table-container mat-table {
+      mat-header-row {
+        display: none;
+      }
+
+      mat-row {
+        display: block;
+        border-bottom: 3px solid rgba(0, 0, 0, 0.12);
+        margin-bottom: 25px;
+
+        &::after {
+          content: none;
+        }
+
+        &:last-of-type {
+          border-bottom: none;
+          margin-bottom: 0;
+        }
+      }
+
+      mat-cell {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+        .dynamic-table-cell {
+          display: flex;
+          flex-direction: column;
+          flex: auto;
+          align-items: center;
+        }
+
+        // Move header to ::before content to display inline
+        &:not(:first-child):before {
+          display: flex;
+          flex-direction: column;
+          flex: 0 0 30%;
+          align-items: flex-start;
+          padding-left: 25px;
+
+          content: attr(data-label);
+          color: rgba(0, 0, 0, 0.54);
+          font-weight: 500;
+        }
+
+        &:last-child {
+          border-bottom: 0;
+        }
+
+        &:last-of-type {
+          padding-right: 0;
+        }
+      }
+    }
+  }
+}

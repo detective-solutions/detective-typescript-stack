@@ -1,0 +1,46 @@
+@import 'variables';
+@import 'util-mixins';
+
+.component-wrapper .table-container {
+  mat-header-cell,
+  mat-cell {
+    &:first-of-type {
+      justify-content: flex-start !important;
+      min-width: 40%;
+      padding-left: 0;
+      margin-right: 20px;
+    }
+
+    .cell-wrapper {
+      .thumbnail {
+        padding: 0 $table-first-column-padding;
+
+        &:hover {
+          cursor: pointer;
+        }
+
+        img {
+          width: 100%;
+          padding: 20px;
+
+          &:hover {
+            filter: brightness(80%);
+            transition: 0.3s;
+          }
+        }
+      }
+
+      .info-wrapper {
+        @include break-words();
+
+        h3 {
+          @include flex-ellipsis();
+        }
+
+        p {
+          @include flex-ellipsis(3);
+        }
+      }
+    }
+  }
+}

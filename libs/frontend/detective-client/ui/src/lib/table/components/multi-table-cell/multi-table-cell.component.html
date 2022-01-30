@@ -1,0 +1,19 @@
+<div class="cell-wrapper" fxLayout="row" fxLayoutAlign="center center" *transloco="let t; read: 'table.multiTableCell'">
+  <div
+    class="thumbnail"
+    fxFlex="150px"
+    fxLayoutAlign="center center"
+    (click)="openCasefile()"
+    [matTooltip]="t('imageTooltip')"
+  >
+    <img src="{{ imageSrc }}" />
+  </div>
+  <div class="info-wrapper">
+    <h3 #headerRef [matTooltip]="header" [matTooltipDisabled]="(truncateHeader$ | async) === false">
+      {{ header }}
+    </h3>
+    <p #descriptionRef [matTooltip]="description" [matTooltipDisabled]="(truncateDescription$ | async) === false">
+      {{ description }}
+    </p>
+  </div>
+</div>

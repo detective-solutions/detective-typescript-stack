@@ -1,0 +1,36 @@
+@import 'variables';
+
+$margin-top: 25px;
+
+.component-wrapper {
+  margin-top: $margin-top;
+  height: calc(100vh - $navigation-toolbar-height - $margin-top);
+
+  .tiles-container {
+    width: 100%;
+    height: 100%;
+    padding: 0 25px;
+    overflow: auto;
+    overflow-wrap: break-word;
+
+    .tile-wrapper {
+      padding: 20px;
+
+      .new-casefile-tile {
+        cursor: pointer;
+
+        mat-icon {
+          width: 100%;
+          height: 100%;
+          font-size: 60px;
+          padding-bottom: 25px;
+        }
+      }
+
+      .share-button {
+        position: absolute;
+        right: 5px;
+      }
+    }
+  }
+}

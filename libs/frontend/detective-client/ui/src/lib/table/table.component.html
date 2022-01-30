@@ -1,0 +1,33 @@
+<div class="component-wrapper" [class.isMobile]="isMobile$ | async">
+  <div class="table-container" *ngIf="isLoaded; else loading">
+    <mat-table [dataSource]="tableDataSource">
+      <ng-container [matColumnDef]="column.id" *ngFor="let column of columnDefinitions">
+        <mat-header-cell *matHeaderCellDef fxLayoutAlign="center center">
+          {{ column.name }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let item" [attr.data-label]="column.name" fxLayoutAlign="center center">
+          <div dynamicTableCell class="dynamic-table-cell">
+            <ng-template
+              dynamicTableCell
+              [casefileId]="item[column.id].casefileId"
+              [tableCellData]="item[column.id].cellData"
+              [tableCellEvents$]="tableCellEvents$"
+            ></ng-template>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="columnIds; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: columnIds"></mat-row>
+    </mat-table>
+  </div>
+  <div [hidden]="!isLoaded">
+    <mat-paginator
+      [pageSizeOptions]="pageSizeOptions"
+      attr.aria-label="{{ 'table.pageOptionsLabel' | transloco }}"
+    ></mat-paginator>
+  </div>
+  <ng-template #loading>
+    <div class="loading-spinner"></div>
+  </ng-template>
+</div>

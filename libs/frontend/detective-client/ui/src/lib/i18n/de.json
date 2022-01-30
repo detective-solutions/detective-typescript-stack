@@ -1,0 +1,23 @@
+{
+  "navigation": {
+    "searchbarPlaceholder": "Nach Casefiles suchen",
+    "inviteButtonText": "Einladen",
+    "userMenu": { "account": "Konto verwalten", "documentation": "API & Dokumentation", "logout": "Abmelden" }
+  },
+  "tiles": {
+    "newCasefileTileTitle": "Neue Casefile erstellen",
+    "tileImageAltAttribute": "Vorschaubild der Casefile",
+    "tileDescriptionPlaceholderText": "Keine Beschreibung vorhanden",
+    "tileOpenButtonText": "Öffnen",
+    "tileOpenButtonLabel": "Öffnen",
+    "tileShareButtonLabel": "Diese Casefile teilen"
+  },
+  "table": {
+    "pageOptionsLabel": "Seite auswählen",
+    "accessIndicatorCell": {
+      "accessGranted": "Zugang gewährt",
+      "accessPending": "Berechtigung ausstehend",
+      "noAccess": "Kein Zugang"
+    }
+  }
+}

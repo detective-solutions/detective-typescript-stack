@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "searchbarPlaceholder": "Search Casefiles",
+    "inviteButtonText": "Invite",
+    "userMenu": { "account": "My Account", "documentation": "API & Documentation", "logout": "Logout" }
+  },
+  "tiles": {
+    "newCasefileTileTitle": "New Casefile",
+    "tileImageAltAttribute": "Preview thumbnail of the Casefile",
+    "tileDescriptionPlaceholderText": "No description available.",
+    "tileOpenButtonText": "Open",
+    "tileOpenButtonLabel": "Open this Casefile",
+    "tileShareButtonLabel": "Share this Casefile"
+  },
+  "table": {
+    "pageOptionsLabel": "Select page",
+    "multiTableCell": {
+      "imageTooltip": "Open"
+    },
+    "accessIndicatorTableCell": {
+      "accessGranted": "Access Granted",
+      "accessPending": "Access Pending",
+      "noAccess": "Request Access"
+    }
+  }
+}
