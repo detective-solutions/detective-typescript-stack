@@ -5,7 +5,15 @@
     fxLayout="row wrap"
     matchTileHeight="tile"
   >
-    <div class="tile-wrapper" fxFlex fxFlex.xs="100%" fxFlex.sm="100%" fxFlex.md="50%" fxFlex.lg="25%" fxFlex.xl="20%">
+    <div
+      class="tile-wrapper"
+      fxFlex
+      fxFlex.xs="100%"
+      fxFlex.sm="100%"
+      fxFlex.md="50%"
+      fxFlex.lg="25%"
+      fxFlex.xl="16.666%"
+    >
       <mat-card class="tile new-casefile-tile mat-elevation-z3" fxLayout="column" fxLayoutAlign="center center">
         <div>
           <mat-icon fxLayoutAlign="center center">add</mat-icon>
@@ -21,7 +29,7 @@
       fxFlex.sm="100%"
       fxFlex.md="50%"
       fxFlex.lg="25%"
-      fxFlex.xl="20%"
+      fxFlex.xl="16.666%"
       *ngFor="let tile of tileItems"
     >
       <mat-card class="tile" fxLayout="column" fxLayoutAlign="space-between center">
@@ -33,7 +41,7 @@
           alt="{{ t('tileImageAltAttribute') }}"
         />
         <mat-card-content *ngIf="tile.description; else noTileDescription"
-          ><p>{{ tile.description }}</p></mat-card-content
+          ><p [matTooltip]="tile.description">{{ tile.description }}</p></mat-card-content
         >
         <ng-template #noTileDescription
           ><p>{{ t('tileDescriptionPlaceholderText') }}</p></ng-template

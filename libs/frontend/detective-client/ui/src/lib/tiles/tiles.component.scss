@@ -1,5 +1,8 @@
 @import 'variables';
+@import 'util-mixins';
 
+$tile-height: 350px;
+$tile-padding: 20px;
 $margin-top: 25px;
 
 .component-wrapper {
@@ -14,7 +17,24 @@ $margin-top: 25px;
     overflow-wrap: break-word;
 
     .tile-wrapper {
-      padding: 20px;
+      padding: $tile-padding;
+
+      .tile {
+        max-height: $tile-height;
+
+        img {
+          object-fit: contain;
+        }
+
+        p {
+          @include flex-ellipsis(3);
+        }
+
+        .share-button {
+          position: absolute;
+          right: 5px;
+        }
+      }
 
       .new-casefile-tile {
         cursor: pointer;
@@ -25,11 +45,6 @@ $margin-top: 25px;
           font-size: 60px;
           padding-bottom: 25px;
         }
-      }
-
-      .share-button {
-        position: absolute;
-        right: 5px;
       }
     }
   }
