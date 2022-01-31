@@ -1,2 +1,2 @@
-export * from './lib/backend-users.service';
-export * from './lib/backend-users.module';
+export * from './lib/users.service';
+export * from './lib/users.module';
