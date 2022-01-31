@@ -53,6 +53,52 @@
       },
       "tags": []
     },
+    "backend-auth": {
+      "root": "libs/backend/auth",
+      "sourceRoot": "libs/backend/auth/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/backend/auth/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/backend/auth"],
+          "options": {
+            "jestConfig": "libs/backend/auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "backend-users": {
+      "root": "libs/backend/users",
+      "sourceRoot": "libs/backend/users/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/backend/users/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/backend/users"],
+          "options": {
+            "jestConfig": "libs/backend/users/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "detective-client": {
       "projectType": "application",
       "root": "apps/detective-client",

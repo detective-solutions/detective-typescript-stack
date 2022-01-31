@@ -17,6 +17,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@detective-typescript-stack/backend/users": ["libs/backend/users/src/index.ts"],
+      "@detective.solutions/backend/auth": ["libs/backend/auth/src/index.ts"],
       "@detective.solutions/detective-client/features/admin": [
         "libs/frontend/detective-client/features/admin/src/index.ts"
       ],
