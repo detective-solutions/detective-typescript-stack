@@ -1,5 +1,6 @@
 export interface IUser {
   email: string;
+  password?: string;
   firstname?: string;
   lastname?: string;
   title?: string;
@@ -13,6 +14,7 @@ export interface IUserGroup {}
 export class User implements IUser {
   constructor(
     public email = '',
+    public password = '',
     public firstname = '',
     public lastname = '',
     public title = '',
@@ -27,6 +29,7 @@ export class User implements IUser {
 
     return new User(
       user.email,
+      user.password,
       user.firstname,
       user.lastname,
       user.title,
