@@ -15,6 +15,7 @@ export class UsersService {
   ] as User[];
 
   async findOne(email: string): Promise<User | undefined> {
+    // TODO: Add corresponding error handling
     return this.users.find((user) => user.email === email);
   }
 }
