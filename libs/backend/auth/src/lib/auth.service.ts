@@ -7,8 +7,7 @@ import { UsersService } from '@detective.solutions/backend/users';
 export class AuthService {
   constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<IUser | null> {
     const user = await this.usersService.findOne(username);
     if (user && user.password === password) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
