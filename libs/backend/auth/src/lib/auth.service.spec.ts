@@ -8,6 +8,7 @@ import { UsersService } from '@detective.solutions/backend/users';
 
 describe('AuthService', () => {
   const testUser: IUser = { email: 'tester@detective.solutions', password: 'test' };
+
   let service: AuthService;
 
   beforeEach(async () => {
@@ -38,12 +39,12 @@ describe('AuthService', () => {
   });
 
   it('should return a user object when validateUser is called with valid credentials', async () => {
-    const res = await service.validateUser('tester@detective.solutions', 'test');
-    expect(res.email).toEqual('tester@detective.solutions');
+    const res = await service.validateUser(testUser.email, testUser.password);
+    expect(res.email).toEqual(testUser.email);
   });
 
   it('should not return the password when validateUser is called with valid credentials', async () => {
-    const res = await service.validateUser('tester@detective.solutions', 'test');
+    const res = await service.validateUser(testUser.email, testUser.password);
     expect(res.password).toBeFalsy();
   });
 
@@ -53,7 +54,7 @@ describe('AuthService', () => {
   });
 
   it('should return a JWT object when login is called with valid credentials', async () => {
-    const res = await service.login({ email: 'tester@detective.solutions', password: 'test' });
+    const res = await service.login({ email: testUser.email, password: testUser.password });
     expect(res.access_token).toBeDefined();
   });
 });
