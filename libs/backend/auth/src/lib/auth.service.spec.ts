@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserLogin, UsersService } from '@detective.solutions/backend/users';
 
 import { AuthService } from './auth.service';
-import { IUser } from '@detective.solutions/shared/data-access';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { UsersService } from '@detective.solutions/backend/users';
 
 describe('AuthService', () => {
-  const testUser: IUser = { email: 'tester@detective.solutions', password: 'test' };
+  const testUser: UserLogin = { email: 'tester@detective.solutions', password: 'test' };
 
   let service: AuthService;
 

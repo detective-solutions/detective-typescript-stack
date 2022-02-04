@@ -1,5 +1,6 @@
 import { AuthService, LocalAuthGuard } from '@detective.solutions/backend/auth';
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { UserLogin } from '@detective.solutions/backend/users';
 
 @Controller()
 export class AppController {
@@ -7,8 +8,7 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
-  async login(@Request() req) {
-    // TODO: Add error handling
-    return this.authService.login(req.user);
+  async login(@Body() user: UserLogin) {
+    return this.authService.login(user);
   }
 }
