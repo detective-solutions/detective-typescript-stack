@@ -14,11 +14,11 @@ import { ICasefile } from '@detective.solutions/shared/data-access';
 @Component({ template: '' })
 export class AbstractCasefileListComponent implements OnDestroy {
   showTableView$!: BehaviorSubject<boolean>;
-  tableCellEvents$ = new Subject<CasefileEvent>();
+  readonly tableCellEvents$ = new Subject<CasefileEvent>();
 
   subscriptions = new Subscription();
 
-  casefileAccessRequested$ = this.subscriptions.add(
+  readonly casefileAccessRequested$ = this.subscriptions.add(
     this.tableCellEvents$
       .pipe(
         filter((event: CasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS),
@@ -27,7 +27,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
       .subscribe()
   );
 
-  casefileFavorized$ = this.subscriptions.add(
+  readonly casefileFavorized$ = this.subscriptions.add(
     this.tableCellEvents$
       .pipe(
         filter((event: CasefileEvent) => event.type === CasefileEventType.FAVORIZE && event.value !== undefined),

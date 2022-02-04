@@ -1,11 +1,6 @@
-import {
-  AccessState,
-  IDataSourceTableDef,
-  ITile,
-  TableCellTypes,
-} from '@detective.solutions/frontend/detective-client/ui';
-import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs';
+import { AccessState, IDataSourceTableDef, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { Component, OnInit } from '@angular/core';
+import { Observable, Subject, map, tap } from 'rxjs';
 
 import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { DataSourceService } from '../../services/data-source.service';
@@ -17,10 +12,8 @@ import { IDataSource } from '@detective.solutions/shared/data-access';
   styleUrls: ['./data-sources.component.scss'],
 })
 export class DataSourcesComponent implements OnInit {
-  showTableView$!: BehaviorSubject<boolean>;
-  tableCellEvents$ = new Subject<CasefileEvent>();
+  readonly tableCellEvents$ = new Subject<CasefileEvent>();
   dataSources$!: Observable<IDataSource[]>;
-  tileItems$!: Observable<ITile[]>;
   tableItems$!: Observable<IDataSourceTableDef[]>;
 
   constructor(private dataSourceService: DataSourceService) {}

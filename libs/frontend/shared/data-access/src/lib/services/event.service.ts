@@ -3,5 +3,5 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class EventService {
-  showTableView$ = new BehaviorSubject<boolean>(false);
+  readonly showTableView$ = new BehaviorSubject<boolean>(false);
 }

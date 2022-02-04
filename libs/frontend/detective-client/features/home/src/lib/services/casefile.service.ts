@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class CasefileService {
-  casefiles$: Observable<ICasefile[]> = of(DUMMY_CASEFILE_DATA).pipe(
+  readonly casefiles$: Observable<ICasefile[]> = of(DUMMY_CASEFILE_DATA).pipe(
     delay(1000),
     map((casefiles: ICasefile[]) => casefiles.map(Casefile.Build)),
     shareReplay(),
