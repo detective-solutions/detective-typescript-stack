@@ -5,14 +5,10 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { BehaviorSubject, Subject, Subscription, filter, tap } from 'rxjs';
-import {
-  CasefileEvent,
-  CasefileEventType,
-  CasefileService,
-  EventService,
-} from '@detective.solutions/frontend/shared/data-access';
+import { CasefileEvent, CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { Component, OnDestroy } from '@angular/core';
 
+import { CasefileService } from '../../services/casefile.service';
 import { ICasefile } from '@detective.solutions/shared/data-access';
 
 @Component({ template: '' })

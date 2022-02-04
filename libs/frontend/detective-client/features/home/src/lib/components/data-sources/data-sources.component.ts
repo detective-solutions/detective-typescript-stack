@@ -5,9 +5,10 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs';
-import { CasefileEvent, DataSourceService } from '@detective.solutions/frontend/shared/data-access';
 import { Component, OnInit } from '@angular/core';
 
+import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
+import { DataSourceService } from '../../services/data-source.service';
 import { IDataSource } from '@detective.solutions/shared/data-access';
 
 @Component({

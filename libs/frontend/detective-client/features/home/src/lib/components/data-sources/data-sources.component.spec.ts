@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockModule, ngMocks } from 'ng-mocks';
 import { TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
-import { DataSourceService } from '@detective.solutions/frontend/shared/data-access';
+import { DataSourceService } from '../../services/data-source.service';
 import { DataSourcesComponent } from './data-sources.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 

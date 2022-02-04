@@ -1,9 +1,11 @@
-import { CasefileService, DataSourceService, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { NavigationModule, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
 import { AllCasefilesComponent } from './components/all-casefiles/all-casefiles.component';
+import { CasefileService } from './services/casefile.service';
 import { CommonModule } from '@angular/common';
+import { DataSourceService } from './services/data-source.service';
 import { DataSourcesComponent } from './components/data-sources/data-sources.component';
+import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { HomeContainerComponent } from './components/home-container.component';
 import { HomeRoutingModule } from './home-routing.module';
 import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';

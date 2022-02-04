@@ -1,8 +1,9 @@
-import { CasefileService, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockModule, ngMocks } from 'ng-mocks';
 import { TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
+import { CasefileService } from '../../services/casefile.service';
+import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { MyCasefilesComponent } from './my-casefiles.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
