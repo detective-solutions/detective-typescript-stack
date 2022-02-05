@@ -24,8 +24,7 @@ export class InMemoryAuthService extends AuthService {
     console.warn("You're using the InMemoryAuthService. Do not use this service in production.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected authProvider(email: string, password: string): Observable<IAuthServerResponse> {
+  protected authProvider(email: string): Observable<IAuthServerResponse> {
     email = email.toLowerCase();
 
     if (!email.endsWith('@test.com')) {
