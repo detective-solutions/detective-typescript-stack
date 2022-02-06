@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { HomeContainerComponent } from './home-container.component';
+import { MockProvider } from 'ng-mocks';
 import { NavigationModule } from '@detective.solutions/frontend/detective-client/ui';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -21,6 +23,7 @@ describe('HomeContainerComponent', () => {
           NoopAnimationsModule,
           getTranslocoModule({ 'admin/en': en, 'admin/de': de }),
         ],
+        providers: [MockProvider(AuthService)],
         declarations: [HomeContainerComponent],
       }).compileComponents();
     })

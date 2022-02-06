@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
+import { MockProvider } from 'ng-mocks';
 import { NavigationComponent } from './navigation.component';
 import { NavigationMaterialModule } from './navigation.material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,7 +24,7 @@ describe('NavigationComponent', () => {
         getTranslocoModule({ 'navigation/en': en, 'navigation/de': de }),
       ],
       declarations: [NavigationComponent],
-      providers: [EventService],
+      providers: [EventService, MockProvider(AuthService)],
     }).compileComponents();
   });
 

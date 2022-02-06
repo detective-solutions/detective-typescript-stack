@@ -43,7 +43,6 @@ export class InMemoryAuthService extends AuthService {
         algorithm: 'none',
       }),
     } as IAuthServerResponse;
-
     return of(authResponse);
   }
 
