@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, pipe, tap, throwError } from 'rxjs';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
 import { CacheService } from './cache.service';
@@ -12,11 +12,26 @@ import { transformError } from '@detective.solutions/frontend/shared/utils';
 
 @Injectable()
 export abstract class AuthService extends CacheService implements IAuthService {
+  private getAndUpdateUserIfAuthenticated = pipe(
+    filter((status: IAuthStatus) => status.isAuthenticated),
+    mergeMap(() => this.getCurrentUser()),
+    map((user: IUser) => this.currentUser$.next(user)),
+    catchError(transformError)
+  );
+
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
   readonly currentUser$ = new BehaviorSubject<IUser>(new User());
+  protected readonly resumeCurrentUser$ = this.authStatus$.pipe(this.getAndUpdateUserIfAuthenticated);
 
   constructor() {
     super();
+    if (this.hasExpiredToken()) {
+      this.logout(true);
+    } else {
+      this.authStatus$.next(this.getAuthStatusFromToken());
+      // Resume pipe must run on the next cycle to make sure all services are constructed correctly
+      setTimeout(() => this.resumeCurrentUser$.subscribe());
+    }
   }
 
   protected abstract authProvider(email: string, password: string): Observable<IAuthServerResponse>;
@@ -29,12 +44,10 @@ export abstract class AuthService extends CacheService implements IAuthService {
     const loginResponse$ = this.authProvider(email, password).pipe(
       map((value) => {
         this.setToken(value.accessToken);
-        return this.transformJwtToken(jwtDecode(value.accessToken));
+        return this.getAuthStatusFromToken();
       }),
       tap((status) => this.authStatus$.next(status)),
-      filter((status: IAuthStatus) => status.isAuthenticated),
-      mergeMap(() => this.getCurrentUser()),
-      map((user: IUser) => this.currentUser$.next(user)),
+      this.getAndUpdateUserIfAuthenticated,
       catchError(transformError)
     );
     loginResponse$.subscribe({
@@ -63,5 +76,19 @@ export abstract class AuthService extends CacheService implements IAuthService {
 
   protected clearToken() {
     this.removeItem('jwt');
+  }
+
+  protected hasExpiredToken(): boolean {
+    const jwt = this.getToken();
+
+    if (jwt) {
+      const payload = jwtDecode(jwt) as any;
+      return Date.now() >= payload.exp * 1000;
+    }
+    return true;
+  }
+
+  protected getAuthStatusFromToken(): IAuthStatus {
+    return this.transformJwtToken(jwtDecode(this.getToken()));
   }
 }
