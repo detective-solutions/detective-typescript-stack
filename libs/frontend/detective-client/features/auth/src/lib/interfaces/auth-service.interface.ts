@@ -10,3 +10,8 @@ export interface IAuthService {
   logout(clearToken?: boolean): void;
   getToken(): string;
 }
+
+export enum AuthMode {
+  InMemory = 'In Memory',
+  CustomServer = 'Custom Server',
+}
