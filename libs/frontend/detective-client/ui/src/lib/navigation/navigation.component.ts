@@ -2,6 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Observable, Subscription, map, shareReplay } from 'rxjs';
 
+import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ISidenavItem } from './ISidenavItem.interface';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
@@ -37,7 +38,8 @@ export class NavigationComponent {
   constructor(
     private breakpointObserver: BreakpointObserver,
     private overlayContainer: OverlayContainer,
-    private eventService: EventService
+    private eventService: EventService,
+    private authService: AuthService
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
     this.cdkOverlay = this.overlayContainer.getContainerElement();
@@ -48,5 +50,9 @@ export class NavigationComponent {
 
   toggleViews(toggleChange: MatSlideToggleChange) {
     this.eventService.showTableView$.next(toggleChange.checked);
+  }
+
+  logout() {
+    this.authService.logout(true);
   }
 }

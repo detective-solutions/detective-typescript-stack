@@ -104,7 +104,7 @@
             <mat-icon>description</mat-icon>
             {{ t('userMenu.documentation') }}
           </button>
-          <button mat-menu-item>
+          <button mat-menu-item routerLink="/" (click)="logout()">
             <mat-icon>logout</mat-icon>
             {{ t('userMenu.logout') }}
           </button>
@@ -141,7 +141,7 @@
               <mat-icon>description</mat-icon>
               {{ t('userMenu.documentation') }}
             </button>
-            <button mat-menu-item>
+            <button mat-menu-item routerLink="/" (click)="logout()">
               <mat-icon>logout</mat-icon>
               {{ t('userMenu.logout') }}
             </button>
