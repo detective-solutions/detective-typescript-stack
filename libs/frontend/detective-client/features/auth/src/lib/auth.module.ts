@@ -5,13 +5,12 @@ import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
 import { InMemoryAuthService } from './services/auth.inmemory.service';
 import { LoginComponent } from './components/login/login.component';
-import { LogoutComponent } from './components/logout/logout.component';
 import { NgModule } from '@angular/core';
 import { RegisterComponent } from './components/register/register.component';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
-  declarations: [LoginComponent, LogoutComponent, RegisterComponent],
+  declarations: [LoginComponent, RegisterComponent],
   imports: [CommonModule, TranslocoModule, AuthMaterialModule],
   exports: [LoginComponent, RegisterComponent],
   providers: [
