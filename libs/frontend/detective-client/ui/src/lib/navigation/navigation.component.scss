@@ -1,8 +1,10 @@
+@import 'util-mixins';
+
 $sidenav-width: 220px;
 $toolbar-height: 85px;
 
 mat-sidenav-container {
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0, rgba(0, 0, 0, 0) $toolbar-height + 20px);
+  @include black-to-transparent-gradient($toolbar-height + 20px);
   height: 100%;
 
   mat-sidenav {

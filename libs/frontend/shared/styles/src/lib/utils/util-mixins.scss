@@ -11,3 +11,7 @@
   -moz-hyphens: auto;
   hyphens: auto;
 }
+
+@mixin black-to-transparent-gradient($height) {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0, rgba(0, 0, 0, 0) $height);
+}
