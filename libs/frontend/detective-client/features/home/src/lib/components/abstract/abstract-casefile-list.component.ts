@@ -16,7 +16,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
   showTableView$!: BehaviorSubject<boolean>;
   readonly tableCellEvents$ = new Subject<CasefileEvent>();
 
-  subscriptions = new Subscription();
+  private subscriptions = new Subscription();
 
   readonly casefileAccessRequested$ = this.subscriptions.add(
     this.tableCellEvents$

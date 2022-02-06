@@ -25,7 +25,7 @@ export class TableComponent implements OnInit, OnDestroy {
   columnIds: string[] = [];
 
   isLoaded = false;
-  subscriptions = new Subscription();
+  private subscriptions = new Subscription();
 
   isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])

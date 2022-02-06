@@ -25,15 +25,14 @@ export class NavigationComponent {
   showSearchInput = true;
 
   searchValue = '';
-  cdkOverlay: HTMLElement;
-  subscriptions = new Subscription();
 
   showTableView$: Observable<boolean>;
-
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
     shareReplay()
   );
+
+  private cdkOverlay: HTMLElement;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
