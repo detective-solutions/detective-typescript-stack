@@ -42,11 +42,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
   protected checkLogin(route?: ActivatedRouteSnapshot): Observable<boolean> {
     return this.authService.authStatus$.pipe(
       map((authStatus) => {
-        //   const roleMatch = this.checkRoleMatch(authStatus.userRole, route)
-        //   const allowLogin = authStatus.isAuthenticated && roleMatch
         const allowLogin = authStatus.isAuthenticated;
         if (!allowLogin) {
-          // this.showAlert(authStatus.isAuthenticated, roleMatch)
           this.router.navigate(['login'], {
             queryParams: {
               redirectUrl: this.getResolvedUrl(route),
@@ -55,26 +52,9 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
         }
         return allowLogin;
       }),
-      take(1) // the observable must complete for the guard to work
+      take(1) // The observable must complete for the guard to work
     );
   }
-
-  // private checkRoleMatch(role: Role, route?: ActivatedRouteSnapshot) {
-  //   if (!route?.data?.expectedRole) {
-  //     return true
-  //   }
-  //   return role === route.data.expectedRole
-  // }
-
-  // private showAlert(isAuth: boolean, roleMatch: boolean) {
-  //   if (!isAuth) {
-  //     this.uiService.showToast('You must login to continue')
-  //   }
-
-  //   if (!roleMatch) {
-  //     this.uiService.showToast('You do not have the permissions to view this resource')
-  //   }
-  // }
 
   getResolvedUrl(route?: ActivatedRouteSnapshot): string {
     if (!route) {
