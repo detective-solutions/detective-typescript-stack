@@ -18,10 +18,12 @@ import { Injectable } from '@angular/core';
 export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
   constructor(protected authService: AuthService, protected router: Router) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
     return this.checkLogin();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -29,6 +31,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
     return this.checkLogin(route);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canActivateChild(
     childRoute: ActivatedRouteSnapshot,
     state: RouterStateSnapshot

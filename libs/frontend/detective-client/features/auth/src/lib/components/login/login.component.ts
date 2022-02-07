@@ -53,6 +53,7 @@ export class LoginComponent {
       combineLatest([this.authService.authStatus$, this.authService.currentUser$])
         .pipe(
           filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           tap(([authStatus, user]) => {
             // TODO: Show toast on successful/failed login
             this.router.navigate([this.redirectUrl]);
