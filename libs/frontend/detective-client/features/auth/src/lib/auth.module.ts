@@ -6,12 +6,14 @@ import { CommonModule } from '@angular/common';
 import { InMemoryAuthService } from './services/auth.inmemory.service';
 import { LoginComponent } from './components/login/login.component';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
+import { RouterModule } from '@angular/router';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
   declarations: [LoginComponent, RegisterComponent],
-  imports: [CommonModule, TranslocoModule, AuthMaterialModule],
+  imports: [CommonModule, TranslocoModule, RouterModule, ReactiveFormsModule, AuthMaterialModule],
   exports: [LoginComponent, RegisterComponent],
   providers: [
     { provide: AuthService, useClass: InMemoryAuthService },

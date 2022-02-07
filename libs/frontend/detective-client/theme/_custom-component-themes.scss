@@ -1,3 +1,4 @@
+@import '../features/auth/src/lib/components/login/login.component-theme';
 @import '../ui/src/lib/navigation/navigation.component-theme';
 @import '../ui/src/lib/tiles/tiles.component-theme';
 @import '../ui/src/lib/table/table.component-theme';
@@ -7,6 +8,7 @@
 @import '../ui/src/lib/table/components/access-indicator-table-cell/access-indicator-table-cell.component-theme';
 
 @mixin custom-components-theme($theme) {
+  @include login-component-theme($theme);
   @include navigation-component-theme($theme);
   @include tile-component-theme($theme);
   @include table-component-theme($theme);
