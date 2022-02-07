@@ -1,17 +1,17 @@
 import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EmailValidation, PasswordValidation } from '@detective.solutions/frontend/shared/utils';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription, catchError, combineLatest, filter, tap } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
-import { Component } from '@angular/core';
 
 @Component({
   selector: 'login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   redirectUrl!: string;
   loginForm!: FormGroup;
   loginError = '';
