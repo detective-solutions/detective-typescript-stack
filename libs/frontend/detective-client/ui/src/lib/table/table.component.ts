@@ -23,9 +23,9 @@ export class TableComponent implements OnInit, OnDestroy {
   tableDataSource!: MatTableDataSource<ITableDef>;
   columnDefinitions: IMatColumnDef[] = [];
   columnIds: string[] = [];
-
   isLoaded = false;
-  private subscriptions = new Subscription();
+
+  private readonly subscriptions = new Subscription();
 
   isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
