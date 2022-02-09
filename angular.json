@@ -51,7 +51,7 @@
           }
         }
       },
-      "tags": []
+      "tags": ["backend", "type:app"]
     },
     "backend-auth": {
       "root": "libs/backend/auth",
@@ -74,7 +74,22 @@
           }
         }
       },
-      "tags": []
+      "tags": ["backend", "scope:backend", "type:auth"]
+    },
+    "backend-shared-environments": {
+      "root": "libs/backend/shared/environments",
+      "sourceRoot": "libs/backend/shared/environments/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/backend/shared/environments/**/*.ts"]
+          }
+        }
+      },
+      "tags": ["backend", "scope:backend-shared", "type:environments"]
     },
     "backend-users": {
       "root": "libs/backend/users",
@@ -97,7 +112,7 @@
           }
         }
       },
-      "tags": []
+      "tags": ["backend", "scope:backend", "type:users"]
     },
     "detective-client": {
       "projectType": "application",
@@ -160,8 +175,8 @@
               ],
               "fileReplacements": [
                 {
-                  "replace": "libs/shared/environments/src/lib/environment.ts",
-                  "with": "libs/shared/environments/src/lib/environment.prod.ts"
+                  "replace": "libs/frontend/shared/environments/src/lib/environment.ts",
+                  "with": "libs/frontend/shared/environments/src/lib/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
@@ -210,7 +225,7 @@
           }
         }
       },
-      "tags": [],
+      "tags": ["frontend", "type:app"],
       "implicitDependencies": ["shared-assets", "frontend-shared-styles"]
     },
     "detective-client-e2e": {
@@ -238,7 +253,7 @@
           }
         }
       },
-      "tags": [],
+      "tags": ["frontend", "type:e2e"],
       "implicitDependencies": ["detective-client"]
     },
     "detective-client-feature-admin": {
@@ -262,7 +277,7 @@
           }
         }
       },
-      "tags": ["scope:detective-client", "type:feature"]
+      "tags": ["frontend", "scope:detective-client", "type:feature"]
     },
     "detective-client-feature-auth": {
       "root": "libs/frontend/detective-client/features/auth",
@@ -285,7 +300,7 @@
           }
         }
       },
-      "tags": ["scope:detective-client", "type:feature-auth"]
+      "tags": ["frontend", "scope:detective-client", "type:feature-auth"]
     },
     "detective-client-feature-home": {
       "root": "libs/frontend/detective-client/features/home",
@@ -308,7 +323,7 @@
           }
         }
       },
-      "tags": ["scope:detective-client", "type:feature-home"]
+      "tags": ["frontend", "scope:detective-client", "type:feature-home"]
     },
     "detective-client-ui": {
       "projectType": "library",
@@ -333,7 +348,7 @@
           }
         }
       },
-      "tags": ["scope:detective-client", "type:ui"]
+      "tags": ["frontend", "scope:detective-client", "type:ui"]
     },
     "frontend-shared-data-access": {
       "projectType": "library",
@@ -358,14 +373,29 @@
           }
         }
       },
-      "tags": ["scope:frontend-shared", "type:data-access"]
+      "tags": ["frontend", "scope:frontend-shared", "type:data-access"]
+    },
+    "frontend-shared-environments": {
+      "root": "libs/frontend/shared/environments",
+      "sourceRoot": "libs/frontend/shared/environments/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["libs/frontend/shared/environments/**/*.ts"]
+          }
+        }
+      },
+      "tags": ["frontend", "scope:frontend-shared", "type:environments"]
     },
     "frontend-shared-styles": {
       "projectType": "library",
       "root": "libs/frontend/shared/styles",
       "sourceRoot": "libs/frontend/shared/styles/src",
       "architect": {},
-      "tags": ["scope:frontend-shared", "type:styles"]
+      "tags": ["frontend", "scope:frontend-shared", "type:styles"]
     },
     "frontend-shared-ui": {
       "projectType": "library",
@@ -387,7 +417,7 @@
           }
         }
       },
-      "tags": ["scope:frontend-shared", "type:ui"]
+      "tags": ["frontend", "scope:frontend-shared", "type:ui"]
     },
     "frontend-shared-utils": {
       "root": "libs/frontend/shared/utils",
@@ -410,7 +440,7 @@
           }
         }
       },
-      "tags": ["scope:frontend-shared", "type:utils"]
+      "tags": ["frontend", "scope:frontend-shared", "type:utils"]
     },
     "shared-assets": {
       "projectType": "library",
@@ -432,20 +462,6 @@
         }
       },
       "tags": ["scope:shared", "type:data-access"]
-    },
-    "shared-environments": {
-      "projectType": "library",
-      "root": "libs/shared/environments",
-      "sourceRoot": "libs/shared/environments/src",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/shared/environments/src/**/*.ts", "libs/shared/environments/src/**/*.html"]
-          }
-        }
-      },
-      "tags": ["scope:shared", "type:environments"]
     },
     "shared-i18n": {
       "projectType": "library",

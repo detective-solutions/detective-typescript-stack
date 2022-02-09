@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@detective.solutions/backend/auth": ["libs/backend/auth/src/index.ts"],
+      "@detective.solutions/backend/shared/environments": ["libs/backend/shared/environments/src/index.ts"],
       "@detective.solutions/backend/users": ["libs/backend/users/src/index.ts"],
       "@detective.solutions/detective-client/features/admin": [
         "libs/frontend/detective-client/features/admin/src/index.ts"
@@ -30,10 +31,10 @@
       ],
       "@detective.solutions/frontend/detective-client/ui": ["libs/frontend/detective-client/ui/src/index.ts"],
       "@detective.solutions/frontend/shared/data-access": ["libs/frontend/shared/data-access/src/index.ts"],
+      "@detective.solutions/frontend/shared/environments": ["libs/frontend/shared/environments/src/index.ts"],
       "@detective.solutions/frontend/shared/ui": ["libs/frontend/shared/ui/src/index.ts"],
       "@detective.solutions/frontend/shared/utils": ["libs/frontend/shared/utils/src/index.ts"],
       "@detective.solutions/shared/data-access": ["libs/shared/data-access/src/index.ts"],
-      "@detective.solutions/shared/environments": ["libs/shared/environments/src/index.ts"],
       "@detective.solutions/shared/i18n": ["libs/shared/i18n/src/index.ts"]
     }
   },

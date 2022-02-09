@@ -1,7 +1,7 @@
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
 
 import { debug } from './debug';
-import { environment } from '@detective.solutions/shared/environments';
+import { environment } from '@detective.solutions/frontend/shared/environments';
 
 // eslint-disable-next-line  @typescript-eslint/no-empty-interface
 export interface State {}

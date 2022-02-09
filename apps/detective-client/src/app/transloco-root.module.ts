@@ -14,7 +14,7 @@ import {
 } from '@ngneat/transloco';
 
 import { AVAILABLE_LANGS } from '@detective.solutions/shared/i18n';
-import { environment } from '@detective.solutions/shared/environments';
+import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable({ providedIn: 'root' })
 export class TranslocoHttpLoader implements TranslocoLoader {

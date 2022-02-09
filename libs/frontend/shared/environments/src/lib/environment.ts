@@ -4,6 +4,8 @@
 
 export const environment = {
   production: false,
+  baseUrl: 'http://localhost:3333',
+  authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
 };
 
 /*
