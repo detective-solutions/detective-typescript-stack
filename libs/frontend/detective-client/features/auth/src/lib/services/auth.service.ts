@@ -82,6 +82,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
     const jwt = this.getToken();
 
     if (jwt) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const payload = jwtDecode(jwt) as any;
       return Date.now() >= payload.exp * 1000;
     }

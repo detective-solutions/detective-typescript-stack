@@ -23,17 +23,17 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
     return this.checkLogin();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canActivate(
     route: ActivatedRouteSnapshot,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     state: RouterStateSnapshot
   ): boolean | Observable<boolean> | Promise<boolean> {
     return this.checkLogin(route);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canActivateChild(
     childRoute: ActivatedRouteSnapshot,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     state: RouterStateSnapshot
   ): boolean | Observable<boolean> | Promise<boolean> {
     return this.checkLogin(childRoute);

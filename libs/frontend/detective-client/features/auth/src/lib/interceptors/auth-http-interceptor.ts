@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 @Injectable()
 export class AuthHttpInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService, private router: Router) {}
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const jwt = this.authService.getToken();
     const authRequest = req.clone({ setHeaders: { authorization: `Bearer ${jwt}` } });
