@@ -1,0 +1,22 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/shared/ui",
+  "sourceRoot": "libs/frontend/shared/ui/src",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/shared/ui"],
+      "options": {
+        "jestConfig": "libs/frontend/shared/ui/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/shared/ui/src/**/*.ts", "libs/frontend/shared/ui/src/**/*.html"]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:frontend-shared", "type:ui"]
+}

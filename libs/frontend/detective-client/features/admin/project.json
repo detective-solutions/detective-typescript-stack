@@ -1,0 +1,23 @@
+{
+  "root": "libs/frontend/detective-client/features/admin",
+  "sourceRoot": "libs/frontend/detective-client/features/admin/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/detective-client/features/admin/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/detective-client/features/admin"],
+      "options": {
+        "jestConfig": "libs/frontend/detective-client/features/admin/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:detective-client", "type:feature"]
+}

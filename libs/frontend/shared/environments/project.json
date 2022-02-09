@@ -1,0 +1,15 @@
+{
+  "root": "libs/frontend/shared/environments",
+  "sourceRoot": "libs/frontend/shared/environments/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/shared/environments/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:frontend-shared", "type:environments"]
+}

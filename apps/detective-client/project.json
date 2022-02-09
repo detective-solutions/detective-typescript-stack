@@ -1,0 +1,111 @@
+{
+  "projectType": "application",
+  "root": "apps/detective-client",
+  "sourceRoot": "apps/detective-client/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/detective-client",
+        "index": "apps/detective-client/src/index.html",
+        "main": "apps/detective-client/src/main.ts",
+        "polyfills": "apps/detective-client/src/polyfills.ts",
+        "tsConfig": "apps/detective-client/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          {
+            "glob": "favicon.ico",
+            "input": "libs/shared/assets/src",
+            "output": "./"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/shared/assets/src/assets",
+            "output": "assets"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/frontend/detective-client/ui/src/lib/i18n",
+            "output": "assets/i18n"
+          }
+        ],
+        "stylePreprocessorOptions": {
+          "includePaths": [
+            "libs/frontend/shared/styles/src/lib/themes",
+            "libs/frontend/shared/styles/src/lib/utils",
+            "libs/frontend/detective-client/theme"
+          ]
+        },
+        "styles": ["libs/frontend/shared/styles/src/index.scss", "libs/frontend/detective-client/theme/themes.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "libs/frontend/shared/environments/src/lib/environment.ts",
+              "with": "libs/frontend/shared/environments/src/lib/environment.prod.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": true,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "detective-client:build:production"
+        },
+        "development": {
+          "browserTarget": "detective-client:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "detective-client:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/detective-client/src/**/*.ts", "apps/detective-client/src/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/detective-client"],
+      "options": {
+        "jestConfig": "apps/detective-client/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:app"],
+  "implicitDependencies": ["shared-assets", "frontend-shared-styles"]
+}

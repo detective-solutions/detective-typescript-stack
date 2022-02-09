@@ -1,0 +1,23 @@
+{
+  "root": "libs/backend/users",
+  "sourceRoot": "libs/backend/users/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/backend/users/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/backend/users"],
+      "options": {
+        "jestConfig": "libs/backend/users/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:backend", "scope:backend", "type:users"]
+}

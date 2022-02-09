@@ -1,0 +1,7 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/shared/styles",
+  "sourceRoot": "libs/frontend/shared/styles/src",
+  "targets": {},
+  "tags": ["scope:frontend", "scope:frontend-shared", "type:styles"]
+}

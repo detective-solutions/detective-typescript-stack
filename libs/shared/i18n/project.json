@@ -1,0 +1,14 @@
+{
+  "projectType": "library",
+  "root": "libs/shared/i18n",
+  "sourceRoot": "libs/shared/i18n/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/shared/i18n/src/**/*.ts", "libs/shared/i18n/src/**/*.html"]
+      }
+    }
+  },
+  "tags": ["scope:shared", "type:i18n"]
+}

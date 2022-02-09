@@ -1,0 +1,25 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/detective-client/ui",
+  "sourceRoot": "libs/frontend/detective-client/ui/src",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/detective-client/ui"],
+      "options": {
+        "jestConfig": "libs/frontend/detective-client/ui/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/frontend/detective-client/ui/src/**/*.ts",
+          "libs/frontend/detective-client/ui/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:detective-client", "type:ui"]
+}

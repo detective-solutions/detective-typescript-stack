@@ -1,0 +1,15 @@
+{
+  "root": "libs/backend/shared/environments",
+  "sourceRoot": "libs/backend/shared/environments/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/backend/shared/environments/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["scope:backend", "scope:backend-shared", "type:environments"]
+}
