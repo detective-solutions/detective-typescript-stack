@@ -1,6 +1,6 @@
+import { IJwtToken, IUser } from '@detective.solutions/shared/data-access';
 import { UserLogin, UsersService } from '@detective.solutions/backend/users';
 
-import { IUser } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   async login(user: UserLogin) {
-    const payload = { user: user.email }; // TODO: Add JWT payload interface
+    const payload = { sub: user.email, role: 'basic' } as IJwtToken;
     return {
       access_token: this.jwtService.sign(payload),
     };
