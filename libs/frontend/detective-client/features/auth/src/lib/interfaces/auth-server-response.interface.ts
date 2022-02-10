@@ -1,3 +1,3 @@
 export interface IAuthServerResponse {
-  accessToken: string;
+  access_token: string;
 }

@@ -43,7 +43,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
 
     const loginResponse$ = this.authProvider(email, password).pipe(
       map((value) => {
-        this.setToken(value.accessToken);
+        this.setToken(value.access_token);
         return this.getAuthStatusFromToken();
       }),
       tap((status) => this.authStatus$.next(status)),
