@@ -5,16 +5,16 @@ import { NgModule } from '@angular/core';
 import { PageNotFoundComponent } from '@detective.solutions/frontend/shared/ui';
 
 const routes: Routes = [
+  { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'login/:redirectUrl', component: LoginComponent },
-  { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },
+  { path: 'register', component: RegisterComponent },
   {
     path: 'home',
     loadChildren: () => import('@detective.solutions/detective-client/features/home').then((m) => m.HomeModule),
     canActivate: [AuthGuard],
   },
   { path: 'casefile/:id', loadChildren: () => import('./casefile/casefile.module').then((m) => m.CasefileModule) },
-  { path: 'register', component: RegisterComponent },
   {
     path: 'admin',
     loadChildren: () => import('@detective.solutions/detective-client/features/admin').then((m) => m.AdminModule),
