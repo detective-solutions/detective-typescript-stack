@@ -15,6 +15,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
     return next.handle(authRequest).pipe(
       catchError((err) => {
         if (err.status === 401) {
+          // TODO: Ask for refresh token first if a refresh token is available in the local storage
           this.router.navigate(['/login'], {
             queryParams: { redirectUrl: this.router.routerState.snapshot.url },
           });
