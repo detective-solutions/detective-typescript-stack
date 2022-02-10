@@ -11,7 +11,7 @@ import { jwtConstants } from './constants';
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: process.env.JWT_LIFESPAN || '10m' } }),
+    JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: process.env.JWT_LIFESPAN || '1m' } }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService, UsersModule, JwtModule],
