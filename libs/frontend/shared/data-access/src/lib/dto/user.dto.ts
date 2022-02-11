@@ -2,7 +2,9 @@ import { IUser, IUserGroup, UserRole } from '@detective.solutions/shared/data-ac
 
 export class User implements IUser {
   constructor(
+    public id = '',
     public email = '',
+    public tenantId = '',
     public role = UserRole.BASIC,
     public firstname = '',
     public lastname = '',
@@ -16,7 +18,9 @@ export class User implements IUser {
       return new User();
     }
     return new User(
+      userInput.id,
       userInput.email,
+      userInput.tenantId,
       UserRole.BASIC,
       userInput.firstname,
       userInput.lastname,

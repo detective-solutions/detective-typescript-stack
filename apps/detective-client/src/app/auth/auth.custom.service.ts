@@ -1,6 +1,5 @@
-import { AuthService, IAuthServerResponse, IAuthStatus } from '@detective.solutions/detective-client/features/auth';
-import { IJwtToken, IUser, UserRole } from '@detective.solutions/shared/data-access';
-import { Observable, catchError, map, of } from 'rxjs';
+import { IAuthServerResponse, IJwtTokenPayload, IUser, UserRole } from '@detective.solutions/shared/data-access';
+import { Observable, catchError, map } from 'rxjs';
 
 import { $enum } from 'ts-enum-util';
 import { HttpClient } from '@angular/common/http';
@@ -25,7 +24,7 @@ export class CustomAuthService extends AuthService {
     });
   }
 
-  protected transformJwtToken(token: IJwtToken): IAuthStatus {
+  protected transformJwtToken(token: IJwtTokenPayload): IAuthStatus {
     return {
       isAuthenticated: token.sub ? true : false,
       userId: token.sub,
@@ -34,7 +33,8 @@ export class CustomAuthService extends AuthService {
   }
 
   protected getCurrentUser(): Observable<User> {
-    return of(new User('john.doe@detective.solutions'));
+    // this.getUserGQL.watch().valueChanges.subscribe((val) => console.log('RESPONSE:', val.data));
+    // return of(new User('john.doe@detective.solutions'));
     return this.httpClient.get<IUser>(this.userApiUrl).pipe(map(User.Build), catchError(transformError));
   }
 }

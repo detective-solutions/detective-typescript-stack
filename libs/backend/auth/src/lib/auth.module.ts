@@ -1,19 +1,14 @@
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '@detective.solutions/backend/users';
-import { jwtConstants } from './constants';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: process.env.JWT_LIFESPAN || '1m' } }),
-  ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  imports: [UsersModule, PassportModule, JwtModule.register({})],
+  providers: [AuthService, LocalStrategy, AccessTokenStrategy],
   exports: [AuthService, UsersModule, JwtModule],
 })
 export class AuthModule {}

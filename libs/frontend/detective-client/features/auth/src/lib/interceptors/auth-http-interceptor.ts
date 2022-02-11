@@ -11,7 +11,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authRequest = req.clone({ setHeaders: { authorization: `Bearer ${this.authService.getToken()}` } });
+    const authRequest = req.clone({ setHeaders: { authorization: `Bearer ${this.authService.getAccessToken()}` } });
     return next.handle(authRequest).pipe(
       catchError((err) => {
         if (err.status === 401) {

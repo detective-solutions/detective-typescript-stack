@@ -1,6 +1,10 @@
-export interface IJwtToken {
-  iat: number;
+export interface IJwtTokenPayload {
   sub: string;
-  exp: number;
+  tenantId: string;
   role: string;
+}
+
+export interface IJwtToken extends IJwtTokenPayload {
+  iat: string;
+  exp: number;
 }

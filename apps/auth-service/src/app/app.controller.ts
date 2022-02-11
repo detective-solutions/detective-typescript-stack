@@ -1,14 +1,27 @@
-import { AuthService, LocalAuthGuard } from '@detective.solutions/backend/auth';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { UserLogin } from '@detective.solutions/backend/users';
+import { AccessTokenGuard, AuthService, LocalAuthGuard, RefreshTokenGuard } from '@detective.solutions/backend/auth';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { IAuthServerResponse, IJwtTokenPayload, IUser } from '@detective.solutions/shared/data-access';
+import { UsersService } from '@detective.solutions/backend/users';
 
-@Controller()
+@Controller({ version: '1' })
 export class AppController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UsersService) {}
 
+  @Post('auth/login')
   @UseGuards(LocalAuthGuard)
-  @Post('v1/auth/login')
-  async login(@Body() user: UserLogin) {
-    return this.authService.login(user);
+  async login(@Request() request): Promise<IAuthServerResponse> {
+    return this.authService.login(request.user);
+  }
+
+  @Post('auth/refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refreshTokens(@Body() refreshToken: IJwtTokenPayload): Promise<IAuthServerResponse> {
+    return this.authService.refreshTokens(refreshToken);
+  }
+
+  @Get('auth/me')
+  @UseGuards(AccessTokenGuard)
+  async getUserById(@Request() request): Promise<IUser> {
+    return this.userService.findById(request.user.sub);
   }
 }

@@ -1,17 +1,19 @@
+import { IAuthServerResponse, UserRole } from '@detective.solutions/shared/data-access';
 import { Observable, of, throwError } from 'rxjs';
 
 import { AuthService } from './auth.service';
-import { IAuthServerResponse } from '../interfaces/auth-server-response.interface';
 import { IAuthStatus } from '../interfaces/auth-status.interface';
 import { Injectable } from '@angular/core';
 import { User } from '@detective.solutions/frontend/shared/data-access';
-import { UserRole } from '@detective.solutions/shared/data-access';
+import { generate } from 'short-uuid';
 import { sign } from 'fake-jwt-sign';
 
 @Injectable()
 export class InMemoryAuthService extends AuthService {
   private defaultUser = User.Build({
+    id: generate(),
     email: 'john.tester@test.com',
+    tenantId: generate(),
     role: UserRole.BASIC,
     firstname: 'John',
     lastname: 'Tester',

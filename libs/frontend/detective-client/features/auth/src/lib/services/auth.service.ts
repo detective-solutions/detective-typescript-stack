@@ -1,10 +1,9 @@
 import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, pipe, tap, throwError } from 'rxjs';
+import { IAuthServerResponse, IJwtToken } from '@detective.solutions/shared/data-access';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
 import { CacheService } from './cache.service';
-import { IAuthServerResponse } from '../interfaces/auth-server-response.interface';
 import { IAuthService } from '../interfaces/auth-service.interface';
-import { IUser } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 import { User } from '@detective.solutions/frontend/shared/data-access';
 import jwtDecode from 'jwt-decode';
@@ -12,15 +11,18 @@ import { transformError } from '@detective.solutions/frontend/shared/utils';
 
 @Injectable()
 export abstract class AuthService extends CacheService implements IAuthService {
+  protected static ACCESS_TOKEN_STORAGE_KEY = 'access_token';
+  protected static REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
+
   private getAndUpdateUserIfAuthenticated = pipe(
     filter((status: IAuthStatus) => status.isAuthenticated),
     mergeMap(() => this.getCurrentUser()),
-    map((user: IUser) => this.currentUser$.next(user)),
+    map((user: User) => this.currentUser$.next(user)),
     catchError(transformError)
   );
 
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
-  readonly currentUser$ = new BehaviorSubject<IUser>(new User());
+  readonly currentUser$ = new BehaviorSubject<User>(new User());
   protected readonly resumeCurrentUser$ = this.authStatus$.pipe(this.getAndUpdateUserIfAuthenticated);
 
   constructor() {
@@ -39,11 +41,11 @@ export abstract class AuthService extends CacheService implements IAuthService {
   protected abstract getCurrentUser(): Observable<User>;
 
   login(email: string, password: string): Observable<void> {
-    this.clearToken();
+    this.clearAuthTokens();
 
     const loginResponse$ = this.authProvider(email, password).pipe(
-      map((value) => {
-        this.setToken(value.access_token);
+      map((response: IAuthServerResponse) => {
+        this.setAuthTokens(response.access_token, response.refresh_token);
         return this.getAuthStatusFromToken();
       }),
       tap((status) => this.authStatus$.next(status)),
@@ -61,35 +63,44 @@ export abstract class AuthService extends CacheService implements IAuthService {
 
   logout(clearToken?: boolean) {
     if (clearToken) {
-      this.clearToken();
+      this.clearAuthTokens();
     }
     setTimeout(() => this.authStatus$.next(defaultAuthStatus), 0);
   }
 
-  protected setToken(jwt: string) {
-    this.setItem('jwt', jwt);
+  protected setAuthTokens(accessToken: string, refreshToken: string) {
+    this.setItem(AuthService.ACCESS_TOKEN_STORAGE_KEY, accessToken);
+    this.setItem(AuthService.REFRESH_TOKEN_STORAGE_KEY, refreshToken);
   }
 
-  getToken(): string {
-    return this.getItem('jwt') ?? '';
+  getAccessToken(): string {
+    return this.getItem(AuthService.ACCESS_TOKEN_STORAGE_KEY) ?? '';
   }
 
-  protected clearToken() {
-    this.removeItem('jwt');
+  getRefreshToken(): string {
+    return this.getItem(AuthService.REFRESH_TOKEN_STORAGE_KEY) ?? '';
+  }
+
+  protected clearAuthTokens() {
+    this.removeItem(AuthService.ACCESS_TOKEN_STORAGE_KEY);
+    this.removeItem(AuthService.REFRESH_TOKEN_STORAGE_KEY);
   }
 
   protected hasExpiredToken(): boolean {
-    const jwt = this.getToken();
+    const accessToken = this.getAccessToken();
 
-    if (jwt) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload = jwtDecode(jwt) as any;
-      return Date.now() >= payload.exp * 1000;
+    if (accessToken) {
+      let payload = jwtDecode(accessToken) as IJwtToken;
+      if (Date.now() >= payload.exp * 1000) {
+        const refreshToken = this.getRefreshToken();
+        payload = jwtDecode(refreshToken) as IJwtToken;
+        return Date.now() >= payload.exp * 1000;
+      }
     }
     return true;
   }
 
   protected getAuthStatusFromToken(): IAuthStatus {
-    return this.transformJwtToken(jwtDecode(this.getToken()));
+    return this.transformJwtToken(jwtDecode(this.getAccessToken()));
   }
 }
