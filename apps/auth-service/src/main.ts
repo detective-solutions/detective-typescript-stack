@@ -7,6 +7,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 
 import { AppModule } from './app/app.module';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { environment } from '@detective.solutions/backend/shared/environments';
 
@@ -24,7 +25,8 @@ async function bootstrap() {
       disableErrorMessages: environment.production,
     })
   );
-  const port = process.env.PORT || 3333;
+
+  const port = app.get(ConfigService).get('PORT');
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
 }
