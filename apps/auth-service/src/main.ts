@@ -19,6 +19,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       forbidUnknownValues: true,
       disableErrorMessages: environment.production,
     })
