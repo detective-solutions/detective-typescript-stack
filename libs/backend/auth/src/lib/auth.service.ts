@@ -28,6 +28,25 @@ export class AuthService {
     return this.getTokens(user);
   }
 
+  async refreshTokens(refreshToken: IJwtTokenPayload): Promise<IAuthServerResponse> {
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     id: userId,
+    //   },
+    // });
+    const user = await this.usersService.findById(refreshToken.sub);
+    // if (!user || !user.hashedRt) throw new UnauthorizedException('Access Denied');
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    // const rtMatches = await argon.verify(user.hashedRt, rt);
+    // if (!rtMatches) throw new UnauthorizedException();
+
+    return await this.getTokens(user);
+    // await this.updateRtHash(user.id, tokens.refresh_token);
+  }
+
   async getTokens(user: IUser): Promise<IAuthServerResponse> {
     const jwtPayload: IJwtTokenPayload = {
       sub: user.id,
@@ -50,24 +69,5 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
-  }
-
-  async refreshTokens(refreshToken: IJwtTokenPayload): Promise<IAuthServerResponse> {
-    // const user = await this.prisma.user.findUnique({
-    //   where: {
-    //     id: userId,
-    //   },
-    // });
-    const user = await this.usersService.findById(refreshToken.sub);
-    // if (!user || !user.hashedRt) throw new UnauthorizedException('Access Denied');
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    // const rtMatches = await argon.verify(user.hashedRt, rt);
-    // if (!rtMatches) throw new UnauthorizedException();
-
-    return await this.getTokens(user);
-    // await this.updateRtHash(user.id, tokens.refresh_token);
   }
 }
