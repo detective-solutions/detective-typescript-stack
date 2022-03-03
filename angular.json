@@ -3,7 +3,9 @@
   "projects": {
     "auth-service": "apps/auth-service",
     "backend-auth": "libs/backend/auth",
+    "backend-dgraph-grpc-client": "libs/backend/dgraph-grpc-client",
     "backend-shared-environments": "libs/backend/shared/environments",
+    "backend-shared-utils": "libs/backend/shared/utils",
     "backend-users": "libs/backend/users",
     "detective-client": "apps/detective-client",
     "detective-client-e2e": "apps/detective-client-e2e",

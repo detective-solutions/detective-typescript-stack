@@ -18,7 +18,9 @@
     "baseUrl": ".",
     "paths": {
       "@detective.solutions/backend/auth": ["libs/backend/auth/src/index.ts"],
+      "@detective.solutions/backend/dgraph-grpc-client": ["libs/backend/dgraph-grpc-client/src/index.ts"],
       "@detective.solutions/backend/shared/environments": ["libs/backend/shared/environments/src/index.ts"],
+      "@detective.solutions/backend/shared/utils": ["libs/backend/shared/utils/src/index.ts"],
       "@detective.solutions/backend/users": ["libs/backend/users/src/index.ts"],
       "@detective.solutions/detective-client/features/admin": [
         "libs/frontend/detective-client/features/admin/src/index.ts"

@@ -1,0 +1,23 @@
+{
+  "root": "libs/backend/dgraph-grpc-client",
+  "sourceRoot": "libs/backend/dgraph-grpc-client/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/backend/dgraph-grpc-client/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/backend/dgraph-grpc-client"],
+      "options": {
+        "jestConfig": "libs/backend/dgraph-grpc-client/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
