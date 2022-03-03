@@ -83,7 +83,11 @@
           "browserTarget": "detective-client:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "options": {
+        "browserTarget": "detective-client:build",
+        "proxyConfig": "apps/detective-client/proxy.conf.json"
+      }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
