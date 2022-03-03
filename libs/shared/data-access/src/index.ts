@@ -7,3 +7,4 @@ export * from './lib/auth/auth-server-response.interface';
 
 export * from './lib/user/user.interface';
 export * from './lib/user/user-group.interface';
+export * from './lib/user/tenant.interface';

@@ -4,11 +4,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { UsersModule } from '@detective.solutions/backend/users';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule.register({})],
-  providers: [AuthService, LocalStrategy, AccessTokenStrategy],
+  providers: [AuthService, LocalStrategy, AccessTokenStrategy, RefreshTokenStrategy],
   exports: [AuthService, UsersModule, JwtModule],
 })
 export class AuthModule {}

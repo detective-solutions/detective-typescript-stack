@@ -1,27 +1,28 @@
 import { AccessTokenGuard, AuthService, LocalAuthGuard, RefreshTokenGuard } from '@detective.solutions/backend/auth';
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { IAuthServerResponse, IJwtTokenPayload, IUser } from '@detective.solutions/shared/data-access';
-import { UsersService } from '@detective.solutions/backend/users';
+import { Controller, Header, Ip, Post, Request, UseGuards } from '@nestjs/common';
+import { IAuthServerResponse } from '@detective.solutions/shared/data-access';
 
-@Controller({ version: '1' })
+@Controller({ path: 'auth', version: '1' })
 export class AppController {
-  constructor(private readonly authService: AuthService, private readonly userService: UsersService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post('auth/login')
+  @Post('login')
   @UseGuards(LocalAuthGuard)
-  async login(@Request() request): Promise<IAuthServerResponse> {
-    return this.authService.login(request.user);
+  @Header('Cache-Control', 'no-store') // according to OAuth 2.0 RFC 6749
+  async login(@Request() request, @Ip() ipAddress: string): Promise<IAuthServerResponse> {
+    return this.authService.login(request.user, ipAddress);
   }
 
-  @Post('auth/refresh')
-  @UseGuards(RefreshTokenGuard)
-  async refreshTokens(@Body() refreshToken: IJwtTokenPayload): Promise<IAuthServerResponse> {
-    return this.authService.refreshTokens(refreshToken);
-  }
-
-  @Get('auth/me')
+  @Post('logout')
   @UseGuards(AccessTokenGuard)
-  async getUserById(@Request() request): Promise<IUser> {
-    return this.userService.findById(request.user.sub);
+  async logout(@Request() request): Promise<boolean> {
+    return this.authService.logout(request.user);
+  }
+
+  @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
+  @Header('Cache-Control', 'no-store') // according to OAuth 2.0 RFC 6749
+  async refreshTokens(@Request() request, @Ip() ipAddress: string): Promise<IAuthServerResponse> {
+    return this.authService.refreshTokens(request.user, ipAddress);
   }
 }
