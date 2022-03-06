@@ -3,7 +3,7 @@ import { Observable, catchError, delay, map, of, shareReplay } from 'rxjs';
 
 import { DUMMY_CASEFILE_DATA } from './dummy-data';
 import { Injectable } from '@angular/core';
-import { transformError } from '@detective.solutions/frontend/shared/utils';
+import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 @Injectable()
 export class CasefileService {
