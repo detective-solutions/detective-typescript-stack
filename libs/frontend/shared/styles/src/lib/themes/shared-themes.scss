@@ -3,6 +3,7 @@
 @use '@angular/material' as mat;
 
 @import './color-palettes';
+@import './override-material-snackbar-theme';
 @import './override-theme-background-color';
 
 // Be sure that you only ever include this mixin once!
@@ -18,5 +19,9 @@ $default-theme: mat.define-light-theme(
     ),
   )
 );
+
+// Use theme colors for different types Material Snack Bars
+@include override-material-snackbar-theme($default-theme);
+
 // Unify background colors
 $default-theme: override-theme-background-color($default-theme, #fafafa);
