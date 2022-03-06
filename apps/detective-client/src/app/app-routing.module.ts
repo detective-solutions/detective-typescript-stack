@@ -25,7 +25,11 @@ const routes: Routes = [
     loadChildren: () => import('@detective.solutions/detective-client/features/admin').then((m) => m.AdminModule),
     canLoad: [AuthGuard],
   },
-  { path: '**', component: PageNotFoundComponent },
+  {
+    path: '**',
+    loadChildren: () =>
+      import('@detective.solutions/frontend/shared/page-not-found').then((m) => m.SharedPageNotFoundModule),
+  },
 ];
 
 @NgModule({
