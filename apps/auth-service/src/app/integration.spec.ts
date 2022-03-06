@@ -11,6 +11,8 @@ import { defaultEnvConfig } from './default-env.config';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 let app: NestFastifyApplication;
 let configService: ConfigService;
 let jwtService: JwtService;
