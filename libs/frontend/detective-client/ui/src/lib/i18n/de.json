@@ -2,7 +2,11 @@
   "navigation": {
     "searchbarPlaceholder": "Nach Casefiles suchen",
     "inviteButtonText": "Einladen",
-    "userMenu": { "account": "Konto verwalten", "documentation": "API & Dokumentation", "logout": "Abmelden" }
+    "userMenu": {
+      "account": { "buttonText": "Konto verwalten" },
+      "documentation": { "buttonText": "API & Dokumentation" },
+      "logout": { "buttonText": "Abmelden" }
+    }
   },
   "tiles": {
     "newCasefileTileTitle": "Neue Casefile erstellen",

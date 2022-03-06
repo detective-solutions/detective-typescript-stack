@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MockProvider } from 'ng-mocks';
 import { NavigationComponent } from './navigation.component';
 import { NavigationMaterialModule } from './navigation.material.module';
@@ -10,6 +12,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import de from '../i18n/de.json';
 import en from '../i18n/en.json';
 import { getTranslocoModule } from '@detective.solutions/shared/i18n';
+
+const materialModules = [MatSnackBarModule];
 
 describe('NavigationComponent', () => {
   let component: NavigationComponent;
@@ -21,7 +25,9 @@ describe('NavigationComponent', () => {
         NavigationMaterialModule,
         NoopAnimationsModule,
         RouterTestingModule,
+        HttpClientTestingModule,
         getTranslocoModule({ 'navigation/en': en, 'navigation/de': de }),
+        ...materialModules,
       ],
       declarations: [NavigationComponent],
       providers: [EventService, MockProvider(AuthService)],

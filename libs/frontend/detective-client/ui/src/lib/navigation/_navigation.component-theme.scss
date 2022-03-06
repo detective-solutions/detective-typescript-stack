@@ -8,6 +8,7 @@
   $primary-default: mat.get-color-from-palette($primary-palette);
   $primary-contrast: mat.get-color-from-palette($primary-palette, 'default-contrast');
   $primary-lighter: mat.get-color-from-palette($primary-palette, 900);
+  $primary-lighter2: mat.get-color-from-palette($primary-palette, 700);
 
   $accent-palette: map.get($color-config, 'accent');
   $accent-default: mat.get-color-from-palette($accent-palette);
@@ -46,7 +47,7 @@
         background: $primary-lighter;
 
         &:hover {
-          background: $accent-default;
+          background: $primary-lighter2;
         }
       }
     }

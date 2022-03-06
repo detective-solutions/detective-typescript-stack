@@ -1,12 +1,15 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Observable, map, shareReplay } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
+import { Observable, Subscription, catchError, map, shareReplay, tap, throwError } from 'rxjs';
+import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
+import { HttpClient } from '@angular/common/http';
 import { ISidenavItem } from './ISidenavItem.interface';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'main-navigation',
@@ -14,7 +17,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
   styleUrls: ['./navigation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavigationComponent {
+export class NavigationComponent implements OnDestroy {
   @Input()
   sidenavItems!: ISidenavItem[];
   @Input()
@@ -25,6 +28,10 @@ export class NavigationComponent {
   showSearchInput = true;
 
   searchValue = '';
+  logoutErrorToastMessage!: string;
+  logoutErrorToastAction!: string;
+
+  subscriptions = new Subscription();
 
   showTableView$: Observable<boolean>;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
@@ -35,10 +42,13 @@ export class NavigationComponent {
   private cdkOverlay: HTMLElement;
 
   constructor(
-    private breakpointObserver: BreakpointObserver,
-    private overlayContainer: OverlayContainer,
-    private eventService: EventService,
-    private authService: AuthService
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly overlayContainer: OverlayContainer,
+    private readonly eventService: EventService,
+    private readonly authService: AuthService,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly toastService: ToastService
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
     this.cdkOverlay = this.overlayContainer.getContainerElement();
@@ -51,7 +61,35 @@ export class NavigationComponent {
     this.eventService.showTableView$.next(toggleChange.checked);
   }
 
+  sendTestRequest() {
+    this.subscriptions.add(this.http.get('/v1/auth/me').subscribe((val) => console.log(val)));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
   logout() {
-    this.authService.logout(true);
+    this.subscriptions.add(
+      this.authService
+        .logout(true)
+        .pipe(
+          tap((logoutSuccessful) => {
+            logoutSuccessful ? this.router.navigateByUrl('/login') : this.showLogoutErrorToast();
+          }),
+          catchError((err) => {
+            this.showLogoutErrorToast();
+            return throwError(() => new Error(err));
+          })
+        )
+        .subscribe()
+    );
+  }
+
+  showLogoutErrorToast() {
+    // TODO: Add translation to the error toast
+    this.toastService.showToast('The Logout was not successful. Please try again.', '', ToastType.ERROR, {
+      duration: 3500,
+    });
   }
 }

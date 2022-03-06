@@ -2,7 +2,11 @@
   "navigation": {
     "searchbarPlaceholder": "Search Casefiles",
     "inviteButtonText": "Invite",
-    "userMenu": { "account": "My Account", "documentation": "API & Documentation", "logout": "Logout" }
+    "userMenu": {
+      "account": { "buttonText": "My Account" },
+      "documentation": { "buttonText": "API & Documentation" },
+      "logout": { "buttonText": "Logout" }
+    }
   },
   "tiles": {
     "newCasefileTileTitle": "New Casefile",

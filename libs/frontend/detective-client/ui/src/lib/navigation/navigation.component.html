@@ -78,7 +78,7 @@
       <ng-template #noSearchInput><span fxFlex></span></ng-template>
 
       <span fxLayoutAlign="center center" fxHide.sm fxHide.xs>
-        <button mat-raised-button color="accent" class="invite-button">
+        <button mat-raised-button color="accent" class="invite-button" (click)="sendTestRequest()">
           {{ t('inviteButtonText') }}
         </button>
       </span>
@@ -98,15 +98,15 @@
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item>
             <mat-icon>settings</mat-icon>
-            {{ t('userMenu.account') }}
+            {{ t('userMenu.account.buttonText') }}
           </button>
           <button mat-menu-item>
             <mat-icon>description</mat-icon>
-            {{ t('userMenu.documentation') }}
+            {{ t('userMenu.documentation.buttonText') }}
           </button>
           <button mat-menu-item routerLink="/" (click)="logout()">
             <mat-icon>logout</mat-icon>
-            {{ t('userMenu.logout') }}
+            {{ t('userMenu.logout.buttonText') }}
           </button>
         </mat-menu>
       </span>
@@ -135,15 +135,15 @@
           <div class="mobile-menu-buttons">
             <button mat-menu-item>
               <mat-icon>settings</mat-icon>
-              {{ t('userMenu.account') }}
+              {{ t('userMenu.account.buttonText') }}
             </button>
             <button mat-menu-item>
               <mat-icon>description</mat-icon>
-              {{ t('userMenu.documentation') }}
+              {{ t('userMenu.documentation.buttonText') }}
             </button>
             <button mat-menu-item routerLink="/" (click)="logout()">
               <mat-icon>logout</mat-icon>
-              {{ t('userMenu.logout') }}
+              {{ t('userMenu.logout.buttonText') }}
             </button>
           </div>
         </mat-menu>
