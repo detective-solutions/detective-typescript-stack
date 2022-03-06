@@ -1,4 +1,4 @@
-# Frontend Shared Utils Library
+# Frontend Shared Utils
 
 ## Running unit tests
 
