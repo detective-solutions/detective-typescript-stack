@@ -2,7 +2,6 @@ import { AuthGuard, LoginComponent, RegisterComponent } from '@detective.solutio
 import { RouterModule, Routes } from '@angular/router';
 
 import { NgModule } from '@angular/core';
-import { PageNotFoundComponent } from '@detective.solutions/frontend/shared/ui';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },

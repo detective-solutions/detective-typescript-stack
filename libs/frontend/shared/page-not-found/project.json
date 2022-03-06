@@ -1,0 +1,26 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/shared/page-not-found",
+  "sourceRoot": "libs/frontend/shared/page-not-found/src",
+  "prefix": "detective-typescript-stack",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/shared/page-not-found"],
+      "options": {
+        "jestConfig": "libs/frontend/shared/page-not-found/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/frontend/shared/page-not-found/src/**/*.ts",
+          "libs/frontend/shared/page-not-found/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:frontend-shared", "type:page-not-found"]
+}

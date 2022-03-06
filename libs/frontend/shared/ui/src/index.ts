@@ -1,2 +1,2 @@
-export * from './lib/ui/page-not-found/page-not-found.module';
-export { PageNotFoundComponent } from './lib/ui/page-not-found/page-not-found.component';
+export * from './lib/services';
+export * from './lib/shared-ui.module';

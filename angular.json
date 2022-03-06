@@ -16,6 +16,7 @@
     "frontend-shared-data-access": "libs/frontend/shared/data-access",
     "frontend-shared-environments": "libs/frontend/shared/environments",
     "frontend-shared-error-handling": "libs/frontend/shared/error-handling",
+    "frontend-shared-page-not-found": "libs/frontend/shared/page-not-found",
     "frontend-shared-styles": "libs/frontend/shared/styles",
     "frontend-shared-ui": "libs/frontend/shared/ui",
     "frontend-shared-utils": "libs/frontend/shared/utils",
