@@ -2,9 +2,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EmailValidation, PasswordValidation } from '@detective.solutions/frontend/shared/utils';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subscription, catchError, combineLatest, filter, tap } from 'rxjs';
+import { Subscription, combineLatest, filter, tap } from 'rxjs';
 
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '@detective.solutions/detective-client/features/auth';
 
 @Component({
   selector: 'login',
@@ -20,16 +20,17 @@ export class LoginComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    route: ActivatedRoute
+    private readonly formBuilder: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {
-    this.subscriptions.add(route.paramMap.subscribe((params) => (this.redirectUrl = params.get('redirectUrl') ?? '')));
+    this.subscriptions.add(
+      this.route.paramMap.subscribe((params) => (this.redirectUrl = params.get('redirectUrl') ?? ''))
+    );
   }
 
   ngOnInit() {
-    this.authService.logout();
     this.buildLoginForm();
   }
 
@@ -45,16 +46,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   login(submittedForm: FormGroup) {
-    this.authService
-      .login(submittedForm.value.email, submittedForm.value.password)
-      .pipe(catchError((err) => (this.loginError = err)));
+    this.subscriptions.add(this.authService.login(submittedForm.value.email, submittedForm.value.password).subscribe());
 
     this.subscriptions.add(
       combineLatest([this.authService.authStatus$, this.authService.currentUser$])
         .pipe(
+          tap(() => console.log),
           filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''),
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          tap(([authStatus, user]) => {
+          tap(() => {
             // TODO: Show toast on successful/failed login
             this.router.navigate([this.redirectUrl]);
           })

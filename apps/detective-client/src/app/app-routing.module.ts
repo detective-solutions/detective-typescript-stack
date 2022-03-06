@@ -1,12 +1,18 @@
-import { AuthGuard, LoginComponent, RegisterComponent } from '@detective.solutions/detective-client/features/auth';
+import { AuthGuard, RegisterComponent } from '@detective.solutions/detective-client/features/auth';
 import { RouterModule, Routes } from '@angular/router';
 
 import { NgModule } from '@angular/core';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home/my-casefiles', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'login/:redirectUrl', component: LoginComponent },
+  {
+    path: 'login',
+    loadChildren: () => import('@detective.solutions/detective-client/features/login').then((m) => m.LoginModule),
+  },
+  {
+    path: 'login/:redirectUrl',
+    loadChildren: () => import('@detective.solutions/detective-client/features/login').then((m) => m.LoginModule),
+  },
   { path: 'register', component: RegisterComponent },
   {
     path: 'home',

@@ -1,0 +1,26 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/detective-client/features/login",
+  "sourceRoot": "libs/frontend/detective-client/features/login/src",
+  "prefix": "detective-typescript-stack",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/detective-client/features/login"],
+      "options": {
+        "jestConfig": "libs/frontend/detective-client/features/login/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/frontend/detective-client/features/login/src/**/*.ts",
+          "libs/frontend/detective-client/features/login/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

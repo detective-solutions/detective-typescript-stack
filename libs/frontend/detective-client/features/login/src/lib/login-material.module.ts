@@ -4,11 +4,20 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgModule } from '@angular/core';
 
-const modules = [MatCardModule, MatInputModule, MatFormFieldModule, MatIconModule, MatButtonModule, FlexLayoutModule];
+const modules = [
+  MatCardModule,
+  MatInputModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatButtonModule,
+  MatSnackBarModule,
+  FlexLayoutModule,
+];
 
 @NgModule({
   exports: modules,
 })
-export class AuthMaterialModule {}
+export class LoginMaterialModule {}
