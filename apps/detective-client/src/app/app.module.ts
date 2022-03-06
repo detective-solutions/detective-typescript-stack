@@ -22,7 +22,7 @@ import { TranslocoRootModule } from './transloco-root.module';
         return {
           cache: new InMemoryCache({ addTypename: false }),
           link: httpLink.create({
-            uri: 'http://localhost:8080/graphql',
+            uri: '/graphql',
           }),
         };
       },
