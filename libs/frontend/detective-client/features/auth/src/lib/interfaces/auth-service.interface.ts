@@ -12,6 +12,5 @@ export interface IAuthService {
 }
 
 export enum AuthMode {
-  IN_MEMORY = 'inMemory',
   CUSTOM_SERVER = 'custom',
 }

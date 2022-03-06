@@ -11,14 +11,11 @@ import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
 import { NgModule } from '@angular/core';
 import { TranslocoRootModule } from './transloco-root.module';
-import { authFactory } from './auth/auth.factory';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, CoreModule, AppRoutingModule, BrowserAnimationsModule, AuthModule, TranslocoRootModule],
   providers: [
-    { provide: AuthService, useFactory: authFactory, deps: [HttpClient] },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
     {
       provide: APOLLO_OPTIONS,
       useFactory: (httpLink: HttpLink) => {

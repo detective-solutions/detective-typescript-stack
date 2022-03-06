@@ -2,12 +2,14 @@ import { UserRole } from '@detective.solutions/shared/data-access';
 
 export interface IAuthStatus {
   isAuthenticated: boolean;
-  userRole: UserRole;
   userId: string;
+  tenantId: string;
+  userRole: UserRole;
 }
 
 export const defaultAuthStatus: IAuthStatus = {
   isAuthenticated: false,
-  userRole: UserRole.NONE,
   userId: '',
+  tenantId: '',
+  userRole: UserRole.NONE,
 };

@@ -1,29 +1,24 @@
-import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { AuthService, CustomAuthService } from './services';
 
-import { AuthMaterialModule } from './auth-material.module';
-import { AuthService } from './services/auth.service';
+import { Apollo } from 'apollo-angular';
+import { AuthHttpInterceptor } from './interceptors/auth-http-interceptor';
 import { CommonModule } from '@angular/common';
-import { InMemoryAuthService } from './services/auth.inmemory.service';
-import { LoginComponent } from './components/login/login.component';
+import { GetUserGQL } from './graphql/get-user-gql';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
 import { RouterModule } from '@angular/router';
-import { langScopeLoader } from '@detective.solutions/shared/i18n';
+import { TranslocoModule } from '@ngneat/transloco';
 
 @NgModule({
-  declarations: [LoginComponent, RegisterComponent],
-  imports: [CommonModule, TranslocoModule, RouterModule, ReactiveFormsModule, AuthMaterialModule],
-  exports: [LoginComponent, RegisterComponent],
+  declarations: [RegisterComponent],
+  imports: [CommonModule, TranslocoModule, RouterModule],
+  exports: [RegisterComponent],
   providers: [
-    { provide: AuthService, useClass: InMemoryAuthService },
-    {
-      provide: TRANSLOCO_SCOPE,
-      useValue: {
-        scope: 'auth',
-        loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
-      },
-    },
+    { provide: AuthService, useClass: CustomAuthService },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
+    Apollo,
+    GetUserGQL,
   ],
 })
 export class AuthModule {}

@@ -1,10 +1,10 @@
-import { IUser, IUserGroup, UserRole } from '@detective.solutions/shared/data-access';
+import { ITenant, IUser, IUserGroup, UserRole } from '@detective.solutions/shared/data-access';
 
 export class User implements IUser {
   constructor(
     public id = '',
     public email = '',
-    public tenantId = '',
+    public tenantIds: ITenant[] = [],
     public role = UserRole.BASIC,
     public firstname = '',
     public lastname = '',
@@ -20,7 +20,7 @@ export class User implements IUser {
     return new User(
       userInput.id,
       userInput.email,
-      userInput.tenantId,
+      userInput.tenantIds as ITenant[],
       UserRole.BASIC,
       userInput.firstname,
       userInput.lastname,

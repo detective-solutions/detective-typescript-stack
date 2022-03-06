@@ -1,14 +1,7 @@
+export * from './lib/components';
+export * from './lib/graphql';
 export * from './lib/auth.module';
-
-export { LoginComponent } from './lib/components/login/login.component';
-export { RegisterComponent } from './lib/components/register/register.component';
-
-export * from './lib/services/auth.service';
-export * from './lib/services/auth.inmemory.service';
-
-export * from './lib/interceptors/auth-http-interceptor';
-
-export * from './lib/guards/auth.guard';
-
-export * from './lib/interfaces/auth-status.interface';
-export * from './lib/interfaces/auth-service.interface';
+export * from './lib/guards';
+export * from './lib/interceptors';
+export * from './lib/services';
+export * from './lib/interfaces';
