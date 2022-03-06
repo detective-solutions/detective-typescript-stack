@@ -28,6 +28,11 @@
             "glob": "**/*",
             "input": "libs/frontend/detective-client/ui/src/lib/i18n",
             "output": "assets/i18n"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/frontend/shared/error-handling/src/lib/i18n",
+            "output": "assets/i18n/errorHandling"
           }
         ],
         "stylePreprocessorOptions": {

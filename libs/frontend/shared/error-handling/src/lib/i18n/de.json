@@ -1,0 +1,8 @@
+{
+  "toastMessages": {
+    "byStatusCode": {
+      "500": "Es ist ein unerwarteter Fehler auf dem Server aufgetreten. Bitte versuchen Sie es erneut.",
+      "503": "Keine Verbindung zur Datenbank möglich. Bitte versuchen Sie es erneut."
+    }
+  }
+}
