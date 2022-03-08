@@ -9,7 +9,7 @@ import { TranslocoService } from '@ngneat/transloco';
 export class ServerErrorHttpInterceptor implements HttpInterceptor {
   private static readonly translationScope = 'errorHandling';
 
-  constructor(private readonly translationService: TranslocoService, private readonly toastService: ToastService) {}
+  constructor(private readonly toastService: ToastService, private readonly translationService: TranslocoService) {}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
