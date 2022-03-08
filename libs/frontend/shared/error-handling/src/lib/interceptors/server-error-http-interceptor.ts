@@ -1,16 +1,15 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import { Observable, catchError, of, throwError } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+
+import { Injectable } from '@angular/core';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Injectable({ providedIn: 'root' })
 export class ServerErrorHttpInterceptor implements HttpInterceptor {
-  constructor(
-    private readonly translationService: TranslocoService,
-    @Inject(TRANSLOCO_SCOPE) private readonly translocoProviderScope: ProviderScope,
-    private readonly toastService: ToastService
-  ) {}
+  private static readonly translationScope = 'errorHandling';
+
+  constructor(private readonly translationService: TranslocoService, private readonly toastService: ToastService) {}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -21,23 +20,25 @@ export class ServerErrorHttpInterceptor implements HttpInterceptor {
         } else if (returnedError instanceof HttpErrorResponse) {
           this.handleServerSideError(returnedError);
         }
-        return of(returnedError);
+        return throwError(() => returnedError);
       })
     );
   }
 
   private handleServerSideError(error: HttpErrorResponse) {
     switch (error.status) {
+      // Internal Server Error
       case 500:
         this.translationService
-          .selectTranslate('toastMessages.byStatusCode.500', {}, this.translocoProviderScope.scope)
+          .selectTranslate('toastMessages.byStatusCode.500', {}, ServerErrorHttpInterceptor.translationScope)
           .subscribe((translation) =>
             this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
           );
         break;
+      // Service Unavailable
       case 503:
         this.translationService
-          .selectTranslate('toastMessages.byStatusCode.503', {}, this.translocoProviderScope.scope)
+          .selectTranslate('toastMessages.byStatusCode.503', {}, ServerErrorHttpInterceptor.translationScope)
           .subscribe((translation) =>
             this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
           );
