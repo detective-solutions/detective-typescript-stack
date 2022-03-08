@@ -5,7 +5,6 @@ import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui
 
 import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
-import { HttpClient } from '@angular/common/http';
 import { ISidenavItem } from './ISidenavItem.interface';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -46,7 +45,6 @@ export class NavigationComponent implements OnDestroy {
     private readonly overlayContainer: OverlayContainer,
     private readonly eventService: EventService,
     private readonly authService: AuthService,
-    private readonly http: HttpClient,
     private readonly router: Router,
     private readonly toastService: ToastService
   ) {
@@ -59,10 +57,6 @@ export class NavigationComponent implements OnDestroy {
 
   toggleViews(toggleChange: MatSlideToggleChange) {
     this.eventService.showTableView$.next(toggleChange.checked);
-  }
-
-  sendTestRequest() {
-    this.subscriptions.add(this.http.get('/v1/auth/me').subscribe((val) => console.log(val)));
   }
 
   ngOnDestroy() {
