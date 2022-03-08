@@ -1,0 +1,6 @@
+{
+  "toastMessages": {
+    "loginFailed": "Die eingegeben Anmeldedaten sind nicht korrekt. Bitte versuchen Sie es erneut.",
+    "loginExpired": "Ihr Login ist abgelaufen. Bitte loggen Sie sich erneut ein."
+  }
+}

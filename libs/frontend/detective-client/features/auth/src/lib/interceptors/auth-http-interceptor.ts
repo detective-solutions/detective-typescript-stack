@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, catchError, filter, of, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, catchError, filter, of, switchMap, take, tap } from 'rxjs';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
@@ -7,18 +7,22 @@ import { IAuthServerResponse } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class AuthHttpInterceptor implements HttpInterceptor {
+  private static readonly translationScope = 'auth';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private accessTokenSubject = new BehaviorSubject<any>(null);
+  private readonly accessTokenSubject = new BehaviorSubject<any>(null);
+  private readonly subscriptions = new Subscription();
 
   constructor(
     private readonly authService: AuthService,
+    private readonly logger: LogService,
     private readonly router: Router,
     private readonly toastService: ToastService,
-    private readonly logger: LogService
+    private readonly translationService: TranslocoService
   ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,17 +34,29 @@ export class AuthHttpInterceptor implements HttpInterceptor {
         request = this.setAuthorizationHeader(request, this.authService.getAccessToken());
       }
     }
-
     return next.handle(request).pipe(
       catchError((err) => {
         if (err instanceof HttpErrorResponse && request.url.startsWith(environment.baseUrl) && err.status === 401) {
-          // Explicitly exclude refresh url here to prevent infinite loop
+          // Initiate token refresh if necessary
+          // Explicitly exclude refresh url to prevent infinite loop
           if (!request.url.endsWith('refresh') && this.authService.canRefresh()) {
             this.logger.info('Access token expired. Refreshing ...');
             return this.refreshTokens(request, next);
           }
-          this.logoutAndRedirect(request);
-          return of(err);
+          // Handle error produced by login route
+          if (request.url.endsWith('login')) {
+            this.logger.error('Invalid login credentials');
+            this.subscriptions.add(
+              this.translationService
+                .selectTranslate('toastMessages.loginFailed', {}, AuthHttpInterceptor.translationScope)
+                .subscribe((translation) =>
+                  this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
+                )
+            );
+          } else {
+            // General handling of 401 errors
+            this.logoutAndRedirect(request);
+          }
         }
         return of(err);
       })
@@ -49,19 +65,27 @@ export class AuthHttpInterceptor implements HttpInterceptor {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logoutAndRedirect(request: HttpRequest<any>) {
-    console.log('REDIRECTING because of:', request);
+    this.authService.logout();
+
+    // Redirect to login on failed token refresh
     if (request.url.endsWith('refresh')) {
       this.router.navigate(['/login'], {
         queryParams: { redirectUrl: this.router.url },
       });
+      // Show info toast if login has expired while using the application to provide better UX
     } else if (!request.url.endsWith('login')) {
-      // TODO: Add translation to toast
-      const toast = this.toastService.showToast('Your login has expired. Please login again.', 'Login', ToastType.INFO);
-      toast.onAction().subscribe(() => {
-        this.router.navigate(['/login'], {
-          queryParams: { redirectUrl: this.router.url },
-        });
-      });
+      this.subscriptions.add(
+        this.translationService
+          .selectTranslate('toastMessages.loginExpired', {}, AuthHttpInterceptor.translationScope)
+          .subscribe((translation) => {
+            const toast = this.toastService.showToast(translation, 'Login', ToastType.INFO);
+            toast.onAction().subscribe(() => {
+              this.router.navigate(['/login'], {
+                queryParams: { redirectUrl: this.router.url },
+              });
+            });
+          })
+      );
     }
   }
 

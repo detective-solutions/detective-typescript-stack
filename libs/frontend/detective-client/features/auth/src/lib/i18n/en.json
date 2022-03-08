@@ -1,0 +1,6 @@
+{
+  "toastMessages": {
+    "loginFailed": "Incorrect e-mail or password. Please try again.",
+    "loginExpired": "Your login has expired. Please login again."
+  }
+}

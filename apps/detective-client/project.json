@@ -31,6 +31,11 @@
           },
           {
             "glob": "**/*",
+            "input": "libs/frontend/detective-client/features/auth/src/lib/i18n",
+            "output": "assets/i18n/auth"
+          },
+          {
+            "glob": "**/*",
             "input": "libs/frontend/shared/error-handling/src/lib/i18n",
             "output": "assets/i18n/errorHandling"
           }
