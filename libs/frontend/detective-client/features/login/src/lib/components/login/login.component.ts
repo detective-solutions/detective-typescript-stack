@@ -2,7 +2,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EmailValidation, PasswordValidation } from '@detective.solutions/frontend/shared/utils';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Subscription, combineLatest, filter } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/detective-client/features/auth';
 
@@ -47,19 +47,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   login(submittedForm: FormGroup) {
     this.subscriptions.add(this.authService.login(submittedForm.value.email, submittedForm.value.password).subscribe());
-
     this.subscriptions.add(
       combineLatest([this.authService.authStatus$, this.authService.currentUser$])
-        .pipe(
-          tap(() => console.log),
-          filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''),
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          tap(() => {
-            // TODO: Show toast on successful/failed login
-            this.router.navigate([this.redirectUrl]);
-          })
-        )
-        .subscribe()
+        .pipe(filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''))
+        .subscribe(() => this.router.navigateByUrl(this.redirectUrl))
     );
   }
 }
