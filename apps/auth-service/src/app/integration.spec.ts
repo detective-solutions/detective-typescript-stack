@@ -1,4 +1,4 @@
-import { AuthEnvironment, AuthModule, AuthService, LocalStrategy } from '@detective.solutions/backend/auth';
+import { AuthEnvironment, AuthModule, AuthService } from '@detective.solutions/backend/auth';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
@@ -38,9 +38,6 @@ beforeAll(async () => {
 
   configService = moduleRef.get<ConfigService>(ConfigService);
   jwtService = moduleRef.get<JwtService>(JwtService);
-
-  // Disable loggers for test run
-  moduleRef.get<LocalStrategy>(LocalStrategy).logger.localInstance.setLogLevels([]);
 });
 
 afterEach(() => {
@@ -140,7 +137,7 @@ describe('AppController', () => {
         });
     });
 
-    it('should return Bad Request (400) if the given email address is invalid', async () => {
+    it('should return Unauthorized (401) if the given email address is invalid', async () => {
       return app
         .inject({
           method: 'POST',
@@ -148,8 +145,8 @@ describe('AppController', () => {
           url: '/auth/login',
         })
         .then((result) => {
-          expect(result.statusCode).toEqual(400);
-          expect(JSON.parse(result.body)).toEqual({ statusCode: 400, message: 'Bad Request' });
+          expect(result.statusCode).toEqual(401);
+          expect(JSON.parse(result.body)).toEqual({ statusCode: 401, message: 'Unauthorized' });
         });
     });
 
