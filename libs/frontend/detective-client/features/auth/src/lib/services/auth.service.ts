@@ -22,10 +22,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
     filter((authStatus: IAuthStatus) => authStatus.isAuthenticated),
     mergeMap((authStatus) => this.getCurrentUser(authStatus.userId)),
     map((user: User) => this.currentUser$.next(user)),
-    catchError(() => {
-      // TODO: Check error handling
-      return EMPTY;
-    })
+    catchError(transformError)
   );
 
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
