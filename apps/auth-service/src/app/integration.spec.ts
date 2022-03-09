@@ -202,12 +202,12 @@ describe('AppController', () => {
         url: '/auth/login',
       });
 
-      const accessToken = JSON.parse(loginResponse.body).access_token;
+      const refreshToken = JSON.parse(loginResponse.body).refresh_token;
 
       return app
         .inject({
           method: 'POST',
-          headers: { authorization: `Bearer ${accessToken}` },
+          headers: { authorization: `Bearer ${refreshToken}` },
           url: '/auth/logout',
         })
         .then((result) => {

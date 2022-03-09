@@ -14,7 +14,9 @@ export abstract class AuthService extends CacheService implements IAuthService {
   protected static ACCESS_TOKEN_STORAGE_KEY = 'access_token';
   protected static REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
 
+  // Flags to determine when to use refresh token as bearer token in AuthHttpInterceptor
   isRefreshing = false;
+  isLoggingOut = false;
 
   private getAndUpdateUserIfAuthenticated = pipe(
     filter((authStatus: IAuthStatus) => authStatus.isAuthenticated),
@@ -59,12 +61,14 @@ export abstract class AuthService extends CacheService implements IAuthService {
   }
 
   logout(clearToken?: boolean): Observable<void> {
+    this.isLoggingOut = true;
     return this.logoutProvider().pipe(
       tap(() => {
         if (clearToken) {
           this.clearAuthTokens();
           this.authStatus$.next(defaultAuthStatus);
         }
+        this.isLoggingOut = false;
       })
     );
   }
@@ -95,7 +99,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
     return this.getItem(AuthService.REFRESH_TOKEN_STORAGE_KEY) ?? '';
   }
 
-  canRefresh(): boolean {
+  tokenRefreshNeeded(): boolean {
     const hasExpiredAccessToken = this.hasExpiredToken(this.getAccessToken());
     const hasExpiredRefreshToken = this.hasExpiredToken(this.getRefreshToken());
     return hasExpiredAccessToken && !hasExpiredRefreshToken ? true : false;

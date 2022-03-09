@@ -51,7 +51,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
     return this.authService.authStatus$.pipe(
       switchMap((authStatus) => {
         const loginAllowed = authStatus.isAuthenticated;
-        if (!loginAllowed && this.authService.canRefresh()) {
+        if (!loginAllowed && this.authService.tokenRefreshNeeded()) {
           return this.authService.refreshTokens().pipe(
             switchMap(() => this.authService.authStatus$),
             map((updatedAuthStatus) => updatedAuthStatus.isAuthenticated)
