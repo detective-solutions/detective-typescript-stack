@@ -7,7 +7,7 @@
       <mat-card-title fxLayoutAlign="center center"> Login </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form [formGroup]="loginForm" fxLayout="column" fxLayoutGap="10px">
+      <form [formGroup]="loginForm" (keydown.enter)="login(loginForm)" fxLayout="column" fxLayoutGap="10px">
         <div fxLayout="row" fxLayoutAlign="start center">
           <mat-form-field fxFlex appearance="fill">
             <input matInput placeholder="Email" aria-label="Email" formControlName="email" #email />
@@ -36,6 +36,7 @@
               (click)="hidePassword = !hidePassword"
               attr.aria-label="{{ t('passwordHideLabel') }}"
               [attr.aria-pressed]="hidePassword"
+              type="button"
             >
               <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
