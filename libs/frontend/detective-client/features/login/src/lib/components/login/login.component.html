@@ -7,13 +7,16 @@
       <mat-card-title fxLayoutAlign="center center"> Login </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form [formGroup]="loginForm" fxLayout="column">
-        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <form [formGroup]="loginForm" fxLayout="column" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="start center">
           <mat-form-field fxFlex appearance="fill">
-            <input matInput placeholder="E-Mail" aria-label="E-Mail" formControlName="email" #email />
+            <input matInput placeholder="Email" aria-label="Email" formControlName="email" #email />
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">{{
+              t('emailFormErrors.required')
+            }}</mat-error>
           </mat-form-field>
         </div>
-        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="start center">
           <mat-form-field fxFlex appearance="fill">
             <input
               matInput
@@ -24,6 +27,9 @@
               [type]="hidePassword ? 'password' : 'text'"
               #password
             />
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">{{
+              t('passwordFormErrors.required')
+            }}</mat-error>
             <button
               mat-icon-button
               matSuffix

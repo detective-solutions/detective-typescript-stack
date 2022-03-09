@@ -1,5 +1,11 @@
 {
+  "emailFormErrors": {
+    "required": "Bitte geben Sie Ihre E-Mail Adresse an"
+  },
   "passwordFormPlaceholder": "Passwort",
   "passwordHideLabel": "Passwort verbergen",
-  "passwordResetLink": "Passwort vergessen?"
+  "passwordResetLink": "Passwort vergessen?",
+  "passwordFormErrors": {
+    "required": "Bitte geben Sie Ihr Password an"
+  }
 }

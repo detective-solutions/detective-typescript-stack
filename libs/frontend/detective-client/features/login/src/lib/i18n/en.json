@@ -1,5 +1,11 @@
 {
+  "emailFormErrors": {
+    "required": "Please provide an email address"
+  },
   "passwordFormPlaceholder": "Password",
   "passwordHideLabel": "Hide password",
-  "passwordResetLink": "Forgot your password?"
+  "passwordResetLink": "Forgot your password?",
+  "passwordFormErrors": {
+    "required": "Please provide a password"
+  }
 }
