@@ -54,13 +54,11 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   }
 
   handleAuthorizationError(request: HttpRequest<any>, next: HttpHandler) {
+    // Initiate token refresh if necessary
     // Explicitly exclude refresh url to prevent infinite loop
-    if (!request.url.endsWith('refresh')) {
-      // Initiate token refresh if necessary
-      if (this.authService.tokenRefreshNeeded()) {
-        this.logger.info('Access token expired. Refreshing ...');
-        this.refreshTokens(request, next);
-      }
+    if (this.authService.tokenRefreshNeeded() && !request.url.endsWith('refresh')) {
+      this.logger.info('Access token expired. Refreshing ...');
+      this.refreshTokens(request, next);
     }
     // Handle error produced by refresh route
     else if (request.url.endsWith('refresh')) {
