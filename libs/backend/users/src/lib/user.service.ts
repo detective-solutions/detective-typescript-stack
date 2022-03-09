@@ -153,13 +153,14 @@ export class UserService {
     return jwtUserInfo;
   }
 
-  async removeRefreshTokenId(id: string): Promise<Record<string, any> | null> {
+  async removeRefreshTokenId(id: string): Promise<void | null> {
     const mutationJson = {
       uid: id,
       'User.refreshTokenId': '',
     };
 
     return this.sendMutation(mutationJson).catch(() => {
+      this.logger.error(`There was a problem while trying to remove the refresh token id for user ${id}`);
       return null;
     });
   }

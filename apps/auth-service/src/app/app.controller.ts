@@ -1,5 +1,5 @@
 import { AccessTokenGuard, AuthService, LocalAuthGuard, RefreshTokenGuard } from '@detective.solutions/backend/auth';
-import { Controller, Header, Ip, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Header, HttpCode, Ip, Post, Request, UseGuards } from '@nestjs/common';
 import { IAuthServerResponse } from '@detective.solutions/shared/data-access';
 
 @Controller({ path: 'auth', version: '1' })
@@ -15,8 +15,9 @@ export class AppController {
 
   @Post('logout')
   @UseGuards(AccessTokenGuard)
-  async logout(@Request() request): Promise<boolean> {
-    return this.authService.logout(request.user);
+  @HttpCode(200)
+  async logout(@Request() request): Promise<void> {
+    this.authService.logout(request.user);
   }
 
   @Post('refresh')

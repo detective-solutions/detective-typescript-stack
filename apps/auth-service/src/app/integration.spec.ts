@@ -188,7 +188,7 @@ describe('AppController', () => {
       refreshTokenId: uuidv4(),
     } as JwtUserInfo;
 
-    it('should return true if the logout process was successful', async () => {
+    it('should return OK (200) if the logout process was successfully invoked', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
         .mockResolvedValueOnce({ jwtUserInfo: [testJwtUserInfo] })
@@ -212,43 +212,8 @@ describe('AppController', () => {
           url: '/auth/logout',
         })
         .then((result) => {
-          expect(result.statusCode).toEqual(201);
-          expect(result.body).toBeTruthy();
-          const body = JSON.parse(result.body);
-          expect(body).toBe(true);
-        });
-    });
-
-    it('should return false if the logout process was not successful', async () => {
-      jest
-        .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ jwtUserInfo: [testJwtUserInfo] })
-        .mockResolvedValueOnce({
-          passwordCheck: [{ isValid: true }],
-        });
-      jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValueOnce({});
-
-      const loginResponse = await app.inject({
-        method: 'POST',
-        payload: { email: 'test@test.com', password: 'testPassword' },
-        url: '/auth/login',
-      });
-
-      const accessToken = JSON.parse(loginResponse.body).access_token;
-
-      jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValueOnce(null);
-
-      return app
-        .inject({
-          method: 'POST',
-          headers: { authorization: `Bearer ${accessToken}` },
-          url: '/auth/logout',
-        })
-        .then((result) => {
-          expect(result.statusCode).toEqual(201);
-          expect(result.body).toBeTruthy();
-          const body = JSON.parse(result.body);
-          expect(body).toBe(false);
+          expect(result.statusCode).toEqual(200);
+          expect(result.body).toBeFalsy();
         });
     });
 

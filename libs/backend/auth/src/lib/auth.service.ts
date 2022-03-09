@@ -52,17 +52,12 @@ export class AuthService {
     return this.getTokens(jwtUserInfo, ipAddress);
   }
 
-  async logout(payload: IJwtTokenPayload): Promise<boolean> {
+  async logout(payload: IJwtTokenPayload): Promise<void> {
     this.logger.log(
       `Logging out user ${payload.sub} with role ${payload.role} for tenant ${payload.tenantId} (Refresh token ID: ${payload.jti})`
     );
 
-    const response = await this.userService.removeRefreshTokenId(payload.sub);
-    if (!response) {
-      return false;
-    }
-
-    return true;
+    this.userService.removeRefreshTokenId(payload.sub);
   }
 
   async refreshTokens(payload: IJwtTokenPayload, requestIpAddress: string): Promise<IAuthServerResponse> {

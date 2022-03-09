@@ -152,20 +152,10 @@ describe('AuthService', () => {
     };
 
     it('should return true if the refresh token ID was removed from the database', async () => {
-      const removeRefreshTokenIdSpy = jest.spyOn(userService, 'removeRefreshTokenId').mockResolvedValue({});
+      const removeRefreshTokenIdSpy = jest.spyOn(userService, 'removeRefreshTokenId');
 
-      const res = await authService.logout(testTokenPayload);
+      await authService.logout(testTokenPayload);
 
-      expect(res).toBe(true);
-      expect(removeRefreshTokenIdSpy).toBeCalledTimes(1);
-    });
-
-    it('should return false if the refresh token ID could not be removed from the database', async () => {
-      const removeRefreshTokenIdSpy = jest.spyOn(userService, 'removeRefreshTokenId').mockResolvedValue(null);
-
-      const res = await authService.logout(testTokenPayload);
-
-      expect(res).toBe(false);
       expect(removeRefreshTokenIdSpy).toBeCalledTimes(1);
     });
   });

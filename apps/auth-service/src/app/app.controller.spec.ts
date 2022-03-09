@@ -45,13 +45,12 @@ describe('AppController', () => {
   });
 
   describe('logout', () => {
-    it('should invoke the authService login method with correct input parameters', async () => {
-      const testServerResponse = true;
+    it('should invoke the authService logout method with correct input parameters', async () => {
       const testRequest = { user: { id: '1' }, meta: { test: '1' } };
+      const loginSpy = jest.spyOn(authService, 'logout');
 
-      const loginSpy = jest.spyOn(authService, 'logout').mockResolvedValue(testServerResponse);
+      await appController.logout(testRequest);
 
-      expect(await appController.logout(testRequest)).toBe(testServerResponse);
       expect(loginSpy).toBeCalledTimes(1);
       expect(loginSpy).toBeCalledWith(testRequest.user);
     });
