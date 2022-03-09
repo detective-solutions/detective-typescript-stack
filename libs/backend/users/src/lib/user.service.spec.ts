@@ -312,15 +312,20 @@ describe('UserService', () => {
 
   describe('updateRefreshTokenId', () => {
     it('should return a valid object reference if the database mutation was successful ', async () => {
+      const mutationJson = {
+        uid: testUserCredentials.id,
+        'User.refreshTokenId': testUserCredentials.refreshTokenId,
+      };
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const res = await userService.updateRefreshTokenId(testUserCredentials.id, testUserCredentials.refreshTokenId);
 
       expect(res).toBeTruthy();
       expect(createMutationSpy).toBeCalledTimes(1);
+      expect(createMutationSpy).toBeCalledWith(mutationJson);
     });
 
-    it('should return null if an error occurred during the database mutation', async () => {
+    it('should return null if an error occurred while updating the refresh token id in the database', async () => {
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockRejectedValue(null);
 
       const res = await userService.updateRefreshTokenId(testUserCredentials.id, testUserCredentials.refreshTokenId);
