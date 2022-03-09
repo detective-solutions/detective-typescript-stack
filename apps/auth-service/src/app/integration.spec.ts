@@ -19,6 +19,8 @@ let jwtService: JwtService;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'production';
+  process.env.ACCESS_TOKEN_SECRET = 'accessTokenSecret';
+  process.env.REFRESH_TOKEN_SECRET = 'refreshTokenSecret';
 
   const moduleRef = await Test.createTestingModule({
     imports: [
