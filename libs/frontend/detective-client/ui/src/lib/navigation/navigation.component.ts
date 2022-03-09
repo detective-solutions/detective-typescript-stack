@@ -1,7 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
-import { Observable, Subscription, catchError, map, shareReplay, tap, throwError } from 'rxjs';
-import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { Observable, Subscription, map, shareReplay } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/detective-client/features/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
@@ -41,12 +40,11 @@ export class NavigationComponent implements OnDestroy {
   private cdkOverlay: HTMLElement;
 
   constructor(
-    private readonly breakpointObserver: BreakpointObserver,
-    private readonly overlayContainer: OverlayContainer,
-    private readonly eventService: EventService,
     private readonly authService: AuthService,
-    private readonly router: Router,
-    private readonly toastService: ToastService
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly eventService: EventService,
+    private readonly overlayContainer: OverlayContainer,
+    private readonly router: Router
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
     this.cdkOverlay = this.overlayContainer.getContainerElement();
@@ -59,31 +57,11 @@ export class NavigationComponent implements OnDestroy {
     this.eventService.showTableView$.next(toggleChange.checked);
   }
 
+  logout() {
+    this.subscriptions.add(this.authService.logout(true).subscribe(() => this.router.navigateByUrl('login')));
+  }
+
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
-  }
-
-  logout() {
-    this.subscriptions.add(
-      this.authService
-        .logout(true)
-        .pipe(
-          tap((logoutSuccessful) => {
-            logoutSuccessful ? this.router.navigateByUrl('/login') : this.showLogoutErrorToast();
-          }),
-          catchError((err) => {
-            this.showLogoutErrorToast();
-            return throwError(() => new Error(err));
-          })
-        )
-        .subscribe()
-    );
-  }
-
-  showLogoutErrorToast() {
-    // TODO: Add translation to the error toast
-    this.toastService.showToast('The Logout was not successful. Please try again.', '', ToastType.ERROR, {
-      duration: 3500,
-    });
   }
 }

@@ -31,7 +31,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
   protected readonly resumeCurrentUser$ = this.authStatus$.pipe(this.getAndUpdateUserIfAuthenticated);
 
   protected abstract loginProvider(email: string, password: string): Observable<IAuthServerResponse>;
-  protected abstract logoutProvider(): Observable<boolean>;
+  protected abstract logoutProvider(): Observable<void>;
   protected abstract refreshProvider(): Observable<IAuthServerResponse>;
   protected abstract transformJwtToken(token: IJwtTokenPayload): IAuthStatus;
   protected abstract getCurrentUser(userId: string): Observable<User>;
@@ -58,13 +58,11 @@ export abstract class AuthService extends CacheService implements IAuthService {
     );
   }
 
-  logout(clearToken?: boolean): Observable<boolean> {
+  logout(clearToken?: boolean): Observable<void> {
     return this.logoutProvider().pipe(
-      tap((logoutSuccessful) => {
-        if (logoutSuccessful) {
-          if (clearToken) {
-            this.clearAuthTokens();
-          }
+      tap(() => {
+        if (clearToken) {
+          this.clearAuthTokens();
           this.authStatus$.next(defaultAuthStatus);
         }
       })

@@ -29,8 +29,8 @@ export class CustomAuthService extends AuthService {
     });
   }
 
-  protected logoutProvider(): Observable<boolean> {
-    return this.httpClient.post<boolean>(this.logoutUrl, {});
+  protected logoutProvider(): Observable<void> {
+    return this.httpClient.post<void>(this.logoutUrl, {});
   }
 
   protected refreshProvider(): Observable<IAuthServerResponse> {
