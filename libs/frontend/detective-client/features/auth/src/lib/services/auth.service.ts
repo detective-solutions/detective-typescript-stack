@@ -21,13 +21,16 @@ export abstract class AuthService extends CacheService implements IAuthService {
   private getAndUpdateUserIfAuthenticated = pipe(
     filter((authStatus: IAuthStatus) => authStatus.isAuthenticated),
     mergeMap((authStatus) => this.getCurrentUser(authStatus.userId)),
-    map((user: User) => this.currentUser$.next(user)),
-    catchError(transformError)
+    map((user: User) => this.currentUser$.next(user))
   );
 
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
   readonly currentUser$ = new BehaviorSubject<User>(new User());
-  protected readonly resumeCurrentUser$ = this.authStatus$.pipe(this.getAndUpdateUserIfAuthenticated);
+
+  protected readonly resumeCurrentUser$ = this.authStatus$.pipe(
+    this.getAndUpdateUserIfAuthenticated,
+    catchError(transformError)
+  );
 
   protected abstract loginProvider(email: string, password: string): Observable<IAuthServerResponse>;
   protected abstract logoutProvider(): Observable<void>;
@@ -53,7 +56,8 @@ export abstract class AuthService extends CacheService implements IAuthService {
         return this.getAuthStatusFromToken();
       }),
       tap((status) => this.authStatus$.next(status)),
-      this.getAndUpdateUserIfAuthenticated
+      this.getAndUpdateUserIfAuthenticated,
+      catchError(transformError)
     );
   }
 
