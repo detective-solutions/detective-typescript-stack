@@ -81,7 +81,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
     else if (request.url.endsWith('logout')) {
       this.logoutAndRedirect();
     }
-    // General handling of 401 errors
+    // Show info toast as default behavior in case of an invalid login to provide better UX
     else {
       this.showExpiredLoginToast();
     }
@@ -98,7 +98,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
         })
       );
     } else {
-      // If a token refresh is on progress, queue up incoming requests and provide them with updated access tokens
+      // If a token refresh is in progress, queue up incoming requests and provide them with updated access tokens
       this.accessTokenSubject.pipe(
         filter((accessToken) => accessToken !== null),
         take(1),
@@ -115,7 +115,6 @@ export class AuthHttpInterceptor implements HttpInterceptor {
     });
   }
 
-  // Show info toast as default behavior if login has expired to provide better UX
   showExpiredLoginToast() {
     this.logger.error('Login expired');
     this.subscriptions.add(
