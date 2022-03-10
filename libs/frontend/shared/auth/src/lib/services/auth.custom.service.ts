@@ -1,9 +1,9 @@
+import { GetUserGQL, IGetCurrentUserResponse } from '../graphql/get-user-gql';
 import { IAuthServerResponse, IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
 import { Observable, catchError, map } from 'rxjs';
 
 import { $enum } from 'ts-enum-util';
 import { AuthService } from './auth.service';
-import { GetUserGQL } from '../graphql/get-user-gql';
 import { HttpClient } from '@angular/common/http';
 import { IAuthStatus } from '../interfaces/auth-status.interface';
 import { Injectable } from '@angular/core';
@@ -48,9 +48,9 @@ export class CustomAuthService extends AuthService {
 
   protected getCurrentUser(userId: string): Observable<User> {
     return this.getUserGQL.fetch({ userId: userId }).pipe(
-      // TODO: Add correct response type
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      map((response: any) => response.data.getUser),
+      map((response: any) => response?.data),
+      map((response: IGetCurrentUserResponse) => response.getUser),
       map(User.Build),
       catchError(transformError)
     );
