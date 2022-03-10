@@ -3,6 +3,8 @@ import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { validate } from 'class-validator';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const validateDto = async (
   targetClass: ClassConstructor<unknown>,
   inputObject: Record<string, any>,
