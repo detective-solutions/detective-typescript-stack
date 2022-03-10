@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'detective-client-features',
+  displayName: 'frontend-detective-client-features-login',
   preset: '../../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -8,7 +8,7 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../coverage/libs/frontend/detective-client/features/auth',
+  coverageDirectory: '../../../../../coverage/libs/frontend/detective-client/features/login',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

@@ -2,7 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
 import { Observable, Subscription, map, shareReplay } from 'rxjs';
 
-import { AuthService } from '@detective.solutions/detective-client/features/auth';
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ISidenavItem } from './ISidenavItem.interface';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';

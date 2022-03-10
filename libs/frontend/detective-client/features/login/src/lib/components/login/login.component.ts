@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { LoginEmailValidation, LoginPasswordValidation } from '@detective.solutions/frontend/shared/utils';
 import { Subscription, combineLatest, filter } from 'rxjs';
 
-import { AuthService } from '@detective.solutions/detective-client/features/auth';
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 
 @Component({
   selector: 'login',

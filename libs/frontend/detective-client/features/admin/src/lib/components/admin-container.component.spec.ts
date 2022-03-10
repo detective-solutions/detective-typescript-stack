@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AdminContainerComponent } from './admin-container.component';
-import { AuthService } from '@detective.solutions/detective-client/features/auth';
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MockProvider } from 'ng-mocks';

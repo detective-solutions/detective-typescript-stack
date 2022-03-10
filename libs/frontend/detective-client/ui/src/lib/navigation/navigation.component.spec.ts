@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AuthService } from '@detective.solutions/detective-client/features/auth';
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';

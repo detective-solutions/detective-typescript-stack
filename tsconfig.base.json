@@ -22,19 +22,20 @@
       "@detective.solutions/backend/shared/environments": ["libs/backend/shared/environments/src/index.ts"],
       "@detective.solutions/backend/shared/utils": ["libs/backend/shared/utils/src/index.ts"],
       "@detective.solutions/backend/users": ["libs/backend/users/src/index.ts"],
-      "@detective.solutions/detective-client/features/admin": [
+      "@detective.solutions/frontend/detective-client/features/admin": [
         "libs/frontend/detective-client/features/admin/src/index.ts"
       ],
-      "@detective.solutions/detective-client/features/auth": [
-        "libs/frontend/detective-client/features/auth/src/index.ts"
-      ],
-      "@detective.solutions/detective-client/features/home": [
+      "@detective.solutions/frontend/detective-client/features/home": [
         "libs/frontend/detective-client/features/home/src/index.ts"
       ],
-      "@detective.solutions/detective-client/features/login": [
+      "@detective.solutions/frontend/detective-client/features/login": [
         "libs/frontend/detective-client/features/login/src/index.ts"
       ],
+      "@detective.solutions/frontend/detective-client/features/register": [
+        "libs/frontend/detective-client/features/register/src/index.ts"
+      ],
       "@detective.solutions/frontend/detective-client/ui": ["libs/frontend/detective-client/ui/src/index.ts"],
+      "@detective.solutions/frontend/shared/auth": ["libs/frontend/shared/auth/src/index.ts"],
       "@detective.solutions/frontend/shared/data-access": ["libs/frontend/shared/data-access/src/index.ts"],
       "@detective.solutions/frontend/shared/environments": ["libs/frontend/shared/environments/src/index.ts"],
       "@detective.solutions/frontend/shared/error-handling": ["libs/frontend/shared/error-handling/src/index.ts"],

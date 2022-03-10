@@ -7,14 +7,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/frontend/detective-client/features/auth/**/*.ts"]
+        "lintFilePatterns": ["libs/frontend/shared/auth/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/frontend/detective-client/features/auth"],
+      "outputs": ["coverage/libs/frontend/shared/auth"],
       "options": {
-        "jestConfig": "libs/frontend/detective-client/features/auth/jest.config.js",
+        "jestConfig": "libs/frontend/shared/auth/jest.config.js",
         "passWithNoTests": true
       }
     }
