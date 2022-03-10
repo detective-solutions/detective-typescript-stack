@@ -31,7 +31,7 @@
           },
           {
             "glob": "**/*",
-            "input": "libs/frontend/detective-client/features/auth/src/lib/i18n",
+            "input": "libs/frontend/shared/auth/src/lib/i18n",
             "output": "assets/i18n/auth"
           },
           {
