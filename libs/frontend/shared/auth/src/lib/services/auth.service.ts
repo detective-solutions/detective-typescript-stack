@@ -1,4 +1,4 @@
-import { BehaviorSubject, EMPTY, Observable, catchError, filter, map, mergeMap, pipe, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, pipe, tap } from 'rxjs';
 import { IAuthServerResponse, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
@@ -85,9 +85,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
       catchError((err) => {
         this.isRefreshing = false;
         this.logout(true);
-        console.log('ERROR');
-        transformError(err);
-        return EMPTY;
+        return transformError(err);
       })
     );
   }
