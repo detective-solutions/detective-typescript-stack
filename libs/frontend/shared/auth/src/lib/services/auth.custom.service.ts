@@ -1,4 +1,4 @@
-import { GetUserGQL, IGetCurrentUserResponse } from '../graphql/get-user-gql';
+import { GetUserGQL, IGetCurrentUserGQLResponse } from '../graphql/get-user-gql';
 import { IAuthServerResponse, IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
 import { Observable, catchError, map } from 'rxjs';
 
@@ -50,7 +50,7 @@ export class CustomAuthService extends AuthService {
     return this.getUserGQL.fetch({ userId: userId }).pipe(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       map((response: any) => response?.data),
-      map((response: IGetCurrentUserResponse) => response.getUser),
+      map((response: IGetCurrentUserGQLResponse) => response.getUser),
       map(User.Build),
       catchError(transformError)
     );
