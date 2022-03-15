@@ -14,19 +14,19 @@ export enum TableCellTypes {
 }
 
 export interface ITextTableCell {
-  readonly type: TableCellTypes.TEXT_TABLE_CELL;
-  readonly text: string;
+  type: TableCellTypes.TEXT_TABLE_CELL;
+  text: string;
 }
 
 export interface IHtmlTableCell {
-  readonly type: TableCellTypes.HTML_TABLE_CELL;
-  readonly imageSrc: string;
-  readonly header: string;
-  readonly description: string;
+  type: TableCellTypes.HTML_TABLE_CELL;
+  imageSrc: string;
+  header: string;
+  description: string;
 }
 
 export interface IAccessTableCell {
-  readonly type: TableCellTypes.ACCESS_TABLE_CELL;
+  type: TableCellTypes.ACCESS_TABLE_CELL;
   accessState: AccessState;
 }
 
@@ -37,16 +37,16 @@ export enum AccessState {
 }
 
 export interface IFavorizedTableCell {
-  readonly type: TableCellTypes.FAVORIZED_TABLE_CELL;
+  type: TableCellTypes.FAVORIZED_TABLE_CELL;
   favorized: boolean;
 }
 
 export interface IUserAvatarListTableCell {
-  readonly type: TableCellTypes.USER_AVATAR_LIST_TABLE_CELL;
-  readonly userAvatars: IUserAvatar[];
+  type: TableCellTypes.USER_AVATAR_LIST_TABLE_CELL;
+  userAvatars: IUserAvatar[];
 }
 
 export interface IUserAvatar {
-  readonly name: string;
-  readonly imageSrc: string;
+  name: string;
+  imageSrc: string;
 }
