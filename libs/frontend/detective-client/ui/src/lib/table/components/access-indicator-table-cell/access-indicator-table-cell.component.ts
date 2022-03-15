@@ -1,5 +1,5 @@
 import { AccessState, IAccessTableCell } from '../../interfaces/table-cell-data.interface';
-import { CasefileEvent, CasefileEventType } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileEventType, ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { Subject } from 'rxjs';
@@ -15,7 +15,7 @@ export class AccessIndicatorTableCellComponent implements OnInit {
   cellData!: IAccessTableCell;
   casefileId!: string;
   accessState: AccessState = AccessState.NO_ACCESS;
-  tableCellEvents$!: Subject<CasefileEvent>;
+  tableCellEvents$!: Subject<ICasefileEvent>;
 
   accessGranted = false;
   accessPending = false;

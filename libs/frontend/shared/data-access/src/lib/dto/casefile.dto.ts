@@ -1,45 +1,36 @@
-import { IUser } from './user/user.interface';
+import { IUser } from '@detective.solutions/shared/data-access';
+import { User } from './user.dto';
 
-export interface ICasefile {
-  _id: string;
-  title: string;
-  description?: string;
-  imageSrc?: string;
-  author?: IUser;
-  views?: number;
-  editors?: IUser[];
-  lastUpdated?: Date | null | string;
-}
-
-export class Casefile implements ICasefile {
+export class Casefile implements Casefile {
   static readonly casefileImagePlaceholder = 'assets/images/mocks/casefile-thumbnail-mock.jpg';
 
   constructor(
-    public _id = '',
+    public id = '',
     public title = '',
     public description = '',
     public imageSrc = '',
-    public author = { email: '' } as IUser,
+    public author = new User(),
     public views = 0,
     public editors = [{ email: '' }] as IUser[],
     public lastUpdated: Date | null = null
   ) {}
 
-  static Build(casefile: ICasefile) {
+  static Build(casefile: Casefile) {
     if (!casefile) {
       return new Casefile();
     }
 
-    if (!casefile.imageSrc) {
-      casefile.imageSrc = Casefile.casefileImagePlaceholder;
-    }
+    // TODO: Provide fallback image here
+    // if (!casefile.imageSrc) {
+    //   casefile.imageSrc = Casefile.casefileImagePlaceholder;
+    // }
 
     return new Casefile(
-      casefile._id,
+      casefile.id,
       casefile.title,
       casefile.description,
       casefile.imageSrc,
-      casefile.author as IUser,
+      User.Build(casefile.author as IUser),
       casefile.views,
       casefile.editors as IUser[],
       casefile.lastUpdated as Date

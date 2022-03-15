@@ -1,4 +1,4 @@
-import { CasefileEvent, CasefileEventType } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileEventType, ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Subject } from 'rxjs';
@@ -12,7 +12,7 @@ import { Subject } from 'rxjs';
 export class FavorizedTableCellComponent {
   casefileId!: string;
   isFavorized = false;
-  tableCellEvents$!: Subject<CasefileEvent>;
+  tableCellEvents$!: Subject<ICasefileEvent>;
 
   favorize() {
     // TODO: Handle error case

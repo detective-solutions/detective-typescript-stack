@@ -1,28 +1,31 @@
-import {
-  AccessState,
-  ICasefileTableDef,
-  ITile,
-  TableCellTypes,
-} from '@detective.solutions/frontend/detective-client/ui';
+import { AccessState, ITile, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { BehaviorSubject, Subject, Subscription, filter, tap } from 'rxjs';
-import { CasefileEvent, CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
+import {
+  Casefile,
+  CasefileEventType,
+  EventService,
+  ICasefileEvent,
+} from '@detective.solutions/frontend/shared/data-access';
 import { Component, OnDestroy } from '@angular/core';
 
 import { CasefileService } from '../../services/casefile.service';
-import { ICasefile } from '@detective.solutions/shared/data-access';
+import { ICasefileTableDef } from '../../interfaces';
 
 @Component({ template: '' })
 export class AbstractCasefileListComponent implements OnDestroy {
-  showTableView$!: BehaviorSubject<boolean>;
-  readonly tableCellEvents$ = new Subject<CasefileEvent>();
+  readonly showTableView$!: BehaviorSubject<boolean>;
+  readonly tableCellEvents$ = new Subject<ICasefileEvent>();
+  readonly paginatorEvents$ = new Subject<number>();
 
   private readonly subscriptions = new Subscription();
+
+  readonly pageSize = 10;
 
   readonly casefileAccessRequested$ = this.subscriptions.add(
     this.tableCellEvents$
       .pipe(
-        filter((event: CasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS),
-        tap((event: CasefileEvent) => console.log(event))
+        filter((event: ICasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS),
+        tap((event: ICasefileEvent) => console.log(event))
       )
       .subscribe()
   );
@@ -30,35 +33,38 @@ export class AbstractCasefileListComponent implements OnDestroy {
   readonly casefileFavorized$ = this.subscriptions.add(
     this.tableCellEvents$
       .pipe(
-        filter((event: CasefileEvent) => event.type === CasefileEventType.FAVORIZE && event.value !== undefined),
-        tap((event: CasefileEvent) => console.log(event))
+        filter((event: ICasefileEvent) => event.type === CasefileEventType.FAVORIZE && event.value !== undefined),
+        tap((event: ICasefileEvent) => console.log(event))
       )
       .subscribe()
   );
 
-  constructor(protected casefileService: CasefileService, protected eventService: EventService) {
+  constructor(protected readonly casefileService: CasefileService, protected readonly eventService: EventService) {
     this.showTableView$ = this.eventService.showTableView$;
+    this.paginatorEvents$.subscribe((pageOffset: number) =>
+      this.casefileService.updateCasefiles(pageOffset, this.pageSize)
+    );
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
 
-  protected transformToTileStructure(originalCasefiles: ICasefile[]): ITile[] {
+  protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {
     const tempTileItems = [] as ITile[];
-    originalCasefiles.forEach((casefile: ICasefile) => {
-      tempTileItems.push({ id: casefile._id, title: casefile.title, description: casefile?.description });
+    originalCasefiles.forEach((casefile: Casefile) => {
+      tempTileItems.push({ id: casefile.id, title: casefile.title, description: casefile?.description });
     });
     return tempTileItems;
   }
 
-  protected transformToTableStructure(originalCasefiles: ICasefile[]): ICasefileTableDef[] {
+  protected transformToTableStructure(originalCasefiles: Casefile[]): ICasefileTableDef[] {
     const tempTableItems = [] as ICasefileTableDef[];
-    originalCasefiles.forEach((casefile: ICasefile) => {
+    originalCasefiles.forEach((casefile: Casefile) => {
       tempTableItems.push({
         casefileInfo: {
           columnName: '',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.HTML_TABLE_CELL,
             imageSrc: casefile.imageSrc,
@@ -68,7 +74,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
         },
         access: {
           columnName: 'Access',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.ACCESS_TABLE_CELL,
             accessState: AccessState.NO_ACCESS,
@@ -76,15 +82,15 @@ export class AbstractCasefileListComponent implements OnDestroy {
         },
         owner: {
           columnName: 'Owner',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.TEXT_TABLE_CELL,
-            text: casefile.author?.firstname,
+            text: casefile.author.fullName,
           },
         },
         starred: {
           columnName: 'Starred',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.FAVORIZED_TABLE_CELL,
             favorized: false,
@@ -92,7 +98,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
         },
         views: {
           columnName: 'Views',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: String(casefile.views),
@@ -100,7 +106,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
         },
         lastUpdated: {
           columnName: 'Last Updated',
-          casefileId: casefile._id,
+          casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: String(casefile.lastUpdated),

@@ -1,23 +1,40 @@
 import { Component, OnInit } from '@angular/core';
-import { ICasefileTableDef, ITile } from '@detective.solutions/frontend/detective-client/ui';
+import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detective-client/ui';
 import { Observable, map } from 'rxjs';
 
 import { AbstractCasefileListComponent } from '../abstract/abstract-casefile-list.component';
-import { ICasefile } from '@detective.solutions/shared/data-access';
+import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-response.interface';
 
 @Component({
   selector: 'my-casefiles',
   templateUrl: './my-casefiles.component.html',
   styleUrls: ['./my-casefiles.component.scss'],
 })
+// TODO: Check if more abstraction is possible
 export class MyCasefilesComponent extends AbstractCasefileListComponent implements OnInit {
-  casefiles$!: Observable<ICasefile[]>;
-  tileItems$!: Observable<ITile[]>;
-  tableItems$!: Observable<ICasefileTableDef[]>;
+  casefiles$!: Observable<IGetAllCasefilesResponse>;
+  tileItems$!: Observable<ITilesInput>;
+  tableItems$!: Observable<ITableInput>;
+
+  private readonly initialPageOffset = 0;
 
   ngOnInit() {
-    this.casefiles$ = this.casefileService.casefiles$;
-    this.tileItems$ = this.casefiles$.pipe(map((casefiles: ICasefile[]) => this.transformToTileStructure(casefiles)));
-    this.tableItems$ = this.casefiles$.pipe(map((casefiles: ICasefile[]) => this.transformToTableStructure(casefiles)));
+    this.casefiles$ = this.casefileService.getAllCasefiles(this.initialPageOffset, this.pageSize);
+    this.tileItems$ = this.casefiles$.pipe(
+      map((response: IGetAllCasefilesResponse) => {
+        return {
+          tiles: this.transformToTileStructure(response.casefiles),
+          totalElementsCount: response.totalElementsCount,
+        };
+      })
+    );
+    this.tableItems$ = this.casefiles$.pipe(
+      map((response: IGetAllCasefilesResponse) => {
+        return {
+          tableItems: this.transformToTableStructure(response.casefiles),
+          totalElementsCount: response.totalElementsCount,
+        };
+      })
+    );
   }
 }

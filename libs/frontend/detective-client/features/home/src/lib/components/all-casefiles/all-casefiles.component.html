@@ -2,7 +2,9 @@
   *ngIf="showTableView$ | async; else showTileView"
   [tableRows$]="tableItems$"
   [tableCellEvents$]="tableCellEvents$"
+  [paginatorEvents$]="paginatorEvents$"
+  [pageSize]="pageSize"
 ></table-view>
 <ng-template #showTileView>
-  <tiles-view [tileItems$]="tileItems$"></tiles-view>
+  <tiles-view [tilesInput$]="tileItems$" [paginatorEvents$]="paginatorEvents$" [pageSize]="pageSize"></tiles-view>
 </ng-template>

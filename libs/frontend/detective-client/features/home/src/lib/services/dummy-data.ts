@@ -8,7 +8,7 @@ function randomDate() {
 
 export const DUMMY_CASEFILE_DATA: ICasefile[] = [
   {
-    _id: '1',
+    id: '1',
     title: 'Sales Forecast',
     description:
       'The topic centres around the features relevant for predicting sales volumes for mid-sized clients in EMEA. Historical sales volume over the last 6 months and outstanding invoices are considered trusted predictors for repurchase likelihoods. Both attributes are in tables OP1 and P73 of the data warehouse.',
@@ -18,7 +18,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '2',
+    id: '2',
     title: 'Lead Generation',
     description:
       'The topic centres around how to profile unknown customers visiting the Webshop. Cookie and market basket data stored in ECAP are discussed as feasible traces for initial qualification.',
@@ -28,7 +28,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '3',
+    id: '3',
     title: 'Customer Sentiment Analysis',
     description:
       'The topic centres around the evaluation of voice of the customer data to bucket users into sentiment categories. The discussion reveals high sentiment variances coincide with irregular purchase intervals.',
@@ -38,7 +38,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '4',
+    id: '4',
     title: 'Cannibalization Analysis',
     description:
       'The topic centres around which attributes to use for quantifying product similarity between product product ranges ARAGON and PAROS. The discussion qualifies material, primary feature and color as main pointers. Attributes were located in within the product master data system.',
@@ -48,7 +48,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '5',
+    id: '5',
     title: 'Competitive Product Analysis',
     description:
       'The topic centres around how to quantify similarity between product range ARAGON and the product portfolio of competitor SUNLUSH Ltd to predict switching behavior. The discussion reveals that price, material and decency as the main discriminatory factors for analysis. Column PRICE_L should not be used as values are in local currency. Product launch information is missing for products launched in April and May 2021.',
@@ -58,7 +58,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '6',
+    id: '6',
     title: 'CLV Analysis',
     description:
       'The discussion centers around how to quantify CLV for irregular customers. The discussion reveals that purchase history alone is not sufficient in isolation. Loyalty indicators such as ECOS Webshop visits and newsletter subsections need to be factored in.',
@@ -68,7 +68,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '7',
+    id: '7',
     title: 'Optimal Price Prediction',
     description:
       'The topic centres around which time horizon to use to compute price elasticites for the 5 least selling products of the SUKU collection. The discussion reveals that data older than 2019 should not be considered to account for product enhancements shipped ever after 1.1.2019. Table Prod_Suku_f19  contains changes to core features in column fcoR.',
@@ -78,7 +78,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '8',
+    id: '8',
     title: 'Cross-Selling Analysis',
     description:
       'The topic centres around how to quantify fit for recommendation between items of the appliance product line. The discussion uncovers that purchase history is a reliable predictor for next best offer. Data can be retrieved in system P25.',
@@ -88,7 +88,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '9',
+    id: '9',
     title: 'Up-Selling Analysis',
     description:
       'The topic centres around how to quantify product compatibility. The discussion uncovers primary key foreign key columns to perform joins and the possibility of 1-to-n relationships.',
@@ -98,7 +98,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '10',
+    id: '10',
     title: 'Demand Forecasting',
     description:
       'The topic centres around demand forecasting during Black Friday. The discussion reveals that discount campaign data is needed to scope out sales volume portions useful for prediction. Attributes discount ID is needed to look up campaign characteristics in the DMP.',
@@ -108,7 +108,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '11',
+    id: '11',
     title: 'Delivery Prediction',
     description:
       'Centres around the predictability of delivery times. The discussion uncovers that logistics data is not adjusted for time zone differences. the attribute del_UTC_offest should be used to quantify delivery times',
@@ -118,7 +118,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '12',
+    id: '12',
     title: 'Customer Preference Prediction',
     description:
       'The topic centres around clustering customers into groups. Persona characteristics provided by marketing should be used to initialize cluster centroids.',
@@ -128,7 +128,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '13',
+    id: '13',
     title: 'Supplier Analysis',
     description: '',
     imageSrc: '',
@@ -137,7 +137,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
     lastUpdated: randomDate(),
   },
   {
-    _id: '14',
+    id: '14',
     title: 'Voice of the customer',
     description:
       'The topic centres around the use of voice of the customer data for locality assessments. The discussion clarifies that NPS ranges from 0-11. Code 11 stands for non response and has to ne precluded. The non response reason was captured in the CRM In column NPS_na_text.',

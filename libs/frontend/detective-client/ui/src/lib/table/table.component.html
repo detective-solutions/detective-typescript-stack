@@ -1,5 +1,10 @@
 <div class="component-wrapper" [class.isMobile]="isMobile$ | async">
-  <div class="table-container" *ngIf="isLoaded; else loading">
+  <cdk-virtual-scroll-viewport
+    *ngIf="initialDataLoaded; else isLoading"
+    class="table-container"
+    (scroll)="onScroll($event)"
+    tvsItemSize="120"
+  >
     <mat-table [dataSource]="tableDataSource">
       <ng-container [matColumnDef]="column.id" *ngFor="let column of columnDefinitions">
         <mat-header-cell *matHeaderCellDef fxLayoutAlign="center center">
@@ -16,18 +21,12 @@
           </div>
         </mat-cell>
       </ng-container>
-
       <mat-header-row *matHeaderRowDef="columnIds; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: columnIds"></mat-row>
     </mat-table>
-  </div>
-  <div [hidden]="!isLoaded">
-    <mat-paginator
-      [pageSizeOptions]="pageSizeOptions"
-      attr.aria-label="{{ 'table.pageOptionsLabel' | transloco }}"
-    ></mat-paginator>
-  </div>
-  <ng-template #loading>
+  </cdk-virtual-scroll-viewport>
+  <mat-progress-bar *ngIf="isFetchingMoreData" mode="query" color="accent"></mat-progress-bar>
+  <ng-template #isLoading>
     <div class="loading-spinner"></div>
   </ng-template>
 </div>

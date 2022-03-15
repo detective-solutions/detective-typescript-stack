@@ -1,7 +1,9 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+
 import { Injectable } from '@angular/core';
 
 @Injectable()
 export class EventService {
   readonly showTableView$ = new BehaviorSubject<boolean>(false);
+  readonly resetLoadingStates$ = new Subject<boolean>();
 }

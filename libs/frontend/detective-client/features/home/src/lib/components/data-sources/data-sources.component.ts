@@ -1,10 +1,11 @@
-import { AccessState, IDataSourceTableDef, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
+import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { Component, OnInit } from '@angular/core';
-import { Observable, Subject, map, tap } from 'rxjs';
+import { Observable, Subject, map } from 'rxjs';
 
-import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { DataSourceService } from '../../services/data-source.service';
+import { ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { IDataSource } from '@detective.solutions/shared/data-access';
+import { IDataSourceTableDef } from '../../interfaces';
 
 @Component({
   selector: 'data-sources',
@@ -12,17 +13,28 @@ import { IDataSource } from '@detective.solutions/shared/data-access';
   styleUrls: ['./data-sources.component.scss'],
 })
 export class DataSourcesComponent implements OnInit {
-  readonly tableCellEvents$ = new Subject<CasefileEvent>();
+  readonly tableCellEvents$ = new Subject<ICasefileEvent>();
+  readonly paginatorEvents$ = new Subject<number>();
+
   dataSources$!: Observable<IDataSource[]>;
-  tableItems$!: Observable<IDataSourceTableDef[]>;
+  tableItems$!: Observable<ITableInput>;
+  totalElementsCount$!: Observable<number>;
+
+  readonly pageSize = 10;
+
+  private readonly initialPageOffset = 0;
 
   constructor(private dataSourceService: DataSourceService) {}
 
   ngOnInit() {
     this.dataSources$ = this.dataSourceService.dataSources$;
     this.tableItems$ = this.dataSources$.pipe(
-      tap((val) => console.log(val)),
-      map((dataSources: IDataSource[]) => this.transformToTableStructure(dataSources))
+      map((dataSources: IDataSource[]) => {
+        return {
+          tableItems: this.transformToTableStructure(dataSources),
+          totalElementsCount: 100,
+        };
+      })
     );
   }
 

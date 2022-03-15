@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { SharedErrorHandlingModule } from '@detective.solutions/frontend/shared/error-handling';
 import { SharedUiModule } from '@detective.solutions/frontend/shared/ui';
 import { TranslocoRootModule } from './transloco-root.module';
+import { offsetLimitPagination } from '@apollo/client/utilities';
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,7 +33,16 @@ import { TranslocoRootModule } from './transloco-root.module';
       provide: APOLLO_OPTIONS,
       useFactory: (httpLink: HttpLink) => {
         return {
-          cache: new InMemoryCache({ addTypename: false }),
+          cache: new InMemoryCache({
+            addTypename: false,
+            typePolicies: {
+              Query: {
+                fields: {
+                  queryCasefile: offsetLimitPagination(),
+                },
+              },
+            },
+          }),
           link: httpLink.create({
             uri: '/graphql',
           }),

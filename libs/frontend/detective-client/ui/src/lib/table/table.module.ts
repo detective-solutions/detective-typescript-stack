@@ -21,7 +21,7 @@ import { UserAvatarListTableCellComponent } from './components/user-avatar-list-
     AccessIndicatorTableCellComponent,
     UserAvatarListTableCellComponent,
   ],
-  imports: [CommonModule, TranslocoModule, TableMaterialModule, RouterModule],
+  imports: [CommonModule, TranslocoModule, RouterModule, TableMaterialModule],
   exports: [TableComponent],
 })
 export class TableModule {}

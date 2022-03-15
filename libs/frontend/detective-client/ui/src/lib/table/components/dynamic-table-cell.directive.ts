@@ -2,8 +2,8 @@ import { Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
 import { ITableCellData, TableCellTypes } from '../interfaces/table-cell-data.interface';
 
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
-import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
+import { ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
 import { Subject } from 'rxjs';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
@@ -15,7 +15,7 @@ import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/
 export class DynamicTableCellDirective implements OnInit {
   @Input() casefileId!: string;
   @Input() tableCellData!: ITableCellData;
-  @Input() tableCellEvents$!: Subject<CasefileEvent>;
+  @Input() tableCellEvents$!: Subject<ICasefileEvent>;
 
   constructor(private viewContainerRef: ViewContainerRef) {}
 
