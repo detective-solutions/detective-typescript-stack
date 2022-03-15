@@ -14,7 +14,6 @@ import { TranslocoModule } from '@ngneat/transloco';
   providers: [
     { provide: AuthService, useClass: CustomAuthService },
     { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
-    Apollo,
     GetUserGQL,
   ],
 })

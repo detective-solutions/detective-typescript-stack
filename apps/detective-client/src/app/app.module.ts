@@ -1,4 +1,5 @@
-import { APOLLO_OPTIONS } from 'apollo-angular';
+import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
+
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AuthModule } from '@detective.solutions/frontend/shared/auth';
@@ -25,6 +26,8 @@ import { TranslocoRootModule } from './transloco-root.module';
     SharedErrorHandlingModule, // Import last due to interceptor chain
   ],
   providers: [
+    // TODO: Move this to individual modules
+    Apollo,
     {
       provide: APOLLO_OPTIONS,
       useFactory: (httpLink: HttpLink) => {
