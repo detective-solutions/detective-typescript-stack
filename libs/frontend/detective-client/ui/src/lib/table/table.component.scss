@@ -13,6 +13,10 @@ $row-height: 120px;
 
     mat-cell {
       height: $row-height;
+
+      .dynamic-table-cell {
+        text-align: center;
+      }
     }
   }
 
