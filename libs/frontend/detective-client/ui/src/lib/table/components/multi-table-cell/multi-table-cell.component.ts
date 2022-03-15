@@ -36,6 +36,8 @@ export class MultiTableCellComponent implements OnInit {
 
   ngOnInit() {
     this.casefileUrl = this.casefileBaseUrl + this.casefileId;
+    // Manually dispatch resize event to trigger truncation mechanism on component init
+    window.dispatchEvent(new Event('resize'));
   }
 
   openCasefile() {
