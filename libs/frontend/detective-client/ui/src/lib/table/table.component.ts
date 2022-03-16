@@ -16,9 +16,9 @@ import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 })
 export class TableComponent implements OnInit, OnDestroy {
   @Input() tableRows$!: Observable<ITableInput>;
-  @Input() tableCellEvents$!: Subject<ICasefileEvent>;
-  @Input() paginatorEvents$!: Subject<number>;
   @Input() pageSize = 10;
+  @Input() tableCellEvents$!: Subject<ICasefileEvent>;
+  @Input() fetchMoreDataByOffset$!: Subject<number>;
 
   tableDataSource!: MatTableDataSource<IAbstractTableDef>;
   columnDefinitions: IMatColumnDef[] = [];
@@ -91,7 +91,7 @@ export class TableComponent implements OnInit, OnDestroy {
       this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
       if (this.alreadyLoadedElementsCount < this.totalElementsCount) {
-        this.paginatorEvents$.next(this.currentPageOffset);
+        this.fetchMoreDataByOffset$.next(this.currentPageOffset);
         this.isFetchingMoreData = true;
       }
     }

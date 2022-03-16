@@ -15,7 +15,7 @@ import { ICasefileTableDef } from '../../interfaces';
 export class AbstractCasefileListComponent implements OnDestroy {
   readonly showTableView$!: BehaviorSubject<boolean>;
   readonly tableCellEvents$ = new Subject<ICasefileEvent>();
-  readonly paginatorEvents$ = new Subject<number>();
+  readonly fetchMoreDataByOffset$ = new Subject<number>();
 
   private readonly subscriptions = new Subscription();
 
@@ -41,7 +41,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
 
   constructor(protected readonly casefileService: CasefileService, protected readonly eventService: EventService) {
     this.showTableView$ = this.eventService.showTableView$;
-    this.paginatorEvents$.subscribe((pageOffset: number) =>
+    this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
       this.casefileService.updateCasefiles(pageOffset, this.pageSize)
     );
   }

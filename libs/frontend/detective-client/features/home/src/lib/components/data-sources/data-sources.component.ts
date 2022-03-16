@@ -14,7 +14,7 @@ import { IDataSourceTableDef } from '../../interfaces';
 })
 export class DataSourcesComponent implements OnInit {
   readonly tableCellEvents$ = new Subject<ICasefileEvent>();
-  readonly paginatorEvents$ = new Subject<number>();
+  readonly fetchMoreDataByOffset$ = new Subject<number>();
 
   dataSources$!: Observable<IDataSource[]>;
   tableItems$!: Observable<ITableInput>;

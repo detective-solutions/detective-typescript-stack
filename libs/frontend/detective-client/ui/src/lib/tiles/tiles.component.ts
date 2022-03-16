@@ -13,8 +13,8 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 })
 export class TilesComponent implements OnInit, OnDestroy {
   @Input() tilesInput$!: Observable<ITilesInput>;
-  @Input() paginatorEvents$!: Subject<number>;
   @Input() pageSize = 10;
+  @Input() fetchMoreDataByOffset$!: Subject<number>;
 
   totalElementsCount = 0;
   isFetchingMoreData = false;
@@ -63,7 +63,7 @@ export class TilesComponent implements OnInit, OnDestroy {
       this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
       if (this.alreadyLoadedElementsCount < this.totalElementsCount) {
-        this.paginatorEvents$.next(this.currentPageOffset);
+        this.fetchMoreDataByOffset$.next(this.currentPageOffset);
         this.isFetchingMoreData = true;
       }
     }
