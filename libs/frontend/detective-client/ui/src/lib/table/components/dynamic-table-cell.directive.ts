@@ -36,7 +36,7 @@ export class DynamicTableCellDirective implements OnInit {
         const componentRef = this.viewContainerRef.createComponent(MultiTableCellComponent);
         componentRef.instance.casefileId = this.casefileId;
         componentRef.instance.thumbnailSrc = this.tableCellData.thumbnailSrc;
-        componentRef.instance.header = this.tableCellData.header;
+        componentRef.instance.name = this.tableCellData.name;
         componentRef.instance.description = this.tableCellData.description;
         break;
       }

@@ -22,6 +22,10 @@
       "accessGranted": "Access Granted",
       "accessPending": "Access Pending",
       "noAccess": "Request Access"
+    },
+    "multiTableCell": {
+      "noName": "No name available",
+      "noDescription": "No description available."
     }
   }
 }

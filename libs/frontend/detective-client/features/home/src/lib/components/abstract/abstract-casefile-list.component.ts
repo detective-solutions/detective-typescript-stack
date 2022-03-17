@@ -73,7 +73,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           cellData: {
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: casefile.thumbnailSrc,
-            header: casefile.title,
+            name: casefile.title,
             description: casefile.description,
           },
         },

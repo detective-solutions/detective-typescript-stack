@@ -60,7 +60,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
           cellData: {
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: dataSource.iconSrc,
-            header: dataSource.name,
+            name: dataSource.name,
             description: dataSource.description,
           },
         },

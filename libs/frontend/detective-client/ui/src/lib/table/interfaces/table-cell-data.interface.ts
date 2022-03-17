@@ -1,7 +1,7 @@
 export type ITableCellData =
   | ITextTableCell
   | IDateTableCell
-  | IHtmlTableCell
+  | IMultiTableCell
   | IAccessTableCell
   | IFavorizedTableCell
   | IUserAvatarListTableCell;
@@ -25,10 +25,10 @@ export interface IDateTableCell {
   date: string;
 }
 
-export interface IHtmlTableCell {
+export interface IMultiTableCell {
   type: TableCellTypes.MULTI_TABLE_CELL;
   thumbnailSrc: string;
-  header: string;
+  name: string;
   description: string;
 }
 

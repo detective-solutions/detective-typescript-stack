@@ -22,6 +22,10 @@
       "accessGranted": "Zugang gewährt",
       "accessPending": "Berechtigung ausstehend",
       "noAccess": "Kein Zugang"
+    },
+    "multiTableCell": {
+      "noName": "Kein Name verfügbar",
+      "noDescription": "Keine Beschreibung verfügbar."
     }
   }
 }

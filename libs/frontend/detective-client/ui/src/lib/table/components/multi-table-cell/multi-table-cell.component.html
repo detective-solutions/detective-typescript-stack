@@ -3,11 +3,27 @@
     <img src="{{ thumbnailSrc }}" />
   </div>
   <div class="info-wrapper">
-    <h3 #headerRef [matTooltip]="header" [matTooltipDisabled]="(truncateHeader$ | async) === false">
-      {{ header }}
+    <h3
+      *ngIf="name; else noName"
+      #headerRef
+      [matTooltip]="name"
+      [matTooltipDisabled]="(truncateName$ | async) === false"
+    >
+      {{ name }}
     </h3>
-    <p #descriptionRef [matTooltip]="description" [matTooltipDisabled]="(truncateDescription$ | async) === false">
+    <ng-template #noName>
+      <h3>{{ t('noName') }}</h3>
+    </ng-template>
+    <p
+      *ngIf="description; else noDescription"
+      #descriptionRef
+      [matTooltip]="description"
+      [matTooltipDisabled]="(truncateDescription$ | async) === false"
+    >
       {{ description }}
     </p>
+    <ng-template #noDescription>
+      <p>{{ t('noDescription') }}</p></ng-template
+    >
   </div>
 </div>

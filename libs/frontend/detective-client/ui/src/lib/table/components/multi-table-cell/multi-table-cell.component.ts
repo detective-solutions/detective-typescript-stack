@@ -12,8 +12,8 @@ import { Router } from '@angular/router';
 })
 export class MultiTableCellComponent implements OnInit {
   readonly windowResized$: Observable<Event> = fromEvent(window, 'resize').pipe(debounceTime(200), share());
-  readonly truncateHeader$: Observable<boolean> = this.windowResized$.pipe(
-    map(() => this.hasOverflow(this.headerRef)),
+  readonly truncateName$: Observable<boolean> = this.windowResized$.pipe(
+    map(() => this.hasOverflow(this.nameRef)),
     distinctUntilChanged()
   );
   readonly truncateDescription$: Observable<boolean> = this.windowResized$.pipe(
@@ -21,27 +21,17 @@ export class MultiTableCellComponent implements OnInit {
     distinctUntilChanged()
   );
 
-  readonly casefileBaseUrl = '/casefile/';
-  casefileUrl!: string;
-
   casefileId!: string;
   thumbnailSrc!: string;
-  header!: string;
+  name!: string;
   description!: string;
 
-  @ViewChild('headerRef') headerRef!: ElementRef;
+  @ViewChild('nameRef') nameRef!: ElementRef;
   @ViewChild('descriptionRef') descriptionRef!: ElementRef;
 
-  constructor(private router: Router) {}
-
   ngOnInit() {
-    this.casefileUrl = this.casefileBaseUrl + this.casefileId;
     // Manually dispatch resize event to trigger truncation mechanism on component init
     window.dispatchEvent(new Event('resize'));
-  }
-
-  openCasefile() {
-    this.router.navigateByUrl(this.casefileUrl);
   }
 
   private hasOverflow(elementRef: ElementRef) {
