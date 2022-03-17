@@ -18,7 +18,14 @@ export class MyCasefilesComponent extends AbstractCasefileListComponent implemen
   readonly pageSize = 10;
 
   ngOnInit() {
-    this.casefiles$ = this.casefileService.getAllCasefiles(this.initialPageOffset, this.pageSize);
+    this.casefiles$ = this.authService.authStatus$.pipe(
+      filter((authStatus) => authStatus.isAuthenticated && !!authStatus.userId),
+      map((authStatus) => authStatus.userId),
+      switchMap((userId) => {
+        return this.casefileService.getCasefilesByAuthor(this.initialPageOffset, this.pageSize, userId);
+      })
+    );
+
     this.tileItems$ = this.casefiles$.pipe(
       map((response: IGetAllCasefilesResponse) => {
         return {
