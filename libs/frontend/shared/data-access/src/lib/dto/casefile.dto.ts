@@ -35,7 +35,7 @@ export class Casefile implements ICasefile {
 
   toJSON(): object {
     const serialized = Object.assign(this);
-    delete serialized._id;
+    delete serialized.id;
     return serialized;
   }
 }
