@@ -6,7 +6,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgModule } from '@angular/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 
 const modules = [
   MatTableModule,
@@ -15,7 +14,6 @@ const modules = [
   MatTooltipModule,
   MatProgressBarModule,
   ScrollingModule,
-  TableVirtualScrollModule,
   FlexLayoutModule,
 ];
 

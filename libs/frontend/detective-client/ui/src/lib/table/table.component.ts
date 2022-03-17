@@ -6,7 +6,6 @@ import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatTableDataSource } from '@angular/material/table';
-import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 
 @Component({
   selector: 'table-view',
@@ -19,7 +18,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @Input() pageSize = 10;
   @Input() fetchMoreDataByOffset$!: Subject<number>;
 
-  tableDataSource: MatTableDataSource<IAbstractTableDef> = new TableVirtualScrollDataSource();
+  tableDataSource: MatTableDataSource<IAbstractTableDef> = new MatTableDataSource();
   columnDefinitions: IMatColumnDef[] = [];
   columnIds: string[] = [];
   totalElementsCount = 0;
@@ -58,7 +57,7 @@ export class TableComponent implements OnInit, OnDestroy {
           this.columnIds = this.extractColumnIds(this.columnDefinitions);
           this.totalElementsCount = tableInput.totalElementsCount;
           this.alreadyLoadedElementsCount += tableInput.tableItems.length;
-          this.tableDataSource = new TableVirtualScrollDataSource(tableInput.tableItems);
+          this.tableDataSource = new MatTableDataSource(tableInput.tableItems);
         })
     );
 

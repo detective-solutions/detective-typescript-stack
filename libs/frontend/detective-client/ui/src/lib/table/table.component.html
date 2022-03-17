@@ -1,9 +1,8 @@
 <div class="component-wrapper" [class.isMobile]="isMobile$ | async">
-  <cdk-virtual-scroll-viewport
+  <div
     *ngIf="(tableRows$ | async) && tableDataSource; else isLoading"
     class="table-container"
     (scroll)="onScroll($event)"
-    tvsItemSize="120"
   >
     <mat-table [dataSource]="tableDataSource">
       <ng-container [matColumnDef]="column.id" *ngFor="let column of columnDefinitions">
@@ -23,7 +22,7 @@
       <mat-header-row *matHeaderRowDef="columnIds; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: columnIds"></mat-row>
     </mat-table>
-  </cdk-virtual-scroll-viewport>
+  </div>
   <mat-progress-bar *ngIf="isFetchingMoreData" mode="query" color="accent"></mat-progress-bar>
   <ng-template #isLoading>
     <div class="loading-spinner"></div>
