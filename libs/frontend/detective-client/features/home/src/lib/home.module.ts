@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { DataSourceService } from './services/data-source.service';
 import { DataSourcesComponent } from './components/data-sources/data-sources.component';
 import { GetAllCasefilesGQL } from './graphql/get-all-casefiles-gql';
+import { GetAllDataSourcesGQL } from './graphql/get-all-data-sources-gql';
 import { GetCasefilesByAuthorGQL } from './graphql/get-casefiles-by-author.gql';
 import { HomeContainerComponent } from './components/home-container.component';
 import { HomeRoutingModule } from './home-routing.module';
@@ -29,6 +30,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     DataSourceService,
     GetAllCasefilesGQL,
     GetCasefilesByAuthorGQL,
+    GetAllDataSourcesGQL,
   ],
 })
 export class HomeModule {}
