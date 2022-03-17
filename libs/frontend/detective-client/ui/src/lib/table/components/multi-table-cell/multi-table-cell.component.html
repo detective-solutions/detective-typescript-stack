@@ -1,11 +1,5 @@
 <div class="cell-wrapper" fxLayout="row" fxLayoutAlign="center center" *transloco="let t; read: 'table.multiTableCell'">
-  <div
-    class="thumbnail"
-    fxFlex="150px"
-    fxLayoutAlign="center center"
-    (click)="openCasefile()"
-    [matTooltip]="t('imageTooltip')"
-  >
+  <div class="thumbnail" fxFlex="150px" fxLayoutAlign="center center">
     <img src="{{ thumbnailSrc }}" />
   </div>
   <div class="info-wrapper">

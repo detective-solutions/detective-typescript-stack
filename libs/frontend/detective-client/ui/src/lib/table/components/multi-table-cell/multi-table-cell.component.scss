@@ -15,18 +15,9 @@
       .thumbnail {
         padding: 0 $table-first-column-padding;
 
-        &:hover {
-          cursor: pointer;
-        }
-
         img {
           width: 100%;
           padding: 20px;
-
-          &:hover {
-            filter: brightness(80%);
-            transition: 0.3s;
-          }
         }
       }
 

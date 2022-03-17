@@ -18,9 +18,6 @@
   },
   "table": {
     "pageOptionsLabel": "Select page",
-    "multiTableCell": {
-      "imageTooltip": "Open"
-    },
     "accessIndicatorTableCell": {
       "accessGranted": "Access Granted",
       "accessPending": "Access Pending",
