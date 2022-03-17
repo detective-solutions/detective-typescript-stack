@@ -10,16 +10,16 @@ import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-res
   templateUrl: './all-casefiles.component.html',
   styleUrls: ['./all-casefiles.component.scss'],
 })
-// TODO: Check if more abstraction is possible
 export class AllCasefilesComponent extends AbstractCasefileListComponent implements OnInit {
   casefiles$!: Observable<IGetAllCasefilesResponse>;
   tileItems$!: Observable<ITilesInput>;
   tableItems$!: Observable<ITableInput>;
 
-  private readonly initialPageOffset = 0;
+  readonly pageSize = 10;
 
   ngOnInit() {
     this.casefiles$ = this.casefileService.getAllCasefiles(this.initialPageOffset, this.pageSize);
+
     this.tileItems$ = this.casefiles$.pipe(
       map((response: IGetAllCasefilesResponse) => {
         return {
@@ -28,6 +28,7 @@ export class AllCasefilesComponent extends AbstractCasefileListComponent impleme
         };
       })
     );
+
     this.tableItems$ = this.casefiles$.pipe(
       map((response: IGetAllCasefilesResponse) => {
         return {
@@ -35,6 +36,13 @@ export class AllCasefilesComponent extends AbstractCasefileListComponent impleme
           totalElementsCount: response.totalElementsCount,
         };
       })
+    );
+
+    // Handle fetching of more data from the corresponding service
+    this.subscriptions.add(
+      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
+        this.casefileService.getAllCasefilesNextPage(pageOffset, this.pageSize)
+      )
     );
   }
 }

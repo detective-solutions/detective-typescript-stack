@@ -1,9 +1,9 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { EventService, ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces/table.interface';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 
+import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatTableDataSource } from '@angular/material/table';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
@@ -17,7 +17,6 @@ import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 export class TableComponent implements OnInit, OnDestroy {
   @Input() tableRows$!: Observable<ITableInput>;
   @Input() pageSize = 10;
-  @Input() tableCellEvents$!: Subject<ICasefileEvent>;
   @Input() fetchMoreDataByOffset$!: Subject<number>;
 
   tableDataSource!: MatTableDataSource<IAbstractTableDef>;
@@ -102,7 +101,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.extractColumnIds();
   }
 
-  // TODO: Use Material Design Types for abstract design (see example on Angular Material page)
+  // TODO: Use Angular Material types for abstract design (see example on Angular Material page)
   private createMatColumnDefs(tableItems: IAbstractTableDef[]) {
     Object.entries(tableItems[0]).forEach(([key, value]) =>
       this.columnDefinitions.push({ id: key, name: value.columnName })

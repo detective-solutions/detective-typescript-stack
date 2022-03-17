@@ -8,21 +8,20 @@ import {
 } from '@detective.solutions/frontend/shared/data-access';
 import { Component, OnDestroy } from '@angular/core';
 
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { CasefileService } from '../../services/casefile.service';
 import { ICasefileTableDef } from '../../interfaces';
 
 @Component({ template: '' })
 export class AbstractCasefileListComponent implements OnDestroy {
   readonly showTableView$!: BehaviorSubject<boolean>;
-  readonly tableCellEvents$ = new Subject<ICasefileEvent>();
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
-  private readonly subscriptions = new Subscription();
+  protected readonly initialPageOffset = 0;
+  protected readonly subscriptions = new Subscription();
 
-  readonly pageSize = 10;
-
-  readonly casefileAccessRequested$ = this.subscriptions.add(
-    this.tableCellEvents$
+  protected readonly casefileAccessRequested$ = this.subscriptions.add(
+    this.eventService.tableCellEvents$
       .pipe(
         filter((event: ICasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS),
         tap((event: ICasefileEvent) => console.log(event))
@@ -30,8 +29,8 @@ export class AbstractCasefileListComponent implements OnDestroy {
       .subscribe()
   );
 
-  readonly casefileFavorized$ = this.subscriptions.add(
-    this.tableCellEvents$
+  protected readonly casefileFavorized$ = this.subscriptions.add(
+    this.eventService.tableCellEvents$
       .pipe(
         filter((event: ICasefileEvent) => event.type === CasefileEventType.FAVORIZE && event.value !== undefined),
         tap((event: ICasefileEvent) => console.log(event))
@@ -39,11 +38,12 @@ export class AbstractCasefileListComponent implements OnDestroy {
       .subscribe()
   );
 
-  constructor(protected readonly casefileService: CasefileService, protected readonly eventService: EventService) {
+  constructor(
+    protected readonly authService: AuthService,
+    protected readonly casefileService: CasefileService,
+    protected readonly eventService: EventService
+  ) {
     this.showTableView$ = this.eventService.showTableView$;
-    this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-      this.casefileService.updateCasefiles(pageOffset, this.pageSize)
-    );
   }
 
   ngOnDestroy() {

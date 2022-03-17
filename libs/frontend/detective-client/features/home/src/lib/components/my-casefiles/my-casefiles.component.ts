@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detective-client/ui';
-import { Observable, map } from 'rxjs';
+import { Observable, filter, map, switchMap } from 'rxjs';
 
 import { AbstractCasefileListComponent } from '../abstract/abstract-casefile-list.component';
 import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-response.interface';
@@ -10,13 +10,12 @@ import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-res
   templateUrl: './my-casefiles.component.html',
   styleUrls: ['./my-casefiles.component.scss'],
 })
-// TODO: Check if more abstraction is possible
 export class MyCasefilesComponent extends AbstractCasefileListComponent implements OnInit {
   casefiles$!: Observable<IGetAllCasefilesResponse>;
   tileItems$!: Observable<ITilesInput>;
   tableItems$!: Observable<ITableInput>;
 
-  private readonly initialPageOffset = 0;
+  readonly pageSize = 10;
 
   ngOnInit() {
     this.casefiles$ = this.casefileService.getAllCasefiles(this.initialPageOffset, this.pageSize);
@@ -28,6 +27,7 @@ export class MyCasefilesComponent extends AbstractCasefileListComponent implemen
         };
       })
     );
+
     this.tableItems$ = this.casefiles$.pipe(
       map((response: IGetAllCasefilesResponse) => {
         return {
@@ -35,6 +35,13 @@ export class MyCasefilesComponent extends AbstractCasefileListComponent implemen
           totalElementsCount: response.totalElementsCount,
         };
       })
+    );
+
+    // Handle fetching of more data from the corresponding service
+    this.subscriptions.add(
+      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
+        this.casefileService.getCasefilesByAuthorNextPage(pageOffset, this.pageSize)
+      )
     );
   }
 }

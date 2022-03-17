@@ -2,7 +2,6 @@
   *ngIf="showTableView$ | async; else showTileView"
   [tableRows$]="tableItems$"
   [pageSize]="pageSize"
-  [tableCellEvents$]="tableCellEvents$"
   [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
 ></table-view>
 <ng-template #showTileView>

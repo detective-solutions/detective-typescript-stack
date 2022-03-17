@@ -3,9 +3,7 @@ import { ITableCellData, TableCellTypes } from '../interfaces/table-cell-data.in
 
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
-import { ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
-import { Subject } from 'rxjs';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
 import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/user-avatar-list-table-cell.component';
 
@@ -15,7 +13,6 @@ import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/
 export class DynamicTableCellDirective implements OnInit {
   @Input() casefileId!: string;
   @Input() tableCellData!: ITableCellData;
-  @Input() tableCellEvents$!: Subject<ICasefileEvent>;
 
   constructor(private viewContainerRef: ViewContainerRef) {}
 
@@ -41,14 +38,12 @@ export class DynamicTableCellDirective implements OnInit {
         const componentRef = this.viewContainerRef.createComponent(AccessIndicatorTableCellComponent);
         componentRef.instance.casefileId = this.casefileId;
         componentRef.instance.accessState = this.tableCellData.accessState;
-        componentRef.instance.tableCellEvents$ = this.tableCellEvents$;
         break;
       }
       case TableCellTypes.FAVORIZED_TABLE_CELL: {
         const componentRef = this.viewContainerRef.createComponent(FavorizedTableCellComponent);
         componentRef.instance.casefileId = this.casefileId;
         componentRef.instance.isFavorized = this.tableCellData.favorized;
-        componentRef.instance.tableCellEvents$ = this.tableCellEvents$;
         break;
       }
       case TableCellTypes.USER_AVATAR_LIST_TABLE_CELL: {
