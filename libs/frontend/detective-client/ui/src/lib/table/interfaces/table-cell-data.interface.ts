@@ -9,7 +9,7 @@ export type ITableCellData =
 export enum TableCellTypes {
   TEXT_TABLE_CELL = 'textTableCell',
   DATE_TABLE_CELL = 'dateTableCell',
-  HTML_TABLE_CELL = 'htmlTableCell',
+  MULTI_TABLE_CELL = 'multiTableCell',
   ACCESS_TABLE_CELL = 'accessTableCell',
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
   USER_AVATAR_LIST_TABLE_CELL = 'userIconListTableCell',
@@ -26,7 +26,7 @@ export interface IDateTableCell {
 }
 
 export interface IHtmlTableCell {
-  type: TableCellTypes.HTML_TABLE_CELL;
+  type: TableCellTypes.MULTI_TABLE_CELL;
   imageSrc: string;
   header: string;
   description: string;

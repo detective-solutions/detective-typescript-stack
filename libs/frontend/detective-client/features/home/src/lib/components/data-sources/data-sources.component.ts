@@ -46,7 +46,7 @@ export class DataSourcesComponent implements OnInit {
           columnName: '',
           dataSourceId: dataSource._id,
           cellData: {
-            type: TableCellTypes.HTML_TABLE_CELL,
+            type: TableCellTypes.MULTI_TABLE_CELL,
             imageSrc: dataSource.thumbnailSrc,
             header: dataSource.name,
             description: dataSource.description,
