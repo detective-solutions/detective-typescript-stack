@@ -21,6 +21,7 @@ export class TilesComponent implements OnInit, OnDestroy {
 
   private currentPageOffset = 0;
   private alreadyLoadedElementsCount = 0;
+  private readonly loadingScrollBuffer = 80;
   private readonly subscriptions = new Subscription();
 
   constructor(private readonly eventService: EventService, private readonly logService: LogService) {}
@@ -50,16 +51,13 @@ export class TilesComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  onScroll(e: any) {
-    // TODO: Move to own directive
-    const tableViewHeight = e.target.offsetHeight; // viewport: ~500px
-    const tableScrollHeight = e.target.scrollHeight; // length of all table
-    const scrollLocation = e.target.scrollTop; // how far user scrolled
+  onScroll(e: Event) {
+    const currentScrollLocation = (e.target as HTMLElement).scrollTop;
+    const limit =
+      (e.target as HTMLElement).scrollHeight - (e.target as HTMLElement).offsetHeight - this.loadingScrollBuffer;
 
-    // If the user has scrolled within 80px of the bottom, add more data
-    const buffer = 80;
-    const limit = tableScrollHeight - tableViewHeight - buffer;
-    if (scrollLocation > limit) {
+    // If the user has scrolled between the bottom and the loadingScrollBuffer range, add more data
+    if (currentScrollLocation > limit) {
       this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
       if (this.alreadyLoadedElementsCount < this.totalElementsCount) {
