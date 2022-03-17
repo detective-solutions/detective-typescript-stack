@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces/table.interface';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 
@@ -19,11 +19,10 @@ export class TableComponent implements OnInit, OnDestroy {
   @Input() pageSize = 10;
   @Input() fetchMoreDataByOffset$!: Subject<number>;
 
-  tableDataSource!: MatTableDataSource<IAbstractTableDef>;
+  tableDataSource: MatTableDataSource<IAbstractTableDef> = new TableVirtualScrollDataSource();
   columnDefinitions: IMatColumnDef[] = [];
   columnIds: string[] = [];
   totalElementsCount = 0;
-  initialDataLoaded = false;
   isFetchingMoreData = false;
 
   private currentPageOffset = 0;
@@ -40,7 +39,6 @@ export class TableComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly eventService: EventService,
     private readonly logService: LogService
   ) {}
@@ -56,12 +54,11 @@ export class TableComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((tableInput: ITableInput) => {
-          this.transformData(tableInput.tableItems);
-          this.tableDataSource = new TableVirtualScrollDataSource(tableInput.tableItems);
-          this.alreadyLoadedElementsCount = tableInput.tableItems.length;
+          this.columnDefinitions = this.createMatColumnDefs(tableInput.tableItems);
+          this.columnIds = this.extractColumnIds(this.columnDefinitions);
           this.totalElementsCount = tableInput.totalElementsCount;
-          this.initialDataLoaded = true;
-          this.changeDetectorRef.detectChanges();
+          this.alreadyLoadedElementsCount += tableInput.tableItems.length;
+          this.tableDataSource = new TableVirtualScrollDataSource(tableInput.tableItems);
         })
     );
 
@@ -94,21 +91,15 @@ export class TableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private transformData(tableItems: IAbstractTableDef[]) {
-    if (!this.columnDefinitions.length) {
-      this.createMatColumnDefs(tableItems);
-    }
-    this.extractColumnIds();
-  }
-
-  // TODO: Use Angular Material types for abstract design (see example on Angular Material page)
-  private createMatColumnDefs(tableItems: IAbstractTableDef[]) {
+  private createMatColumnDefs(tableItems: IAbstractTableDef[]): IMatColumnDef[] {
+    const tempMatColumnDefs = [] as IMatColumnDef[];
     Object.entries(tableItems[0]).forEach(([key, value]) =>
-      this.columnDefinitions.push({ id: key, name: value.columnName })
+      tempMatColumnDefs.push({ id: key, name: value.columnName })
     );
+    return tempMatColumnDefs;
   }
 
-  private extractColumnIds() {
-    this.columnIds = this.columnDefinitions.map((columnDefinition: IMatColumnDef) => columnDefinition.id);
+  private extractColumnIds(columnDefinitions: IMatColumnDef[]) {
+    return columnDefinitions.map((columnDefinition: IMatColumnDef) => columnDefinition.id);
   }
 }

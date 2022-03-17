@@ -1,6 +1,6 @@
 <div class="component-wrapper" [class.isMobile]="isMobile$ | async">
   <cdk-virtual-scroll-viewport
-    *ngIf="initialDataLoaded; else isLoading"
+    *ngIf="tableDataSource; else isLoading"
     class="table-container"
     (scroll)="onScroll($event)"
     tvsItemSize="120"
