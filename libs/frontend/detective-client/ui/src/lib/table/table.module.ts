@@ -1,5 +1,6 @@
 import { AccessIndicatorTableCellComponent } from './components/access-indicator-table-cell/access-indicator-table-cell.component';
 import { CommonModule } from '@angular/common';
+import { DateTableCellComponent } from './components/date-table-cell/date-table-cell.component';
 import { DynamicTableCellDirective } from './components/dynamic-table-cell.directive';
 import { FavorizedTableCellComponent } from './components/favorized-table-cell/favorized-table-cell.component';
 import { MultiTableCellComponent } from './components/multi-table-cell/multi-table-cell.component';
@@ -15,10 +16,11 @@ import { UserAvatarListTableCellComponent } from './components/user-avatar-list-
   declarations: [
     TableComponent,
     DynamicTableCellDirective,
-    MultiTableCellComponent,
-    FavorizedTableCellComponent,
     TextTableCellComponent,
+    DateTableCellComponent,
+    MultiTableCellComponent,
     AccessIndicatorTableCellComponent,
+    FavorizedTableCellComponent,
     UserAvatarListTableCellComponent,
   ],
   imports: [CommonModule, TranslocoModule, RouterModule, TableMaterialModule],

@@ -2,6 +2,7 @@ import { Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
 import { ITableCellData, TableCellTypes } from '../interfaces/table-cell-data.interface';
 
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
+import { DateTableCellComponent } from './date-table-cell/date-table-cell.component';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
@@ -24,6 +25,11 @@ export class DynamicTableCellDirective implements OnInit {
       case TableCellTypes.TEXT_TABLE_CELL: {
         const componentRef = this.viewContainerRef.createComponent(TextTableCellComponent);
         componentRef.instance.text = this.tableCellData.text;
+        break;
+      }
+      case TableCellTypes.DATE_TABLE_CELL: {
+        const componentRef = this.viewContainerRef.createComponent(DateTableCellComponent);
+        componentRef.instance.date = this.tableCellData.date;
         break;
       }
       case TableCellTypes.HTML_TABLE_CELL: {

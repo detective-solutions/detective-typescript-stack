@@ -108,8 +108,8 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: 'Last Updated',
           casefileId: casefile.id,
           cellData: {
-            type: TableCellTypes.TEXT_TABLE_CELL,
-            text: String(casefile.lastUpdated),
+            type: TableCellTypes.DATE_TABLE_CELL,
+            date: String(casefile.lastUpdated),
           },
         },
       } as ICasefileTableDef);

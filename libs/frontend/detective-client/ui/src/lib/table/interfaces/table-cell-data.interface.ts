@@ -1,5 +1,6 @@
 export type ITableCellData =
   | ITextTableCell
+  | IDateTableCell
   | IHtmlTableCell
   | IAccessTableCell
   | IFavorizedTableCell
@@ -7,6 +8,7 @@ export type ITableCellData =
 
 export enum TableCellTypes {
   TEXT_TABLE_CELL = 'textTableCell',
+  DATE_TABLE_CELL = 'dateTableCell',
   HTML_TABLE_CELL = 'htmlTableCell',
   ACCESS_TABLE_CELL = 'accessTableCell',
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
@@ -16,6 +18,11 @@ export enum TableCellTypes {
 export interface ITextTableCell {
   type: TableCellTypes.TEXT_TABLE_CELL;
   text: string;
+}
+
+export interface IDateTableCell {
+  type: TableCellTypes.DATE_TABLE_CELL;
+  date: string;
 }
 
 export interface IHtmlTableCell {
