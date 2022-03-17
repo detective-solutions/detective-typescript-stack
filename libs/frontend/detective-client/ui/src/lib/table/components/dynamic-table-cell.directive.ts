@@ -35,7 +35,7 @@ export class DynamicTableCellDirective implements OnInit {
       case TableCellTypes.MULTI_TABLE_CELL: {
         const componentRef = this.viewContainerRef.createComponent(MultiTableCellComponent);
         componentRef.instance.casefileId = this.casefileId;
-        componentRef.instance.imageSrc = this.tableCellData.imageSrc;
+        componentRef.instance.thumbnailSrc = this.tableCellData.thumbnailSrc;
         componentRef.instance.header = this.tableCellData.header;
         componentRef.instance.description = this.tableCellData.description;
         break;

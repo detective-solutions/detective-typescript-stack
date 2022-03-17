@@ -53,7 +53,12 @@ export class AbstractCasefileListComponent implements OnDestroy {
   protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {
     const tempTileItems = [] as ITile[];
     originalCasefiles.forEach((casefile: Casefile) => {
-      tempTileItems.push({ id: casefile.id, title: casefile.title, description: casefile?.description });
+      tempTileItems.push({
+        id: casefile.id,
+        title: casefile.title,
+        description: casefile.description,
+        thumbnailSrc: casefile.thumbnailSrc,
+      });
     });
     return tempTileItems;
   }
@@ -67,7 +72,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.MULTI_TABLE_CELL,
-            imageSrc: casefile.imageSrc,
+            thumbnailSrc: casefile.thumbnailSrc,
             header: casefile.title,
             description: casefile.description,
           },

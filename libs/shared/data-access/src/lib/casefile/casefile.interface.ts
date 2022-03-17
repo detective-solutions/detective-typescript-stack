@@ -4,7 +4,7 @@ export interface ICasefile {
   id: string;
   title: string;
   description?: string;
-  imageSrc?: string;
+  thumbnailSrc?: string;
   author?: IUser;
   views?: number;
   editors?: IUser[];

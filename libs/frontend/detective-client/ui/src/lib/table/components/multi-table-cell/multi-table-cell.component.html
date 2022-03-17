@@ -6,7 +6,7 @@
     (click)="openCasefile()"
     [matTooltip]="t('imageTooltip')"
   >
-    <img src="{{ imageSrc }}" />
+    <img src="{{ thumbnailSrc }}" />
   </div>
   <div class="info-wrapper">
     <h3 #headerRef [matTooltip]="header" [matTooltipDisabled]="(truncateHeader$ | async) === false">

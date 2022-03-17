@@ -27,7 +27,7 @@ export interface IDateTableCell {
 
 export interface IHtmlTableCell {
   type: TableCellTypes.MULTI_TABLE_CELL;
-  imageSrc: string;
+  thumbnailSrc: string;
   header: string;
   description: string;
 }

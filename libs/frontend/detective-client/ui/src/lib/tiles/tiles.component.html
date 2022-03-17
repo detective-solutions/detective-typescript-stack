@@ -35,12 +35,7 @@
     >
       <mat-card class="tile" fxLayout="column" fxLayoutAlign="space-between center">
         <mat-card-title>{{ tile.title }}</mat-card-title>
-        <img
-          mat-card-image
-          height="200px"
-          src="assets/images/mocks/casefile-thumbnail-mock.jpg"
-          alt="{{ t('tileImageAltAttribute') }}"
-        />
+        <img mat-card-image height="100px" src="{{ tile.thumbnailSrc }}" alt="{{ t('tileImageAltAttribute') }}" />
         <mat-card-content *ngIf="tile.description; else noTileDescription"
           ><p [matTooltip]="tile.description">{{ tile.description }}</p></mat-card-content
         >

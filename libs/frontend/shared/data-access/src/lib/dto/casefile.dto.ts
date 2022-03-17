@@ -1,14 +1,15 @@
-import { IUser } from '@detective.solutions/shared/data-access';
+import { ICasefile, IUser } from '@detective.solutions/shared/data-access';
+
 import { User } from './user.dto';
 
-export class Casefile implements Casefile {
-  static readonly casefileImagePlaceholder = 'assets/images/mocks/casefile-thumbnail-mock.jpg';
+export class Casefile implements ICasefile {
+  static readonly casefileImagePlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
     public id = '',
     public title = '',
     public description = '',
-    public imageSrc = '',
+    public thumbnailSrc = '',
     public author = new User(),
     public views = 0,
     public editors = [{ email: '' }] as IUser[],
@@ -20,16 +21,11 @@ export class Casefile implements Casefile {
       return new Casefile();
     }
 
-    // TODO: Provide fallback image here
-    // if (!casefile.imageSrc) {
-    //   casefile.imageSrc = Casefile.casefileImagePlaceholder;
-    // }
-
     return new Casefile(
       casefile.id,
       casefile.title,
-      casefile.description,
-      casefile.imageSrc,
+      casefile.description ?? '',
+      casefile.thumbnailSrc ?? Casefile.casefileImagePlaceholder,
       User.Build(casefile.author as IUser),
       casefile.views,
       casefile.editors as IUser[],

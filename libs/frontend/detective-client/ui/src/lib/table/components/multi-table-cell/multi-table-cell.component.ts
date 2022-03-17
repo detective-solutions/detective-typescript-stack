@@ -25,7 +25,7 @@ export class MultiTableCellComponent implements OnInit {
   casefileUrl!: string;
 
   casefileId!: string;
-  imageSrc!: string;
+  thumbnailSrc!: string;
   header!: string;
   description!: string;
 

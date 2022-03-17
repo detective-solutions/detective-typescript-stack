@@ -16,6 +16,7 @@ export class GetCasefilesByAuthorGQL extends Query<Response> {
         id
         title
         description
+        thumbnailSrc
         author(filter: { id: [$userId] }) {
           firstname
           lastname
