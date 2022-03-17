@@ -1,7 +1,7 @@
 import { Casefile, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { GetAllCasefilesGQL, IGetAllCasefilesGQLResponse } from '../graphql/get-all-casefiles-gql';
 import { GetCasefilesByAuthorGQL, IGetCasefilesByAuthorGQLResponse } from '../graphql/get-casefiles-by-author.gql';
-import { Observable, catchError, map, tap } from 'rxjs';
+import { Observable, catchError, map } from 'rxjs';
 
 import { IGetAllCasefilesResponse } from '../interfaces/get-all-casefiles-response.interface';
 import { Injectable } from '@angular/core';
@@ -45,7 +45,11 @@ export class CasefileService {
       .catch(this.handleError);
   }
 
-  getCasefilesByAuthor(paginationOffset: number, pageSize: number, userId: string) {
+  getCasefilesByAuthor(
+    paginationOffset: number,
+    pageSize: number,
+    userId: string
+  ): Observable<IGetAllCasefilesResponse> {
     this.getCasefilesByAuthorWatchQuery = this.getCasefilesByAuthorGQL.watch({
       paginationOffset: paginationOffset,
       pageSize: pageSize,
