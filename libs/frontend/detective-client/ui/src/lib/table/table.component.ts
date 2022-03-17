@@ -92,6 +92,9 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   private createMatColumnDefs(tableItems: IAbstractTableDef[]): IMatColumnDef[] {
+    if (!tableItems || tableItems.length === 0) {
+      return [];
+    }
     const tempMatColumnDefs = [] as IMatColumnDef[];
     Object.entries(tableItems[0]).forEach(([key, value]) =>
       tempMatColumnDefs.push({ id: key, name: value.columnName })

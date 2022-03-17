@@ -33,7 +33,7 @@ export class CasefileService {
           totalElementsCount: response.aggregateCasefile.count,
         };
       }),
-      catchError(this.handleError)
+      catchError((error) => this.handleError(error))
     );
   }
 
@@ -42,7 +42,7 @@ export class CasefileService {
       .fetchMore({
         variables: { paginationOffset: paginationOffset, pageSize: pageSize },
       })
-      .catch(this.handleError);
+      .catch((error) => this.handleError(error));
   }
 
   getCasefilesByAuthor(
@@ -64,7 +64,7 @@ export class CasefileService {
           totalElementsCount: response.aggregateCasefile.count,
         };
       }),
-      catchError(this.handleError)
+      catchError((error) => this.handleError(error))
     );
   }
 
@@ -73,7 +73,7 @@ export class CasefileService {
       .fetchMore({
         variables: { paginationOffset: paginationOffset, pageSize: pageSize },
       })
-      .catch(this.handleError);
+      .catch((error) => this.handleError(error));
   }
 
   private handleError(error: string) {
