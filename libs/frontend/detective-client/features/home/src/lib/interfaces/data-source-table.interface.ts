@@ -1,4 +1,4 @@
-import { IAbstractTableDef, ITableCellData } from '@detective.solutions/frontend/detective-client/ui';
+import { IAbstractTableDef, TableCellData } from '@detective.solutions/frontend/detective-client/ui';
 
 export interface IDataSourceTableDef extends IAbstractTableDef {
   dataSourceInfo: IDataSourceColumnDef;
@@ -9,5 +9,5 @@ export interface IDataSourceTableDef extends IAbstractTableDef {
 export interface IDataSourceColumnDef {
   columnName: string;
   dataSourceId: string;
-  cellData?: ITableCellData;
+  cellData: TableCellData;
 }

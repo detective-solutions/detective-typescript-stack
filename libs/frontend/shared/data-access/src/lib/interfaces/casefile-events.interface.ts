@@ -1,7 +1,7 @@
 export interface ICasefileEvent {
-  readonly casefileId: string;
-  readonly type: CasefileEventType;
-  readonly value?: string | boolean;
+  id: string;
+  type: CasefileEventType;
+  value?: string | boolean;
 }
 
 export enum CasefileEventType {

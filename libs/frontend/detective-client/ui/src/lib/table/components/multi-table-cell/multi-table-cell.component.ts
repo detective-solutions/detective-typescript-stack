@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Observable, debounceTime, distinctUntilChanged, filter, fromEvent, map, share } from 'rxjs';
 
+import { IMultiTableCell } from '../../interfaces';
+
 @Component({
   selector: 'multi-table-cell',
   templateUrl: 'multi-table-cell.component.html',
@@ -24,10 +26,7 @@ export class MultiTableCellComponent implements OnInit {
   @ViewChild('nameRef') nameRef!: ElementRef;
   @ViewChild('descriptionRef') descriptionRef!: ElementRef;
 
-  casefileId!: string;
-  thumbnailSrc!: string;
-  name!: string;
-  description!: string;
+  cellData!: IMultiTableCell; // Will be populated by the DynamicTableDirective
 
   ngOnInit() {
     // Manually dispatch resize event to trigger truncation mechanism on component init

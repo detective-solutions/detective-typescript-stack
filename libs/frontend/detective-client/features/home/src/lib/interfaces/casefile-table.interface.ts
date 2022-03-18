@@ -1,4 +1,4 @@
-import { IAbstractTableDef, ITableCellData } from '@detective.solutions/frontend/detective-client/ui';
+import { IAbstractTableDef, TableCellData } from '@detective.solutions/frontend/detective-client/ui';
 
 export interface ICasefileTableDef extends IAbstractTableDef {
   casefileInfo: ICasefileColumnDef;
@@ -13,5 +13,5 @@ export interface ICasefileTableDef extends IAbstractTableDef {
 export interface ICasefileColumnDef {
   columnName: string;
   casefileId: string;
-  cellData?: ITableCellData;
+  cellData: TableCellData;
 }

@@ -1,21 +1,26 @@
 <div class="cell-wrapper" fxLayout="row" fxLayoutAlign="center center" *transloco="let t; read: 'table.multiTableCell'">
   <div class="thumbnail" fxFlex="150px" fxLayoutAlign="center center">
-    <img src="{{ thumbnailSrc }}" />
+    <img src="{{ cellData.thumbnailSrc }}" />
   </div>
   <div class="info-wrapper">
-    <h3 *ngIf="name; else noName" #nameRef [matTooltip]="name" [matTooltipDisabled]="(truncateName$ | async) === false">
-      {{ name }}
+    <h3
+      *ngIf="cellData.name; else noName"
+      #nameRef
+      [matTooltip]="cellData.name"
+      [matTooltipDisabled]="(truncateName$ | async) === false"
+    >
+      {{ cellData.name }}
     </h3>
     <ng-template #noName>
       <h3>{{ t('noName') }}</h3>
     </ng-template>
     <p
-      *ngIf="description; else noDescription"
+      *ngIf="cellData.description; else noDescription"
       #descriptionRef
-      [matTooltip]="description"
+      [matTooltip]="cellData.description"
       [matTooltipDisabled]="(truncateDescription$ | async) === false"
     >
-      {{ description }}
+      {{ cellData.description }}
     </p>
     <ng-template #noDescription>
       <p>{{ t('noDescription') }}</p></ng-template

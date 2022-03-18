@@ -72,6 +72,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: '',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: casefile.thumbnailSrc,
             name: casefile.title,
@@ -82,6 +83,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: 'Access',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.ACCESS_TABLE_CELL,
             targetUrl: Casefile.basePath + casefile.id,
             accessState: AccessState.ACCESS_GRANTED,
@@ -91,6 +93,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: 'Owner',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: casefile.author.fullName,
           },
@@ -99,14 +102,16 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: 'Starred',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.FAVORIZED_TABLE_CELL,
-            favorized: false,
+            isFavorized: false,
           },
         },
         views: {
           columnName: 'Views',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: String(casefile.views),
           },
@@ -115,6 +120,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           columnName: 'Last Updated',
           casefileId: casefile.id,
           cellData: {
+            id: casefile.id,
             type: TableCellTypes.DATE_TABLE_CELL,
             date: String(casefile.lastUpdated),
           },

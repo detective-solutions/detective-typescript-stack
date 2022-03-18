@@ -1,4 +1,4 @@
-<button mat-button *ngIf="isFavorized; else notFavorized" (click)="favorize()">
+<button mat-button *ngIf="cellData.isFavorized; else notFavorized" (click)="favorize()">
   <mat-icon inline class="favorized">star</mat-icon>
 </button>
 <ng-template #notFavorized>

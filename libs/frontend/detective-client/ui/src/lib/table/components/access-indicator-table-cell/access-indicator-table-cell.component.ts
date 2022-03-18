@@ -1,7 +1,7 @@
+import { AccessState, IAccessTableCell } from '../../interfaces';
 import { CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 
-import { AccessState } from '../../interfaces/table-cell-data.interface';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,18 +12,16 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessIndicatorTableCellComponent implements OnInit {
-  casefileId!: string;
-  targetUrl!: string;
-  accessState!: AccessState;
+  cellData!: IAccessTableCell; // Will be populated by the DynamicTableDirective
 
-  accessGranted = false;
-  accessPending = false;
   noAccess = false;
+  accessPending = false;
+  accessGranted = false;
 
   constructor(private readonly router: Router, private readonly eventService: EventService) {}
 
   ngOnInit() {
-    switch (this.accessState) {
+    switch (this.cellData.accessState) {
       case AccessState.ACCESS_GRANTED:
         this.accessGranted = true;
         break;
@@ -36,12 +34,12 @@ export class AccessIndicatorTableCellComponent implements OnInit {
   }
 
   openTargetUrl() {
-    this.router.navigateByUrl(this.targetUrl);
+    this.router.navigateByUrl(this.cellData.targetUrl);
   }
 
   requestAccess() {
     // TODO: Handle error case
-    this.eventService.tableCellEvents$.next({ casefileId: this.casefileId, type: CasefileEventType.REQUEST_ACCESS });
+    this.eventService.tableCellEvents$.next({ id: this.cellData.id, type: CasefileEventType.REQUEST_ACCESS });
     this.noAccess = false;
     this.accessPending = true;
   }

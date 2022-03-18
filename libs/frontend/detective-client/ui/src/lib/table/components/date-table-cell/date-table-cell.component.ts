@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
+import { IDateTableCell } from '../../interfaces';
+
 @Component({
-  selector: 'text-table-cell',
-  template: '{{date | date: "longDate"}}',
+  selector: 'date-table-cell',
+  template: '{{cellData.date | date: "longDate"}}',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateTableCellComponent {
-  date!: string;
+  cellData!: IDateTableCell; // Will be populated by the DynamicTableDirective
 }
