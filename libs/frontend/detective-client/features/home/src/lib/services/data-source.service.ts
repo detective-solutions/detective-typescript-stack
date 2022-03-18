@@ -23,7 +23,6 @@ export class DataSourceService {
     });
     return this.getAllDataSourcesWatchQuery.valueChanges.pipe(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tap(console.log),
       map((response: any) => response.data),
       map((response: IGetAllDataSourcesGQLResponse) => {
         return {
