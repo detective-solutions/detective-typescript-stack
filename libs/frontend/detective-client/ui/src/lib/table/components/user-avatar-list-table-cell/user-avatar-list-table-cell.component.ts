@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { IUserAvatar } from '../../interfaces/table-cell-data.interface';
+import { IUserAvatarListTableCell } from '../../interfaces';
 
 @Component({
   selector: 'user-avatar-list-table-cell',
@@ -9,5 +9,5 @@ import { IUserAvatar } from '../../interfaces/table-cell-data.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserAvatarListTableCellComponent {
-  userAvatars: IUserAvatar[] = [];
+  cellData!: IUserAvatarListTableCell; // Will be populated by the DynamicTableDirective
 }

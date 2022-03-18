@@ -1,9 +1,5 @@
 export * from './lib/navigation/ISidenavItem.interface';
 export * from './lib/navigation/navigation.module';
-export * from './lib/tiles/tiles.module';
-export * from './lib/tiles/interfaces/tile.interface';
-export * from './lib/table/table.module';
-export * from './lib/table/interfaces/casefile-table.interface';
-export * from './lib/table/interfaces/data-source-table.interface';
-export * from './lib/table/interfaces/table-cell-data.interface';
-export * from './lib/table/interfaces/table.interface';
+
+export * from './lib/table';
+export * from './lib/tiles';

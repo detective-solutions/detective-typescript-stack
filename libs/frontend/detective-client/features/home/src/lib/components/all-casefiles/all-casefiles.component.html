@@ -1,8 +1,13 @@
 <table-view
   *ngIf="showTableView$ | async; else showTileView"
   [tableRows$]="tableItems$"
-  [tableCellEvents$]="tableCellEvents$"
+  [pageSize]="pageSize"
+  [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
 ></table-view>
 <ng-template #showTileView>
-  <tiles-view [tileItems$]="tileItems$"></tiles-view>
+  <tiles-view
+    [tilesInput$]="tileItems$"
+    [pageSize]="pageSize"
+    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+  ></tiles-view>
 </ng-template>

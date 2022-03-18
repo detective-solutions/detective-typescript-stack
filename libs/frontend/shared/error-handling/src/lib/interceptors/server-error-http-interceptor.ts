@@ -31,17 +31,19 @@ export class ServerErrorHttpInterceptor implements HttpInterceptor {
       case 500:
         this.translationService
           .selectTranslate('toastMessages.byStatusCode.500', {}, ServerErrorHttpInterceptor.translationScope)
-          .subscribe((translation) =>
-            this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
-          );
+          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
         break;
       // Service Unavailable
       case 503:
         this.translationService
           .selectTranslate('toastMessages.byStatusCode.503', {}, ServerErrorHttpInterceptor.translationScope)
-          .subscribe((translation) =>
-            this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
-          );
+          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+        break;
+      // Gateway Timeout
+      case 504:
+        this.translationService
+          .selectTranslate('toastMessages.byStatusCode.504', {}, ServerErrorHttpInterceptor.translationScope)
+          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
   }
 }

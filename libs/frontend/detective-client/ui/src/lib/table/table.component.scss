@@ -7,12 +7,16 @@ $row-height: 120px;
   padding: 0 40px;
 
   .table-container {
-    margin-top: 20px;
-    height: 90%;
+    margin-top: 18px;
+    height: 97%;
     overflow: auto;
 
     mat-cell {
       height: $row-height;
+
+      .dynamic-table-cell {
+        text-align: center;
+      }
     }
   }
 

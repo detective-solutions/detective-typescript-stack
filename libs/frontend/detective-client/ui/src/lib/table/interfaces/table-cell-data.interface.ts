@@ -1,33 +1,18 @@
-export type ITableCellData =
-  | ITextTableCell
-  | IHtmlTableCell
+export type TableCellData =
   | IAccessTableCell
+  | IDateTableCell
   | IFavorizedTableCell
+  | IMultiTableCell
+  | ITextTableCell
   | IUserAvatarListTableCell;
 
 export enum TableCellTypes {
-  TEXT_TABLE_CELL = 'textTableCell',
-  HTML_TABLE_CELL = 'htmlTableCell',
   ACCESS_TABLE_CELL = 'accessTableCell',
+  DATE_TABLE_CELL = 'dateTableCell',
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
+  MULTI_TABLE_CELL = 'multiTableCell',
+  TEXT_TABLE_CELL = 'textTableCell',
   USER_AVATAR_LIST_TABLE_CELL = 'userIconListTableCell',
-}
-
-export interface ITextTableCell {
-  readonly type: TableCellTypes.TEXT_TABLE_CELL;
-  readonly text: string;
-}
-
-export interface IHtmlTableCell {
-  readonly type: TableCellTypes.HTML_TABLE_CELL;
-  readonly imageSrc: string;
-  readonly header: string;
-  readonly description: string;
-}
-
-export interface IAccessTableCell {
-  readonly type: TableCellTypes.ACCESS_TABLE_CELL;
-  accessState: AccessState;
 }
 
 export enum AccessState {
@@ -36,17 +21,44 @@ export enum AccessState {
   NO_ACCESS = 'noAccess',
 }
 
-export interface IFavorizedTableCell {
-  readonly type: TableCellTypes.FAVORIZED_TABLE_CELL;
-  favorized: boolean;
+interface IBaseTableCell {
+  id: string;
 }
 
-export interface IUserAvatarListTableCell {
-  readonly type: TableCellTypes.USER_AVATAR_LIST_TABLE_CELL;
-  readonly userAvatars: IUserAvatar[];
+export interface IAccessTableCell extends IBaseTableCell {
+  type: TableCellTypes.ACCESS_TABLE_CELL;
+  targetUrl: string;
+  accessState: AccessState;
 }
 
-export interface IUserAvatar {
-  readonly name: string;
-  readonly imageSrc: string;
+export interface IDateTableCell extends IBaseTableCell {
+  type: TableCellTypes.DATE_TABLE_CELL;
+  date: string;
+}
+
+export interface IFavorizedTableCell extends IBaseTableCell {
+  type: TableCellTypes.FAVORIZED_TABLE_CELL;
+  isFavorized: boolean;
+}
+
+export interface IMultiTableCell extends IBaseTableCell {
+  type: TableCellTypes.MULTI_TABLE_CELL;
+  thumbnailSrc: string;
+  name: string;
+  description: string;
+}
+
+export interface ITextTableCell extends IBaseTableCell {
+  type: TableCellTypes.TEXT_TABLE_CELL;
+  text: string;
+}
+
+export interface IUserAvatarListTableCell extends IBaseTableCell {
+  type: TableCellTypes.USER_AVATAR_LIST_TABLE_CELL;
+  userAvatars: IUserAvatar[];
+}
+
+export interface IUserAvatar extends IBaseTableCell {
+  name: string;
+  imageSrc: string;
 }

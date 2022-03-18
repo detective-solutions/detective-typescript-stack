@@ -18,13 +18,14 @@
   },
   "table": {
     "pageOptionsLabel": "Select page",
-    "multiTableCell": {
-      "imageTooltip": "Open"
-    },
     "accessIndicatorTableCell": {
-      "accessGranted": "Access Granted",
+      "accessGranted": "Open",
       "accessPending": "Access Pending",
       "noAccess": "Request Access"
+    },
+    "multiTableCell": {
+      "noName": "No name available",
+      "noDescription": "No description available."
     }
   }
 }

@@ -1,61 +1,65 @@
-import { Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
-import { ITableCellData, TableCellTypes } from '../interfaces/table-cell-data.interface';
+import { ComponentRef, Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
+import { TableCellData, TableCellTypes } from '../interfaces/table-cell-data.interface';
 
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
-import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
+import { DateTableCellComponent } from './date-table-cell/date-table-cell.component';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
-import { Subject } from 'rxjs';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
 import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/user-avatar-list-table-cell.component';
+
+type TableCellComponents =
+  | TextTableCellComponent
+  | DateTableCellComponent
+  | MultiTableCellComponent
+  | AccessIndicatorTableCellComponent
+  | FavorizedTableCellComponent
+  | UserAvatarListTableCellComponent;
 
 @Directive({
   selector: '[dynamicTableCell]',
 })
 export class DynamicTableCellDirective implements OnInit {
-  @Input() casefileId!: string;
-  @Input() tableCellData!: ITableCellData;
-  @Input() tableCellEvents$!: Subject<CasefileEvent>;
+  @Input() tableCellData!: TableCellData;
 
-  constructor(private viewContainerRef: ViewContainerRef) {}
+  constructor(private viewContainerRef: ViewContainerRef, private readonly logService: LogService) {}
 
   ngOnInit() {
-    if (!this.tableCellData) return;
+    if (!this.tableCellData) {
+      return;
+    }
     this.viewContainerRef.clear();
 
-    switch (this.tableCellData.type) {
-      case TableCellTypes.TEXT_TABLE_CELL: {
-        const componentRef = this.viewContainerRef.createComponent(TextTableCellComponent);
-        componentRef.instance.text = this.tableCellData.text;
-        break;
-      }
-      case TableCellTypes.HTML_TABLE_CELL: {
-        const componentRef = this.viewContainerRef.createComponent(MultiTableCellComponent);
-        componentRef.instance.casefileId = this.casefileId;
-        componentRef.instance.imageSrc = this.tableCellData.imageSrc;
-        componentRef.instance.header = this.tableCellData.header;
-        componentRef.instance.description = this.tableCellData.description;
-        break;
-      }
+    const componentRef = this.getComponentInstanceByType(this.tableCellData.type);
+    if (componentRef) {
+      componentRef.instance.cellData = this.tableCellData;
+    }
+  }
+
+  getComponentInstanceByType(componentType: string): ComponentRef<TableCellComponents> | null {
+    switch (componentType) {
       case TableCellTypes.ACCESS_TABLE_CELL: {
-        const componentRef = this.viewContainerRef.createComponent(AccessIndicatorTableCellComponent);
-        componentRef.instance.casefileId = this.casefileId;
-        componentRef.instance.accessState = this.tableCellData.accessState;
-        componentRef.instance.tableCellEvents$ = this.tableCellEvents$;
-        break;
+        return this.viewContainerRef.createComponent(AccessIndicatorTableCellComponent);
+      }
+      case TableCellTypes.DATE_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(DateTableCellComponent);
       }
       case TableCellTypes.FAVORIZED_TABLE_CELL: {
-        const componentRef = this.viewContainerRef.createComponent(FavorizedTableCellComponent);
-        componentRef.instance.casefileId = this.casefileId;
-        componentRef.instance.isFavorized = this.tableCellData.favorized;
-        componentRef.instance.tableCellEvents$ = this.tableCellEvents$;
-        break;
+        return this.viewContainerRef.createComponent(FavorizedTableCellComponent);
+      }
+      case TableCellTypes.MULTI_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(MultiTableCellComponent);
+      }
+      case TableCellTypes.TEXT_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(TextTableCellComponent);
       }
       case TableCellTypes.USER_AVATAR_LIST_TABLE_CELL: {
-        const componentRef = this.viewContainerRef.createComponent(UserAvatarListTableCellComponent);
-        componentRef.instance.userAvatars = this.tableCellData.userAvatars;
-        break;
+        return this.viewContainerRef.createComponent(UserAvatarListTableCellComponent);
       }
+      default:
+        this.logService.error(`Component type ${componentType} is not supported. Skipping cell initialization.`);
+        return null;
     }
   }
 }

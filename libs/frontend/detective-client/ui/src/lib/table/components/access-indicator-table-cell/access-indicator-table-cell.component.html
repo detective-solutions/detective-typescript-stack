@@ -1,8 +1,8 @@
 <div *transloco="let t; read: 'table.accessIndicatorTableCell'">
-  <div *ngIf="accessGranted" class="access-granted" fxLayoutAlign="center center">
-    <mat-icon class="access-icon">done</mat-icon>
-    <span fxFlex="auto">{{ t('accessGranted') }}</span>
-  </div>
+  <button *ngIf="accessGranted" mat-stroked-button (click)="openTargetUrl()">
+    <mat-icon class="access-icon">open_in_browser</mat-icon>
+    <span>{{ t('accessGranted') }}</span>
+  </button>
   <div *ngIf="accessPending" class="access-pending" fxLayoutAlign="center center">
     <mat-icon class="access-icon">query_builder</mat-icon>
     <span fxFlex="auto">{{ t('accessPending') }}</span>

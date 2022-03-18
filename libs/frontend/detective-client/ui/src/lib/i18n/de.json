@@ -18,10 +18,14 @@
   },
   "table": {
     "pageOptionsLabel": "Seite auswählen",
-    "accessIndicatorCell": {
-      "accessGranted": "Zugang gewährt",
+    "accessIndicatorTableCell": {
+      "accessGranted": "Öffnen",
       "accessPending": "Berechtigung ausstehend",
-      "noAccess": "Kein Zugang"
+      "noAccess": "Zugang anfordern"
+    },
+    "multiTableCell": {
+      "noName": "Kein Name verfügbar",
+      "noDescription": "Keine Beschreibung verfügbar."
     }
   }
 }

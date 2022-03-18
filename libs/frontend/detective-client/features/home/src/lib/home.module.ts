@@ -5,7 +5,9 @@ import { CasefileService } from './services/casefile.service';
 import { CommonModule } from '@angular/common';
 import { DataSourceService } from './services/data-source.service';
 import { DataSourcesComponent } from './components/data-sources/data-sources.component';
-import { EventService } from '@detective.solutions/frontend/shared/data-access';
+import { GetAllCasefilesGQL } from './graphql/get-all-casefiles-gql';
+import { GetAllDataSourcesGQL } from './graphql/get-all-data-sources-gql';
+import { GetCasefilesByAuthorGQL } from './graphql/get-casefiles-by-author.gql';
 import { HomeContainerComponent } from './components/home-container.component';
 import { HomeRoutingModule } from './home-routing.module';
 import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';
@@ -24,9 +26,11 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
         loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
       },
     },
-    EventService,
     CasefileService,
     DataSourceService,
+    GetAllCasefilesGQL,
+    GetCasefilesByAuthorGQL,
+    GetAllDataSourcesGQL,
   ],
 })
 export class HomeModule {}

@@ -1,11 +1,10 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { IMatColumnDef, ITableDef } from './interfaces/table.interface';
+import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces/table.interface';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 
-import { CasefileEvent } from '@detective.solutions/frontend/shared/data-access';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { EventService } from '@detective.solutions/frontend/shared/data-access';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
@@ -15,16 +14,19 @@ import { MatTableDataSource } from '@angular/material/table';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent implements OnInit, OnDestroy {
-  readonly pageSizeOptions = [10, 25, 100];
+  @Input() tableRows$!: Observable<ITableInput>;
+  @Input() pageSize = 10;
+  @Input() fetchMoreDataByOffset$!: Subject<number>;
 
-  @Input() tableRows$!: Observable<ITableDef[]>;
-  @Input() tableCellEvents$!: Subject<CasefileEvent>;
-
-  tableDataSource!: MatTableDataSource<ITableDef>;
+  tableDataSource: MatTableDataSource<IAbstractTableDef> = new MatTableDataSource();
   columnDefinitions: IMatColumnDef[] = [];
   columnIds: string[] = [];
-  isLoaded = false;
+  totalElementsCount = 0;
+  isFetchingMoreData = false;
 
+  private currentPageOffset = 0;
+  private alreadyLoadedElementsCount = 0;
+  private readonly loadingScrollBuffer = 100;
   private readonly subscriptions = new Subscription();
 
   isMobile$: Observable<boolean> = this.breakpointObserver
@@ -34,21 +36,37 @@ export class TableComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly eventService: EventService,
+    private readonly logService: LogService
+  ) {}
 
   ngOnInit() {
     this.subscriptions.add(
       this.tableRows$
-        .pipe(tap((tableRows: ITableDef[]) => this.transformData(tableRows)))
-        .subscribe((tableDef: ITableDef[]) => {
-          this.tableDataSource = new MatTableDataSource(tableDef);
-          this.tableDataSource.paginator = this.paginator;
-          this.tableDataSource.sort = this.sort;
-          this.isLoaded = true;
+        .pipe(
+          tap(() => {
+            if (this.isFetchingMoreData) {
+              this.isFetchingMoreData = false;
+            }
+          })
+        )
+        .subscribe((tableInput: ITableInput) => {
+          this.columnDefinitions = this.createMatColumnDefs(tableInput.tableItems);
+          this.columnIds = this.extractColumnIds(this.columnDefinitions);
+          this.totalElementsCount = tableInput.totalElementsCount;
+          this.alreadyLoadedElementsCount += tableInput.tableItems.length;
+          this.tableDataSource = new MatTableDataSource(tableInput.tableItems);
         })
+    );
+
+    // Handle resetting of fetching state flag in case of an error
+    this.subscriptions.add(
+      this.eventService.resetLoadingStates$.subscribe(() => {
+        this.isFetchingMoreData = false;
+        this.logService.debug('Resetting loading indicator due to error');
+      })
     );
   }
 
@@ -56,19 +74,34 @@ export class TableComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private transformData(tableItems: ITableDef[]) {
-    this.createMatColumnDefs(tableItems);
-    this.extractColumnIds();
+  onScroll(e: Event) {
+    const currentScrollLocation = (e.target as HTMLElement).scrollTop;
+    const limit =
+      (e.target as HTMLElement).scrollHeight - (e.target as HTMLElement).offsetHeight - this.loadingScrollBuffer;
+
+    // If the user has scrolled between the bottom and the loadingScrollBuffer range, add more data
+    if (currentScrollLocation > limit) {
+      this.currentPageOffset += this.pageSize;
+      // Check if all available data was already fetched
+      if (!this.isFetchingMoreData && this.alreadyLoadedElementsCount < this.totalElementsCount) {
+        this.fetchMoreDataByOffset$.next(this.currentPageOffset);
+        this.isFetchingMoreData = true;
+      }
+    }
   }
 
-  // TODO: Use Material Design Types for abstract design (see example on Angular Material page)
-  private createMatColumnDefs(tableItems: ITableDef[]) {
+  private createMatColumnDefs(tableItems: IAbstractTableDef[]): IMatColumnDef[] {
+    if (!tableItems || tableItems.length === 0) {
+      return [];
+    }
+    const tempMatColumnDefs = [] as IMatColumnDef[];
     Object.entries(tableItems[0]).forEach(([key, value]) =>
-      this.columnDefinitions.push({ id: key, name: value.columnName })
+      tempMatColumnDefs.push({ id: key, name: value.columnName })
     );
+    return tempMatColumnDefs;
   }
 
-  private extractColumnIds() {
-    this.columnIds = this.columnDefinitions.map((columnDefinition: IMatColumnDef) => columnDefinition.id);
+  private extractColumnIds(columnDefinitions: IMatColumnDef[]) {
+    return columnDefinitions.map((columnDefinition: IMatColumnDef) => columnDefinition.id);
   }
 }

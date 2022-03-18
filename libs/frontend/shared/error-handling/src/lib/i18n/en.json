@@ -2,7 +2,8 @@
   "toastMessages": {
     "byStatusCode": {
       "500": "An error occurred on the server. Please try again.",
-      "503": "The database seems to be currently unavailable. Please try again later."
+      "503": "The database seems to be currently unavailable. Please try again later.",
+      "504": "The database seems to be currently unavailable. Please reload or try again later."
     }
   }
 }

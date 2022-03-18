@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Observable, debounceTime, distinctUntilChanged, fromEvent, map, share } from 'rxjs';
+import { Observable, debounceTime, distinctUntilChanged, filter, fromEvent, map, share } from 'rxjs';
 
-import { Router } from '@angular/router';
+import { IMultiTableCell } from '../../interfaces';
 
 @Component({
   selector: 'multi-table-cell',
@@ -12,34 +12,25 @@ import { Router } from '@angular/router';
 })
 export class MultiTableCellComponent implements OnInit {
   readonly windowResized$: Observable<Event> = fromEvent(window, 'resize').pipe(debounceTime(200), share());
-  readonly truncateHeader$: Observable<boolean> = this.windowResized$.pipe(
-    map(() => this.hasOverflow(this.headerRef)),
+  readonly truncateName$: Observable<boolean> = this.windowResized$.pipe(
+    filter(() => !!this.nameRef),
+    map(() => this.hasOverflow(this.nameRef)),
     distinctUntilChanged()
   );
   readonly truncateDescription$: Observable<boolean> = this.windowResized$.pipe(
+    filter(() => !!this.descriptionRef),
     map(() => this.hasOverflow(this.descriptionRef)),
     distinctUntilChanged()
   );
 
-  readonly casefileBaseUrl = '/casefile/';
-  casefileUrl!: string;
-
-  casefileId!: string;
-  imageSrc!: string;
-  header!: string;
-  description!: string;
-
-  @ViewChild('headerRef') headerRef!: ElementRef;
+  @ViewChild('nameRef') nameRef!: ElementRef;
   @ViewChild('descriptionRef') descriptionRef!: ElementRef;
 
-  constructor(private router: Router) {}
+  cellData!: IMultiTableCell; // Will be populated by the DynamicTableDirective
 
   ngOnInit() {
-    this.casefileUrl = this.casefileBaseUrl + this.casefileId;
-  }
-
-  openCasefile() {
-    this.router.navigateByUrl(this.casefileUrl);
+    // Manually dispatch resize event to trigger truncation mechanism on component init
+    window.dispatchEvent(new Event('resize'));
   }
 
   private hasOverflow(elementRef: ElementRef) {

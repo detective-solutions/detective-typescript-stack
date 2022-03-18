@@ -1,4 +1,5 @@
-import { APOLLO_OPTIONS } from 'apollo-angular';
+import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
+
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AuthModule } from '@detective.solutions/frontend/shared/auth';
@@ -11,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { SharedErrorHandlingModule } from '@detective.solutions/frontend/shared/error-handling';
 import { SharedUiModule } from '@detective.solutions/frontend/shared/ui';
 import { TranslocoRootModule } from './transloco-root.module';
+import { offsetLimitPagination } from '@apollo/client/utilities';
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,11 +27,22 @@ import { TranslocoRootModule } from './transloco-root.module';
     SharedErrorHandlingModule, // Import last due to interceptor chain
   ],
   providers: [
+    Apollo,
     {
       provide: APOLLO_OPTIONS,
       useFactory: (httpLink: HttpLink) => {
         return {
-          cache: new InMemoryCache({ addTypename: false }),
+          cache: new InMemoryCache({
+            addTypename: false,
+            typePolicies: {
+              Query: {
+                fields: {
+                  queryCasefile: offsetLimitPagination(),
+                  querySourceConnection: offsetLimitPagination(),
+                },
+              },
+            },
+          }),
           link: httpLink.create({
             uri: '/graphql',
           }),
