@@ -83,7 +83,7 @@ export class TableComponent implements OnInit, OnDestroy {
     if (currentScrollLocation > limit) {
       this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
-      if (this.alreadyLoadedElementsCount < this.totalElementsCount) {
+      if (!this.isFetchingMoreData && this.alreadyLoadedElementsCount < this.totalElementsCount) {
         this.fetchMoreDataByOffset$.next(this.currentPageOffset);
         this.isFetchingMoreData = true;
       }
