@@ -8,6 +8,5 @@ export interface IDataSourceTableDef extends IAbstractTableDef {
 
 export interface IDataSourceColumnDef {
   columnName: string;
-  dataSourceId: string;
   cellData: TableCellData;
 }

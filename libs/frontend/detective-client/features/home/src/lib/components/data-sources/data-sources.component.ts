@@ -66,8 +66,8 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
       tempTableItems.push({
         dataSourceInfo: {
           columnName: '',
-          dataSourceId: dataSource.id,
           cellData: {
+            id: dataSource.id,
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: dataSource.iconSrc,
             name: dataSource.name,
@@ -76,16 +76,16 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
         },
         access: {
           columnName: 'Access',
-          dataSourceId: dataSource.id,
           cellData: {
+            id: dataSource.id,
             type: TableCellTypes.ACCESS_TABLE_CELL,
             accessState: AccessState.NO_ACCESS,
           },
         },
         lastUpdated: {
           columnName: 'Last Updated',
-          dataSourceId: dataSource.id,
           cellData: {
+            id: dataSource.id,
             type: TableCellTypes.DATE_TABLE_CELL,
             date: String(dataSource.lastUpdated),
           },
