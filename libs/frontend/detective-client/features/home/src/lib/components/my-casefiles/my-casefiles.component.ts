@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detective-client/ui';
 import { Observable, filter, map, switchMap } from 'rxjs';
 
-import { AbstractCasefileListComponent } from '../abstract/abstract-casefile-list.component';
+import { BaseCasefileListComponent } from '../base/base-casefile-list.component';
 import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-response.interface';
 
 @Component({
@@ -10,7 +10,7 @@ import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-res
   templateUrl: './my-casefiles.component.html',
   styleUrls: ['./my-casefiles.component.scss'],
 })
-export class MyCasefilesComponent extends AbstractCasefileListComponent implements OnInit {
+export class MyCasefilesComponent extends BaseCasefileListComponent implements OnInit {
   casefiles$!: Observable<IGetAllCasefilesResponse>;
   tileItems$!: Observable<ITilesInput>;
   tableItems$!: Observable<ITableInput>;

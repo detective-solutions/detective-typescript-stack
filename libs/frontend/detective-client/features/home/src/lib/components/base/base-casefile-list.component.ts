@@ -13,7 +13,7 @@ import { CasefileService } from '../../services/casefile.service';
 import { ICasefileTableDef } from '../../interfaces';
 
 @Component({ template: '' })
-export class AbstractCasefileListComponent implements OnDestroy {
+export class BaseCasefileListComponent implements OnDestroy {
   readonly showTableView$!: BehaviorSubject<boolean>;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
