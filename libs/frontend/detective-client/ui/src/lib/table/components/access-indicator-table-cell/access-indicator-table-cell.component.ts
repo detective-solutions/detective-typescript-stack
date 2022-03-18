@@ -1,6 +1,8 @@
-import { AccessState, IAccessTableCell } from '../../interfaces/table-cell-data.interface';
 import { CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
+
+import { AccessState } from '../../interfaces/table-cell-data.interface';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'access-indicator-table-cell',
@@ -10,15 +12,18 @@ import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessIndicatorTableCellComponent implements OnInit {
-  cellData!: IAccessTableCell;
+  static readonly casefileBaseUrl = '/casefile/';
+
   casefileId!: string;
-  accessState: AccessState = AccessState.NO_ACCESS;
+  accessState!: AccessState;
 
   accessGranted = false;
   accessPending = false;
   noAccess = false;
 
-  constructor(private readonly eventService: EventService) {}
+  private casefileUrl!: string;
+
+  constructor(private readonly router: Router, private readonly eventService: EventService) {}
 
   ngOnInit() {
     switch (this.accessState) {
@@ -31,6 +36,12 @@ export class AccessIndicatorTableCellComponent implements OnInit {
       default:
         this.noAccess = true;
     }
+
+    this.casefileUrl = AccessIndicatorTableCellComponent.casefileBaseUrl + this.casefileId;
+  }
+
+  openCasefile() {
+    this.router.navigateByUrl(this.casefileUrl);
   }
 
   requestAccess() {

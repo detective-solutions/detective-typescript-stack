@@ -19,7 +19,7 @@
   "table": {
     "pageOptionsLabel": "Seite auswählen",
     "accessIndicatorTableCell": {
-      "accessGranted": "Zugang gewährt",
+      "accessGranted": "Öffnen",
       "accessPending": "Berechtigung ausstehend",
       "noAccess": "Zugang anfordern"
     },
