@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Observable, debounceTime, distinctUntilChanged, fromEvent, map, share } from 'rxjs';
-
-import { Router } from '@angular/router';
+import { Observable, debounceTime, distinctUntilChanged, filter, fromEvent, map, share } from 'rxjs';
 
 @Component({
   selector: 'multi-table-cell',
@@ -13,21 +11,23 @@ import { Router } from '@angular/router';
 export class MultiTableCellComponent implements OnInit {
   readonly windowResized$: Observable<Event> = fromEvent(window, 'resize').pipe(debounceTime(200), share());
   readonly truncateName$: Observable<boolean> = this.windowResized$.pipe(
+    filter(() => !!this.nameRef),
     map(() => this.hasOverflow(this.nameRef)),
     distinctUntilChanged()
   );
   readonly truncateDescription$: Observable<boolean> = this.windowResized$.pipe(
+    filter(() => !!this.descriptionRef),
     map(() => this.hasOverflow(this.descriptionRef)),
     distinctUntilChanged()
   );
+
+  @ViewChild('nameRef') nameRef!: ElementRef;
+  @ViewChild('descriptionRef') descriptionRef!: ElementRef;
 
   casefileId!: string;
   thumbnailSrc!: string;
   name!: string;
   description!: string;
-
-  @ViewChild('nameRef') nameRef!: ElementRef;
-  @ViewChild('descriptionRef') descriptionRef!: ElementRef;
 
   ngOnInit() {
     // Manually dispatch resize event to trigger truncation mechanism on component init
