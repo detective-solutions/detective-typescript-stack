@@ -4,10 +4,10 @@ import { TableCellData, TableCellTypes } from '../interfaces/table-cell-data.int
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
 import { DateTableCellComponent } from './date-table-cell/date-table-cell.component';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
 import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/user-avatar-list-table-cell.component';
-import { throwError } from 'rxjs';
 
 type TableCellComponents =
   | TextTableCellComponent
@@ -21,13 +21,13 @@ type TableCellComponents =
   selector: '[dynamicTableCell]',
 })
 export class DynamicTableCellDirective implements OnInit {
-  @Input() casefileId!: string;
   @Input() tableCellData!: TableCellData;
 
-  constructor(private viewContainerRef: ViewContainerRef) {}
+  constructor(private viewContainerRef: ViewContainerRef, private readonly logService: LogService) {}
 
   ngOnInit() {
     if (!this.tableCellData) {
+      this.logService.error('No data available to initialize table cell. Skipping ...');
       return;
     }
     this.viewContainerRef.clear();
@@ -59,7 +59,7 @@ export class DynamicTableCellDirective implements OnInit {
         return this.viewContainerRef.createComponent(UserAvatarListTableCellComponent);
       }
       default:
-        throwError(() => new Error(`Component type ${componentType} is not supported. Skipping cell initialization.`));
+        this.logService.error(`Component type ${componentType} is not supported. Skipping cell initialization.`);
         return null;
     }
   }
