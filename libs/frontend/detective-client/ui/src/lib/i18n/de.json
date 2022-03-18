@@ -21,7 +21,7 @@
     "accessIndicatorTableCell": {
       "accessGranted": "Zugang gewährt",
       "accessPending": "Berechtigung ausstehend",
-      "noAccess": "Kein Zugang"
+      "noAccess": "Zugang anfordern"
     },
     "multiTableCell": {
       "noName": "Kein Name verfügbar",
