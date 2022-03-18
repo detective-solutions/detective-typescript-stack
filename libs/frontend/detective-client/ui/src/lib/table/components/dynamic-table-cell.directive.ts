@@ -27,7 +27,6 @@ export class DynamicTableCellDirective implements OnInit {
 
   ngOnInit() {
     if (!this.tableCellData) {
-      this.logService.error('No data available to initialize table cell. Skipping ...');
       return;
     }
     this.viewContainerRef.clear();
