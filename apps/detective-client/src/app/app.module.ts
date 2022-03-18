@@ -39,6 +39,7 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
               Query: {
                 fields: {
                   queryCasefile: offsetLimitPagination(),
+                  querySourceConnection: offsetLimitPagination(),
                 },
               },
             },
