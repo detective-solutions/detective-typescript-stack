@@ -82,7 +82,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.ACCESS_TABLE_CELL,
-            accessState: AccessState.NO_ACCESS,
+            accessState: AccessState.ACCESS_GRANTED,
           },
         },
         owner: {
