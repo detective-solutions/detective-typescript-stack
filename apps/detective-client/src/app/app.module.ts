@@ -27,7 +27,6 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
     SharedErrorHandlingModule, // Import last due to interceptor chain
   ],
   providers: [
-    // TODO: Move this to individual modules
     Apollo,
     {
       provide: APOLLO_OPTIONS,
