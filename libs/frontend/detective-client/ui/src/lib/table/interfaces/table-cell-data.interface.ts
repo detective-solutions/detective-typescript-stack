@@ -34,6 +34,7 @@ export interface IMultiTableCell {
 
 export interface IAccessTableCell {
   type: TableCellTypes.ACCESS_TABLE_CELL;
+  targetUrl: string;
   accessState: AccessState;
 }
 

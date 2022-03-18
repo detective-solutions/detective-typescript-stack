@@ -56,6 +56,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
       tempTileItems.push({
         id: casefile.id,
         title: casefile.title,
+        targetUrl: Casefile.basePath + casefile.id,
         description: casefile.description,
         thumbnailSrc: casefile.thumbnailSrc,
       });
@@ -82,6 +83,7 @@ export class AbstractCasefileListComponent implements OnDestroy {
           casefileId: casefile.id,
           cellData: {
             type: TableCellTypes.ACCESS_TABLE_CELL,
+            targetUrl: Casefile.basePath + casefile.id,
             accessState: AccessState.ACCESS_GRANTED,
           },
         },

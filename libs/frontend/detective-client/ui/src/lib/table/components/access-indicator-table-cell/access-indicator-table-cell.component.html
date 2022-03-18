@@ -1,5 +1,5 @@
 <div *transloco="let t; read: 'table.accessIndicatorTableCell'">
-  <button *ngIf="accessGranted" mat-stroked-button (click)="openCasefile()">
+  <button *ngIf="accessGranted" mat-stroked-button (click)="openTargetUrl()">
     <mat-icon class="access-icon">open_in_browser</mat-icon>
     <span>{{ t('accessGranted') }}</span>
   </button>

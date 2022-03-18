@@ -4,6 +4,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ITilesInput } from './interfaces/tile.interface';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'tiles-view',
@@ -24,7 +25,11 @@ export class TilesComponent implements OnInit, OnDestroy {
   private readonly loadingScrollBuffer = 80;
   private readonly subscriptions = new Subscription();
 
-  constructor(private readonly eventService: EventService, private readonly logService: LogService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly eventService: EventService,
+    private readonly logService: LogService
+  ) {}
 
   ngOnInit() {
     // Populate locally loaded elements count and reset fetching state flag
@@ -49,6 +54,10 @@ export class TilesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  openTargetUrl(targetUrl: string) {
+    this.router.navigateByUrl(targetUrl);
   }
 
   onScroll(e: Event) {

@@ -43,6 +43,7 @@ export class DynamicTableCellDirective implements OnInit {
       case TableCellTypes.ACCESS_TABLE_CELL: {
         const componentRef = this.viewContainerRef.createComponent(AccessIndicatorTableCellComponent);
         componentRef.instance.casefileId = this.casefileId;
+        componentRef.instance.targetUrl = this.tableCellData.targetUrl;
         componentRef.instance.accessState = this.tableCellData.accessState;
         break;
       }

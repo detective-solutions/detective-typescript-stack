@@ -3,7 +3,8 @@ import { ICasefile, IUser } from '@detective.solutions/shared/data-access';
 import { User } from './user.dto';
 
 export class Casefile implements ICasefile {
-  static readonly casefileImagePlaceholder = 'assets/images/detective-logo.svg';
+  static readonly basePath = '/casefile/';
+  static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
     public id = '',
@@ -25,7 +26,7 @@ export class Casefile implements ICasefile {
       casefile.id,
       casefile.title,
       casefile.description ?? '',
-      casefile.thumbnailSrc ?? Casefile.casefileImagePlaceholder,
+      casefile.thumbnailSrc ?? Casefile.thumbnailPlaceholder,
       User.Build(casefile.author as IUser),
       casefile.views,
       casefile.editors as IUser[],

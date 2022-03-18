@@ -12,16 +12,13 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccessIndicatorTableCellComponent implements OnInit {
-  static readonly casefileBaseUrl = '/casefile/';
-
   casefileId!: string;
+  targetUrl!: string;
   accessState!: AccessState;
 
   accessGranted = false;
   accessPending = false;
   noAccess = false;
-
-  private casefileUrl!: string;
 
   constructor(private readonly router: Router, private readonly eventService: EventService) {}
 
@@ -36,12 +33,10 @@ export class AccessIndicatorTableCellComponent implements OnInit {
       default:
         this.noAccess = true;
     }
-
-    this.casefileUrl = AccessIndicatorTableCellComponent.casefileBaseUrl + this.casefileId;
   }
 
-  openCasefile() {
-    this.router.navigateByUrl(this.casefileUrl);
+  openTargetUrl() {
+    this.router.navigateByUrl(this.targetUrl);
   }
 
   requestAccess() {

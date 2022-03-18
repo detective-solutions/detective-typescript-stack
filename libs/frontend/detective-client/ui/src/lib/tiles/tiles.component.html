@@ -43,7 +43,9 @@
           ><p>{{ t('tileDescriptionPlaceholderText') }}</p></ng-template
         >
         <mat-card-actions>
-          <button mat-button attr.aria-label="{{ t('tileOpenButtonLabel') }}">{{ t('tileOpenButtonText') }}</button>
+          <button mat-button attr.aria-label="{{ t('tileOpenButtonLabel') }}" (click)="openTargetUrl(tile.targetUrl)">
+            {{ t('tileOpenButtonText') }}
+          </button>
           <button mat-flat-button class="share-button" attr.aria-label="{{ t('tileShareButtonLabel') }}">
             <mat-icon>share</mat-icon>
           </button>
