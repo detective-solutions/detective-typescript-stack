@@ -12,6 +12,5 @@ export interface ICasefileTableDef extends IAbstractTableDef {
 
 export interface ICasefileColumnDef {
   columnName: string;
-  casefileId: string;
   cellData: TableCellData;
 }

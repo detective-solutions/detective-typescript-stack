@@ -70,7 +70,6 @@ export class BaseCasefileListComponent implements OnDestroy {
       tempTableItems.push({
         casefileInfo: {
           columnName: '',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.MULTI_TABLE_CELL,
@@ -81,7 +80,6 @@ export class BaseCasefileListComponent implements OnDestroy {
         },
         access: {
           columnName: 'Access',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.ACCESS_TABLE_CELL,
@@ -91,7 +89,6 @@ export class BaseCasefileListComponent implements OnDestroy {
         },
         owner: {
           columnName: 'Owner',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.TEXT_TABLE_CELL,
@@ -100,7 +97,6 @@ export class BaseCasefileListComponent implements OnDestroy {
         },
         starred: {
           columnName: 'Starred',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.FAVORIZED_TABLE_CELL,
@@ -109,7 +105,6 @@ export class BaseCasefileListComponent implements OnDestroy {
         },
         views: {
           columnName: 'Views',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.TEXT_TABLE_CELL,
@@ -118,7 +113,6 @@ export class BaseCasefileListComponent implements OnDestroy {
         },
         lastUpdated: {
           columnName: 'Last Updated',
-          casefileId: casefile.id,
           cellData: {
             id: casefile.id,
             type: TableCellTypes.DATE_TABLE_CELL,

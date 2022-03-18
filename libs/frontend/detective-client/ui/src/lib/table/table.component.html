@@ -11,11 +11,7 @@
         </mat-header-cell>
         <mat-cell *matCellDef="let item" [attr.data-label]="column.name" fxLayoutAlign="center center">
           <div dynamicTableCell class="dynamic-table-cell">
-            <ng-template
-              dynamicTableCell
-              [casefileId]="item[column.id].casefileId"
-              [tableCellData]="item[column.id].cellData"
-            ></ng-template>
+            <ng-template dynamicTableCell [tableCellData]="item[column.id].cellData"></ng-template>
           </div>
         </mat-cell>
       </ng-container>
