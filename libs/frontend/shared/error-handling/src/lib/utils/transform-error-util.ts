@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { throwError } from 'rxjs';
 
-// TODO: Add unit test
+// TODO: Improve & add unit test
 export function transformError(error: HttpErrorResponse | string) {
   let errorMessage = 'An unknown error has occurred';
   if (typeof error === 'string') {

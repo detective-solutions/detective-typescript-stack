@@ -31,9 +31,6 @@
       "@detective.solutions/frontend/detective-client/features/login": [
         "libs/frontend/detective-client/features/login/src/index.ts"
       ],
-      "@detective.solutions/frontend/detective-client/features/register": [
-        "libs/frontend/detective-client/features/register/src/index.ts"
-      ],
       "@detective.solutions/frontend/detective-client/ui": ["libs/frontend/detective-client/ui/src/index.ts"],
       "@detective.solutions/frontend/shared/auth": ["libs/frontend/shared/auth/src/index.ts"],
       "@detective.solutions/frontend/shared/data-access": ["libs/frontend/shared/data-access/src/index.ts"],
