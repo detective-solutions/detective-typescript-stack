@@ -23,7 +23,7 @@ export class BaseCasefileListComponent implements OnDestroy {
   protected readonly casefileAccessRequested$ = this.subscriptions.add(
     this.eventService.tableCellEvents$
       .pipe(
-        filter((event: ICasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS),
+        filter((event: ICasefileEvent) => !!event.id && event.type === CasefileEventType.REQUEST_ACCESS),
         tap((event: ICasefileEvent) => console.log(event))
       )
       .subscribe()

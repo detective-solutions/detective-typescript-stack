@@ -28,7 +28,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
   readonly accessRequested$ = this.subscriptions.add(
     this.eventService.tableCellEvents$
       .pipe(
-        filter((event: ICasefileEvent) => event.type === CasefileEventType.REQUEST_ACCESS && event.value !== undefined),
+        filter((event: ICasefileEvent) => !!event.id && event.type === CasefileEventType.REQUEST_ACCESS),
         tap((event: ICasefileEvent) => console.log(event))
       )
       .subscribe()
