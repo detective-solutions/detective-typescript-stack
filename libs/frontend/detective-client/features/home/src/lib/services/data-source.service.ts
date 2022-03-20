@@ -1,6 +1,6 @@
 import { DataSource, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { GetAllDataSourcesGQL, IGetAllDataSourcesGQLResponse } from '../graphql/get-all-data-sources-gql';
-import { Observable, catchError, map, tap } from 'rxjs';
+import { Observable, catchError, map } from 'rxjs';
 
 import { IGetAllDataSourcesResponse } from '../interfaces/get-all-data-sources-response.interface';
 import { Injectable } from '@angular/core';
