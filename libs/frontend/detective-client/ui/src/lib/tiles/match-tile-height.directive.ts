@@ -29,10 +29,6 @@ export class MatchHeightDirective implements AfterViewChecked {
       return;
     }
 
-    Array.from(children).forEach((x: HTMLElement) => {
-      x.style.height = 'initial';
-    });
-
     const itemHeights = Array.from(children).map((x) => x.clientHeight);
     const maxHeight = itemHeights.reduce((prev, curr) => {
       return curr > prev ? curr : prev;
