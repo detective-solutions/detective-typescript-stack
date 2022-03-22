@@ -9,15 +9,16 @@ import { GetAllDataSourcesGQL } from '../graphql/get-all-data-sources-gql';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-function createQueryRefMock(mockResponse: object) {
-  return {
-    valueChanges: of({ data: mockResponse, loading: false, networkStatus: 7 }),
-    fetchMore: jest.fn().mockReturnValue(new Promise(jest.fn())),
-  };
-}
-
-const eventServiceMock = {
-  resetLoadingStates$: new Subject(),
+const mockUtils = {
+  eventServiceMock: {
+    resetLoadingStates$: new Subject(),
+  },
+  createQueryRefMock: (mockResponse: object) => {
+    return {
+      valueChanges: of({ data: mockResponse, loading: false, networkStatus: 7 }),
+      fetchMore: jest.fn().mockReturnValue(new Promise(jest.fn())),
+    };
+  },
 };
 
 describe('DataSourceService', () => {
@@ -31,7 +32,7 @@ describe('DataSourceService', () => {
         DataSourceService,
         GetAllDataSourcesGQL,
         MockProvider(Apollo),
-        { provide: EventService, useValue: eventServiceMock },
+        { provide: EventService, useValue: mockUtils.eventServiceMock },
       ],
     });
 
@@ -52,7 +53,7 @@ describe('DataSourceService', () => {
       const mockResponse = { querySourceConnection: dataSources, aggregateSourceConnection: { count: 2 } };
       const watchQuerySpy = jest
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
-        .mockReturnValue(createQueryRefMock(mockResponse));
+        .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
 
       dataSourceService.getAllDataSources(0, 10).subscribe((response: any) => {
         expect(watchQuerySpy).toBeCalledTimes(1);
@@ -65,7 +66,9 @@ describe('DataSourceService', () => {
     it('should invoke internal error handling if the response does not comply with the IGetAllDataSourcesResponse interface', fakeAsync(() => {
       const dataSources = [DataSource.Build(new DataSource())];
       const mockResponse = { wrongKey: dataSources, aggregateSourceConnection: { count: 1 } };
-      jest.spyOn(GetAllDataSourcesGQL.prototype as any, 'watch').mockReturnValue(createQueryRefMock(mockResponse));
+      jest
+        .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
+        .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
       const handleErrorSpy = jest.spyOn(DataSourceService.prototype as any, 'handleError').mockReturnValue(EMPTY);
 
       dataSourceService.getAllDataSources(0, 10).subscribe(() => {
@@ -78,7 +81,7 @@ describe('DataSourceService', () => {
   describe('getAllDataSourcesNextPage', () => {
     it('should invoke the fetchMore function with correctly forwarded parameters', fakeAsync(() => {
       const mockResponse = { querySourceConnection: [], aggregateSourceConnection: { count: 2 } };
-      const queryRefMock = createQueryRefMock(mockResponse);
+      const queryRefMock = mockUtils.createQueryRefMock(mockResponse);
       const fetchMoreSpy = jest.spyOn(queryRefMock, 'fetchMore');
       jest.spyOn(GetAllDataSourcesGQL.prototype as any, 'watch').mockReturnValue(queryRefMock);
 
@@ -93,7 +96,7 @@ describe('DataSourceService', () => {
 
     it('should invoke internal error handling if an error occurs during the execution of the fetchMore function', fakeAsync(() => {
       const mockResponse = { querySourceConnection: [], aggregateSourceConnection: { count: 2 } };
-      const queryRefMock = createQueryRefMock(mockResponse);
+      const queryRefMock = mockUtils.createQueryRefMock(mockResponse);
       const fetchMorePromise = queryRefMock.fetchMore;
       jest.spyOn(GetAllDataSourcesGQL.prototype as any, 'watch').mockReturnValue(queryRefMock);
       const handleErrorSpy = jest.spyOn(DataSourceService.prototype as any, 'handleError').mockReturnValue(EMPTY);
