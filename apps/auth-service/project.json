@@ -27,6 +27,16 @@
         }
       }
     },
+    "dockerize": {
+      "builder": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "nx build auth-service",
+          "docker build -f ./apps/auth-service/docker/Dockerfile . -t detective-auth-service"
+        ],
+        "parallel": false
+      }
+    },
     "serve": {
       "executor": "@nrwl/node:node",
       "options": {
