@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  main:
+  Main:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
     steps:
@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: '16'
       - run: npm install
-      - run: npx nx affected --target=build --parallel=3
       - run: npx nx affected --target=test --parallel=2
-  pr:
+      - run: npx nx affected --target=build --parallel=3
+  PR:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -36,5 +36,5 @@ jobs:
         with:
           node-version: '16'
       - run: npm install
-      - run: npx nx affected --target=build --parallel=3
       - run: npx nx affected --target=test --parallel=2
+      - run: npx nx affected --target=build --parallel=3
