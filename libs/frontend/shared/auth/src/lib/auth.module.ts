@@ -1,6 +1,5 @@
 import { AuthService, CustomAuthService } from './services';
 
-import { Apollo } from 'apollo-angular';
 import { AuthHttpInterceptor } from './interceptors/auth-http-interceptor';
 import { CommonModule } from '@angular/common';
 import { GetUserGQL } from './graphql/get-user-gql';
