@@ -1,0 +1,13 @@
+.node {
+  cursor: pointer;
+  transition: stroke-width 0.1s ease-out, fill 0.1s ease-out, stroke 0.1s ease-out;
+
+  .node-name {
+    font-family: 'Lato';
+    font-size: 12;
+    text-anchor: middle;
+    alignment-baseline: central;
+    font-weight: 300;
+    fill: white;
+  }
+}

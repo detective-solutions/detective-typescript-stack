@@ -1,6 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 
-import { HostComponent } from './components/host/host.component';
+import { HostComponent } from './components';
 import { NgModule } from '@angular/core';
 
 const routes: Routes = [
