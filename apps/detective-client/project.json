@@ -83,6 +83,16 @@
       },
       "defaultConfiguration": "production"
     },
+    "dockerize": {
+      "builder": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "nx build detective-client",
+          "docker build -f ./apps/detective-client/docker/Dockerfile . -t detective-client"
+        ],
+        "parallel": false
+      }
+    },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
