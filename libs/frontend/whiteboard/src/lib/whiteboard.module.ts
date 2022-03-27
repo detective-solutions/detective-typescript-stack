@@ -1,8 +1,8 @@
+import { D3Service, WhiteboardService } from './services';
 import { DraggableDirective, ZoomableDirective } from './directives';
 import { HostComponent, SidebarComponent, TestLinkComponent, TestNodeComponent } from './components';
 
 import { CommonModule } from '@angular/common';
-import { D3Service } from './services/d3.service';
 import { NgModule } from '@angular/core';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
@@ -17,6 +17,6 @@ import { WhiteboardRoutingModule } from './whiteboard-routing.module';
     DraggableDirective,
     ZoomableDirective,
   ],
-  providers: [D3Service],
+  providers: [D3Service, WhiteboardService],
 })
 export class WhiteboardModule {}

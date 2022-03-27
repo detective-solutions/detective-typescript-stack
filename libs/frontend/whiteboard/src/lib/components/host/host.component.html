@@ -1,9 +1,9 @@
 <div>
   <whiteboard-sidebar></whiteboard-sidebar>
-  <svg #svg [attr.width]="options.width" [attr.height]="options.height">
+  <svg id="whiteboard" #svg [attr.width]="width" [attr.height]="height">
     <g [zoomableOf]="svg">
-      <g [linkVisual]="link" *ngFor="let link of dummyLinks"></g>
-      <g [nodeVisual]="node" *ngFor="let node of dummyNodes" [draggableNode]="node" [draggableInGraph]="graph"></g>
+      <g [linkVisual]="link" *ngFor="let link of links$ | async"></g>
+      <g [nodeVisual]="node" *ngFor="let node of nodes$ | async" [draggableNode]="node" [draggableInGraph]="graph"></g>
     </g>
   </svg>
 </div>
