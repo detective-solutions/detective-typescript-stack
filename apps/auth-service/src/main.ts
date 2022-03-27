@@ -1,8 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 
@@ -30,7 +25,7 @@ async function bootstrap() {
 
   const port = app.get(ConfigService).get('PORT');
   await app.listen(port);
-  Logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  Logger.log(`🚀 Application is running on port ${port}`);
 }
 
 bootstrap();
