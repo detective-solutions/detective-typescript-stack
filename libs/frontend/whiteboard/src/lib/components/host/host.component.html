@@ -1,7 +1,9 @@
-<button (click)="increaseNodes()"></button>
-<svg #svg [attr.width]="options.width" [attr.height]="options.height">
-  <g [zoomableOf]="svg">
-    <g [linkVisual]="link" *ngFor="let link of dummyLinks"></g>
-    <g [nodeVisual]="node" *ngFor="let node of dummyNodes" [draggableNode]="node" [draggableInGraph]="graph"></g>
-  </g>
-</svg>
+<div>
+  <whiteboard-sidebar></whiteboard-sidebar>
+  <svg #svg [attr.width]="options.width" [attr.height]="options.height">
+    <g [zoomableOf]="svg">
+      <g [linkVisual]="link" *ngFor="let link of dummyLinks"></g>
+      <g [nodeVisual]="node" *ngFor="let node of dummyNodes" [draggableNode]="node" [draggableInGraph]="graph"></g>
+    </g>
+  </svg>
+</div>
