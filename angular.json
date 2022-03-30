@@ -21,6 +21,7 @@
     "frontend-shared-styles": "libs/frontend/shared/styles",
     "frontend-shared-ui": "libs/frontend/shared/ui",
     "frontend-shared-utils": "libs/frontend/shared/utils",
+    "frontend-whiteboard": "libs/frontend/whiteboard",
     "shared-assets": "libs/shared/assets",
     "shared-data-access": "libs/shared/data-access",
     "shared-i18n": "libs/shared/i18n"

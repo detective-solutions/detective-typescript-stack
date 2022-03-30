@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces/table.interface';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 

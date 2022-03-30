@@ -1,0 +1,39 @@
+{
+  "projectType": "library",
+  "root": "libs/frontend/whiteboard",
+  "sourceRoot": "libs/frontend/whiteboard/src",
+  "prefix": "detective.solutions",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:ng-packagr-lite",
+      "outputs": ["dist/libs/frontend/whiteboard"],
+      "options": {
+        "project": "libs/frontend/whiteboard/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/frontend/whiteboard/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/frontend/whiteboard/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/frontend/whiteboard"],
+      "options": {
+        "jestConfig": "libs/frontend/whiteboard/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/whiteboard/src/**/*.ts", "libs/frontend/whiteboard/src/**/*.html"]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "scope:whiteboard"]
+}

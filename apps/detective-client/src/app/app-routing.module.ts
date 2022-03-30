@@ -21,7 +21,11 @@ const routes: Routes = [
       import('@detective.solutions/frontend/detective-client/features/home').then((m) => m.HomeModule),
     canActivate: [AuthGuard],
   },
-  { path: 'casefile/:id', loadChildren: () => import('./casefile/casefile.module').then((m) => m.CasefileModule) },
+  {
+    path: 'casefile/:id',
+    loadChildren: () => import('@detective.solutions/frontend/whiteboard').then((m) => m.WhiteboardModule),
+    canActivate: [AuthGuard],
+  },
   {
     path: 'admin',
     loadChildren: () =>
