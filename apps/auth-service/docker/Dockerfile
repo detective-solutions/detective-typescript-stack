@@ -10,6 +10,5 @@ RUN rm package*.json && rm main.js.map
 
 FROM code AS final
 ENV NODE_ENV=production
-ENV PORT=1111
-EXPOSE ${PORT}
+EXPOSE 1111
 CMD node ./main.js
