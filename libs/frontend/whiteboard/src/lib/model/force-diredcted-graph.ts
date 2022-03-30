@@ -1,25 +1,20 @@
 import {
   Simulation,
   forceCenter as d3ForceCenter,
-  forceCollide as d3ForceCollide,
   forceLink as d3ForceLink,
-  forceManyBody as d3ForceManyBody,
   forceSimulation as d3ForceSimulation,
 } from 'd3-force';
 
 import { EventEmitter } from '@angular/core';
 import { Link } from './link';
 import { Node } from './node';
+import { rectCollide } from '../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const FORCES = {
-  LINKS: 1 / 50,
-  COLLISION: 1,
-  CHARGE: -1,
-};
-
 export class ForceDirectedGraph {
+  private linkForceStrength = 1 / 80;
+
   public ticker: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
   public simulation!: Simulation<any, any>;
 
@@ -63,7 +58,7 @@ export class ForceDirectedGraph {
       'links',
       d3ForceLink(this.links)
         .id((data: any) => data['id'])
-        .strength(FORCES.LINKS)
+        .strength(this.linkForceStrength)
     );
   }
 
@@ -74,18 +69,7 @@ export class ForceDirectedGraph {
 
     const ticker = this.ticker;
 
-    this.simulation = d3ForceSimulation()
-      .force(
-        'charge',
-        d3ForceManyBody().strength((data: any) => FORCES.CHARGE * data['r'])
-      )
-      .force(
-        'collide',
-        d3ForceCollide()
-          .strength(FORCES.COLLISION)
-          .radius((data: any) => data['r'] + 10)
-          .iterations(2)
-      );
+    this.simulation = d3ForceSimulation().force('collision', rectCollide());
 
     // Connecting the d3 ticker to an angular event emitter
     this.simulation.on('tick', function () {
@@ -95,10 +79,9 @@ export class ForceDirectedGraph {
     this.initNodes();
     this.initLinks();
 
-    /** Updating the central force of the simulation */
+    // Adjust center of the viewport while dragging elements
     this.simulation.force('centers', d3ForceCenter(options.width / 2, options.height / 2));
 
-    /** Restarting the simulation internal timer */
     this.simulation.restart();
   }
 }

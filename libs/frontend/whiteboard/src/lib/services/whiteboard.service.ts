@@ -15,10 +15,11 @@ export class WhiteboardService {
   graph!: ForceDirectedGraph;
   rootSVGElement!: SVGElement | null;
 
-  nodes = [new Node('0'), new Node('1'), new Node('2'), new Node('3')];
+  nodes = [new Node('0'), new Node('1')];
   nodes$ = of(this.nodes);
 
-  links = [new Link(this.nodes[1], this.nodes[3]), new Link(this.nodes[1], this.nodes[2])];
+  links = [new Link(this.nodes[0], this.nodes[1])];
+  // links = [];
   links$ = of(this.links);
 
   subscriptions = new Subscription();

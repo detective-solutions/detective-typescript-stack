@@ -10,6 +10,9 @@ export class Node implements SimulationNodeDatum {
   fx?: number | null;
   fy?: number | null;
 
+  width = 1000;
+  height = 500;
+
   id: string;
 
   constructor(id: string) {
@@ -18,7 +21,7 @@ export class Node implements SimulationNodeDatum {
 
   // Important for force collision calculation
   get r() {
-    return 24;
+    return 200;
   }
 
   get color() {

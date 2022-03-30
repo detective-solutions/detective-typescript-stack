@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 
 import { ForceDirectedGraph } from '../../model';
 import { Subscription } from 'rxjs';
@@ -20,6 +20,13 @@ export class HostComponent implements OnInit {
   links$ = this.whiteboardService.links$;
 
   subscriptions = new Subscription();
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    console.log('RESIZE');
+    this.graph.initNodes();
+    this.graph.initLinks();
+  }
 
   constructor(
     private readonly whiteboardService: WhiteboardService,
