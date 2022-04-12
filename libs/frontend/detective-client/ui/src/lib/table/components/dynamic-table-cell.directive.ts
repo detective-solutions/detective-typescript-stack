@@ -27,7 +27,7 @@ export class DynamicTableCellDirective implements OnInit {
 
   ngOnInit() {
     if (!this.tableCellData) {
-      return;
+      throw new Error('No table cell data provided. Cannot instantiate table cell component.');
     }
     this.viewContainerRef.clear();
 
