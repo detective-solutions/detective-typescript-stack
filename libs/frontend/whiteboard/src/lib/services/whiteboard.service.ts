@@ -14,8 +14,7 @@ export class WhiteboardService {
   graph!: ForceDirectedGraph;
   rootSVGElement!: SVGElement | null;
 
-  dummyNodes = [new Node('0', 0, 0), new Node('1', 500, 500)];
-  // dummyNodes: Node[] = [];
+  dummyNodes: Node[] = [];
   availableWhiteboardComponents: WhiteboardComponent[] = [];
   nodes$ = of(this.dummyNodes);
 
