@@ -1,31 +1,38 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 
-import { ForceDirectedGraph } from '../../model';
 import { Subscription } from 'rxjs';
 import { WhiteboardService } from '../../services';
 
 @Component({
   selector: 'whiteboard-host',
   templateUrl: './host.component.html',
-  styleUrls: ['./host.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HostComponent implements OnInit {
-  width = this.whiteboardService.options.width;
-  height = this.whiteboardService.options.height;
+export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
+  @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
 
-  graph!: ForceDirectedGraph;
+  readonly whiteboardHtmlId = 'whiteboard';
+  readonly nodes$ = this.whiteboardService.nodes$;
+  readonly links$ = this.whiteboardService.links$;
 
-  nodes$ = this.whiteboardService.nodes$;
-  links$ = this.whiteboardService.links$;
+  protected readonly graph = this.whiteboardService.graph;
+  protected readonly subscriptions = new Subscription();
 
-  subscriptions = new Subscription();
-
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    console.log('RESIZE');
-    this.graph.initNodes();
-    this.graph.initLinks();
+  // Reset element selection when clicking blank space on the whiteboard
+  @HostListener('pointerdown', ['$event'])
+  private resetElementSelection(event: PointerEvent) {
+    (event.target as HTMLElement).id === this.whiteboardHtmlId && this.whiteboardService.resetSelection();
   }
 
   constructor(
@@ -34,12 +41,30 @@ export class HostComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.graph = this.whiteboardService.getForceDirectedGraph();
     // Bind change detection to each graph tick to improve performance
     this.subscriptions.add(
       this.graph.ticker.subscribe(() => {
         this.changeDetectorRef.markForCheck();
       })
     );
+  }
+
+  ngAfterViewInit() {
+    this.whiteboardService.applyZoomBehavior(
+      this.whiteboardContainerElement.nativeElement,
+      this.zoomContainerElement.nativeElement
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
+  onElementDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onElementDrop(event: DragEvent) {
+    this.whiteboardService.addElement(this.zoomContainerElement.nativeElement, event.clientX, event.clientY);
   }
 }

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, View
 import { Observable, debounceTime, distinctUntilChanged, filter, fromEvent, map, share } from 'rxjs';
 
 import { IMultiTableCell } from '../../interfaces';
+import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
 
 @Component({
   selector: 'multi-table-cell',
@@ -11,6 +12,8 @@ import { IMultiTableCell } from '../../interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultiTableCellComponent implements OnInit {
+  readonly tooltipDelay = TOOLTIP_DELAY;
+
   readonly windowResized$: Observable<Event> = fromEvent(window, 'resize').pipe(debounceTime(200), share());
   readonly truncateName$: Observable<boolean> = this.windowResized$.pipe(
     filter(() => !!this.nameRef),

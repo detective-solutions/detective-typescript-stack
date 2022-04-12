@@ -79,9 +79,9 @@ export class ForceDirectedGraph {
     this.initNodes();
     this.initLinks();
 
+    // TODO: Activate this in a correct manner without breaking coordinates
     // Adjust center of the viewport while dragging elements
-    this.simulation.force('centers', d3ForceCenter(options.width / 2, options.height / 2));
-
-    this.simulation.restart();
+    // this.simulation.force('centers', d3ForceCenter(options.width / 2, options.height / 2));
+    // this.simulation.restart();
   }
 }
