@@ -14,7 +14,7 @@ export class MatchHeightDirective implements AfterViewChecked {
   }
 
   @HostListener('window:resize')
-  onResize() {
+  private onResize() {
     // Call matchHeight again when browser window height changes
     this.matchHeight(this.el.nativeElement, this.matchTileHeight);
   }
