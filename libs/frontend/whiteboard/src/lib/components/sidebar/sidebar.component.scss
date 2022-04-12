@@ -12,6 +12,10 @@
   .sidebar-button-wrapper {
     height: inherit;
 
+    &:hover {
+      cursor: grab;
+    }
+
     mat-icon {
       width: 100%;
     }
