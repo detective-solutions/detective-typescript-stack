@@ -10,7 +10,7 @@
           {{ column.name }}
         </mat-header-cell>
         <mat-cell *matCellDef="let item" [attr.data-label]="column.name" fxLayoutAlign="center center">
-          <div dynamicTableCell class="dynamic-table-cell">
+          <div class="dynamic-table-cell">
             <ng-template dynamicTableCell [tableCellData]="item[column.id].cellData"></ng-template>
           </div>
         </mat-cell>
