@@ -14,17 +14,16 @@ export class Node implements SimulationNodeDatum {
   height = 500;
 
   id: string;
+  locked!: boolean;
 
-  constructor(id: string) {
+  constructor(id: string, x: number, y: number) {
     this.id = id;
+    this.x = x;
+    this.y = y;
   }
 
   // Important for force collision calculation
   get r() {
     return 200;
-  }
-
-  get color() {
-    return '#fc1767';
   }
 }

@@ -1,7 +1,14 @@
 <whiteboard-sidebar></whiteboard-sidebar>
-<svg id="whiteboard" #svg width="100%" height="100%">
-  <g [zoomableOf]="svg">
+<svg
+  #whiteboardContainer
+  id="{{ whiteboardHtmlId }}"
+  (dragover)="onElementDragOver($event)"
+  (drop)="onElementDrop($event)"
+  width="100%"
+  height="100%"
+>
+  <g #zoomContainer>
     <g [linkVisual]="link" *ngFor="let link of links$ | async"></g>
-    <g [nodeVisual]="node" *ngFor="let node of nodes$ | async" [draggableNode]="node" [draggableInGraph]="graph"></g>
+    <g whiteboardElement [node]="node" *ngFor="let node of nodes$ | async"></g>
   </g>
 </svg>

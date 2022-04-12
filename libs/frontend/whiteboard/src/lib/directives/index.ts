@@ -1,2 +1,2 @@
-export * from './draggable.directive';
-export * from './zoomable.directive';
+export * from './iframe-tracker.directive';
+export * from './dynamic-whiteboard-components.directive';

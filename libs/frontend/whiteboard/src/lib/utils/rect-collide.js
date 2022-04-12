@@ -35,6 +35,7 @@ export function rectCollide() {
             } else {
               ly = 0;
             }
+
             node.x -= x *= lx / 2;
             node.y -= y *= ly / 2;
             q.data.x += x / 2;

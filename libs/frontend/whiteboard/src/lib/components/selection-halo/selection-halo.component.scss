@@ -1,18 +1,18 @@
-#sidebar-wrapper {
+:host {
   position: absolute;
-  min-height: 350px;
-  width: 50px;
-  left: 50px;
-  top: 50%;
-  transform: translateY(-50%);
+  width: 55px;
+  height: 50%;
+  right: 5px;
+
   background-color: white;
   box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
   border-radius: 4px;
 
-  .sidebar-button-wrapper {
-    height: inherit;
+  .selection-halo-wrapper {
+    height: 100%;
+    width: 100%;
 
-    mat-icon {
+    button {
       width: 100%;
     }
   }
