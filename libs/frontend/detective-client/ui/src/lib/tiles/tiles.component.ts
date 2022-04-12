@@ -5,6 +5,7 @@ import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ITilesInput } from './interfaces/tile.interface';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
+import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
 
 @Component({
   selector: 'tiles-view',
@@ -19,6 +20,8 @@ export class TilesComponent implements OnInit, OnDestroy {
 
   totalElementsCount = 0;
   isFetchingMoreData = false;
+
+  readonly tooltipDelay = TOOLTIP_DELAY;
 
   private currentPageOffset = 0;
   private alreadyLoadedElementsCount = 0;

@@ -19,6 +19,7 @@
       #descriptionRef
       [matTooltip]="cellData.description"
       [matTooltipDisabled]="(truncateDescription$ | async) === false"
+      [matTooltipShowDelay]="tooltipDelay"
     >
       {{ cellData.description }}
     </p>

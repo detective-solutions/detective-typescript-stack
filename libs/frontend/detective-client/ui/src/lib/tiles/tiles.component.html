@@ -37,7 +37,9 @@
         <mat-card-title>{{ tile.title }}</mat-card-title>
         <img mat-card-image height="100px" src="{{ tile.thumbnailSrc }}" alt="{{ t('tileImageAltAttribute') }}" />
         <mat-card-content *ngIf="tile.description; else noTileDescription"
-          ><p [matTooltip]="tile.description">{{ tile.description }}</p></mat-card-content
+          ><p [matTooltip]="tile.description" [matTooltipShowDelay]="tooltipDelay">
+            {{ tile.description }}
+          </p></mat-card-content
         >
         <ng-template #noTileDescription
           ><p>{{ t('tileDescriptionPlaceholderText') }}</p></ng-template
