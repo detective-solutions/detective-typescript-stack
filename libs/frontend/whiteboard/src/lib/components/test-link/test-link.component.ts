@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Link } from '../../model';
+import { Link } from '../../models';
 
 @Component({
   selector: '[linkVisual]',

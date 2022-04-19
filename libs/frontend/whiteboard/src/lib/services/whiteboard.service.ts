@@ -1,11 +1,16 @@
-import { ForceDirectedGraph, Node, WhiteboardComponent } from '../model';
-import { Subject, of } from 'rxjs';
+import { ForceDirectedGraph, INodeInput, Node, NodeComponent } from '../models';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Subject, Subscription, delay, of } from 'rxjs';
 
 import { D3Service } from './d3.service';
-import { Injectable } from '@angular/core';
+import { ITableNode } from '../components/node-components/table/model';
+import { Store } from '@ngrx/store';
+import { Update } from '@ngrx/entity';
+import { WebsocketService } from './websocket.service';
+import { WhiteboardActions } from '../state';
 
 @Injectable()
-export class WhiteboardService {
+export class WhiteboardService implements OnDestroy {
   options = {
     width: window.innerWidth,
     height: window.innerHeight,
@@ -13,9 +18,9 @@ export class WhiteboardService {
 
   graph!: ForceDirectedGraph;
   rootSVGElement!: SVGElement | null;
+  zoomContainerElement!: SVGGraphicsElement | null;
 
   dummyNodes: Node[] = [];
-  availableWhiteboardComponents: WhiteboardComponent[] = [];
   nodes$ = of(this.dummyNodes);
 
   whiteboardSelection$: Subject<string | null> = new Subject();
@@ -24,20 +29,54 @@ export class WhiteboardService {
   links = [];
   links$ = of(this.links);
 
-  selectedWhiteboardElements: WhiteboardComponent[] = [];
+  selectedNodeComponents: NodeComponent[] = [];
 
-  nodeNodesIndex = 4;
+  private readonly subscriptions = new Subscription();
 
-  constructor(private readonly d3Service: D3Service) {
+  constructor(
+    private readonly d3Service: D3Service,
+    private readonly websocketService: WebsocketService,
+    private readonly store: Store
+  ) {
     this.getForceDirectedGraph();
+    this.subscriptions.add(
+      this.websocketService.incomingWebsocketMessages$.pipe(delay(3000)).subscribe((messageData) => {
+        const update: Update<ITableNode> = {
+          id: messageData.id,
+          changes: { colDefs: messageData.colDefs, rowData: messageData.rowData },
+        };
+        this.store.dispatch(WhiteboardActions.tableDataReceived({ update: update }));
+      })
+    );
   }
 
-  addElement(zoomContainerElement: SVGGraphicsElement, x: number, y: number) {
-    const convertedDOMPoint = this.convertDOMToSVGCoordinates(zoomContainerElement, x, y);
-    const node = new Node(String(this.nodeNodesIndex), convertedDOMPoint.x, convertedDOMPoint.y);
+  addElementToWhiteboard(elementToAdd: INodeInput) {
+    if (!this.zoomContainerElement) {
+      this.zoomContainerElement = document.querySelector('#whiteboard g');
+      if (!this.zoomContainerElement) {
+        throw new Error(
+          'Could not add new element, because WhiteboardService has not reference to the zoomContainerElement.'
+        );
+      }
+    }
+
+    const convertedDOMPoint = this.convertDOMToSVGCoordinates(
+      this.zoomContainerElement,
+      elementToAdd.layout.x,
+      elementToAdd.layout.y
+    );
+    const node = new Node(
+      elementToAdd.id,
+      elementToAdd.type,
+      elementToAdd.title,
+      elementToAdd.locked,
+      convertedDOMPoint.x,
+      convertedDOMPoint.y,
+      elementToAdd.layout.width,
+      elementToAdd.layout.height
+    );
 
     this.dummyNodes.push(node);
-    ++this.nodeNodesIndex;
 
     this.graph.initNodes();
     this.graph.initLinks();
@@ -47,46 +86,41 @@ export class WhiteboardService {
     this.graph.simulation.alphaTarget(1).restart();
   }
 
-  getForceDirectedGraph() {
-    this.graph = this.d3Service.getForceDirectedGraph(this.dummyNodes, this.links, this.options);
-  }
-
-  registerWhiteboardComponent(component: WhiteboardComponent) {
-    this.availableWhiteboardComponents.push(component);
-    this.applyDragBehavior(component);
-    this.d3Service.addZoomPreventionEventHandler(component.elementRef.nativeElement);
-  }
-
-  setupWhiteboardComponentEventHandler(component: WhiteboardComponent) {
-    this.d3Service.addZoomPreventionEventHandler(component.elementRef.nativeElement);
-  }
-
-  addSelectedElement(selectedElementComponent: WhiteboardComponent) {
-    this.whiteboardSelection$.next(selectedElementComponent.id);
-    this.selectedWhiteboardElements.push(selectedElementComponent);
+  addSelectedElement(selectedElementComponent: NodeComponent) {
+    this.whiteboardSelection$.next(selectedElementComponent.node.id);
+    this.selectedNodeComponents.push(selectedElementComponent);
   }
 
   resetSelection() {
     this.whiteboardSelection$.next(null);
-    this.selectedWhiteboardElements = [];
+    this.selectedNodeComponents = [];
   }
 
   applyZoomBehavior(elementToZoomOn: Element, zoomContainer: Element) {
     this.d3Service.applyZoomBehavior(elementToZoomOn, zoomContainer);
   }
 
-  applyDragBehavior(component: WhiteboardComponent) {
+  applyDragBehavior(component: NodeComponent) {
     this.d3Service.applyDragBehavior(component.elementRef.nativeElement, component.node, this.graph);
   }
 
-  /**
-   * Convert DOM coordinates to SVG coordinates based on SVG offset and zoom level
-   */
+  getTableData(elementId: string) {
+    this.websocketService.publishMessage(elementId);
+  }
+
   convertDOMToSVGCoordinates(zoomContainerElement: SVGGraphicsElement, x: number, y: number): DOMPoint {
     const screenCTM = zoomContainerElement.getScreenCTM();
     if (!screenCTM) {
       throw new Error('Could not get screen CTM for the SVG zoom group while transforming DOM to SVG coordinates');
     }
     return new DOMPoint(x, y).matrixTransform(screenCTM.inverse());
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
+  private getForceDirectedGraph() {
+    this.graph = this.d3Service.getForceDirectedGraph(this.dummyNodes, this.links, this.options);
   }
 }

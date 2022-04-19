@@ -1,6 +1,7 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { metaReducers, reducers } from './reducers';
 
+import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
 import { environment } from '@detective.solutions/frontend/shared/environments';
@@ -10,6 +11,7 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
     StoreModule.forRoot(reducers, {
       metaReducers,
     }),
+    EffectsModule.forRoot(),
     StoreDevtoolsModule.instrument({
       logOnly: environment.production,
       maxAge: 25,

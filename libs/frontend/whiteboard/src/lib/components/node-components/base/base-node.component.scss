@@ -1,0 +1,29 @@
+$border-radius: 12px;
+
+.node-container {
+  .node-actions-wrapper {
+    height: 100%;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .node-content {
+    filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1));
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+  }
+
+  .drag-overlay {
+    display: block;
+    background-color: gray;
+    opacity: 0.1;
+    position: absolute;
+    top: 0;
+    width: inherit;
+    height: inherit;
+    z-index: 10;
+  }
+}

@@ -1,7 +1,4 @@
 import { Injectable } from '@angular/core';
-import { WindowGlobals } from '../interfaces';
-
-declare let window: WindowGlobals;
 
 enum KeyboardCodes {
   SPACE = 'Space',
@@ -9,17 +6,17 @@ enum KeyboardCodes {
 
 @Injectable({ providedIn: 'root' })
 export class KeyboardService {
-  constructor() {
-    window.isSpacebarPressed = false;
+  isSpaceKeyPressed = false;
 
+  constructor() {
     window.onkeydown = (event: KeyboardEvent) => {
       if (event.code === KeyboardCodes.SPACE) {
-        window.isSpacebarPressed = true;
+        this.isSpaceKeyPressed = true;
       }
     };
     window.onkeyup = (event: KeyboardEvent) => {
       if (event.code === KeyboardCodes.SPACE) {
-        window.isSpacebarPressed = false;
+        this.isSpaceKeyPressed = false;
       }
     };
   }
