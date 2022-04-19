@@ -1,0 +1,34 @@
+<svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
+  <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
+  <foreignObject
+    *ngIf="selected$ | async"
+    table-actions-menu
+    [attr.x]="node.width"
+    [attr.width]="80"
+    [attr.height]="node.height"
+  >
+    <table-actions-menu></table-actions-menu>
+  </foreignObject>
+  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
+    <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
+    <node-header [title]="node.title"></node-header>
+    <!-- <iframe
+      IFrameClickTracker
+      src="http://detective.solutions"
+      style="height: inherit; width: inherit"
+      frameBorder="0"
+    ></iframe> -->
+    <ng-template #isLoading>
+      <div class="loading-spinner"></div>
+    </ng-template>
+    <ag-grid-angular
+      *ngIf="getTableData$ | async"
+      class="ag-theme-alpine"
+      [gridOptions]="gridOptions"
+      [columnDefs]="columnDefs$ | async"
+      [rowData]="rowData$ | async"
+      (wheel)="preventZoom($event)"
+    >
+    </ag-grid-angular>
+  </foreignObject>
+</svg:g>

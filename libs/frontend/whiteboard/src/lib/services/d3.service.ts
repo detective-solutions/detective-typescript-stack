@@ -1,6 +1,6 @@
 import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
-import { ForceDirectedGraph, Link, Node } from '../model';
+import { ForceDirectedGraph, Link, Node } from '../models';
 
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
@@ -51,17 +51,6 @@ export class D3Service {
       pass = false;
     }
     return pass;
-  }
-
-  addZoomPreventionEventHandler(elementToBeHandled: HTMLElement) {
-    d3Select(elementToBeHandled)
-      .selectAll('.prevent-zoom')
-      .on('wheel', (event: WheelEvent) => {
-        console.log('Spacebar pressed', window.isSpacebarPressed);
-        if (!window.isSpacebarPressed) {
-          event.stopPropagation();
-        }
-      });
   }
 
   applyDragBehavior(elementToDrag: Element, nodeToUpdate: Node, graph: ForceDirectedGraph) {

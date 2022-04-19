@@ -9,6 +9,6 @@
 >
   <g #zoomContainer>
     <g [linkVisual]="link" *ngFor="let link of links$ | async"></g>
-    <g whiteboardElement [node]="node" *ngFor="let node of nodes$ | async"></g>
+    <g nodeGenerator [node]="node" *ngFor="let node of nodes$ | async"></g>
   </g>
 </svg>

@@ -10,7 +10,9 @@ import {
   ViewChild,
 } from '@angular/core';
 
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { WhiteboardActions } from '../../state';
 import { WhiteboardService } from '../../services';
 
 @Component({
@@ -26,6 +28,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly nodes$ = this.whiteboardService.nodes$;
   readonly links$ = this.whiteboardService.links$;
 
+  readonly randomTitles = [
+    'Clue 1',
+    'I am a randomly chosen title',
+    'Clue 2',
+    'Find suspicious content',
+    'Clue 3',
+    'Suspicious data',
+    '',
+  ];
+
   protected readonly graph = this.whiteboardService.graph;
   protected readonly subscriptions = new Subscription();
 
@@ -37,7 +49,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private readonly whiteboardService: WhiteboardService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly store: Store
   ) {}
 
   ngOnInit() {
@@ -65,6 +78,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onElementDrop(event: DragEvent) {
-    this.whiteboardService.addElement(this.zoomContainerElement.nativeElement, event.clientX, event.clientY);
+    this.store.dispatch(
+      WhiteboardActions.tableNodeAdded({
+        tableElementAdded: {
+          id: crypto.randomUUID(),
+          type: 'table',
+          title: this.randomTitles[Math.floor(Math.random() * this.randomTitles.length)],
+          layout: { x: event.clientX, y: event.clientY, width: 900, height: 500 },
+        },
+      })
+    );
   }
 }
