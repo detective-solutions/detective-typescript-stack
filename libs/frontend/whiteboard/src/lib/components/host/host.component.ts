@@ -14,6 +14,7 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { WhiteboardActions } from '../../state';
 import { WhiteboardService } from '../../services';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'whiteboard-host',
@@ -81,7 +82,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(
       WhiteboardActions.tableNodeAdded({
         tableElementAdded: {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           type: 'table',
           title: this.randomTitles[Math.floor(Math.random() * this.randomTitles.length)],
           layout: { x: event.clientX, y: event.clientY, width: 900, height: 500 },
