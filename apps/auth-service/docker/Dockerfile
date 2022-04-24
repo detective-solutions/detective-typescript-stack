@@ -1,19 +1,18 @@
-# Handle dependencies (mostly from cache if unchanged)
-FROM node@sha256:38bc06c682ae1f89f4c06a5f40f7a07ae438ca437a2a04cf773e66960b2d75bc AS dependencies
+FROM node@sha256:38bc06c682ae1f89f4c06a5f40f7a07ae438ca437a2a04cf773e66960b2d75bc
+
+# Set up container environment
 WORKDIR /app
-COPY package.json package-lock.json ./
 ENV NODE_ENV=production
+
+# Install dependencies
+COPY ./dist/apps/auth-service/package.json package-lock.json ./
 RUN npm ci --audit=false
 RUN rm package*.json
 
-# Handle actual code (mostly not from cache)
-FROM dependencies AS code
+# Copy built code
 COPY ./dist/apps/auth-service ./
-RUN rm main.js.map
 
-# Set up actual production container
-FROM code
-# Run application as node default user
+# Run application as node default user (instead of root)
 RUN chown -R node:node /app
 USER node
 
