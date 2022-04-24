@@ -33,7 +33,7 @@ export class DGraphGrpcClientService {
       });
       this._client = new DgraphClient(...this._stubs);
       if (options.debug) {
-        this._client.setDebugMode(true);
+        this._client.setDebugMode();
       }
     }
     return this._client;
