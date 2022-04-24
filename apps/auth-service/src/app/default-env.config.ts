@@ -7,4 +7,6 @@ export const defaultEnvConfig = Joi.object({
   ACCESS_TOKEN_EXPIRY: Joi.string().default('5m'),
   REFRESH_TOKEN_SECRET: Joi.string().required(),
   REFRESH_TOKEN_EXPIRY: Joi.string().default('30m'),
+  DATABASE_GRPC_SERVICE_NAME: Joi.string().required(),
+  DATABASE_GRPC_PORT: Joi.string().required(),
 });
