@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
-import { INodeInput } from '../../models';
-import { ITableNode } from '../../components/node-components/table/model';
+import { INodeInput } from '../../../../../models';
+import { ITableNode } from '../../model';
 import { Update } from '@ngrx/entity';
 
 export const tableNodeAdded = createAction(

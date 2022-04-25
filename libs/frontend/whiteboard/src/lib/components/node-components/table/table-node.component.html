@@ -22,7 +22,7 @@
       <div class="loading-spinner"></div>
     </ng-template>
     <ag-grid-angular
-      *ngIf="getTableData$ | async"
+      *ngIf="getTableDataFromStore$ | async"
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
       [columnDefs]="columnDefs$ | async"

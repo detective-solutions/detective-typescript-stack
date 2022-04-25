@@ -10,7 +10,8 @@ export class DragService {
 
   isMouseDown = false;
   isDraggingActivated = false;
-  isDragging$ = new Subject<boolean>();
+
+  readonly isDragging$ = new Subject<boolean>();
 
   addDelayedDragHandling(event: Event) {
     this.isMouseDown = true;

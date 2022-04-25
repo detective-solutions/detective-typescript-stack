@@ -12,7 +12,7 @@ import {
 
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { WhiteboardActions } from '../../state';
+import { TableNodeActions } from '../node-components/table/state';
 import { WhiteboardService } from '../../services';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -80,7 +80,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onElementDrop(event: DragEvent) {
     this.store.dispatch(
-      WhiteboardActions.tableNodeAdded({
+      TableNodeActions.tableNodeAdded({
         tableElementAdded: {
           id: uuidv4(),
           type: 'table',

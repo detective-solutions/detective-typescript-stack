@@ -1,13 +1,9 @@
-import { ForceDirectedGraph, INodeInput, Node, NodeComponent } from '../models';
+import { ForceDirectedGraph, INodeInput, Node, NodeComponent, WebsocketMessage } from '../models';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject, Subscription, delay, of } from 'rxjs';
+import { Subject, Subscription, of } from 'rxjs';
 
 import { D3Service } from './d3.service';
-import { ITableNode } from '../components/node-components/table/model';
-import { Store } from '@ngrx/store';
-import { Update } from '@ngrx/entity';
 import { WebsocketService } from './websocket.service';
-import { WhiteboardActions } from '../state';
 
 @Injectable()
 export class WhiteboardService implements OnDestroy {
@@ -21,33 +17,20 @@ export class WhiteboardService implements OnDestroy {
   zoomContainerElement!: SVGGraphicsElement | null;
 
   dummyNodes: Node[] = [];
-  nodes$ = of(this.dummyNodes);
+  readonly nodes$ = of(this.dummyNodes);
 
   whiteboardSelection$: Subject<string | null> = new Subject();
 
   // links = [new Link(this.dummyNodes[0], this.dummyNodes[1])];
   links = [];
-  links$ = of(this.links);
+  readonly links$ = of(this.links);
 
   selectedNodeComponents: NodeComponent[] = [];
 
   private readonly subscriptions = new Subscription();
 
-  constructor(
-    private readonly d3Service: D3Service,
-    private readonly websocketService: WebsocketService,
-    private readonly store: Store
-  ) {
+  constructor(private readonly d3Service: D3Service, private readonly websocketService: WebsocketService) {
     this.getForceDirectedGraph();
-    this.subscriptions.add(
-      this.websocketService.incomingWebsocketMessages$.pipe(delay(3000)).subscribe((messageData) => {
-        const update: Update<ITableNode> = {
-          id: messageData.id,
-          changes: { colDefs: messageData.colDefs, rowData: messageData.rowData },
-        };
-        this.store.dispatch(WhiteboardActions.tableDataReceived({ update: update }));
-      })
-    );
   }
 
   addElementToWhiteboard(elementToAdd: INodeInput) {
@@ -104,8 +87,9 @@ export class WhiteboardService implements OnDestroy {
     this.d3Service.applyDragBehavior(component.elementRef.nativeElement, component.node, this.graph);
   }
 
-  getTableData(elementId: string) {
-    this.websocketService.publishMessage(elementId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sendWebsocketMessage(message: WebsocketMessage<any>) {
+    this.websocketService.publishMessage(message);
   }
 
   convertDOMToSVGCoordinates(zoomContainerElement: SVGGraphicsElement, x: number, y: number): DOMPoint {

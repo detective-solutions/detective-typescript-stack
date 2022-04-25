@@ -6,4 +6,4 @@ import { NODES_STORE_NAME } from '../../../../../state';
 
 export const selectTableNodeState = createFeatureSelector<fromWhiteboardNodes.WhiteboardNodesState>(NODES_STORE_NAME);
 
-export const selectEntities = createSelector(selectTableNodeState, fromWhiteboardNodes.selectEntities);
+export const selectTableNodesFromStore = createSelector(selectTableNodeState, fromWhiteboardNodes.selectEntities);

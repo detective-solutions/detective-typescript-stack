@@ -8,13 +8,8 @@ import {
   TableNodeComponent,
   TestLinkComponent,
 } from './components';
-import {
-  METADATA_STORE_NAME,
-  NODES_STORE_NAME,
-  WhiteboardEffects,
-  whiteboardMetadataReducer,
-  whiteboardNodesReducer,
-} from './state';
+import { METADATA_STORE_NAME, NODES_STORE_NAME, WhiteboardMetadataEffects, whiteboardMetadataReducer } from './state';
+import { TableNodeEffects, tableNodeReducer } from './components/node-components/table/state';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
@@ -31,8 +26,8 @@ import { WhiteboardRoutingModule } from './whiteboard-routing.module';
     CommonModule,
     AgGridModule,
     WhiteboardRoutingModule,
-    EffectsModule.forFeature([WhiteboardEffects]),
-    StoreModule.forFeature(NODES_STORE_NAME, whiteboardNodesReducer),
+    EffectsModule.forFeature([WhiteboardMetadataEffects, TableNodeEffects]),
+    StoreModule.forFeature(NODES_STORE_NAME, tableNodeReducer),
     StoreModule.forFeature(METADATA_STORE_NAME, whiteboardMetadataReducer),
     WhiteboardMaterialModule,
   ],
