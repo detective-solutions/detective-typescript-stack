@@ -4,4 +4,3 @@ import { EntityState, createEntityAdapter } from '@ngrx/entity';
 export interface WhiteboardNodesState extends EntityState<WhiteboardNodesState> {}
 export const whiteboardNodesStateAdapter = createEntityAdapter<WhiteboardNodesState>();
 export const initialWhiteboardNodesState = whiteboardNodesStateAdapter.getInitialState();
-export const { selectIds, selectEntities, selectAll } = whiteboardNodesStateAdapter.getSelectors();

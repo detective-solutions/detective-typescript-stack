@@ -1,14 +1,15 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ITableNode, ITableNodeDataInput, TableEvents } from './model';
-import { TableNodeActions, selectTableNodesFromStore } from './state';
 import { filter, map } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
+import { TableNodeActions } from './state';
 import { Update } from '@ngrx/entity';
 import { WebsocketMessage } from '../../../models';
 import { select } from '@ngrx/store';
+import { selectWhiteboardNodesFromStore } from '../../../state/selectors';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -30,7 +31,7 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
   );
 
   readonly getTableDataFromStore$ = this.store.pipe(
-    select(selectTableNodesFromStore),
+    select(selectWhiteboardNodesFromStore),
     filter((entities: any) => this.node && entities[this.node.id]),
     map((entities: any) => entities[this.node.id])
   );
