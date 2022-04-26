@@ -1,5 +1,6 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Injectable } from '@angular/core';
 import { TableEvents } from '../../model';
 import { TableNodeActions } from '../actions/table-node-action.types';
@@ -15,6 +16,7 @@ export class TableNodeEffects {
         tap((action) => this.whiteboardService.addElementToWhiteboard(action.tableElementAdded)),
         tap((action) =>
           this.whiteboardService.sendWebsocketMessage({
+            access_token: this.authService.getAccessToken(),
             event: TableEvents.QueryTable,
             data: action.tableElementAdded.id,
           })
@@ -24,5 +26,9 @@ export class TableNodeEffects {
     { dispatch: false }
   );
 
-  constructor(private readonly actions$: Actions, private readonly whiteboardService: WhiteboardService) {}
+  constructor(
+    private readonly actions$: Actions,
+    private readonly whiteboardService: WhiteboardService,
+    private readonly authService: AuthService
+  ) {}
 }
