@@ -1,1 +1,4 @@
-export * from './local.strategy'; // exported for use in integration tests
+export * from './access-token.strategy';
+export * from './auth-strategies.enum';
+export * from './local.strategy';
+export * from './refresh-token.strategy';
