@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged@sha256:021d2c67fbf0a7308b49bd48efa7c3fb9c3c66f413ba6e0fdafcf5a4fb8f8393
+FROM nginx@sha256:efc09388b15fb423c402f0b8b28ca70c7fd20fe31f8d7531ae1896bbb4944999
 
 COPY ./dist/apps/detective-client /usr/share/nginx/html
 
