@@ -10,7 +10,8 @@
         "outputPath": "dist/apps/websocket-gateway",
         "main": "apps/websocket-gateway/src/main.ts",
         "tsConfig": "apps/websocket-gateway/tsconfig.app.json",
-        "assets": ["apps/websocket-gateway/src/assets"]
+        "assets": ["apps/websocket-gateway/src/assets"],
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {
