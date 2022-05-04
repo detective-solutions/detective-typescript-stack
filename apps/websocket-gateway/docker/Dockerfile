@@ -17,5 +17,4 @@ COPY ./dist/apps/websocket-gateway ./
 RUN chown -R node:node /app
 USER node
 
-EXPOSE 7777
 CMD node ./main.js

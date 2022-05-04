@@ -17,5 +17,4 @@ COPY ./dist/apps/auth-service ./
 RUN chown -R node:node /app
 USER node
 
-EXPOSE 1111
 CMD node ./main.js
