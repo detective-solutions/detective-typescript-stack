@@ -1,6 +1,4 @@
-# frontend-shared-rx-websocket-wrapper
-
-This library was generated with [Nx](https://nx.dev).
+# Frontend Shared RX Websocket Wrapper
 
 ## Running unit tests
 
