@@ -69,6 +69,7 @@
     "ts-enum-util": "^4.0.2",
     "tslib": "^2.0.0",
     "uuid": "8.3.2",
+    "ws": "8.5.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -87,6 +88,7 @@
     "@nrwl/cypress": "13.10.2",
     "@nrwl/eslint-plugin-nx": "13.10.2",
     "@nrwl/jest": "13.10.2",
+    "@nrwl/js": "13.10.2",
     "@nrwl/linter": "13.10.2",
     "@nrwl/nest": "13.10.2",
     "@nrwl/node": "13.10.2",
