@@ -13,15 +13,18 @@ import {
 } from 'rxjs';
 import { WebSocketSubject, WebSocketSubjectConfig } from 'rxjs/webSocket';
 
+import { EventBasedWebSocketMessage } from './models/event-based-websocket-message.type';
 import { RxWebsocketWrapperConfig } from './models/rx-websocket-wrapper-config.interface';
 import { WebSocketConnectionStatus } from './models';
-import { WebSocketMessage } from './models/websocket-message.type';
-import { WebSocketMessageServer } from './models/websocket-message-server.type';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export class RxWebsocketWrapperSubject<T> extends Subject<T> {
-  private readonly _wsSubjectConfig!: WebSocketSubjectConfig<T>;
+export class RxWebSocketWrapperSubject<T> extends Subject<T> {
+  // Internal subject for the current connection status
+  private _connectionStatus$ = new Subject<boolean>();
+  // Internal subject to indicate that all reconnection attempts failed
+  private _connectionFailedEventually$ = new BehaviorSubject<boolean>(false);
+
   private _socket!: WebSocketSubject<any> | null;
   private _socketSubscription!: Subscription;
 
@@ -30,66 +33,20 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
   private _reconnectionInterval = 2000;
   private _reconnectionAttempts = 15;
 
-  // Internal subject for the current connection status
-  private _connectionStatus$ = new Subject<boolean>();
-  // Internal subject to indicate that all reconnection attempts failed
-  private _connectionFailedEventually$ = new BehaviorSubject<boolean>(false);
-
-  constructor(config: RxWebsocketWrapperConfig) {
-    super();
-
-    this._wsSubjectConfig = Object.assign({}, { url: config.url });
-
-    // set reconnect interval
-    if (config.reconnectInterval) {
-      this._reconnectionInterval = config.reconnectInterval;
-    }
-
-    // set reconnect attempts
-    if (config.reconnectAttempts) {
-      this._reconnectionAttempts = config.reconnectAttempts;
-    }
-
-    // add protocol in config
-    if (config.protocol) {
-      Object.assign(this._wsSubjectConfig, { protocol: config.protocol });
-    }
-
-    // add WebSocketCtor in config
-    if (config.WebSocketCtor) {
-      Object.assign(this._wsSubjectConfig, {
-        WebSocketCtor: config.WebSocketCtor,
-      });
-    }
-
-    // add default data in config
-    Object.assign(this._wsSubjectConfig, {
-      deserializer: this._deserializer,
-      serializer: this._serializer,
-      openObserver: {
-        next: () => {
-          this._connectionStatus$.next(true);
-        },
+  private readonly _wsSubjectConfig: WebSocketSubjectConfig<T> = {
+    url: '',
+    deserializer: this._deserializer,
+    serializer: this._serializer,
+    openObserver: {
+      next: () => this._connectionStatus$.next(true),
+    },
+    closeObserver: {
+      next: () => {
+        this._cleanSocket();
+        this._connectionStatus$.next(false);
       },
-      closeObserver: {
-        next: () => {
-          this._cleanSocket();
-          this._connectionStatus$.next(false);
-        },
-      },
-    });
-
-    this._connect();
-
-    // Connection status subscription
-    this.connectionStatus$.subscribe({
-      next: (isConnected: WebSocketConnectionStatus) => {
-        if (!this._reconnectionObservable && isConnected === WebSocketConnectionStatus.NOT_CONNECTED) {
-          this._reconnect();
-        }
-      },
-    });
-  }
+    },
+  };
 
   set config(configInput: RxWebsocketWrapperConfig) {
     Object.assign(this._wsSubjectConfig, configInput);
@@ -115,86 +72,49 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
     return this._connectionFailedEventually$.pipe(distinctUntilChanged());
   }
 
-  send(data: any) {
-    if (!this._socket) {
-      throw new Error('Cannot send message, because internal socket is null!');
+  constructor(config: RxWebsocketWrapperConfig) {
+    super();
+
+    if (!config.url) {
+      throw new Error('Could not initialize WebSocket connection due to missing URL in WebSocket configuration');
     }
-    this._socket.next(data);
-  }
 
-  emit(event: string, data: any) {
-    this.send({ event, data });
-  }
+    this._wsSubjectConfig = Object.assign(this._wsSubjectConfig, config);
+    this._connect();
 
-  /**
-   * Function to handle text response for given event from server
-   *
-   * @example <caption>UTF Text Message from server</caption>
-   *
-   * const message = {
-   *  type: 'utf8',
-   *  utf8Data: {
-   *      event: 'data',
-   *      data: 'Data from the server'
-   *  }
-   * }
-   *
-   * @example <caption>Simple Text Message from server</caption>
-   *
-   * const message = {
-   *  event: 'data',
-   *  data: 'Data from the server'
-   * }
-   *
-   * @param event represents value inside {utf8Data.event} or {event} from server response
-   *
-   *  @value complete | <any>
-   *  @example <caption>Event type</caption>
-   *
-   *  if (event === 'complete') => handle Observable's complete
-   *  else handle Observable's success
-   *
-   * @param cb is the function executed if event matches the response from the server
-   */
-  on(event: string | 'close', cb: (data?: any) => void) {
-    this._message$<WebSocketMessageServer>(event).subscribe({
-      next: (message: WebSocketMessageServer) => cb(message.data),
-      /* istanbul ignore next */
-      error: () => null,
-      complete: () => {
-        /* istanbul ignore else */
-        if (event === 'close') {
-          cb();
+    this.connectionStatus$.subscribe({
+      next: (isConnected: WebSocketConnectionStatus) => {
+        if (!this._reconnectionObservable && isConnected === WebSocketConnectionStatus.NOT_CONNECTED) {
+          this._reconnect();
         }
       },
     });
   }
 
-  /**
-   * Same as `on` method but with Observable response
-   *
-   * @param event represents value inside {utf8Data.event} or {event} from server response
-   *
-   * @return {Observable<any>}
-   */
-  on$(event: string): Observable<any> {
-    return this._message$<WebSocketMessageServer>(event).pipe(map((_) => _.data));
+  emit(message: EventBasedWebSocketMessage) {
+    if (!this._socket) {
+      throw new Error('Cannot send message, because internal WebSocket is not available!');
+    }
+    this._socket.next(message);
   }
 
-  // Handle socket close event from server
-  onClose$(): Observable<void> {
-    return new Observable((observer) => {
-      this.subscribe({
-        /* istanbul ignore next */
-        next: () => null,
-        /* istanbul ignore next */
-        error: () => null,
-        complete: () => {
-          observer.next();
-          observer.complete();
-        },
-      });
+  on(event: string | 'close', callBack: (data?: any) => void) {
+    this._message$<EventBasedWebSocketMessage>(event).subscribe({
+      next: (message: EventBasedWebSocketMessage) => callBack(message.data),
+      /* istanbul ignore next */
+      error: () => null,
+      complete: () => {
+        /* istanbul ignore else */
+        if (event === 'close') {
+          callBack();
+        }
+      },
     });
+  }
+
+  // Same as `on` method but returns an observable
+  on$(event: string): Observable<any> {
+    return this._message$<EventBasedWebSocketMessage>(event).pipe(map((_) => _.data));
   }
 
   resetConnection() {
@@ -215,32 +135,6 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
     );
   }
 
-  private _cleanSocket() {
-    /* istanbul ignore else */
-    if (this._socketSubscription) {
-      this._socketSubscription.unsubscribe();
-    }
-    this._socket = null;
-  }
-
-  /**
-   * Function to clean reconnection data
-   *
-   * @private
-   */
-  private _cleanReconnection() {
-    /* istanbul ignore else */
-    if (this._reconnectionSubscription) {
-      this._reconnectionSubscription.unsubscribe();
-    }
-    this._reconnectionObservable = null;
-  }
-
-  /**
-   * Function to create socket and subscribe to it
-   *
-   * @private
-   */
   private _connect() {
     this._socket = new WebSocketSubject(this._wsSubjectConfig);
     this._socketSubscription = this._socket.subscribe({
@@ -255,6 +149,14 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
         }
       },
     });
+  }
+
+  private _cleanSocket() {
+    /* istanbul ignore else */
+    if (this._socketSubscription) {
+      this._socketSubscription.unsubscribe();
+    }
+    this._socket = null;
   }
 
   private _reconnect() {
@@ -276,12 +178,18 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
         this._cleanReconnection();
         if (!this._socket) {
           this.complete();
-          // TODO: Clarify if completed status can be used for connection status
-          console.log('COMPLETE STATUS');
           this._connectionStatus$.complete();
         }
       },
     });
+  }
+
+  private _cleanReconnection() {
+    /* istanbul ignore else */
+    if (this._reconnectionSubscription) {
+      this._reconnectionSubscription.unsubscribe();
+    }
+    this._reconnectionObservable = null;
   }
 
   private _deserializer(e: MessageEvent): T {
@@ -292,7 +200,7 @@ export class RxWebsocketWrapperSubject<T> extends Subject<T> {
     }
   }
 
-  private _serializer(data: any): WebSocketMessage {
+  private _serializer(data: any): string {
     return typeof data === 'string' ? data : JSON.stringify(data);
   }
 }

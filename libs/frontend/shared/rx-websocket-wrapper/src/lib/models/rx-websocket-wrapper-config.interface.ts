@@ -3,7 +3,6 @@ export interface RxWebsocketWrapperConfig {
   protocol?: string | Array<string>;
   // A WebSocket constructor to use. This is useful for mocking a WebSocket for testing purposes
   WebSocketCtor?: { new (url: string, protocol?: string | Array<string>): WebSocket };
-  binaryType?: 'blob' | 'arraybuffer';
   reconnectInterval?: number;
   reconnectAttempts?: number;
 }

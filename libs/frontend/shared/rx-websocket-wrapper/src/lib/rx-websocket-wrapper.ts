@@ -1,6 +1,6 @@
+import { RxWebSocketWrapperSubject } from './rx-websocket-wrapper-subject';
 import { RxWebsocketWrapperConfig } from './models/rx-websocket-wrapper-config.interface';
-import { RxWebsocketWrapperSubject } from './rx-websocket-wrapper-subject';
 
-export function initRxWebsocketWrapper<T>(config: RxWebsocketWrapperConfig): RxWebsocketWrapperSubject<T> {
-  return new RxWebsocketWrapperSubject<T>(config);
+export function initRxWebSocketWrapper<T>(config: RxWebsocketWrapperConfig): RxWebSocketWrapperSubject<T> {
+  return new RxWebSocketWrapperSubject<T>(config);
 }
