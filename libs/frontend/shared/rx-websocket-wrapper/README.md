@@ -1,4 +1,4 @@
-# Frontend Shared RX Websocket Wrapper
+# Frontend Shared RX WebSocket Wrapper
 
 ## Running unit tests
 

@@ -1,25 +1,9 @@
 {
+  "projectType": "library",
   "root": "libs/frontend/shared/rx-websocket-wrapper",
   "sourceRoot": "libs/frontend/shared/rx-websocket-wrapper/src",
-  "projectType": "library",
+  "prefix": "detective-typescript-stack",
   "targets": {
-    "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/frontend/shared/rx-websocket-wrapper",
-        "main": "libs/frontend/shared/rx-websocket-wrapper/src/index.ts",
-        "tsConfig": "libs/frontend/shared/rx-websocket-wrapper/tsconfig.lib.json",
-        "assets": ["libs/frontend/shared/rx-websocket-wrapper/*.md"]
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/frontend/shared/rx-websocket-wrapper/**/*.ts"]
-      }
-    },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/frontend/shared/rx-websocket-wrapper"],
@@ -27,7 +11,13 @@
         "jestConfig": "libs/frontend/shared/rx-websocket-wrapper/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/shared/rx-websocket-wrapper/**/*.ts"]
+      }
     }
   },
-  "tags": ["frontend"]
+  "tags": ["scope:frontend", "scope:frontend-shared", "type:rx-websocket-wrapper"]
 }
