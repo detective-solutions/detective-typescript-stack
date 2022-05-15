@@ -22,5 +22,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["scope:frontend", "scope:detective-client", "type:login"]
 }
