@@ -1,6 +1,6 @@
 import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
-import { ForceDirectedGraph, Link, Node } from '../models';
+import { ForceDirectedGraph, Node, WhiteboardOptions } from '../../models';
 
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
@@ -11,9 +11,9 @@ declare let window: WindowGlobals;
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
-export class D3Service {
-  getForceDirectedGraph(nodes: Node[], links: Link[], options: { width: number; height: number }) {
-    return new ForceDirectedGraph(nodes, links, options);
+export class D3AdapterService {
+  getForceDirectedGraph(options: WhiteboardOptions) {
+    return new ForceDirectedGraph(options);
   }
 
   applyZoomBehavior(elementToZoomOn: Element, containerElement: Element) {
@@ -80,6 +80,8 @@ export class D3Service {
         if (window.isDraggingActivated) {
           nodeToUpdate.fx = onDragEvent.x + deltaX;
           nodeToUpdate.fy = onDragEvent.y + deltaY;
+          // nodeToUpdate.x = onDragEvent.x + deltaX;
+          // nodeToUpdate.y = onDragEvent.y + deltaY;
         }
       }
 
@@ -88,6 +90,8 @@ export class D3Service {
         if (!dragStartEvent.active) {
           graph.simulation.alphaTarget(0);
         }
+        nodeToUpdate.x = nodeToUpdate.fx as number;
+        nodeToUpdate.y = nodeToUpdate.fy as number;
         nodeToUpdate.fx = null;
         nodeToUpdate.fy = null;
       }

@@ -1,10 +1,9 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 
-import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Injectable } from '@angular/core';
 import { TableEvents } from '../../model';
 import { TableNodeActions } from '../actions/table-node-action.types';
-import { WhiteboardService } from '../../../../../services';
+import { WhiteboardFacadeService } from '../../../../../services';
 import { tap } from 'rxjs';
 
 @Injectable()
@@ -13,12 +12,17 @@ export class TableNodeEffects {
     () => {
       return this.actions$.pipe(
         ofType(TableNodeActions.tableNodeAdded),
-        tap((action) => this.whiteboardService.addElementToWhiteboard(action.tableElementAdded)),
-        tap((action) =>
-          this.whiteboardService.sendWebsocketMessage({
-            access_token: this.authService.getAccessToken(),
+        tap((action) => this.whiteboardFacade.addElementToWhiteboard(action.tableElementAdded)),
+        tap(() =>
+          this.whiteboardFacade.sendWebsocketMessage({
             event: TableEvents.QueryTable,
-            data: action.tableElementAdded.id,
+            data: {
+              case: '90d404c5-9d20-11ec-83f2-287fc999439d',
+              query_type: 'general',
+              query: ['SELECT emp_no, first_name, last_name FROM employees LIMIT 100'],
+              source: ['99o404c5-9d20-11ec-83f2-287fcf6e439d'],
+              groups: ['4e45ac4b-9d18-11ec-8804-287fcf6e439d'],
+            },
           })
         )
       );
@@ -26,9 +30,5 @@ export class TableNodeEffects {
     { dispatch: false }
   );
 
-  constructor(
-    private readonly actions$: Actions,
-    private readonly whiteboardService: WhiteboardService,
-    private readonly authService: AuthService
-  ) {}
+  constructor(private readonly actions$: Actions, private readonly whiteboardFacade: WhiteboardFacadeService) {}
 }

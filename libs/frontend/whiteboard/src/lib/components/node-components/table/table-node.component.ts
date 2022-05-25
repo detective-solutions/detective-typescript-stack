@@ -1,15 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ITableNode, ITableNodeDataInput, TableEvents } from './model';
-import { filter, map } from 'rxjs';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { map, tap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
+import { ITableNode } from './model';
 import { TableNodeActions } from './state';
 import { Update } from '@ngrx/entity';
-import { WebsocketMessage } from '../../../models';
-import { select } from '@ngrx/store';
-import { selectWhiteboardNodesFromStore } from '../../../state/selectors';
+import { ofType } from '@ngrx/effects';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -19,37 +17,42 @@ import { selectWhiteboardNodesFromStore } from '../../../state/selectors';
   styleUrls: ['./table-node.component.scss', '../base/base-node.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TableNodeComponent extends BaseNodeComponent implements OnInit {
+export class TableNodeComponent extends BaseNodeComponent implements OnInit, AfterViewInit {
   gridOptions: GridOptions = {
     loadingOverlayComponent: CustomLoadingOverlayComponent,
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
 
-  // Observable for all incoming messages addressed to a certain instance of this component
-  readonly incomingWebsocketMessages$ = this.websocketService.websocketSubject$.pipe(
-    filter((message: WebsocketMessage<any>) => message.data?.id === this.node.id)
+  readonly incomingWebsocketMessages$ = this.whiteboardFacade.webSocket$;
+
+  readonly getTableDataFromStore$ = this.actions$.pipe(
+    ofType(TableNodeActions.tableDataReceived),
+    map((data) => data.update.changes)
   );
 
-  readonly getTableDataFromStore$ = this.store.pipe(
-    select(selectWhiteboardNodesFromStore),
-    filter((entities: any) => this.node && entities[this.node.id]),
-    map((entities: any) => entities[this.node.id])
+  readonly columnDefs$ = this.getTableDataFromStore$.pipe(
+    tap(console.log),
+    map((data) => data.colDefs)
   );
-  readonly columnDefs$ = this.getTableDataFromStore$.pipe(map((data) => data.colDefs));
-  readonly rowData$ = this.getTableDataFromStore$.pipe(map((data) => data.rowData));
 
-  override ngOnInit() {
-    this.initBaseNode();
+  readonly rowData$ = this.getTableDataFromStore$.pipe(
+    tap(console.log),
+    map((data) => data.rowData)
+  );
+
+  ngOnInit() {
     this.subscriptions.add(
+      // TODO: Add event keys to Kafka messages
       this.incomingWebsocketMessages$
-        .pipe(
-          filter((message: WebsocketMessage<any>) => message.event === TableEvents.QueryTable),
-          map((message: WebsocketMessage<ITableNodeDataInput>) => message.data)
-        )
-        .subscribe((messageData: ITableNodeDataInput) => {
+        // .pipe(
+        // filter((message: WebsocketMessage<any>) => message.event === TableEvents.QueryTable),
+        // map((message: WebsocketMessage<ITableNodeDataInput>) => message.data)
+        // )
+        // TODO: Set correct type for incoming data
+        .subscribe((messageData: any) => {
           const update: Update<ITableNode> = {
-            id: messageData.id,
-            changes: { colDefs: messageData.colDefs, rowData: messageData.rowData },
+            id: this.node.id,
+            changes: { colDefs: messageData.schema, rowData: messageData.data },
           };
           this.store.dispatch(TableNodeActions.tableDataReceived({ update: update }));
         })

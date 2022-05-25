@@ -1,5 +1,5 @@
 import { ComponentRef, Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
-import { Node, NodeComponent, NodeTypes } from '../models';
+import { ForceDirectedGraph, Node, NodeComponent, NodeTypes } from '../models';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { TableNodeComponent } from '../components';
@@ -9,6 +9,7 @@ import { TableNodeComponent } from '../components';
 })
 export class DynamicNodeGeneratorDirective implements OnInit {
   @Input() node!: Node;
+  @Input() graph!: ForceDirectedGraph;
 
   constructor(private viewContainerRef: ViewContainerRef, private readonly logService: LogService) {}
 
@@ -21,6 +22,7 @@ export class DynamicNodeGeneratorDirective implements OnInit {
     const componentRef = this.getComponentInstanceByType(this.node.type);
     if (componentRef) {
       componentRef.instance.node = this.node;
+      componentRef.instance.graph = this.graph;
     }
   }
 

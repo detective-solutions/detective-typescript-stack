@@ -7,4 +7,4 @@ const { selectEntities } = whiteboardNodesStateAdapter.getSelectors();
 
 export const selectWhiteboardNodesState = createFeatureSelector<WhiteboardNodesState>(NODES_STORE_NAME);
 
-export const selectWhiteboardNodesFromStore = createSelector(selectWhiteboardNodesState, selectEntities);
+export const selectWhiteboardNodes = createSelector(selectWhiteboardNodesState, selectEntities);

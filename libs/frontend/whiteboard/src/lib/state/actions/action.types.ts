@@ -1,3 +1,4 @@
+import * as WhiteboardActions from './whiteboard.actions';
 import * as WhiteboardMetadataActions from './whiteboard-metadata.actions';
 
-export { WhiteboardMetadataActions };
+export { WhiteboardActions, WhiteboardMetadataActions };

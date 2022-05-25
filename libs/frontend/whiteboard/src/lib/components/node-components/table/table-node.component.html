@@ -18,11 +18,7 @@
       style="height: inherit; width: inherit"
       frameBorder="0"
     ></iframe> -->
-    <ng-template #isLoading>
-      <div class="loading-spinner"></div>
-    </ng-template>
     <ag-grid-angular
-      *ngIf="getTableDataFromStore$ | async"
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
       [columnDefs]="columnDefs$ | async"

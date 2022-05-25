@@ -1,0 +1,9 @@
+{
+  "toastMessages": {
+    "webSocketConnection": {
+      "reconnecting": "Die Verbindung zum Server ist abgebrochen. Verbindung wird wiederhergestellt ...",
+      "reconnectionSuccessful": "Verbindung wiederhergestellt",
+      "noConnection": "Es konnte keine Verbindung zu den Servern aufgebaut werden. Bitte laden Sie die Casefile neu."
+    }
+  }
+}

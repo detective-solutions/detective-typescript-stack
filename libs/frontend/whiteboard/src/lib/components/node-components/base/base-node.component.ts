@@ -1,52 +1,50 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
-import { DragService, WebsocketService, WhiteboardService } from '../../../services';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
+import { ForceDirectedGraph, Node } from '../../../models';
 import { Subscription, distinctUntilChanged, map } from 'rxjs';
 
+import { Actions } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
-import { Node } from '../../../models';
 import { Store } from '@ngrx/store';
+import { WhiteboardFacadeService } from '../../../services';
 
 @Component({
   template: '',
   styleUrls: ['./base-node.component.scss'],
 })
-export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   @Input() node!: Node;
+  @Input() graph!: ForceDirectedGraph;
 
-  readonly selected$ = this.whiteboardService.whiteboardSelection$.pipe(
+  readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
-  readonly isDragging$ = this.dragService.isDragging$.pipe(distinctUntilChanged());
+  readonly isDragging$ = this.whiteboardFacade.isDragging$.pipe(distinctUntilChanged());
 
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
   private onClick(event: PointerEvent) {
-    this.whiteboardService.addSelectedElement(this);
-    this.dragService.addDelayedDragHandling(event);
+    this.whiteboardFacade.addSelectedElement(this);
+    this.whiteboardFacade.addDelayedDragHandling(event);
   }
 
   @HostListener('pointerup')
   private onPointerUp() {
-    this.dragService.removeDelayedDragHandling();
+    this.whiteboardFacade.removeDelayedDragHandling();
   }
 
   constructor(
     public readonly elementRef: ElementRef,
     protected readonly store: Store,
-    protected readonly whiteboardService: WhiteboardService,
-    protected readonly websocketService: WebsocketService,
-    protected readonly keyboardService: KeyboardService,
-    protected readonly dragService: DragService
+    protected readonly actions$: Actions,
+    protected readonly whiteboardFacade: WhiteboardFacadeService,
+    protected readonly keyboardService: KeyboardService
   ) {}
 
-  ngOnInit() {
-    this.initBaseNode();
-  }
-
   ngAfterViewInit() {
+    this.whiteboardFacade.applyDragBehavior(this);
     // Select element on whiteboard right after creation
-    this.whiteboardService.whiteboardSelection$.next(this.node.id);
+    this.whiteboardFacade.whiteboardSelection$.next(this.node.id);
   }
 
   ngOnDestroy() {
@@ -58,9 +56,5 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.keyboardService.isSpaceKeyPressed) {
       event.stopPropagation();
     }
-  }
-
-  protected initBaseNode() {
-    this.whiteboardService.applyDragBehavior(this);
   }
 }

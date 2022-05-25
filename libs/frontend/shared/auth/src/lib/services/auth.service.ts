@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, pipe, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, filter, map, mergeMap, pipe, tap } from 'rxjs';
 import { IAuthServerResponse, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
@@ -26,6 +26,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
 
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
   readonly currentUser$ = new BehaviorSubject<User>(new User());
+  readonly loggedOut$ = new Subject<boolean>();
 
   protected readonly resumeCurrentUser$ = this.authStatus$.pipe(
     this.getAndUpdateUserIfAuthenticated,
@@ -63,6 +64,7 @@ export abstract class AuthService extends CacheService implements IAuthService {
 
   logout(clearToken?: boolean): Observable<void> {
     this.isLoggingOut = true;
+    this.loggedOut$.next(true); // Inform possible subscribers about logout
     return this.logoutProvider().pipe(
       tap(() => {
         if (clearToken) {

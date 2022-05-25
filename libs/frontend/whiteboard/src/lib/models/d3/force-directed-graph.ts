@@ -13,49 +13,54 @@ import { rectCollide } from '../../utils';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export class ForceDirectedGraph {
+  ticker: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
+  simulation!: Simulation<any, any>;
+
+  private nodes!: Node[];
+  private links: Link[] = [];
   private options: { width: number; height: number };
-  private linkForceStrength = 1 / 80;
+  private readonly linkForceStrength = 1 / 80;
 
-  public ticker: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
-  public simulation!: Simulation<any, any>;
-
-  public nodes: Node[] = [];
-  public links: Link[] = [];
-
-  constructor(nodes: Node[], links: Link[], options: { width: number; height: number }) {
+  constructor(options: { width: number; height: number }) {
     if (!options || !options.width || !options.height) {
       throw new Error('Missing options when initializing simulation');
     }
     this.options = options;
 
-    this.nodes = nodes;
-    this.links = links;
+    const ticker = this.ticker; // Make ticker available in function context
+    this.simulation = d3ForceSimulation().force('collision', rectCollide());
+    // Connecting the d3 ticker to an angular event emitter
+    this.simulation.on('tick', function () {
+      ticker.emit(this);
+    });
+  }
 
-    this.initSimulation();
+  initialize(nodes: Node[]) {
+    this.nodes = nodes;
+    this.updateNodes();
+    this.updateLinks();
   }
 
   connectNodes(source: any, target: any) {
     if (!this.nodes[source] || !this.nodes[target]) {
       throw new Error('One of the nodes does not exist');
     }
-
     const link = new Link(source, target);
     this.simulation.stop();
     this.links.push(link);
     this.simulation.alphaTarget(0.3).restart();
-
-    this.initLinks();
+    this.updateLinks();
   }
 
-  initNodes() {
+  updateNodes() {
     if (!this.simulation) {
       throw new Error('Simulation was not initialized yet');
     }
-
     this.simulation.nodes(this.nodes);
+    this.simulation.alphaTarget(1).restart();
   }
 
-  initLinks() {
+  updateLinks() {
     if (!this.simulation) {
       throw new Error('Simulation was not initialized yet');
     }
@@ -66,20 +71,7 @@ export class ForceDirectedGraph {
         .id((data: any) => data['id'])
         .strength(this.linkForceStrength)
     );
-  }
-
-  initSimulation() {
-    const ticker = this.ticker;
-
-    this.simulation = d3ForceSimulation().force('collision', rectCollide());
-
-    // Connecting the d3 ticker to an angular event emitter
-    this.simulation.on('tick', function () {
-      ticker.emit(this);
-    });
-
-    this.initNodes();
-    this.initLinks();
+    this.simulation.alphaTarget(1).restart();
   }
 
   addCenterForce() {

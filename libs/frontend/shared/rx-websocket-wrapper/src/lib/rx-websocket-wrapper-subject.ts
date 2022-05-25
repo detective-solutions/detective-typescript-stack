@@ -1,21 +1,8 @@
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  Subscription,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  interval,
-  map,
-  takeWhile,
-  tap,
-} from 'rxjs';
+import { Observable, Subject, Subscription, distinctUntilChanged, filter, interval, map, takeWhile, tap } from 'rxjs';
 import { WebSocketSubject, WebSocketSubjectConfig } from 'rxjs/webSocket';
 
 import { EventBasedWebSocketMessage } from './models/event-based-websocket-message.type';
 import { RxWebsocketWrapperConfig } from './models/rx-websocket-wrapper-config.interface';
-import { WebSocketConnectionStatus } from './models';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -23,14 +10,14 @@ export class RxWebSocketWrapperSubject<T> extends Subject<T> {
   // Internal subject for the current connection status
   private _connectionStatus$ = new Subject<boolean>();
   // Internal subject to indicate that all reconnection attempts failed
-  private _connectionFailedEventually$ = new BehaviorSubject<boolean>(false);
+  private _connectionFailedEventually$ = new Subject<boolean>();
 
   private _socket!: WebSocketSubject<any> | null;
   private _socketSubscription!: Subscription;
 
   private _reconnectionObservable!: Observable<number> | null;
   private _reconnectionSubscription!: Subscription;
-  private _reconnectionInterval = 2000;
+  private _reconnectionInterval = 1500;
   private _reconnectionAttempts = 15;
 
   private readonly _wsSubjectConfig: WebSocketSubjectConfig<T> = {
@@ -52,20 +39,8 @@ export class RxWebSocketWrapperSubject<T> extends Subject<T> {
     Object.assign(this._wsSubjectConfig, configInput);
   }
 
-  get connectionStatus$(): Observable<WebSocketConnectionStatus> {
-    return combineLatest([this._connectionStatus$, this._connectionFailedEventually$]).pipe(
-      map(([connectionStatus, connectionFailedEventually]) => {
-        if (connectionFailedEventually) {
-          return WebSocketConnectionStatus.FAILED;
-        }
-        if (connectionStatus) {
-          return WebSocketConnectionStatus.CONNECTED;
-        } else {
-          return WebSocketConnectionStatus.NOT_CONNECTED;
-        }
-      }),
-      distinctUntilChanged()
-    );
+  get connectionStatus$(): Observable<boolean> {
+    return this._connectionStatus$.pipe(distinctUntilChanged());
   }
 
   get connectionFailedEventually$(): Observable<boolean> {
@@ -83,8 +58,8 @@ export class RxWebSocketWrapperSubject<T> extends Subject<T> {
     this._connect();
 
     this.connectionStatus$.subscribe({
-      next: (isConnected: WebSocketConnectionStatus) => {
-        if (!this._reconnectionObservable && isConnected === WebSocketConnectionStatus.NOT_CONNECTED) {
+      next: (isConnected: boolean) => {
+        if (!this._reconnectionObservable && !isConnected) {
           this._reconnect();
         }
       },
@@ -118,6 +93,7 @@ export class RxWebSocketWrapperSubject<T> extends Subject<T> {
   }
 
   resetConnection() {
+    this._connectionStatus$.next(false);
     this.complete();
     this._cleanSocket();
     this._cleanReconnection();
