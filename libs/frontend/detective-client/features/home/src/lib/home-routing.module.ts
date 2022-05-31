@@ -1,6 +1,7 @@
 import { RouterModule, Routes } from '@angular/router';
 
 import { AllCasefilesComponent } from './components/all-casefiles/all-casefiles.component';
+import { AuthGuard } from '@detective.solutions/frontend/shared/auth';
 import { DataSourcesComponent } from './components/data-sources/data-sources.component';
 import { HomeContainerComponent } from './components/home-container.component';
 import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';
@@ -16,6 +17,7 @@ const routes: Routes = [
       { path: 'all-casefiles', component: AllCasefilesComponent },
       { path: 'data-sources', component: DataSourcesComponent },
     ],
+    canActivate: [AuthGuard],
   },
 ];
 
