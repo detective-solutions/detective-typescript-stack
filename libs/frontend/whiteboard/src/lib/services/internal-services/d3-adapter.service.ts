@@ -61,6 +61,11 @@ export class D3AdapterService {
     const dragServiceRef = this.dragService;
 
     function onDragStart(dragStartEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      // Continue dragging only on allowed target elements
+      if (!dragServiceRef.isDraggingAllowedOnTarget(dragStartEvent.sourceEvent.target as HTMLElement)) {
+        return;
+      }
+
       // Prevent propagation to parent elements
       dragStartEvent.sourceEvent.stopPropagation();
 

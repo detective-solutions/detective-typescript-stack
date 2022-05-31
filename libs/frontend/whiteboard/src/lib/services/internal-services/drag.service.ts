@@ -25,8 +25,7 @@ export class DragService {
     this.isMouseDown = true;
     this.dragHoldTimeout = setTimeout(() => {
       if (this.isMouseDown && !this.isDraggingActivated) {
-        // Prevent drag for input elements
-        if ((event.target as HTMLElement).tagName !== 'INPUT') {
+        if (this.isDraggingAllowedOnTarget(event.target as HTMLElement)) {
           this.activateDragging();
         }
       }
@@ -77,5 +76,11 @@ export class DragService {
     );
     this.store.dispatch(WhiteboardActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
     this.nodeLayoutUpdateBuffer.clear();
+  }
+
+  isDraggingAllowedOnTarget(targetElement: HTMLElement): boolean {
+    return (
+      targetElement.tagName !== 'MAT-ICON' && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'INPUT'
+    );
   }
 }
