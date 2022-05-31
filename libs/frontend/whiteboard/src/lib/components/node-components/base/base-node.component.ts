@@ -22,7 +22,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
-  private onClick(event: PointerEvent) {
+  private onPointerDown(event: PointerEvent) {
     this.whiteboardFacade.addSelectedElement(this);
     this.whiteboardFacade.addDelayedDragHandling(event);
   }
