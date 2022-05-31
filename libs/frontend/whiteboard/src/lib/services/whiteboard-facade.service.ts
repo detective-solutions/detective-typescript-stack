@@ -1,7 +1,7 @@
 import { Actions, ofType } from '@ngrx/effects';
 import { D3AdapterService, DragService, WebSocketService, WhiteboardSelectionService } from './internal-services';
 import { ForceDirectedGraph, INodeInput, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
-import { Observable, Subject, combineLatest, filter, map, of } from 'rxjs';
+import { Observable, combineLatest, filter, map, of } from 'rxjs';
 
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
@@ -16,26 +16,21 @@ import { selectWhiteboardNodes } from '../state/selectors';
 
 @Injectable()
 export class WhiteboardFacadeService {
-  readonly initialWhiteboardNodes$: Observable<Node[]> = this.store.select(selectWhiteboardNodes).pipe(
+  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectWhiteboardNodes).pipe(
     filter((entities) => !!entities),
     map((entities) => Object.values(entities) as any),
-    map((nodeInputs: INodeInput[]) => nodeInputs.map(Node.Build))
+    map((nodeInputs: INodeInput[]) => nodeInputs.map(Node.Build)) // TODO: Move this to selector function
   );
 
-  readonly initialWhiteboardLinks$: Observable<Link[]> = of([]);
-  readonly graphProvider$ = new Subject<ForceDirectedGraph>();
+  readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
-  readonly isWhiteboardInitialized$: Observable<ForceDirectedGraph> = combineLatest([
+  readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
     this.actions$.pipe(ofType(WhiteboardActions.whiteboardDataLoaded)),
     this.webSocketService.isConnectedToWebSocketServer$,
-    this.graphProvider$,
   ]).pipe(
-    filter(
-      ([isWhiteboardDataLoaded, isConnectedToWebSocketServer, graph]) =>
-        isWhiteboardDataLoaded && isConnectedToWebSocketServer && !!graph
-    ),
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    map(([_isWhiteboardDataLoaded, _isConnectedToWebSocketServer, graph]) => graph)
+    map(
+      ([isWhiteboardDataLoaded, isConnectedToWebSocketServer]) => isWhiteboardDataLoaded && isConnectedToWebSocketServer
+    )
   );
 
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
@@ -44,15 +39,10 @@ export class WhiteboardFacadeService {
   readonly isConnectedToWebSocketServer$ = this.webSocketService.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
 
-  initializeWhiteboard(
-    whiteboardContainerElement: Element,
-    zoomContainerElement: Element,
-    whiteboardOptions: WhiteboardOptions
-  ) {
+  initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.establishWebsocketConnection();
     this.store.dispatch(WhiteboardActions.loadWhiteboardData());
-    this.graphProvider$.next(this.getForceDirectedGraph(whiteboardOptions));
 
     // TODO: Remove these mocked data when action is triggered by backend response
     setTimeout(() => {
@@ -60,8 +50,12 @@ export class WhiteboardFacadeService {
     }, 500);
   }
 
-  applyDragBehavior(component: NodeComponent) {
-    this.d3AdapterServe.applyDragBehavior(component.elementRef.nativeElement, component.node, component.graph);
+  getForceGraph(options: WhiteboardOptions): ForceDirectedGraph {
+    return this.getForceDirectedGraph(options);
+  }
+
+  applyDragBehaviorToComponent(component: NodeComponent) {
+    this.d3AdapterServe.applyDragBehavior(component.elementRef.nativeElement, component.node);
   }
 
   resetWhiteboard() {
@@ -74,7 +68,7 @@ export class WhiteboardFacadeService {
   }
 
   addSelectedElement(selectedElementComponent: NodeComponent) {
-    this.whiteboardSelectionService.addSelectedElement(selectedElementComponent);
+    this.whiteboardSelectionService.addSelectedNode(selectedElementComponent);
   }
 
   resetSelection() {
@@ -91,6 +85,14 @@ export class WhiteboardFacadeService {
 
   removeDelayedDragHandling() {
     this.dragService.removeDelayedDragHandling();
+  }
+
+  addNodesToUpdateAfterDrag(node: Node) {
+    this.dragService.addNodeToUpdateAfterDrag(node);
+  }
+
+  updateNodesAfterDrag() {
+    this.dragService.updateNodesAfterDrag();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

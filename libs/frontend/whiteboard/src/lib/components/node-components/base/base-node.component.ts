@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
-import { ForceDirectedGraph, Node } from '../../../models';
-import { Subscription, distinctUntilChanged, map } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 
 import { Actions } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
+import { Node } from '../../../models';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
 
@@ -13,12 +13,11 @@ import { WhiteboardFacadeService } from '../../../services';
 })
 export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   @Input() node!: Node;
-  @Input() graph!: ForceDirectedGraph;
 
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
-  readonly isDragging$ = this.whiteboardFacade.isDragging$.pipe(distinctUntilChanged());
+  readonly isDragging$ = this.whiteboardFacade.isDragging$;
 
   protected readonly subscriptions = new Subscription();
 
@@ -42,9 +41,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit() {
-    this.whiteboardFacade.applyDragBehavior(this);
-    // Select element on whiteboard right after creation
-    this.whiteboardFacade.whiteboardSelection$.next(this.node.id);
+    this.whiteboardFacade.applyDragBehaviorToComponent(this);
   }
 
   ngOnDestroy() {

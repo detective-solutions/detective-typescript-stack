@@ -13,7 +13,14 @@ export class TableNodeEffects {
       return this.actions$.pipe(
         ofType(TableNodeActions.tableNodeAdded),
         tap((action) => this.whiteboardFacade.addElementToWhiteboard(action.tableElementAdded)),
+        tap((action) => {
+          // Select added element if it was added manually
+          if (action.addedManually) {
+            this.whiteboardFacade.whiteboardSelection$.next(action.tableElementAdded.id);
+          }
+        }),
         tap(() =>
+          // TODO: Get this data from node
           this.whiteboardFacade.sendWebsocketMessage({
             event: TableEvents.QueryTable,
             data: {

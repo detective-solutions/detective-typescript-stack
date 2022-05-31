@@ -6,7 +6,7 @@ import { Update } from '@ngrx/entity';
 
 export const tableNodeAdded = createAction(
   '[Whiteboard] Table element added',
-  props<{ tableElementAdded: INodeInput }>()
+  props<{ tableElementAdded: INodeInput; addedManually: boolean }>()
 );
 
 export const tableDataReceived = createAction(

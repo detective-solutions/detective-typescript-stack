@@ -1,5 +1,12 @@
 import { IForceDirectedNode } from './d3';
 
+interface INodeLayout {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface INodeInput {
   id: string;
   type: string;
@@ -13,11 +20,6 @@ export interface INode extends IForceDirectedNode {
   type: string;
   title: string;
   locked?: boolean;
-  width: number;
-  height: number;
-}
-
-interface INodeLayout {
   x: number;
   y: number;
   width: number;

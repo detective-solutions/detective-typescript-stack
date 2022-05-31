@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { NodeComponent } from '../../models';
-import { Subject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 
 @Injectable()
 export class WhiteboardSelectionService {
-  whiteboardSelection$: Subject<string | null> = new Subject();
+  whiteboardSelection$: ReplaySubject<string | null> = new ReplaySubject();
 
-  addSelectedElement(selectedElementComponent: NodeComponent) {
-    this.whiteboardSelection$.next(selectedElementComponent.node.id);
+  addSelectedNode(selectedNode: NodeComponent) {
+    this.whiteboardSelection$.next(selectedNode.node.id);
   }
 
   resetSelection() {

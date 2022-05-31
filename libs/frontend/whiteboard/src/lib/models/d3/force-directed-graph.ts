@@ -1,87 +1,135 @@
-import {
-  Simulation,
-  forceCenter as d3ForceCenter,
-  forceLink as d3ForceLink,
-  forceSimulation as d3ForceSimulation,
-} from 'd3-force';
+import { Simulation, forceCenter as d3ForceCenter, forceSimulation as d3ForceSimulation } from 'd3-force';
 
 import { EventEmitter } from '@angular/core';
 import { Link } from '../link';
 import { Node } from '../node';
-import { rectCollide } from '../../utils';
+import { WhiteboardOptions } from '../whiteboard-options.type';
+import { quadtree as d3Quadtree } from 'd3-quadtree';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export class ForceDirectedGraph {
-  ticker: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
+  ticker$: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
+  nodePositionUpdatedByForce$: EventEmitter<Node> = new EventEmitter();
+
   simulation!: Simulation<any, any>;
 
-  private nodes!: Node[];
-  private links: Link[] = [];
+  private nodes: Node[] = [];
   private options: { width: number; height: number };
-  private readonly linkForceStrength = 1 / 80;
+  // private readonly linkForceStrength = 1 / 80;
 
-  constructor(options: { width: number; height: number }) {
+  constructor(options: WhiteboardOptions) {
     if (!options || !options.width || !options.height) {
       throw new Error('Missing options when initializing simulation');
     }
     this.options = options;
 
-    const ticker = this.ticker; // Make ticker available in function context
-    this.simulation = d3ForceSimulation().force('collision', rectCollide());
-    // Connecting the d3 ticker to an angular event emitter
+    const ticker = this.ticker$; // Make ticker available in function context
+    this.simulation = d3ForceSimulation().force(
+      'collision',
+      this.rectCollide((nodeWithUpdatedPosition: Node) =>
+        this.nodePositionUpdatedByForce$.emit(nodeWithUpdatedPosition)
+      )
+    );
+    // Connecting the d3 ticker to an Angular event emitter
     this.simulation.on('tick', function () {
       ticker.emit(this);
     });
   }
 
-  initialize(nodes: Node[]) {
+  // connectNodes(source: any, target: any) {
+  //   if (!this.nodes[source] || !this.nodes[target]) {
+  //     throw new Error('One of the nodes does not exist');
+  //   }
+  //   const link = new Link(source, target);
+  //   this.simulation.stop();
+  //   this.links.push(link);
+  //   this.simulation.alpha(0.01).restart();
+  //   this.updateLinks();
+  // }
+
+  updateNodes(nodes: Node[]) {
+    if (!this.simulation) {
+      throw new Error('Simulation was not initialized yet');
+    }
     this.nodes = nodes;
-    this.updateNodes();
-    this.updateLinks();
-  }
-
-  connectNodes(source: any, target: any) {
-    if (!this.nodes[source] || !this.nodes[target]) {
-      throw new Error('One of the nodes does not exist');
-    }
-    const link = new Link(source, target);
-    this.simulation.stop();
-    this.links.push(link);
-    this.simulation.alphaTarget(0.3).restart();
-    this.updateLinks();
-  }
-
-  updateNodes() {
-    if (!this.simulation) {
-      throw new Error('Simulation was not initialized yet');
-    }
     this.simulation.nodes(this.nodes);
-    this.simulation.alphaTarget(1).restart();
+    this.simulation.alphaTarget(0.1).restart();
   }
 
-  updateLinks() {
-    if (!this.simulation) {
-      throw new Error('Simulation was not initialized yet');
-    }
+  // private updateLinks() {
+  //   if (!this.simulation) {
+  //     throw new Error('Simulation was not initialized yet');
+  //   }
+  //   this.simulation.force(
+  //     'links',
+  //     d3ForceLink(this.links)
+  //       .id((data: any) => data['id'])
+  //       .strength(this.linkForceStrength)
+  //   );
+  //   this.simulation.alphaTarget(1).restart();
+  // }
 
-    this.simulation.force(
-      'links',
-      d3ForceLink(this.links)
-        .id((data: any) => data['id'])
-        .strength(this.linkForceStrength)
-    );
-    this.simulation.alphaTarget(1).restart();
-  }
-
-  addCenterForce() {
+  private addCenterForce() {
     // TODO: Allow elements to be dropped at the rights coordinates when center force is activated
     // Adjust center of the viewport while dragging elements
     this.simulation.force('centers', d3ForceCenter(this.options.width, this.options.height));
     this.simulation.restart();
   }
 
-  removeCenterForce() {
+  private removeCenterForce() {
     this.simulation.force('centers', null);
+  }
+
+  private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: Node) => void) {
+    const padding = 20;
+    let nodes: any;
+
+    function force() {
+      const quadTree = d3Quadtree(
+        nodes,
+        (d: any) => d.x,
+        (d: any) => d.y
+      );
+      for (const node of nodes) {
+        quadTree.visit((q: any) => {
+          let updated = false;
+          if (q.data && q.data !== node) {
+            let x = node.x - q.data.x;
+            let y = node.y - q.data.y;
+            let l, lx, ly;
+
+            const xSpacing = padding + (q.data.width + node.width) / 2;
+            const ySpacing = padding + (q.data.height + node.height) / 2;
+            const absX = Math.abs(x);
+            const absY = Math.abs(y);
+
+            if (absX < xSpacing && absY < ySpacing) {
+              l = Math.sqrt(x * x + y * y);
+
+              lx = (absX - xSpacing) / l;
+              ly = (absY - ySpacing) / l;
+
+              if (Math.abs(lx) > Math.abs(ly)) {
+                lx = 0;
+              } else {
+                ly = 0;
+              }
+
+              node.x -= x *= lx / 2;
+              node.y -= y *= ly / 2;
+              q.data.x += x / 2;
+              q.data.x += x / 2;
+
+              nodePositionCallback(node);
+              updated = true;
+            }
+          }
+          return updated;
+        });
+      }
+    }
+    force.initialize = (_nodes: Node[]) => (nodes = _nodes);
+    return force;
   }
 }

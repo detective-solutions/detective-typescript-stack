@@ -2,6 +2,7 @@ import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
 import { ForceDirectedGraph, Node, WhiteboardOptions } from '../../models';
 
+import { DragService } from './drag.service';
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
 import { select as d3Select } from 'd3-selection';
@@ -12,6 +13,8 @@ declare let window: WindowGlobals;
 
 @Injectable()
 export class D3AdapterService {
+  constructor(private readonly dragService: DragService) {}
+
   getForceDirectedGraph(options: WhiteboardOptions) {
     return new ForceDirectedGraph(options);
   }
@@ -53,8 +56,9 @@ export class D3AdapterService {
     return pass;
   }
 
-  applyDragBehavior(elementToDrag: Element, nodeToUpdate: Node, graph: ForceDirectedGraph) {
+  applyDragBehavior(elementToDrag: Element, nodeToUpdate: Node) {
     const d3element = d3Select(elementToDrag);
+    const dragServiceRef = this.dragService;
 
     function onDragStart(dragStartEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
       // Prevent propagation to parent elements
@@ -68,32 +72,27 @@ export class D3AdapterService {
         deltaY = nodeToUpdate.y - dragStartEvent.y;
       }
 
-      // TODO: Check why this is necessary
-      if (!dragStartEvent.active) {
-        graph.simulation.alphaTarget(0.4).restart();
-      }
-
       dragStartEvent.on('drag', OnDrag).on('end', OnDragEnd);
 
-      function OnDrag(onDragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      function OnDrag(dragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
         // Abort drag if dragging is not activated
         if (window.isDraggingActivated) {
-          nodeToUpdate.fx = onDragEvent.x + deltaX;
-          nodeToUpdate.fy = onDragEvent.y + deltaY;
-          // nodeToUpdate.x = onDragEvent.x + deltaX;
-          // nodeToUpdate.y = onDragEvent.y + deltaY;
+          nodeToUpdate.fx = dragEvent.x + deltaX;
+          nodeToUpdate.fy = dragEvent.y + deltaY;
         }
       }
 
-      function OnDragEnd() {
-        // TODO: Check why this is necessary
-        if (!dragStartEvent.active) {
-          graph.simulation.alphaTarget(0);
+      function OnDragEnd(dragEndEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+        const hasBeenDragged = dragStartEvent.x !== dragEndEvent.x || dragStartEvent.y !== dragEndEvent.y;
+        if (hasBeenDragged) {
+          nodeToUpdate.fx = null;
+          nodeToUpdate.fy = null;
+          nodeToUpdate.x = dragEndEvent.x + deltaX;
+          nodeToUpdate.y = dragEndEvent.y + deltaY;
+
+          dragServiceRef.addNodeToUpdateAfterDrag(nodeToUpdate);
+          dragServiceRef.updateNodesAfterDrag();
         }
-        nodeToUpdate.x = nodeToUpdate.fx as number;
-        nodeToUpdate.y = nodeToUpdate.fy as number;
-        nodeToUpdate.fx = null;
-        nodeToUpdate.fy = null;
       }
     }
 

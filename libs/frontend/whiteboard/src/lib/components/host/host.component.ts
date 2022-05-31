@@ -9,8 +9,8 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ForceDirectedGraph, Node } from '../../models';
-import { Subscription, tap } from 'rxjs';
+import { ForceDirectedGraph, Node, WhiteboardOptions } from '../../models';
+import { Subscription, delayWhen, distinctUntilChanged, filter, tap } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import { TableNodeActions } from '../node-components/table/state';
@@ -35,31 +35,28 @@ const randomTitles = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
-  @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
-
-  currentNodes!: Node[];
-
-  isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$.pipe(
-    tap((graph: ForceDirectedGraph) => {
-      this.graph = graph;
-      // Bind change detection to each graph tick o improve performance
-      this.subscriptions.add(this.graph.ticker.subscribe(() => this.changeDetectorRef.markForCheck()));
-      this.graph.initialize(this.currentNodes);
-    })
-  );
-  isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
-  webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
-
-  graph!: ForceDirectedGraph;
-
-  readonly whiteboardHtmlId = 'whiteboard';
-  private readonly options = {
+  private static readonly options: WhiteboardOptions = {
     width: window.innerWidth,
     height: window.innerHeight,
   };
 
-  protected readonly subscriptions = new Subscription();
+  @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
+  @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
+
+  whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
+    delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
+    tap((nodes: Node[]) => this.forceGraph.updateNodes(nodes)),
+    tap(() => this.whiteboardFacade.updateNodesAfterDrag())
+  );
+
+  isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
+  isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
+  webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
+
+  readonly forceGraph: ForceDirectedGraph = this.whiteboardFacade.getForceGraph(HostComponent.options);
+  readonly whiteboardHtmlId = 'whiteboard';
+
+  private readonly subscriptions = new Subscription();
 
   // Reset element selection when clicking blank space on the whiteboard
   @HostListener('pointerdown', ['$event'])
@@ -74,16 +71,20 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // Bind change detection to each graph tick to improve performance
+    this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
+    // Catch position updates caused by the graph force
     this.subscriptions.add(
-      this.whiteboardFacade.initialWhiteboardNodes$.subscribe((nodes: Node[]) => (this.currentNodes = nodes))
+      this.forceGraph.nodePositionUpdatedByForce$
+        .pipe(distinctUntilChanged())
+        .subscribe((node: Node) => this.whiteboardFacade.addNodesToUpdateAfterDrag(node))
     );
   }
 
   ngAfterViewInit() {
     this.whiteboardFacade.initializeWhiteboard(
       this.whiteboardContainerElement.nativeElement,
-      this.zoomContainerElement.nativeElement,
-      this.options
+      this.zoomContainerElement.nativeElement
     );
   }
 
@@ -99,14 +100,21 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onElementDrop(event: DragEvent) {
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+    // TODO: Use data from added element instead of hard-coded data
     this.store.dispatch(
       TableNodeActions.tableNodeAdded({
         tableElementAdded: {
           id: uuidv4(),
           type: 'table',
           title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-          layout: { x: convertedDOMPoint.x, y: convertedDOMPoint.y, width: 900, height: 500 },
+          layout: {
+            x: convertedDOMPoint.x,
+            y: convertedDOMPoint.y,
+            width: 900,
+            height: 500,
+          },
         },
+        addedManually: true,
       })
     );
   }

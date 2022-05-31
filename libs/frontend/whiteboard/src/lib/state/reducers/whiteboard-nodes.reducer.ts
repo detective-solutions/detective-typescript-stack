@@ -22,6 +22,9 @@ export const whiteboardNodesReducer = createReducer(
   on(WhiteboardActions.WhiteboardNodeAdded, (state: WhiteboardNodesState, action: any) =>
     whiteboardNodesStateAdapter.addOne(action.addedNode, state)
   ),
+  on(WhiteboardActions.WhiteboardNodeLayoutUpdate, (state: WhiteboardNodesState, action: any) =>
+    whiteboardNodesStateAdapter.updateMany(action.updates, state)
+  ),
   on(TableNodeActions.tableNodeAdded, (state: WhiteboardNodesState, action: any) =>
     whiteboardNodesStateAdapter.addOne(action.tableElementAdded, state)
   ),

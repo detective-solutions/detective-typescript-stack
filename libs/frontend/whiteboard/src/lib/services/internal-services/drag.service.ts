@@ -1,17 +1,25 @@
+import { INodeInput, Node } from '../../models';
+
+import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { Update } from '@ngrx/entity';
+import { WhiteboardActions } from '../../state/actions';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
 
 declare let window: WindowGlobals;
 
 @Injectable()
 export class DragService {
-  private dragHoldTimeout!: ReturnType<typeof setTimeout>;
-
   isMouseDown = false;
   isDraggingActivated = false;
 
-  readonly isDragging$ = new Subject<boolean>();
+  readonly isDragging$ = new BehaviorSubject<boolean>(false);
+
+  private nodesToUpdateAfterDrag: Set<Node> = new Set();
+  private dragHoldTimeout!: ReturnType<typeof setTimeout>;
+
+  constructor(private readonly store: Store) {}
 
   addDelayedDragHandling(event: Event) {
     this.isMouseDown = true;
@@ -45,5 +53,30 @@ export class DragService {
     this.isDraggingActivated = false;
     window.isDraggingActivated = false;
     document.body.style.cursor = 'default';
+  }
+
+  // TODO: Make these more general, not only referring to dragging
+  // TODO: Refactor drag service approach
+  addNodeToUpdateAfterDrag(node: Node) {
+    this.nodesToUpdateAfterDrag.add(node);
+  }
+
+  updateNodesAfterDrag() {
+    const updates: Update<INodeInput>[] = [];
+    this.nodesToUpdateAfterDrag.forEach((node: Node) =>
+      updates.push({
+        id: node.id,
+        changes: {
+          layout: {
+            x: node.x,
+            y: node.y,
+            width: node.width,
+            height: node.height,
+          },
+        },
+      })
+    );
+    this.store.dispatch(WhiteboardActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
+    this.nodesToUpdateAfterDrag.clear();
   }
 }
