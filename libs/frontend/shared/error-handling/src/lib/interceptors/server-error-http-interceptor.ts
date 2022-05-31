@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, take, throwError } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { Injectable } from '@angular/core';
@@ -31,19 +31,22 @@ export class ServerErrorHttpInterceptor implements HttpInterceptor {
       case 500:
         this.translationService
           .selectTranslate('toastMessages.byStatusCode.500', {}, ServerErrorHttpInterceptor.translationScope)
-          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+          .pipe(take(1))
+          .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
         break;
       // Service Unavailable
       case 503:
         this.translationService
           .selectTranslate('toastMessages.byStatusCode.503', {}, ServerErrorHttpInterceptor.translationScope)
-          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+          .pipe(take(1))
+          .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
         break;
       // Gateway Timeout
       case 504:
         this.translationService
           .selectTranslate('toastMessages.byStatusCode.504', {}, ServerErrorHttpInterceptor.translationScope)
-          .subscribe((translation) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+          .pipe(take(1))
+          .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
   }
 }

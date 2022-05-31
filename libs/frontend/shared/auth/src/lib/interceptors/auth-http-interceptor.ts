@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subscription, catchError, filter, of, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, of, take, tap } from 'rxjs';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
@@ -14,10 +14,10 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class AuthHttpInterceptor implements HttpInterceptor {
+  private static readonly loggingPrefix = '[AuthHttpInterceptor]';
   private static readonly translationScope = 'auth';
 
   private readonly accessTokenSubject = new BehaviorSubject<any>(null);
-  private readonly subscriptions = new Subscription();
 
   constructor(
     private readonly authService: AuthService,
@@ -50,30 +50,31 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   }
 
   isAuthorizationError(error: HttpErrorResponse, request: HttpRequest<any>): boolean {
-    return error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.baseUrl);
+    return error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.apiBaseUrl);
   }
 
   handleAuthorizationError(request: HttpRequest<any>, next: HttpHandler) {
     // Initiate token refresh if necessary
     // Explicitly exclude refresh url to prevent infinite loop
     if (this.authService.tokenRefreshNeeded() && !request.url.endsWith('refresh')) {
-      this.logger.info('Access token expired. Refreshing ...');
+      this.logger.info(`${AuthHttpInterceptor.loggingPrefix} Access token expired. Refreshing ...`);
       this.refreshTokens(request, next);
     }
     // Handle error produced by refresh route
     else if (request.url.endsWith('refresh')) {
       // Logout & redirect to login if refresh token is expired
-      this.logger.info('Refresh token expired. Logging out ...');
+      this.logger.info(`${AuthHttpInterceptor.loggingPrefix} Refresh token expired. Logging out ...`);
       this.logoutAndRedirect();
     }
     // Handle error produced by login route
     else if (request.url.endsWith('login')) {
-      this.logger.error('Invalid login credentials');
-      this.subscriptions.add(
-        this.translationService
-          .selectTranslate('toastMessages.loginFailed', {}, AuthHttpInterceptor.translationScope)
-          .subscribe((translation) => this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 }))
-      );
+      this.logger.error(`${AuthHttpInterceptor.loggingPrefix} Invalid login credentials`);
+      this.translationService
+        .selectTranslate('toastMessages.loginFailed', {}, AuthHttpInterceptor.translationScope)
+        .pipe(take(1))
+        .subscribe((translation: string) =>
+          this.toastService.showToast(translation, '', ToastType.ERROR, { duration: 3500 })
+        );
     }
     // Handle error produced by logout route
     else if (request.url.endsWith('logout')) {
@@ -91,7 +92,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
       this.authService.refreshTokens().pipe(
         tap((tokens: IAuthServerResponse) => {
           this.accessTokenSubject.next(tokens.access_token);
-          this.logger.debug('Retrying unauthorized request ...');
+          this.logger.debug(`${AuthHttpInterceptor.loggingPrefix} Retrying unauthorized request ...`);
           next.handle(this.setAuthorizationHeader(request, tokens.access_token));
         })
       );
@@ -100,7 +101,9 @@ export class AuthHttpInterceptor implements HttpInterceptor {
       this.accessTokenSubject.pipe(
         filter((accessToken) => accessToken !== null),
         take(1),
-        tap(() => this.logger.debug('Retrying queued request after token refresh ...')),
+        tap(() =>
+          this.logger.debug(`${AuthHttpInterceptor.loggingPrefix} Retrying queued request after token refresh ...`)
+        ),
         tap((accessToken) => next.handle(this.setAuthorizationHeader(request, accessToken)))
       );
     }
@@ -114,18 +117,17 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   }
 
   showExpiredLoginToast() {
-    this.logger.error('Login expired');
-    this.subscriptions.add(
-      this.translationService
-        .selectTranslate('toastMessages.loginExpired', {}, AuthHttpInterceptor.translationScope)
-        .subscribe((translation) => {
-          const toast = this.toastService.showToast(translation, 'Login', ToastType.INFO);
-          toast.onAction().subscribe(() => {
-            this.router.navigate(['/login'], {
-              queryParams: { redirectUrl: this.router.url },
-            });
+    this.logger.error(`${AuthHttpInterceptor.loggingPrefix} Login expired`);
+    this.translationService
+      .selectTranslate('toastMessages.loginExpired', {}, AuthHttpInterceptor.translationScope)
+      .pipe(take(1))
+      .subscribe((translation: string) => {
+        const toast = this.toastService.showToast(translation, 'Login', ToastType.INFO);
+        toast.onAction().subscribe(() => {
+          this.router.navigate(['/login'], {
+            queryParams: { redirectUrl: this.router.url },
           });
-        })
-    );
+        });
+      });
   }
 }
