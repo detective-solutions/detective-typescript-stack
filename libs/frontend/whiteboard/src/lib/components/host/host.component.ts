@@ -93,6 +93,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.forceGraph.simulation.stop();
     this.subscriptions.unsubscribe();
     // Make sure to reset websocket connection & whiteboard data
     this.whiteboardFacade.resetWhiteboard();
