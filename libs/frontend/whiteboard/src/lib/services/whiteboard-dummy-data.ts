@@ -17,14 +17,12 @@ export const dummyNodes: INodeInput[] = [
     id: '1',
     type: 'table',
     title: randomDummyTitles[Math.floor(Math.random() * randomDummyTitles.length)],
-    locked: false,
     layout: { x: 10, y: 100, width: 900, height: 500 },
   },
   {
     id: '2',
     type: 'table',
     title: randomDummyTitles[Math.floor(Math.random() * randomDummyTitles.length)],
-    locked: false,
     layout: { x: 1300, y: 800, width: 900, height: 500 },
   },
 ];
