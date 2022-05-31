@@ -9,6 +9,8 @@ import { quadtree as d3Quadtree } from 'd3-quadtree';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export class ForceDirectedGraph {
+  private static readonly forceCollisionPadding = 85;
+
   ticker$: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
   nodePositionUpdatedByForce$: EventEmitter<Node> = new EventEmitter();
 
@@ -86,7 +88,6 @@ export class ForceDirectedGraph {
   // }
 
   private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: Node) => void) {
-    const padding = 20;
     let nodes: Node[];
 
     function force() {
@@ -103,8 +104,8 @@ export class ForceDirectedGraph {
             let y = node.y - q.data.y;
             let l, lx, ly;
 
-            const xSpacing = padding + (q.data.width + node.width) / 2;
-            const ySpacing = padding + (q.data.height + node.height) / 2;
+            const xSpacing = ForceDirectedGraph.forceCollisionPadding + (q.data.width + node.width) / 2;
+            const ySpacing = ForceDirectedGraph.forceCollisionPadding + (q.data.height + node.height) / 2;
             const absX = Math.abs(x);
             const absY = Math.abs(y);
 
