@@ -4,9 +4,11 @@ import { map, tap } from 'rxjs';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
+import { INodeInput } from '../../../models';
 import { ITableNode } from './model';
 import { TableNodeActions } from './state';
 import { Update } from '@ngrx/entity';
+import { WhiteboardActions } from '../../../state/actions';
 import { ofType } from '@ngrx/effects';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -56,6 +58,17 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit, Aft
           };
           this.store.dispatch(TableNodeActions.tableDataReceived({ update: update }));
         })
+    );
+  }
+
+  toggleLock() {
+    this.store.dispatch(
+      WhiteboardActions.WhiteboardNodeUpdate({
+        update: {
+          id: this.node.id,
+          changes: { locked: !this.node.locked },
+        },
+      })
     );
   }
 }

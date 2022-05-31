@@ -12,6 +12,10 @@ export const whiteboardDataLoaded = createAction(
 );
 export const resetWhiteboardData = createAction(`${actionPrefix} Resetting whiteboard data`);
 export const WhiteboardNodeAdded = createAction(`${actionPrefix} Node added`, props<{ addedNode: INodeInput }>());
+export const WhiteboardNodeUpdate = createAction(
+  `${actionPrefix} Updating node`,
+  props<{ update: Update<INodeInput> }>()
+);
 export const WhiteboardNodeLayoutUpdate = createAction(
   `${actionPrefix} Updating node layout`,
   props<{ updates: Update<INodeInput>[] }>()

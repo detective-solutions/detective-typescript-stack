@@ -97,8 +97,13 @@ export class ForceDirectedGraph {
         (d: any) => d.y
       );
       for (const node of nodes) {
+        if (node.locked) {
+          continue;
+        }
+
         quadTree.visit((q: any) => {
           let updated = false;
+
           if (q.data && q.data !== node) {
             let x = node.x - q.data.x;
             let y = node.y - q.data.y;
@@ -123,8 +128,6 @@ export class ForceDirectedGraph {
 
               node.x -= x *= lx / 2;
               node.y -= y *= ly / 2;
-              q.data.x += x / 2;
-              q.data.x += x / 2;
 
               nodePositionCallback(node);
               updated = true;

@@ -28,7 +28,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
-import { TableActionsMenuComponent } from './components/node-components/table/components';
 import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
@@ -51,7 +50,6 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     SidebarComponent,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
-    TableActionsMenuComponent,
     TestLinkComponent,
     TableNodeComponent,
     IFrameTrackerDirective,
