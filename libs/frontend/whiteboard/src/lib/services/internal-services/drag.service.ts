@@ -16,7 +16,7 @@ export class DragService {
 
   readonly isDragging$ = new BehaviorSubject<boolean>(false);
 
-  private nodesToUpdateAfterDrag: Set<Node> = new Set();
+  private nodeLayoutUpdateBuffer: Set<Node> = new Set();
   private dragHoldTimeout!: ReturnType<typeof setTimeout>;
 
   constructor(private readonly store: Store) {}
@@ -55,15 +55,14 @@ export class DragService {
     document.body.style.cursor = 'default';
   }
 
-  // TODO: Make these more general, not only referring to dragging
   // TODO: Refactor drag service approach
-  addNodeToUpdateAfterDrag(node: Node) {
-    this.nodesToUpdateAfterDrag.add(node);
+  addToNodeLayoutUpdateBuffer(node: Node) {
+    this.nodeLayoutUpdateBuffer.add(node);
   }
 
-  updateNodesAfterDrag() {
+  updateNodeLayoutsFromBuffer() {
     const updates: Update<INodeInput>[] = [];
-    this.nodesToUpdateAfterDrag.forEach((node: Node) =>
+    this.nodeLayoutUpdateBuffer.forEach((node: Node) =>
       updates.push({
         id: node.id,
         changes: {
@@ -77,6 +76,6 @@ export class DragService {
       })
     );
     this.store.dispatch(WhiteboardActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
-    this.nodesToUpdateAfterDrag.clear();
+    this.nodeLayoutUpdateBuffer.clear();
   }
 }

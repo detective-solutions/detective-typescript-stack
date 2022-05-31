@@ -90,8 +90,8 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          dragServiceRef.addNodeToUpdateAfterDrag(nodeToUpdate);
-          dragServiceRef.updateNodesAfterDrag();
+          dragServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
+          dragServiceRef.updateNodeLayoutsFromBuffer();
         }
       }
     }

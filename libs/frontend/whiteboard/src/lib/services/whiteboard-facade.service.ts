@@ -87,12 +87,12 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addNodesToUpdateAfterDrag(node: Node) {
-    this.dragService.addNodeToUpdateAfterDrag(node);
+  addToNodeLayoutUpdateBuffer(node: Node) {
+    this.dragService.addToNodeLayoutUpdateBuffer(node);
   }
 
-  updateNodesAfterDrag() {
-    this.dragService.updateNodesAfterDrag();
+  updateNodeLayoutsFromBuffer() {
+    this.dragService.updateNodeLayoutsFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

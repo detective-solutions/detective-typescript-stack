@@ -44,9 +44,12 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
 
   whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
+    // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
+    // Update underlying graph nodes
     tap((nodes: Node[]) => this.forceGraph.updateNodes(nodes)),
-    tap(() => this.whiteboardFacade.updateNodesAfterDrag())
+    // Update layouts for nodes moved by graph force
+    tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
   );
 
   isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
@@ -71,13 +74,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Bind change detection to each graph tick to improve performance
+    // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
-    // Catch position updates caused by the graph force
+
+    // Handle position updates caused by the graph force
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$
         .pipe(distinctUntilChanged())
-        .subscribe((node: Node) => this.whiteboardFacade.addNodesToUpdateAfterDrag(node))
+        .subscribe((node: Node) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
     );
   }
 
