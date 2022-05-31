@@ -1,4 +1,4 @@
-import { Simulation, forceCenter as d3ForceCenter, forceSimulation as d3ForceSimulation } from 'd3-force';
+import { Simulation, forceSimulation as d3ForceSimulation } from 'd3-force';
 
 import { EventEmitter } from '@angular/core';
 import { Link } from '../link';
@@ -24,29 +24,20 @@ export class ForceDirectedGraph {
     }
     this.options = options;
 
-    const ticker = this.ticker$; // Make ticker available in function context
     this.simulation = d3ForceSimulation().force(
       'collision',
       this.rectCollide((nodeWithUpdatedPosition: Node) =>
         this.nodePositionUpdatedByForce$.emit(nodeWithUpdatedPosition)
       )
     );
-    // Connecting the d3 ticker to an Angular event emitter
+
+    // Make ticker available in callback function context
+    const ticker = this.ticker$;
+    // Connect d3 ticker to an Angular event emitter
     this.simulation.on('tick', function () {
       ticker.emit(this);
     });
   }
-
-  // connectNodes(source: any, target: any) {
-  //   if (!this.nodes[source] || !this.nodes[target]) {
-  //     throw new Error('One of the nodes does not exist');
-  //   }
-  //   const link = new Link(source, target);
-  //   this.simulation.stop();
-  //   this.links.push(link);
-  //   this.simulation.alpha(0.01).restart();
-  //   this.updateLinks();
-  // }
 
   updateNodes(nodes: Node[]) {
     if (!this.simulation) {
@@ -57,6 +48,7 @@ export class ForceDirectedGraph {
     this.simulation.alphaTarget(0.1).restart();
   }
 
+  // TODO: Reactivate when implementing links
   // private updateLinks() {
   //   if (!this.simulation) {
   //     throw new Error('Simulation was not initialized yet');
@@ -70,20 +62,32 @@ export class ForceDirectedGraph {
   //   this.simulation.alphaTarget(1).restart();
   // }
 
-  private addCenterForce() {
-    // TODO: Allow elements to be dropped at the rights coordinates when center force is activated
-    // Adjust center of the viewport while dragging elements
-    this.simulation.force('centers', d3ForceCenter(this.options.width, this.options.height));
-    this.simulation.restart();
-  }
+  // connectNodes(source: any, target: any) {
+  //   if (!this.nodes[source] || !this.nodes[target]) {
+  //     throw new Error('One of the nodes does not exist');
+  //   }
+  //   const link = new Link(source, target);
+  //   this.simulation.stop();
+  //   this.links.push(link);
+  //   this.simulation.alpha(0.01).restart();
+  //   this.updateLinks();
+  // }
 
-  private removeCenterForce() {
-    this.simulation.force('centers', null);
-  }
+  // TODO: Allow elements to be dropped at the rights coordinates when center force is activated
+  // TODO: Reactivate when done
+  // private addCenterForce() {
+  //   // Adjust center of the viewport while dragging elements
+  //   this.simulation.force('centers', d3ForceCenter(this.options.width, this.options.height));
+  //   this.simulation.restart();
+  // }
+
+  // private removeCenterForce() {
+  //   this.simulation.force('centers', null);
+  // }
 
   private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: Node) => void) {
     const padding = 20;
-    let nodes: any;
+    let nodes: Node[];
 
     function force() {
       const quadTree = d3Quadtree(
