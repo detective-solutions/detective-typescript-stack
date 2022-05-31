@@ -1,7 +1,7 @@
 import { Actions, ofType } from '@ngrx/effects';
 import { D3AdapterService, DragService, WebSocketService, WhiteboardSelectionService } from './internal-services';
 import { ForceDirectedGraph, INodeInput, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
-import { Observable, combineLatest, filter, map, of } from 'rxjs';
+import { Observable, combineLatest, map, of } from 'rxjs';
 
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
@@ -12,16 +12,10 @@ import { selectWhiteboardNodes } from '../state/selectors';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
-/* eslint-disable ngrx/avoid-mapping-selectors */ // TODO: Check how to map in selectors
 
 @Injectable()
 export class WhiteboardFacadeService {
-  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectWhiteboardNodes).pipe(
-    filter((entities) => !!entities),
-    map((entities) => Object.values(entities) as any),
-    map((nodeInputs: INodeInput[]) => nodeInputs.map(Node.Build)) // TODO: Move this to selector function
-  );
-
+  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectWhiteboardNodes);
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
