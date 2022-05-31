@@ -178,7 +178,7 @@ export class WebSocketService implements OnDestroy {
   }
 
   private startRefreshTokenTimer() {
-    const refreshToken = JSON.parse(atob(this.authService.getRefreshToken().split('.')[1] ?? ''));
+    const refreshToken = JSON.parse(atob(this.authService.getRefreshToken().split('.')[1]));
     if (!refreshToken) {
       throw new Error('Could not get refresh token to start token timer!');
     }
