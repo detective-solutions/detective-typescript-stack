@@ -10,7 +10,6 @@ import { WhiteboardActions } from '../state/actions';
 import { dummyNodes } from './whiteboard-dummy-data';
 import { selectWhiteboardNodes } from '../state/selectors';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
 
 @Injectable()
