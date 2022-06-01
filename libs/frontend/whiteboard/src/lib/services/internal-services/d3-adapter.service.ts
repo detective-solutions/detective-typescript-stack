@@ -79,6 +79,7 @@ export class D3AdapterService {
         deltaY = nodeToUpdate.y - dragStartEvent.y;
       }
 
+      bufferServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
       dragStartEvent.on('drag', OnDrag).on('end', OnDragEnd);
 
       function OnDrag(dragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
@@ -97,7 +98,6 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          bufferServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
           bufferServiceRef.updateNodeLayoutsFromBuffer();
         }
       }
