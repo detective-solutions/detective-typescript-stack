@@ -20,8 +20,13 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 export class WebSocketService implements OnDestroy {
   private static readonly loggingPrefix = '[WebSocket Service]';
 
-  private currentWebSocket$!: RxWebSocketWrapperSubject<any>; // Need to declare it here, so it can be accessed afterwards
   private readonly webSocketSubject$ = new Subject(); // Need to declare it here, so it can be accessed afterwards
+  private currentWebSocket$!: RxWebSocketWrapperSubject<any>; // Need to declare it here, so it can be accessed afterwards
+  private isFirstConnection = true;
+  private currentToast!: MatSnackBarRef<TextOnlySnackBar>;
+  private refreshTokenTimeout!: number;
+  private subscriptions!: Subscription;
+
   readonly webSocket$ = this.webSocketSubject$.pipe(
     switchMap(() => this.currentWebSocket$),
     catchError(() => {
@@ -29,14 +34,8 @@ export class WebSocketService implements OnDestroy {
       return throwError(() => new Error(' '));
     })
   );
-
   readonly isConnectedToWebSocketServer$ = new Subject<boolean>();
   readonly webSocketConnectionFailedEventually$ = new Subject<boolean>();
-
-  private isFirstConnection = true;
-  private currentToast!: MatSnackBarRef<TextOnlySnackBar>;
-  private refreshTokenTimeout!: number;
-  private subscriptions!: Subscription;
 
   get websocketUrl() {
     return `${environment.webSocketBaseUrl}/?token=${this.authService.getAccessToken()}`;

@@ -7,7 +7,7 @@ import { WhiteboardActions } from '../../state/actions';
 
 @Injectable()
 export class BufferService {
-  private nodeLayoutUpdateBuffer: Set<Node> = new Set();
+  private readonly nodeLayoutUpdateBuffer: Set<Node> = new Set();
 
   constructor(private readonly store: Store) {}
 

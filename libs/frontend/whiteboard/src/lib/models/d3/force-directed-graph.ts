@@ -11,14 +11,14 @@ import { quadtree as d3Quadtree } from 'd3-quadtree';
 export class ForceDirectedGraph {
   private static readonly forceCollisionPadding = 85;
 
-  ticker$: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
-  nodePositionUpdatedByForce$: EventEmitter<Node> = new EventEmitter();
-
-  simulation!: Simulation<any, any>;
-
   private nodes: Node[] = [];
   private options: { width: number; height: number };
   // private readonly linkForceStrength = 1 / 80;
+
+  readonly ticker$: EventEmitter<Simulation<Node, Link>> = new EventEmitter();
+  readonly nodePositionUpdatedByForce$: EventEmitter<Node> = new EventEmitter();
+
+  simulation!: Simulation<any, any>;
 
   constructor(options: WhiteboardOptions) {
     if (!options || !options.width || !options.height) {

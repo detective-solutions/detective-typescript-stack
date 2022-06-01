@@ -14,6 +14,7 @@ export const selectWhiteboardNodes = createSelector(
   selectWhiteboardEntities,
   (entities: Dictionary<WhiteboardNodesState>) => {
     if (Object.keys(entities).length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (Object.values(entities as any) as INodeInput[]).map(Node.Build);
     }
     return [];

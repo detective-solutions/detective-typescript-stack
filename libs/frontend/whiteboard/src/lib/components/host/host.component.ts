@@ -43,7 +43,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
 
-  whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
+  readonly whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
     // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
     // Update underlying graph nodes
@@ -51,16 +51,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Update layouts for nodes moved by graph force
     tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
   );
-
-  isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
-  isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
-  webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
-
+  readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
+  readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
+  readonly webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
   readonly forceGraph: ForceDirectedGraph = this.whiteboardFacade.getForceGraph(HostComponent.options);
   readonly whiteboardHtmlId = 'whiteboard';
 
   private readonly subscriptions = new Subscription();
-
   // Reset element selection when clicking blank space on the whiteboard
   @HostListener('pointerdown', ['$event'])
   private resetElementSelection(event: PointerEvent) {

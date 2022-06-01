@@ -4,7 +4,6 @@ import { map, tap } from 'rxjs';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
-import { INodeInput } from '../../../models';
 import { ITableNode } from './model';
 import { TableNodeActions } from './state';
 import { Update } from '@ngrx/entity';
@@ -20,7 +19,7 @@ import { ofType } from '@ngrx/effects';
   encapsulation: ViewEncapsulation.None,
 })
 export class TableNodeComponent extends BaseNodeComponent implements OnInit, AfterViewInit {
-  gridOptions: GridOptions = {
+  readonly gridOptions: GridOptions = {
     loadingOverlayComponent: CustomLoadingOverlayComponent,
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
