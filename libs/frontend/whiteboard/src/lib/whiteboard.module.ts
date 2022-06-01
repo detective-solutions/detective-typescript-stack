@@ -1,4 +1,5 @@
 import {
+  BufferService,
   D3AdapterService,
   DragService,
   WebSocketService,
@@ -57,10 +58,11 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
   ],
   providers: [
     WhiteboardFacadeService,
-    WhiteboardSelectionService,
+    BufferService,
     D3AdapterService,
-    WebSocketService,
     DragService,
+    WebSocketService,
+    WhiteboardSelectionService,
     KeyboardService,
     {
       provide: TRANSLOCO_SCOPE,

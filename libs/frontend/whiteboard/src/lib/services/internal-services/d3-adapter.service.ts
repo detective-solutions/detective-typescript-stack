@@ -2,6 +2,7 @@ import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
 import { ForceDirectedGraph, Node, WhiteboardOptions } from '../../models';
 
+import { BufferService } from './buffer.service';
 import { DragService } from './drag.service';
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
@@ -13,7 +14,7 @@ declare let window: WindowGlobals;
 
 @Injectable()
 export class D3AdapterService {
-  constructor(private readonly dragService: DragService) {}
+  constructor(private readonly dragService: DragService, private readonly bufferService: BufferService) {}
 
   getForceDirectedGraph(options: WhiteboardOptions) {
     return new ForceDirectedGraph(options);
@@ -59,6 +60,7 @@ export class D3AdapterService {
   applyDragBehavior(elementToDrag: Element, nodeToUpdate: Node) {
     const d3element = d3Select(elementToDrag);
     const dragServiceRef = this.dragService;
+    const bufferServiceRef = this.bufferService;
 
     function onDragStart(dragStartEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
       // Continue dragging only on allowed target elements
@@ -95,8 +97,8 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          dragServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
-          dragServiceRef.updateNodeLayoutsFromBuffer();
+          bufferServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
+          bufferServiceRef.updateNodeLayoutsFromBuffer();
         }
       }
     }

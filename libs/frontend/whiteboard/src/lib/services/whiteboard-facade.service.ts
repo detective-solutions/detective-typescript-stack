@@ -1,5 +1,11 @@
 import { Actions, ofType } from '@ngrx/effects';
-import { D3AdapterService, DragService, WebSocketService, WhiteboardSelectionService } from './internal-services';
+import {
+  BufferService,
+  D3AdapterService,
+  DragService,
+  WebSocketService,
+  WhiteboardSelectionService,
+} from './internal-services';
 import { ForceDirectedGraph, INodeInput, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 
@@ -33,8 +39,8 @@ export class WhiteboardFacadeService {
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
 
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
-    this.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
-    this.establishWebsocketConnection();
+    this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
+    this.webSocketService.establishWebsocketConnection();
     this.store.dispatch(WhiteboardActions.loadWhiteboardData());
 
     // TODO: Remove these mocked data when action is triggered by backend response
@@ -44,11 +50,7 @@ export class WhiteboardFacadeService {
   }
 
   getForceGraph(options: WhiteboardOptions): ForceDirectedGraph {
-    return this.getForceDirectedGraph(options);
-  }
-
-  applyDragBehaviorToComponent(component: NodeComponent) {
-    this.d3AdapterServe.applyDragBehavior(component.elementRef.nativeElement, component.node);
+    return this.d3AdapterService.getForceDirectedGraph(options);
   }
 
   resetWhiteboard() {
@@ -68,6 +70,10 @@ export class WhiteboardFacadeService {
     this.whiteboardSelectionService.resetSelection();
   }
 
+  applyDragBehaviorToComponent(component: NodeComponent) {
+    this.d3AdapterService.applyDragBehavior(component.elementRef.nativeElement, component.node);
+  }
+
   activateDragging() {
     this.dragService.activateDragging();
   }
@@ -81,35 +87,24 @@ export class WhiteboardFacadeService {
   }
 
   addToNodeLayoutUpdateBuffer(node: Node) {
-    this.dragService.addToNodeLayoutUpdateBuffer(node);
+    this.bufferService.addToNodeLayoutUpdateBuffer(node);
   }
 
   updateNodeLayoutsFromBuffer() {
-    this.dragService.updateNodeLayoutsFromBuffer();
+    this.bufferService.updateNodeLayoutsFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {
     this.webSocketService.publishMessage(message);
   }
 
-  private establishWebsocketConnection() {
-    this.webSocketService.establishWebsocketConnection();
-  }
-
-  private getForceDirectedGraph(whiteboardOptions: WhiteboardOptions): ForceDirectedGraph {
-    return this.d3AdapterServe.getForceDirectedGraph(whiteboardOptions);
-  }
-
-  private applyZoomBehavior(whiteboardContainerElement: Element, zoomContainerElement: Element) {
-    this.d3AdapterServe.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
-  }
-
   constructor(
     private readonly store: Store,
     private readonly actions$: Actions,
+    private readonly bufferService: BufferService,
+    private readonly d3AdapterService: D3AdapterService,
     private readonly dragService: DragService,
-    private readonly d3AdapterServe: D3AdapterService,
-    private readonly whiteboardSelectionService: WhiteboardSelectionService,
-    private readonly webSocketService: WebSocketService
+    private readonly webSocketService: WebSocketService,
+    private readonly whiteboardSelectionService: WhiteboardSelectionService
   ) {}
 }
