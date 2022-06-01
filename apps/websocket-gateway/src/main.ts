@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app));
 
   await app.listen();
-  Logger.log('🚀 Application is running');
+  Logger.log('🚀 Application is running'); // TODO: App port info from env into log message
 }
 
 bootstrap();

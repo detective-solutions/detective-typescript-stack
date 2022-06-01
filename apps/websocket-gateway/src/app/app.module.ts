@@ -1,9 +1,9 @@
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
-import { KafkaAdapterModule } from './kafka-adapter/kafka-adapter.module';
 import { Module } from '@nestjs/common';
-import { MouseMirrorModule } from './mouse-mirror/mouse-mirror.module';
+import { WhiteboardConsumer } from './kafka/whiteboard.consumer';
+import { WhiteboardProducer } from './kafka/whiteboard.producer';
+import { WhiteboardWebSocketGateway } from './websocket/whiteboard-websocket.gateway';
 import { defaultEnvConfig } from './default-env.config';
 
 @Module({
@@ -13,10 +13,9 @@ import { defaultEnvConfig } from './default-env.config';
       cache: true,
       validationSchema: defaultEnvConfig,
     }),
-    KafkaAdapterModule,
-    MouseMirrorModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [WhiteboardConsumer],
+  providers: [WhiteboardProducer, WhiteboardWebSocketGateway],
 })
 export class AppModule {}
