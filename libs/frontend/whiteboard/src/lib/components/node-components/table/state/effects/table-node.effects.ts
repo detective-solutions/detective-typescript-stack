@@ -24,11 +24,21 @@ export class TableNodeEffects {
           this.whiteboardFacade.sendWebsocketMessage({
             event: TableEvents.QueryTable,
             data: {
-              case: '90d404c5-9d20-11ec-83f2-287fc999439d',
-              query_type: 'general',
-              query: ['SELECT emp_no, first_name, last_name FROM employees LIMIT 100'],
-              source: ['99o404c5-9d20-11ec-83f2-287fcf6e439d'],
-              groups: ['4e45ac4b-9d18-11ec-8804-287fcf6e439d'],
+              context: {
+                tenantId: '1',
+                casefileId: '2',
+                userId: '3',
+                userRole: 'ADMIN',
+                nodeId: 'node',
+                timestamp: '',
+              },
+              body: {
+                case: '90d404c5-9d20-11ec-83f2-287fc999439d',
+                query_type: 'general',
+                query: ['SELECT emp_no, first_name, last_name FROM employees LIMIT 100'],
+                source: ['99o404c5-9d20-11ec-83f2-287fcf6e439d'],
+                groups: ['4e45ac4b-9d18-11ec-8804-287fcf6e439d'],
+              },
             },
           })
         )
