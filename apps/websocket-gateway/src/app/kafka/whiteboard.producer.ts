@@ -1,12 +1,15 @@
 import { Client, ClientKafka, Transport } from '@nestjs/microservices';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { Injectable } from '@nestjs/common';
-import { Message } from '../models';
+import { IMessage } from '@detective.solutions/shared/data-access';
+import { buildLogContext } from '../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
 export class WhiteboardProducer {
+  private readonly logger = new Logger(WhiteboardProducer.name);
+
   @Client({
     transport: Transport.KAFKA,
     options: {
@@ -15,8 +18,10 @@ export class WhiteboardProducer {
   })
   client: ClientKafka;
 
-  sendKafkaMessage(topicName: string, payload: Message<any>) {
-    // TODO: Add logging according to standard layout (incl. context etc.)
+  sendKafkaMessage(topicName: string, payload: IMessage<any>) {
+    this.logger.log(`${buildLogContext(payload.context)} - Forwarding Kafka message to topic: ${topicName}`);
+    this.logger.debug(payload.body);
+
     this.client.emit(topicName, payload);
   }
 }
