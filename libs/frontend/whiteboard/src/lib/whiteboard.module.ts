@@ -24,6 +24,7 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { TableNodeEffects } from './components/node-components/table/state';
 import { WHITEBOARD_STORE_NAME } from './state';
+import { WhiteboardContextResolver } from './resolvers';
 import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardMetadataEffects } from './state/effects';
@@ -53,6 +54,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     DynamicNodeGeneratorDirective,
   ],
   providers: [
+    WhiteboardContextResolver,
     WhiteboardFacadeService,
     BufferService,
     D3AdapterService,
