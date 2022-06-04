@@ -12,19 +12,19 @@ import { Observable, combineLatest, map, of } from 'rxjs';
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { WhiteboardActions } from '../state/actions';
+import { WhiteboardNodeActions } from '../state/actions';
 import { dummyNodes } from './whiteboard-dummy-data';
-import { selectWhiteboardNodes } from '../state/selectors';
+import { selectAllWhiteboardNodes } from '../state/selectors';
 
 /* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
 
 @Injectable()
 export class WhiteboardFacadeService {
-  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectWhiteboardNodes);
+  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectAllWhiteboardNodes);
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
-    this.actions$.pipe(ofType(WhiteboardActions.whiteboardDataLoaded)),
+    this.actions$.pipe(ofType(WhiteboardNodeActions.whiteboardDataLoaded)),
     this.webSocketService.isConnectedToWebSocketServer$,
   ]).pipe(
     map(
@@ -41,11 +41,11 @@ export class WhiteboardFacadeService {
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
-    this.store.dispatch(WhiteboardActions.loadWhiteboardData());
+    this.store.dispatch(WhiteboardNodeActions.loadWhiteboardData());
 
     // TODO: Remove these mocked data when action is triggered by backend response
     setTimeout(() => {
-      this.store.dispatch(WhiteboardActions.whiteboardDataLoaded({ nodes: dummyNodes }));
+      this.store.dispatch(WhiteboardNodeActions.whiteboardDataLoaded({ nodes: dummyNodes }));
     }, 500);
   }
 
@@ -55,11 +55,11 @@ export class WhiteboardFacadeService {
 
   resetWhiteboard() {
     this.webSocketService.resetWebsocketConnection();
-    this.store.dispatch(WhiteboardActions.resetWhiteboardData());
+    this.store.dispatch(WhiteboardNodeActions.resetWhiteboardData());
   }
 
   addElementToWhiteboard(elementToAdd: INodeInput) {
-    this.store.dispatch(WhiteboardActions.WhiteboardNodeAdded({ addedNode: elementToAdd }));
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeAdded({ addedNode: elementToAdd }));
   }
 
   addSelectedElement(selectedElementComponent: NodeComponent) {
