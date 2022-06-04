@@ -1,2 +1,1 @@
-export const NODES_STORE_NAME = 'whiteboardNodes';
-export const METADATA_STORE_NAME = 'whiteboardMetadata';
+export const WHITEBOARD_STORE_NAME = 'whiteboard';

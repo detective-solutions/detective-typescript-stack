@@ -3,7 +3,7 @@ import { createAction, props } from '@ngrx/store';
 import { INodeInput } from '../../models';
 import { Update } from '@ngrx/entity';
 
-const actionPrefix = '[Whiteboard]';
+const actionPrefix = '[Whiteboard Nodes]';
 
 export const loadWhiteboardData = createAction(`${actionPrefix} Loading whiteboard data`);
 export const whiteboardDataLoaded = createAction(

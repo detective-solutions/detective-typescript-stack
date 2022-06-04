@@ -1,4 +1,6 @@
 import { createAction } from '@ngrx/store';
 
-export const whiteboardTitleChanged = createAction('[WhiteboardMetadata] Title changed');
-export const whiteboardDescriptionChanged = createAction('[WhiteboardMetadata] Description changed');
+const actionPrefix = '[Whiteboard Metadata]';
+
+export const whiteboardTitleChanged = createAction(`${actionPrefix} Title changed`);
+export const whiteboardDescriptionChanged = createAction(`${actionPrefix} Description changed`);

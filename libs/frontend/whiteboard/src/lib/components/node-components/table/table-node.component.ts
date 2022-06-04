@@ -7,7 +7,7 @@ import { GridOptions } from 'ag-grid-community';
 import { ITableNode } from './model';
 import { TableNodeActions } from './state';
 import { Update } from '@ngrx/entity';
-import { WhiteboardActions } from '../../../state/actions';
+import { WhiteboardNodeActions } from '../../../state';
 import { ofType } from '@ngrx/effects';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -62,7 +62,7 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit, Aft
 
   toggleLock() {
     this.store.dispatch(
-      WhiteboardActions.WhiteboardNodeUpdate({
+      WhiteboardNodeActions.WhiteboardNodeUpdate({
         update: {
           id: this.node.id,
           changes: { locked: !this.node.locked },

@@ -1,1 +1,2 @@
-export * from './whiteboard-nodes.selector';
+export * from './whiteboard-node.selector';
+export * from './whiteboard-selector';

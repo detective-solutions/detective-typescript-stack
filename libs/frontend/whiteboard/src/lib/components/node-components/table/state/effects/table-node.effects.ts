@@ -2,7 +2,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 
 import { Injectable } from '@angular/core';
 import { TableEvents } from '../../model';
-import { TableNodeActions } from '../actions/table-node-action.types';
+import { TableNodeActions } from '../actions';
 import { WhiteboardFacadeService } from '../../../../../services';
 import { tap } from 'rxjs';
 

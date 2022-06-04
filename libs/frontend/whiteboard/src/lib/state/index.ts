@@ -1,3 +1,2 @@
-export * from './effects/index';
-export * from './reducers/index';
+export * from './actions';
 export * from './state-constants';
