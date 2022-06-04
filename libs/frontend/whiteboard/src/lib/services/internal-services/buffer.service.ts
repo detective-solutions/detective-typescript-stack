@@ -3,7 +3,7 @@ import { INodeInput, Node } from '../../models';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
-import { WhiteboardActions } from '../../state/actions';
+import { WhiteboardNodeActions } from '../../state';
 
 @Injectable()
 export class BufferService {
@@ -30,7 +30,7 @@ export class BufferService {
         },
       })
     );
-    this.store.dispatch(WhiteboardActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
     this.nodeLayoutUpdateBuffer.clear();
   }
 }
