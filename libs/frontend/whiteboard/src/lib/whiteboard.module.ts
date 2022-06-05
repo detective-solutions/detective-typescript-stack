@@ -15,6 +15,7 @@ import {
   TestLinkComponent,
 } from './components';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { WHITEBOARD_STORE_NAME, WhiteboardMetadataEffects, WhiteboardNodeEffects } from './state';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
@@ -23,11 +24,9 @@ import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { TableNodeEffects } from './components/node-components/table/state';
-import { WHITEBOARD_STORE_NAME } from './state';
 import { WhiteboardContextResolver } from './resolvers';
 import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
-import { WhiteboardMetadataEffects } from './state/effects';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 // Has to be imported from a separate folder to allow webpack bootstrapping
@@ -40,7 +39,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardRoutingModule,
     TranslocoModule,
     StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
-    EffectsModule.forFeature([WhiteboardMetadataEffects, TableNodeEffects]),
+    EffectsModule.forFeature([WhiteboardMetadataEffects, WhiteboardNodeEffects, TableNodeEffects]),
     WhiteboardMaterialModule,
   ],
   declarations: [

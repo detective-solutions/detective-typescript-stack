@@ -6,15 +6,14 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
-import { ForceDirectedGraph, INodeInput, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
+import { ForceDirectedGraph, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
+import { WhiteboardNodeActions, selectAllWhiteboardNodes } from '../state';
 
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { WhiteboardNodeActions } from '../state/actions';
 import { dummyNodes } from './whiteboard-dummy-data';
-import { selectAllWhiteboardNodes } from '../state/selectors';
 
 /* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
 
@@ -56,10 +55,6 @@ export class WhiteboardFacadeService {
   resetWhiteboard() {
     this.webSocketService.resetWebsocketConnection();
     this.store.dispatch(WhiteboardNodeActions.resetWhiteboardData());
-  }
-
-  addElementToWhiteboard(elementToAdd: INodeInput) {
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeAdded({ addedNode: elementToAdd }));
   }
 
   addSelectedElement(selectedElementComponent: NodeComponent) {

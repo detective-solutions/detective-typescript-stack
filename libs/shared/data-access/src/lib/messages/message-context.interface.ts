@@ -4,5 +4,5 @@ export interface IMessageContext {
   userId: string;
   userRole: string;
   nodeId: string;
-  timestamp: string;
+  timestamp: number;
 }

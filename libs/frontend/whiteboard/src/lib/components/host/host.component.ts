@@ -9,12 +9,12 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ForceDirectedGraph, Node, WhiteboardOptions } from '../../models';
+import { ForceDirectedGraph, Node, NodeType, WhiteboardOptions } from '../../models';
 import { Subscription, delayWhen, distinctUntilChanged, filter, tap } from 'rxjs';
 
 import { Store } from '@ngrx/store';
-import { TableNodeActions } from '../node-components/table/state';
 import { WhiteboardFacadeService } from '../../services';
+import { WhiteboardNodeActions } from '../../state';
 import { v4 as uuidv4 } from 'uuid';
 
 // TODO: Remove these when actual node data is loaded
@@ -104,10 +104,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
     // TODO: Use data from added element instead of hard-coded data
     this.store.dispatch(
-      TableNodeActions.tableNodeAdded({
-        tableElementAdded: {
+      WhiteboardNodeActions.WhiteboardNodeAdded({
+        addedNode: {
           id: uuidv4(),
-          type: 'table',
+          type: NodeType.TABLE,
           title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
           layout: {
             x: convertedDOMPoint.x,
