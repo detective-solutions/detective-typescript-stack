@@ -1,21 +1,21 @@
 {
-  "projectType": "library",
   "root": "libs/frontend/whiteboard",
   "sourceRoot": "libs/frontend/whiteboard/src",
-  "prefix": "detective.solutions",
+  "projectType": "library",
   "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/whiteboard/src/**/*.ts", "libs/frontend/whiteboard/src/**/*.html"]
+      }
+    },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/frontend/whiteboard"],
       "options": {
         "jestConfig": "libs/frontend/whiteboard/jest.config.js",
         "passWithNoTests": true
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "options": {
-        "lintFilePatterns": ["libs/frontend/whiteboard/src/**/*.ts", "libs/frontend/whiteboard/src/**/*.html"]
       }
     }
   },
