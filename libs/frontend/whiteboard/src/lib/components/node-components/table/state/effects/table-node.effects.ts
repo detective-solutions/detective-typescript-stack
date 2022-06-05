@@ -1,9 +1,9 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { IQueryMessagePayload, QueryType, TableEvents } from '../../model';
+import { IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
+import { IQueryMessagePayload, QueryType } from '../../model';
 import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../../../state';
 import { combineLatest, filter, of, switchMap, tap } from 'rxjs';
 
-import { IMessageContext } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 import { NodeType } from '../../../../../models';
 import { Store } from '@ngrx/store';
@@ -19,7 +19,7 @@ export class TableNodeEffects {
         switchMap((action) => combineLatest([this.store.select(selectWhiteboardContextState), of(action)])),
         tap(([context, action]) =>
           this.whiteboardFacade.sendWebsocketMessage({
-            event: TableEvents.QueryTable,
+            event: MessageEventType.QueryTable,
             data: {
               context: { nodeId: action.addedNode.id, ...context } as IMessageContext,
               body: {

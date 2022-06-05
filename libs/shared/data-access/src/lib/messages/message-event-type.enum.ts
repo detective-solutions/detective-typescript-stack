@@ -1,3 +1,3 @@
-export enum TableEvents {
+export enum MessageEventType {
   QueryTable = 'QUERY_TABLE',
 }

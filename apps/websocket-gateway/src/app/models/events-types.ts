@@ -1,3 +1,5 @@
+import { MessageEventType } from '@detective.solutions/shared/data-access';
+
 export const EventTypes = {
-  queryTable: { type: 'QUERY_TABLE', targetTopic: 'masking' },
+  queryTable: { type: MessageEventType.QueryTable, targetTopic: 'masking' },
 };
