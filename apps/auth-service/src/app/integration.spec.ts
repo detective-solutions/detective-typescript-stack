@@ -21,6 +21,7 @@ beforeAll(async () => {
   process.env.NODE_ENV = 'production';
   process.env.ACCESS_TOKEN_SECRET = 'accessTokenSecret';
   process.env.REFRESH_TOKEN_SECRET = 'refreshTokenSecret';
+  process.env.SERVER_PORT = '7777';
   process.env.DATABASE_GRPC_SERVICE_NAME = 'db-service-name';
   process.env.DATABASE_GRPC_PORT = '8090';
 
