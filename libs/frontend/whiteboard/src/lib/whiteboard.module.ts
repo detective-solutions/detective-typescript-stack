@@ -1,4 +1,10 @@
-import { D3Service, DragService, WebsocketService, WhiteboardService } from './services';
+import {
+  BufferService,
+  D3AdapterService,
+  DragService,
+  WebSocketService,
+  WhiteboardSelectionService,
+} from './services/internal-services';
 import { DynamicNodeGeneratorDirective, IFrameTrackerDirective } from './directives';
 import {
   HostComponent,
@@ -8,13 +14,8 @@ import {
   TableNodeComponent,
   TestLinkComponent,
 } from './components';
-import {
-  METADATA_STORE_NAME,
-  NODES_STORE_NAME,
-  WhiteboardEffects,
-  whiteboardMetadataReducer,
-  whiteboardNodesReducer,
-} from './state';
+import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { WHITEBOARD_STORE_NAME, WhiteboardMetadataEffects, WhiteboardNodeEffects } from './state';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
@@ -22,18 +23,23 @@ import { EffectsModule } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
-import { TableActionsMenuComponent } from './components/node-components/table/components';
+import { TableNodeEffects } from './components/node-components/table/state';
+import { WhiteboardContextResolver } from './resolvers';
+import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
+import { langScopeLoader } from '@detective.solutions/shared/i18n';
+// Has to be imported from a separate folder to allow webpack bootstrapping
+import { whiteboardFeatureReducers } from './state/reducers';
 
 @NgModule({
   imports: [
     CommonModule,
     AgGridModule,
     WhiteboardRoutingModule,
-    EffectsModule.forFeature([WhiteboardEffects]),
-    StoreModule.forFeature(NODES_STORE_NAME, whiteboardNodesReducer),
-    StoreModule.forFeature(METADATA_STORE_NAME, whiteboardMetadataReducer),
+    TranslocoModule,
+    StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
+    EffectsModule.forFeature([WhiteboardMetadataEffects, WhiteboardNodeEffects, TableNodeEffects]),
     WhiteboardMaterialModule,
   ],
   declarations: [
@@ -41,12 +47,27 @@ import { WhiteboardRoutingModule } from './whiteboard-routing.module';
     SidebarComponent,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
-    TableActionsMenuComponent,
     TestLinkComponent,
     TableNodeComponent,
     IFrameTrackerDirective,
     DynamicNodeGeneratorDirective,
   ],
-  providers: [D3Service, WhiteboardService, WebsocketService, DragService, KeyboardService],
+  providers: [
+    WhiteboardContextResolver,
+    WhiteboardFacadeService,
+    BufferService,
+    D3AdapterService,
+    DragService,
+    WebSocketService,
+    WhiteboardSelectionService,
+    KeyboardService,
+    {
+      provide: TRANSLOCO_SCOPE,
+      useValue: {
+        scope: 'whiteboard',
+        loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
+      },
+    },
+  ],
 })
 export class WhiteboardModule {}

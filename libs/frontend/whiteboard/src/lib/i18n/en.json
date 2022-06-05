@@ -1,0 +1,9 @@
+{
+  "toastMessages": {
+    "webSocketConnection": {
+      "reconnecting": "Lost connection to the server. Reconnecting ...",
+      "reconnectionSuccessful": "Reconnection successful",
+      "noConnection": "It was not possible to reconnect to the server. Please reload to try again."
+    }
+  }
+}

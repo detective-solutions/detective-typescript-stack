@@ -1,12 +1,7 @@
+import { IWhiteboardMetadataState } from '../interfaces';
 import { createReducer } from '@ngrx/store';
 
-export interface WhiteboardMetadataState {
-  id: string;
-  title: string;
-  description: string;
-}
-
-export const initialWhiteboardMetadataState: WhiteboardMetadataState = {
+export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
   id: '',
   title: '',
   description: '',

@@ -1,3 +1,10 @@
+<div *ngIf="!!(isWhiteboardInitialized$ | async) === false || (isConnectedToWebSocketServer$ | async) === false">
+  <div
+    *ngIf="(webSocketConnectionFailedEventually$ | async) === null"
+    class="loading-spinner loading-spinner-whiteboard"
+  ></div>
+  <div class="loading-backdrop"></div>
+</div>
 <whiteboard-sidebar></whiteboard-sidebar>
 <svg
   #whiteboardContainer
@@ -7,8 +14,8 @@
   width="100%"
   height="100%"
 >
-  <g #zoomContainer>
-    <g [linkVisual]="link" *ngFor="let link of links$ | async"></g>
-    <g nodeGenerator [node]="node" *ngFor="let node of nodes$ | async"></g>
+  <g #zoomContainer id="zoom-container">
+    <g nodeGenerator [node]="node" *ngFor="let node of whiteboardNodes$ | async"></g>
+    <!-- <g [linkVisual]="link" *ngFor="let link of links$ | async"></g> -->
   </g>
 </svg>

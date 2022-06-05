@@ -1,4 +1,4 @@
-export enum NodeTypes {
+export enum NodeType {
   TABLE = 'table',
   EMBEDDING = 'embedding',
 }

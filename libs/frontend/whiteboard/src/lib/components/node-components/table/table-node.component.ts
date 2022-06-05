@@ -1,11 +1,16 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import { filter, map } from 'rxjs';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { map, tap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
-import { select } from '@ngrx/store';
-import { selectEntities } from './state';
+import { ITableNode } from './model';
+import { TableNodeActions } from './state';
+import { Update } from '@ngrx/entity';
+import { WhiteboardNodeActions } from '../../../state';
+import { ofType } from '@ngrx/effects';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
   selector: '[node]',
@@ -13,20 +18,56 @@ import { selectEntities } from './state';
   styleUrls: ['./table-node.component.scss', '../base/base-node.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TableNodeComponent extends BaseNodeComponent {
-  gridOptions: GridOptions = {
+export class TableNodeComponent extends BaseNodeComponent implements OnInit, AfterViewInit {
+  readonly gridOptions: GridOptions = {
     loadingOverlayComponent: CustomLoadingOverlayComponent,
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  // TODO: Move this logic to an independent selector
-  getTableData$ = this.store.pipe(
-    select(selectEntities),
-    filter((entities: any) => entities[this.node.id]),
-    map((entities: any) => entities[this.node.id])
+  readonly incomingWebsocketMessages$ = this.whiteboardFacade.webSocket$;
+
+  readonly getTableDataFromStore$ = this.actions$.pipe(
+    ofType(TableNodeActions.tableDataReceived),
+    map((data) => data.update.changes)
   );
 
-  columnDefs$ = this.getTableData$.pipe(map((data) => data.colDefs));
-  rowData$ = this.getTableData$.pipe(map((data) => data.rowData));
+  readonly columnDefs$ = this.getTableDataFromStore$.pipe(
+    tap(console.log),
+    map((data) => data.colDefs)
+  );
+
+  readonly rowData$ = this.getTableDataFromStore$.pipe(
+    tap(console.log),
+    map((data) => data.rowData)
+  );
+
+  ngOnInit() {
+    this.subscriptions.add(
+      // TODO: Add event keys to Kafka messages
+      this.incomingWebsocketMessages$
+        // .pipe(
+        // filter((message: WebsocketMessage<any>) => message.event === TableEvents.QueryTable),
+        // map((message: WebsocketMessage<ITableNodeDataInput>) => message.data)
+        // )
+        // TODO: Set correct type for incoming data
+        .subscribe((messageData: any) => {
+          const update: Update<ITableNode> = {
+            id: this.node.id,
+            changes: { colDefs: messageData.schema, rowData: messageData.data },
+          };
+          this.store.dispatch(TableNodeActions.tableDataReceived({ update: update }));
+        })
+    );
+  }
+
+  toggleLock() {
+    this.store.dispatch(
+      WhiteboardNodeActions.WhiteboardNodeUpdate({
+        update: {
+          id: this.node.id,
+          changes: { locked: !this.node.locked },
+        },
+      })
+    );
+  }
 }

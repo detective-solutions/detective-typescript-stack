@@ -14,9 +14,9 @@ import { transformError } from '@detective.solutions/frontend/shared/error-handl
 // Custom implementation of abstract AuthService to communicate with detective.solutions AuthService backend
 @Injectable()
 export class CustomAuthService extends AuthService {
-  private readonly loginUrl = `${environment.baseUrl}/v1/auth/login`;
-  private readonly logoutUrl = `${environment.baseUrl}/v1/auth/logout`;
-  private readonly refreshUrl = `${environment.baseUrl}/v1/auth/refresh`;
+  private readonly loginUrl = `${environment.apiBaseUrl}/v1/auth/login`;
+  private readonly logoutUrl = `${environment.apiBaseUrl}/v1/auth/logout`;
+  private readonly refreshUrl = `${environment.apiBaseUrl}/v1/auth/refresh`;
 
   constructor(private readonly httpClient: HttpClient, private readonly getUserGQL: GetUserGQL) {
     super();

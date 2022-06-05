@@ -29,8 +29,8 @@ export class Node implements INode {
       nodeInput.locked,
       nodeInput.layout.x,
       nodeInput.layout.y,
-      nodeInput.layout.height,
-      nodeInput.layout.width
+      nodeInput.layout.width,
+      nodeInput.layout.height
     );
   }
 }

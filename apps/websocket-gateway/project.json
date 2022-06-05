@@ -1,0 +1,53 @@
+{
+  "root": "apps/websocket-gateway",
+  "sourceRoot": "apps/websocket-gateway/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/websocket-gateway",
+        "main": "apps/websocket-gateway/src/main.ts",
+        "tsConfig": "apps/websocket-gateway/tsconfig.app.json",
+        "assets": ["apps/websocket-gateway/src/assets"],
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/websocket-gateway/src/environments/environment.ts",
+              "with": "apps/websocket-gateway/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "websocket-gateway:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/websocket-gateway/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/websocket-gateway"],
+      "options": {
+        "jestConfig": "apps/websocket-gateway/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:backend", "type:app"]
+}

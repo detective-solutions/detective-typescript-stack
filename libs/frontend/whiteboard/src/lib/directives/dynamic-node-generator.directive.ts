@@ -1,5 +1,5 @@
 import { ComponentRef, Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
-import { Node, NodeComponent, NodeTypes } from '../models';
+import { Node, NodeComponent, NodeType } from '../models';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { TableNodeComponent } from '../components';
@@ -26,7 +26,7 @@ export class DynamicNodeGeneratorDirective implements OnInit {
 
   getComponentInstanceByType(componentType: string): ComponentRef<NodeComponent> | null {
     switch (componentType) {
-      case NodeTypes.TABLE: {
+      case NodeType.TABLE: {
         return this.viewContainerRef.createComponent(TableNodeComponent);
       }
       default:

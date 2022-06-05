@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { DragService } from '../../services';
+import { WhiteboardFacadeService } from '../../services';
 
 @Component({
   selector: 'node-header',
@@ -11,9 +11,9 @@ import { DragService } from '../../services';
 export class NodeHeaderComponent {
   @Input() title!: string;
 
-  constructor(private readonly dragService: DragService) {}
+  constructor(private readonly whiteboardFacade: WhiteboardFacadeService) {}
 
   enableDragging() {
-    this.dragService.activateDragging();
+    this.whiteboardFacade.activateDragging();
   }
 }

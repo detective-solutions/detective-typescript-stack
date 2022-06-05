@@ -1,4 +1,4 @@
-export * from './actions/action.types';
-export * from './effects/index';
-export * from './reducers/index';
+export * from './actions';
+export * from './effects';
+export * from './selectors';
 export * from './state-constants';

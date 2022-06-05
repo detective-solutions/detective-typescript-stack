@@ -1,0 +1,21 @@
+:host {
+  .loading-spinner-whiteboard:before {
+    z-index: 1001;
+  }
+
+  .loading-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: black;
+    opacity: 0.8;
+    z-index: 1000;
+  }
+
+  mat-progress-bar {
+    position: absolute;
+    bottom: 0;
+    height: 8px;
+  }
+}

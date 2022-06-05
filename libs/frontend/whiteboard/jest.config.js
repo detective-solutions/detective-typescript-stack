@@ -1,3 +1,5 @@
+const esModules = ['d3', 'd3-drag', 'd3-selection', 'd3-zoom'].join('|');
+
 module.exports = {
   displayName: 'frontend-whiteboard',
   preset: '../../../jest.preset.js',
@@ -12,7 +14,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },
-  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
+  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)', `/node_modules/(?!${esModules})`],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',

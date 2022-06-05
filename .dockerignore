@@ -4,6 +4,9 @@
 # Compiled output
 /node_modules
 
+# JavaScript map files
+*.js.map
+
 # OS
 .DS_Store
 

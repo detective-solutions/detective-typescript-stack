@@ -1,13 +1,32 @@
 <svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
   <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
-  <foreignObject
-    *ngIf="selected$ | async"
-    table-actions-menu
-    [attr.x]="node.width"
-    [attr.width]="80"
-    [attr.height]="node.height"
-  >
-    <table-actions-menu></table-actions-menu>
+  <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
+    <div class="node-actions-wrapper table-actions">
+      <div fxFlex fxLayout="column" fxLayoutAlign="center center">
+        <button mat-icon-button>
+          <mat-icon fxFlex>filter_alt</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>info</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>addchart</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>text_fields</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>analytics</mat-icon>
+        </button>
+        <button mat-icon-button (click)="toggleLock()">
+          <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
+          <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>delete</mat-icon>
+        </button>
+      </div>
+    </div>
   </foreignObject>
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
     <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
@@ -18,11 +37,7 @@
       style="height: inherit; width: inherit"
       frameBorder="0"
     ></iframe> -->
-    <ng-template #isLoading>
-      <div class="loading-spinner"></div>
-    </ng-template>
     <ag-grid-angular
-      *ngIf="getTableData$ | async"
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
       [columnDefs]="columnDefs$ | async"

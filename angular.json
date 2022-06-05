@@ -18,12 +18,14 @@
     "frontend-shared-environments": "libs/frontend/shared/environments",
     "frontend-shared-error-handling": "libs/frontend/shared/error-handling",
     "frontend-shared-page-not-found": "libs/frontend/shared/page-not-found",
+    "frontend-shared-rx-websocket-wrapper": "libs/frontend/shared/rx-websocket-wrapper",
     "frontend-shared-styles": "libs/frontend/shared/styles",
     "frontend-shared-ui": "libs/frontend/shared/ui",
     "frontend-shared-utils": "libs/frontend/shared/utils",
     "frontend-whiteboard": "libs/frontend/whiteboard",
     "shared-assets": "libs/shared/assets",
     "shared-data-access": "libs/shared/data-access",
-    "shared-i18n": "libs/shared/i18n"
+    "shared-i18n": "libs/shared/i18n",
+    "websocket-gateway": "apps/websocket-gateway"
   }
 }
