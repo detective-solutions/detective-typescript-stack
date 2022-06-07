@@ -12,7 +12,7 @@ import { TableCellEventService } from '@detective.solutions/frontend/detective-c
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const mockUtils = {
-  eventServiceMock: {
+  tableCellEventServiceMock: {
     resetLoadingStates$: new Subject(),
   },
   createQueryRefMock: (mockResponse: object) => {
@@ -35,7 +35,7 @@ describe('CasefileService', () => {
         GetAllCasefilesGQL,
         GetCasefilesByAuthorGQL,
         MockProvider(Apollo),
-        { provide: TableCellEventService, useValue: mockUtils.eventServiceMock },
+        { provide: TableCellEventService, useValue: mockUtils.tableCellEventServiceMock },
       ],
     });
 
