@@ -1,8 +1,8 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { NgModule } from '@angular/core';
 
-const modules = [
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-] as any[];
+const modules = [MatButtonModule, MatIconModule];
 
 @NgModule({
   exports: modules,
