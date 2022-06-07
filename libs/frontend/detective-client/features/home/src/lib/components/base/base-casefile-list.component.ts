@@ -2,6 +2,7 @@ import {
   AccessState,
   ITableCellEvent,
   ITile,
+  NavigationEventService,
   TableCellEventService,
   TableCellEventType,
   TableCellTypes,
@@ -43,9 +44,10 @@ export class BaseCasefileListComponent implements OnDestroy {
   constructor(
     protected readonly authService: AuthService,
     protected readonly casefileService: CasefileService,
+    protected readonly navigationEventService: NavigationEventService,
     protected readonly tableCellEventService: TableCellEventService
   ) {
-    this.showTableView$ = this.tableCellEventService.showTableView$;
+    this.showTableView$ = this.navigationEventService.showTableView$;
   }
 
   ngOnDestroy() {

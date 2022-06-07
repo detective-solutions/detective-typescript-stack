@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/c
 import { Observable, Subscription, map, shareReplay } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
-import { ISidenavItem } from './ISidenavItem.interface';
+import { ISidenavItem } from '../interfaces';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { NavigationEventService } from '../services';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
-import { TableCellEventService } from '../table/services';
 
 @Component({
   selector: 'main-navigation',
@@ -42,7 +42,7 @@ export class NavigationComponent implements OnDestroy {
   constructor(
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly tableCellEventService: TableCellEventService,
+    private readonly navigationEventService: NavigationEventService,
     private readonly overlayContainer: OverlayContainer,
     private readonly router: Router
   ) {
@@ -50,11 +50,11 @@ export class NavigationComponent implements OnDestroy {
     this.cdkOverlay = this.overlayContainer.getContainerElement();
     this.cdkOverlay.classList.add('default-theme'); // TODO: Inject a theme service to provide the current theme
 
-    this.showTableView$ = this.tableCellEventService.showTableView$;
+    this.showTableView$ = this.navigationEventService.showTableView$;
   }
 
   toggleViews(toggleChange: MatSlideToggleChange) {
-    this.tableCellEventService.showTableView$.next(toggleChange.checked);
+    this.navigationEventService.showTableView$.next(toggleChange.checked);
   }
 
   logout() {

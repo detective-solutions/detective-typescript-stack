@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NavigationComponent } from './navigation.component';
+import { NavigationComponent } from './components';
 import { NavigationMaterialModule } from './navigation.material.module';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';

@@ -5,12 +5,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MockProvider } from 'ng-mocks';
 import { NavigationComponent } from './navigation.component';
-import { NavigationMaterialModule } from './navigation.material.module';
+import { NavigationEventService } from '../services';
+import { NavigationMaterialModule } from '../navigation.material.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { TableCellEventService } from '../table';
-import de from '../i18n/de.json';
-import en from '../i18n/en.json';
+import de from '../../i18n/de.json';
+import en from '../../i18n/en.json';
 import { getTranslocoModule } from '@detective.solutions/shared/i18n';
 
 const materialModules = [MatSnackBarModule];
@@ -30,7 +30,7 @@ describe('NavigationComponent', () => {
         ...materialModules,
       ],
       declarations: [NavigationComponent],
-      providers: [TableCellEventService, MockProvider(AuthService)],
+      providers: [NavigationEventService, MockProvider(AuthService)],
     }).compileComponents();
   });
 
