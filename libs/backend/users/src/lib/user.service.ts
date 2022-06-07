@@ -6,6 +6,7 @@ import { TxnOptions } from 'dgraph-js';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 @Injectable()
 export class UserService {
   private static readonly readTxnOptions: TxnOptions = { readOnly: true, bestEffort: true };
