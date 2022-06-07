@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@a
 import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces/table.interface';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 
-import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatTableDataSource } from '@angular/material/table';
+import { TableCellEventService } from './services';
 
 @Component({
   selector: 'table-view',
@@ -38,7 +38,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly eventService: EventService,
+    private readonly tableCellEventService: TableCellEventService,
     private readonly logService: LogService
   ) {}
 
@@ -63,7 +63,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
     // Handle resetting of fetching state flag in case of an error
     this.subscriptions.add(
-      this.eventService.resetLoadingStates$.subscribe(() => {
+      this.tableCellEventService.resetLoadingStates$.subscribe(() => {
         this.isFetchingMoreData = false;
         this.logService.debug('Resetting loading indicator due to error');
       })

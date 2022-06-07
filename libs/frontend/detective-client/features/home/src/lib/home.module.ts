@@ -9,6 +9,7 @@ import { GetAllCasefilesGQL } from './graphql/get-all-casefiles-gql';
 import { GetAllDataSourcesGQL } from './graphql/get-all-data-sources-gql';
 import { GetCasefilesByAuthorGQL } from './graphql/get-casefiles-by-author.gql';
 import { HomeContainerComponent } from './components/home-container.component';
+import { HomeMaterialModule } from './home.material.module';
 import { HomeRoutingModule } from './home-routing.module';
 import { MyCasefilesComponent } from './components/my-casefiles/my-casefiles.component';
 import { NgModule } from '@angular/core';
@@ -17,7 +18,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
   declarations: [HomeContainerComponent, MyCasefilesComponent, AllCasefilesComponent, DataSourcesComponent],
-  imports: [CommonModule, HomeRoutingModule, NavigationModule, TilesModule, TableModule],
+  imports: [CommonModule, HomeRoutingModule, NavigationModule, TilesModule, TableModule, HomeMaterialModule],
   providers: [
     {
       provide: TRANSLOCO_SCOPE,

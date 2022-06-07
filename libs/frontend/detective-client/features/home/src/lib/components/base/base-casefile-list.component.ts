@@ -1,14 +1,16 @@
-import { AccessState, ITile, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
-import { BehaviorSubject, Subject, Subscription, filter, tap } from 'rxjs';
 import {
-  Casefile,
-  CasefileEventType,
-  EventService,
-  ICasefileEvent,
-} from '@detective.solutions/frontend/shared/data-access';
+  AccessState,
+  ITableCellEvent,
+  ITile,
+  TableCellEventService,
+  TableCellEventType,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
+import { BehaviorSubject, Subject, Subscription, filter, tap } from 'rxjs';
 import { Component, OnDestroy } from '@angular/core';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
+import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from '../../services/casefile.service';
 import { ICasefileTableDef } from '../../interfaces';
 
@@ -21,19 +23,19 @@ export class BaseCasefileListComponent implements OnDestroy {
   protected readonly subscriptions = new Subscription();
 
   protected readonly casefileAccessRequested$ = this.subscriptions.add(
-    this.eventService.tableCellEvents$
+    this.tableCellEventService.tableCellEvents$
       .pipe(
-        filter((event: ICasefileEvent) => !!event.id && event.type === CasefileEventType.REQUEST_ACCESS),
-        tap((event: ICasefileEvent) => console.log(event))
+        filter((event: ITableCellEvent) => !!event.id && event.type === TableCellEventType.REQUEST_ACCESS),
+        tap((event: ITableCellEvent) => console.log(event))
       )
       .subscribe()
   );
 
   protected readonly casefileFavorized$ = this.subscriptions.add(
-    this.eventService.tableCellEvents$
+    this.tableCellEventService.tableCellEvents$
       .pipe(
-        filter((event: ICasefileEvent) => event.type === CasefileEventType.FAVORIZE && event.value !== undefined),
-        tap((event: ICasefileEvent) => console.log(event))
+        filter((event: ITableCellEvent) => event.type === TableCellEventType.FAVORIZE && event.value !== undefined),
+        tap((event: ITableCellEvent) => console.log(event))
       )
       .subscribe()
   );
@@ -41,9 +43,9 @@ export class BaseCasefileListComponent implements OnDestroy {
   constructor(
     protected readonly authService: AuthService,
     protected readonly casefileService: CasefileService,
-    protected readonly eventService: EventService
+    protected readonly tableCellEventService: TableCellEventService
   ) {
-    this.showTableView$ = this.eventService.showTableView$;
+    this.showTableView$ = this.tableCellEventService.showTableView$;
   }
 
   ngOnDestroy() {

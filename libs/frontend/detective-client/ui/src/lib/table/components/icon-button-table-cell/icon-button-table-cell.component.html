@@ -1,0 +1,10 @@
+<ng-container *ngFor="let button of cellData.buttons">
+  <button
+    [matTooltip]="button.tooltipText"
+    [matTooltipShowDelay]="tooltipDelay"
+    mat-button
+    (click)="onClick(button.clickEventKey)"
+  >
+    <mat-icon inline [style.color]="button.iconCssColor">{{ button.icon }}</mat-icon>
+  </button>
+</ng-container>

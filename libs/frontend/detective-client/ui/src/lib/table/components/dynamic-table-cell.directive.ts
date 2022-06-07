@@ -4,17 +4,19 @@ import { TableCellData, TableCellTypes } from '../interfaces/table-cell-data.int
 import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
 import { DateTableCellComponent } from './date-table-cell/date-table-cell.component';
 import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
+import { IconButtonTableCellComponent } from './icon-button-table-cell/icon-button-table-cell.component';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
 import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
 import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/user-avatar-list-table-cell.component';
 
 type TableCellComponents =
-  | TextTableCellComponent
-  | DateTableCellComponent
-  | MultiTableCellComponent
   | AccessIndicatorTableCellComponent
+  | DateTableCellComponent
   | FavorizedTableCellComponent
+  | IconButtonTableCellComponent
+  | MultiTableCellComponent
+  | TextTableCellComponent
   | UserAvatarListTableCellComponent;
 
 @Directive({
@@ -47,6 +49,9 @@ export class DynamicTableCellDirective implements OnInit {
       }
       case TableCellTypes.FAVORIZED_TABLE_CELL: {
         return this.viewContainerRef.createComponent(FavorizedTableCellComponent);
+      }
+      case TableCellTypes.ICON_BUTTON_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(IconButtonTableCellComponent);
       }
       case TableCellTypes.MULTI_TABLE_CELL: {
         return this.viewContainerRef.createComponent(MultiTableCellComponent);

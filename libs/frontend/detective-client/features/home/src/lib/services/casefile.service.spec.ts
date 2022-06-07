@@ -1,12 +1,13 @@
-import { Casefile, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { EMPTY, Subject, of } from 'rxjs';
 import { MockProvider, ngMocks } from 'ng-mocks';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { Apollo } from 'apollo-angular';
+import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from './casefile.service';
 import { GetAllCasefilesGQL } from '../graphql/get-all-casefiles-gql';
 import { GetCasefilesByAuthorGQL } from '../graphql/get-casefiles-by-author.gql';
+import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -34,7 +35,7 @@ describe('CasefileService', () => {
         GetAllCasefilesGQL,
         GetCasefilesByAuthorGQL,
         MockProvider(Apollo),
-        { provide: EventService, useValue: mockUtils.eventServiceMock },
+        { provide: TableCellEventService, useValue: mockUtils.eventServiceMock },
       ],
     });
 

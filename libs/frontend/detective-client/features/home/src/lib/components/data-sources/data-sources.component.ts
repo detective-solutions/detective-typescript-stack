@@ -1,5 +1,11 @@
-import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
-import { CasefileEventType, EventService, ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
+import {
+  AccessState,
+  ITableCellEvent,
+  ITableInput,
+  TableCellEventService,
+  TableCellEventType,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, Subscription, filter, map, tap } from 'rxjs';
 
@@ -26,15 +32,18 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
 
   readonly accessRequested$ = this.subscriptions.add(
-    this.eventService.tableCellEvents$
+    this.tableCellEventService.tableCellEvents$
       .pipe(
-        filter((event: ICasefileEvent) => !!event.id && event.type === CasefileEventType.REQUEST_ACCESS),
-        tap((event: ICasefileEvent) => console.log(event))
+        filter((event: ITableCellEvent) => !!event.id && event.type === TableCellEventType.REQUEST_ACCESS),
+        tap((event: ITableCellEvent) => console.log(event))
       )
       .subscribe()
   );
 
-  constructor(private readonly dataSourceService: DataSourceService, private readonly eventService: EventService) {}
+  constructor(
+    private readonly dataSourceService: DataSourceService,
+    private readonly tableCellEventService: TableCellEventService
+  ) {}
 
   ngOnInit() {
     this.dataSources$ = this.dataSourceService.getAllDataSources(this.initialPageOffset, this.pageSize);

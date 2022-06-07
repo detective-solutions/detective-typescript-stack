@@ -2,6 +2,7 @@ export type TableCellData =
   | IAccessTableCell
   | IDateTableCell
   | IFavorizedTableCell
+  | IIconButtonTableCell
   | IMultiTableCell
   | ITextTableCell
   | IUserAvatarListTableCell;
@@ -10,6 +11,7 @@ export enum TableCellTypes {
   ACCESS_TABLE_CELL = 'accessTableCell',
   DATE_TABLE_CELL = 'dateTableCell',
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
+  ICON_BUTTON_TABLE_CELL = 'iconButtonTableCell',
   MULTI_TABLE_CELL = 'multiTableCell',
   TEXT_TABLE_CELL = 'textTableCell',
   USER_AVATAR_LIST_TABLE_CELL = 'userIconListTableCell',
@@ -39,6 +41,12 @@ export interface IDateTableCell extends IBaseTableCell {
 export interface IFavorizedTableCell extends IBaseTableCell {
   type: TableCellTypes.FAVORIZED_TABLE_CELL;
   isFavorized: boolean;
+}
+
+export interface IIconButtonTableCell extends IBaseTableCell {
+  type: TableCellTypes.ICON_BUTTON_TABLE_CELL;
+  icon: string;
+  buttons: { icon: string; tooltipText: string; clickEventKey: string; iconCssColor?: string }[];
 }
 
 export interface IMultiTableCell extends IBaseTableCell {
