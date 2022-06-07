@@ -24,7 +24,9 @@ export class TableNodeEffects {
               context: { nodeId: action.addedNode.id, ...context } as IMessageContext,
               body: {
                 query_type: QueryType.SqlQuery,
-                query: 'SELECT * FROM employees LIMIT 100', // TODO: Fetch query/table info from node object
+                query: ['SELECT * FROM freequery LIMIT 100'], // TODO: Fetch query/table info from node object
+                tableId: ['59c9547a-dea7-11ec-ac54-287fcf6e439d'],
+                groupId: ['68c127fc-dea7-11ec-8d94-287fcf6e439d'], // TODO: Can be removed after backend adjustments
               } as IQueryMessagePayload,
             },
           })
