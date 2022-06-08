@@ -7,12 +7,11 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { IDataSourceTableDef, IGetAllDataSourcesResponse } from '../../interfaces';
 import { Observable, Subject, Subscription, filter, map, tap } from 'rxjs';
 
-import { DataSourceService } from '../../services/data-source.service';
+import { DataSourceService } from '../../services';
 import { IDataSource } from '@detective.solutions/shared/data-access';
-import { IDataSourceTableDef } from '../../interfaces';
-import { IGetAllDataSourcesResponse } from '../../interfaces/get-all-data-sources-response.interface';
 
 @Component({
   selector: 'data-sources',
@@ -71,6 +70,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
 
   private transformToTableStructure(originalDataSources: IDataSource[]): IDataSourceTableDef[] {
     const tempTableItems = [] as IDataSourceTableDef[];
+    // TODO: Translate column headers
     originalDataSources.forEach((dataSource: IDataSource) => {
       tempTableItems.push({
         dataSourceInfo: {
@@ -97,6 +97,17 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
             id: dataSource.id,
             type: TableCellTypes.DATE_TABLE_CELL,
             date: String(dataSource.lastUpdated),
+          },
+        },
+        actions: {
+          columnName: 'Actions',
+          cellData: {
+            id: dataSource.id,
+            type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
+            buttons: [
+              { icon: 'edit', tooltipText: 'test' },
+              { icon: 'delete', tooltipText: 'test2' },
+            ],
           },
         },
       } as IDataSourceTableDef);

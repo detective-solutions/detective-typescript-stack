@@ -12,7 +12,7 @@ import { Component, OnDestroy } from '@angular/core';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
-import { CasefileService } from '../../services/casefile.service';
+import { CasefileService } from '../../services';
 import { ICasefileTableDef } from '../../interfaces';
 
 @Component({ template: '' })

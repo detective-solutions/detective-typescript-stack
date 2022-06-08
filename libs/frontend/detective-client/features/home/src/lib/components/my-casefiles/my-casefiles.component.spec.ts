@@ -3,8 +3,8 @@ import { MockModule, ngMocks } from 'ng-mocks';
 import { TableCellEventService, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
 import { Apollo } from 'apollo-angular';
-import { CasefileService } from '../../services/casefile.service';
-import { GetAllCasefilesGQL } from '../../graphql/get-all-casefiles-gql';
+import { CasefileService } from '../../services';
+import { GetAllCasefilesGQL } from '../../graphql';
 import { MyCasefilesComponent } from './my-casefiles.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';

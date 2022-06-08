@@ -1,8 +1,8 @@
-import { GetAllDataSourcesGQL, IGetAllDataSourcesGQLResponse } from '../graphql/get-all-data-sources-gql';
+import { GetAllDataSourcesGQL, IGetAllDataSourcesGQLResponse } from '../graphql';
 import { Observable, catchError, map } from 'rxjs';
 
 import { DataSource } from '@detective.solutions/frontend/shared/data-access';
-import { IGetAllDataSourcesResponse } from '../interfaces/get-all-data-sources-response.interface';
+import { IGetAllDataSourcesResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';

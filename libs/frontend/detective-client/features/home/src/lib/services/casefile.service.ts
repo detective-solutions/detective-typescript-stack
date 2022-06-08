@@ -1,9 +1,13 @@
-import { GetAllCasefilesGQL, IGetAllCasefilesGQLResponse } from '../graphql/get-all-casefiles-gql';
-import { GetCasefilesByAuthorGQL, IGetCasefilesByAuthorGQLResponse } from '../graphql/get-casefiles-by-author.gql';
+import {
+  GetAllCasefilesGQL,
+  GetCasefilesByAuthorGQL,
+  IGetAllCasefilesGQLResponse,
+  IGetCasefilesByAuthorGQLResponse,
+} from '../graphql';
 import { Observable, catchError, map } from 'rxjs';
 
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
-import { IGetAllCasefilesResponse } from '../interfaces/get-all-casefiles-response.interface';
+import { IGetAllCasefilesResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';

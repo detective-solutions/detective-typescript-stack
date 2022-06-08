@@ -5,7 +5,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Apollo } from 'apollo-angular';
 import { DataSource } from '@detective.solutions/frontend/shared/data-access';
 import { DataSourceService } from './data-source.service';
-import { GetAllDataSourcesGQL } from '../graphql/get-all-data-sources-gql';
+import { GetAllDataSourcesGQL } from '../graphql';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

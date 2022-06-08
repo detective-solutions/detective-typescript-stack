@@ -3,9 +3,9 @@ import { MockModule, ngMocks } from 'ng-mocks';
 import { TableCellEventService, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
 import { Apollo } from 'apollo-angular';
-import { DataSourceService } from '../../services/data-source.service';
+import { DataSourceService } from '../../services';
 import { DataSourcesComponent } from './data-sources.component';
-import { GetAllDataSourcesGQL } from '../../graphql/get-all-data-sources-gql';
+import { GetAllDataSourcesGQL } from '../../graphql';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
