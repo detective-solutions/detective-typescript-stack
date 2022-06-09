@@ -1,14 +1,11 @@
+import { AdminContainerComponent, ConnectionsComponent, GroupsComponent, MasksComponent } from './components';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 
-import { AdminContainerComponent } from './components/admin-container.component';
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
-import { ConnectionsComponent } from './components/connections/connections.component';
 import { ConnectionsService } from './services';
 import { GetAllConnectionsGQL } from './graphql';
-import { GroupsComponent } from './components/groups/groups.component';
-import { MasksComponent } from './components/masks/masks.component';
 import { NgModule } from '@angular/core';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
