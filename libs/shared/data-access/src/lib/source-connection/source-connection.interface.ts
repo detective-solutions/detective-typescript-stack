@@ -1,4 +1,4 @@
-export interface IDataSource {
+export interface ISourceConnection {
   id: string;
   name: string;
   connectorName: string;

@@ -3,9 +3,9 @@ import { MockProvider, ngMocks } from 'ng-mocks';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { Apollo } from 'apollo-angular';
-import { DataSource } from '@detective.solutions/frontend/shared/data-access';
 import { DataSourceService } from './data-source.service';
 import { GetAllDataSourcesGQL } from '../graphql';
+import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -50,7 +50,10 @@ describe('DataSourceService', () => {
 
   describe('getAllDataSources', () => {
     it('should correctly map the server response to the IGetAllDataSourcesResponse interface', fakeAsync(() => {
-      const dataSources = [DataSource.Build(new DataSource()), DataSource.Build(new DataSource())];
+      const dataSources = [
+        SourceConnection.Build(new SourceConnection()),
+        SourceConnection.Build(new SourceConnection()),
+      ];
       const mockResponse = { querySourceConnection: dataSources, aggregateSourceConnection: { count: 2 } };
       const watchQuerySpy = jest
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
@@ -65,7 +68,7 @@ describe('DataSourceService', () => {
     }));
 
     it('should invoke internal error handling if the response does not comply with the IGetAllDataSourcesResponse interface', fakeAsync(() => {
-      const dataSources = [DataSource.Build(new DataSource())];
+      const dataSources = [SourceConnection.Build(new SourceConnection())];
       const mockResponse = { wrongKey: dataSources, aggregateSourceConnection: { count: 1 } };
       jest
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')

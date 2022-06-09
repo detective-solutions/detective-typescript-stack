@@ -4,7 +4,7 @@ import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfac
 import { Observable, Subject, Subscription, map } from 'rxjs';
 
 import { ConnectionsService } from '../../services';
-import { IDataSource } from '@detective.solutions/shared/data-access';
+import { ISourceConnection } from '@detective.solutions/shared/data-access';
 
 @Component({
   selector: 'connections',
@@ -49,10 +49,10 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private transformToTableStructure(originalConnection: IDataSource[]): IConnectionsTableDef[] {
+  private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {
     const tempTableItems = [] as IConnectionsTableDef[];
     // TODO: Translate column headers
-    originalConnection.forEach((connection: IDataSource) => {
+    originalConnection.forEach((connection: ISourceConnection) => {
       tempTableItems.push({
         dataSourceInfo: {
           columnName: '',

@@ -11,7 +11,7 @@ import { IDataSourceTableDef, IGetAllDataSourcesResponse } from '../../interface
 import { Observable, Subject, Subscription, filter, map, tap } from 'rxjs';
 
 import { DataSourceService } from '../../services';
-import { IDataSource } from '@detective.solutions/shared/data-access';
+import { ISourceConnection } from '@detective.solutions/shared/data-access';
 
 @Component({
   selector: 'data-sources',
@@ -68,10 +68,10 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private transformToTableStructure(originalDataSources: IDataSource[]): IDataSourceTableDef[] {
+  private transformToTableStructure(originalDataSources: ISourceConnection[]): IDataSourceTableDef[] {
     const tempTableItems = [] as IDataSourceTableDef[];
     // TODO: Translate column headers
-    originalDataSources.forEach((dataSource: IDataSource) => {
+    originalDataSources.forEach((dataSource: ISourceConnection) => {
       tempTableItems.push({
         dataSourceInfo: {
           columnName: '',

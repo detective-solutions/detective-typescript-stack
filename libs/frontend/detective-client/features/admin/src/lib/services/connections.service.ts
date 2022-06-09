@@ -1,11 +1,10 @@
 import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
-import { Observable, catchError, map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
-import { DataSource } from '@detective.solutions/frontend/shared/data-access';
 import { IGetAllConnectionsResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
-import { transformError } from '@detective.solutions/frontend/shared/error-handling';
+import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 
 @Injectable()
 export class ConnectionsService {
@@ -23,7 +22,7 @@ export class ConnectionsService {
       map((response: any) => response.data),
       map((response: IGetAllConnectionsGQLResponse) => {
         return {
-          connections: response.querySourceConnection.map(DataSource.Build),
+          connections: response.querySourceConnection.map(SourceConnection.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
         };
       })
