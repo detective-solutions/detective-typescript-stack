@@ -15,7 +15,7 @@ export class GetAllDataSourcesGQL extends Query<Response> {
         id
         name
         description
-        db_type
+        connectorName
       }
       aggregateSourceConnection {
         count
