@@ -33,7 +33,7 @@ export class DataSource implements IDataSource {
   constructor(
     public id = '',
     public name = '',
-    public db_type = '',
+    public connectorName = '',
     public description = '',
     public iconSrc = '',
     public lastUpdated: Date | null = null
@@ -47,9 +47,9 @@ export class DataSource implements IDataSource {
     return new DataSource(
       dataSource.id,
       dataSource.name,
-      dataSource.db_type,
+      dataSource.connectorName,
       dataSource.description,
-      dataSource.iconSrc ?? DataSource.getDataSourceIconSrc(dataSource.db_type),
+      dataSource.iconSrc ?? DataSource.getDataSourceIconSrc(dataSource.connectorName),
       (dataSource.lastUpdated as Date) ?? new Date()
     );
   }

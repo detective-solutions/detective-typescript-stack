@@ -152,7 +152,7 @@ export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
   {
     id: '1',
     name: 'SAP COPA',
-    db_type: 'sql',
+    connectorName: 'sql',
     description:
       'PA stands for profitability analysis. As the name says COPA module in SAP acts as a strategic & financial reporting tool for analyzing the profitability based on different segments. The segments can be based on different user inputs like country wise, customer wise product wise etc. So an organization can easily analyse the profit output based on the data from SD, MM & CO module',
     lastUpdated: randomDate(),
@@ -160,7 +160,7 @@ export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
   {
     id: '2',
     name: 'SAP KNA1',
-    db_type: 'azureBlob',
+    connectorName: 'azureBlob',
     description:
       'KNA1 is a standard SAP Table which is used to store General Data in Customer Master data and is available within R/3 SAP systems depending on the version and release level.',
     lastUpdated: randomDate(),
@@ -168,7 +168,7 @@ export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
   {
     id: '3',
     name: 'Order Main',
-    db_type: 'excel',
+    connectorName: 'excel',
     description:
       'The table is based on the AUFK from the standard SAP ERP and belongs to KAUF. You will find the most important information about orders here.',
     lastUpdated: randomDate(),
@@ -176,7 +176,7 @@ export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
   {
     id: '4',
     name: 'Cost Center Master Data',
-    db_type: 'awsBlob',
+    connectorName: 'awsBlob',
     description:
       'A standard table in SAP R3 ERP systems. It is a joined version holding all relevant information for cost center views.',
     lastUpdated: randomDate(),
@@ -184,21 +184,21 @@ export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
   {
     id: '5',
     name: 'Social Media Tracking',
-    db_type: 'excel',
+    connectorName: 'excel',
     description: 'An aggregated view holding information about CTA for a given lead by channel.',
     lastUpdated: randomDate(),
   },
   {
     id: '6',
     name: 'SAP POSRetailLineItem',
-    db_type: 'awsBlob',
+    connectorName: 'awsBlob',
     description: 'Holds information about all Items sold in a Retail process.',
     lastUpdated: randomDate(),
   },
   {
     id: '7',
     name: 'SAP POSRetailLineTrans',
-    db_type: 'azureBlob',
+    connectorName: 'azureBlob',
     description: 'Is an overview of transactions. Each transaction is just a header and can contain multiple items.',
     lastUpdated: randomDate(),
   },
