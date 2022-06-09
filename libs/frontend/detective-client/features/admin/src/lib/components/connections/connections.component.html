@@ -1,1 +1,9 @@
-<img width="1500px" src="assets/images/mocks/connections-mock.jpg" />
+<button mat-stroked-button>
+  <mat-icon>description</mat-icon>
+  New Connection
+</button>
+<table-view
+  [tableRows$]="tableItems$"
+  [pageSize]="pageSize"
+  [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+></table-view>

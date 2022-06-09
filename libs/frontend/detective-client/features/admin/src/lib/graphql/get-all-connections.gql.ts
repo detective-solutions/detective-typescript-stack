@@ -2,7 +2,7 @@ import { Query, gql } from 'apollo-angular';
 import { DataSource } from '@detective.solutions/frontend/shared/data-access';
 import { Injectable } from '@angular/core';
 
-export interface IGetAllDataSourcesGQLResponse {
+export interface IGetAllConnectionsGQLResponse {
   querySourceConnection: DataSource[];
   aggregateSourceConnection: { count: number };
 }
@@ -15,7 +15,7 @@ export class GetAllConnectionsGQL extends Query<Response> {
         id
         name
         description
-        db_type
+        connectorName
       }
       aggregateSourceConnection {
         count
