@@ -3,8 +3,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfaces';
 import { Observable, Subject, Subscription, map } from 'rxjs';
 
+import { ConnectionsDialogComponent } from './dialog';
 import { ConnectionsService } from '../../services';
 import { ISourceConnection } from '@detective.solutions/shared/data-access';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'connections',
@@ -23,7 +25,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
 
-  constructor(private readonly connectionsService: ConnectionsService) {}
+  constructor(private readonly connectionsService: ConnectionsService, private readonly connectionsDialog: MatDialog) {}
 
   ngOnInit() {
     this.connections$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize);
@@ -47,6 +49,10 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  openConnectionsDialog() {
+    this.connectionsDialog.open(ConnectionsDialogComponent, {});
   }
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {

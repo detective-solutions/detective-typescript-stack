@@ -18,5 +18,6 @@
   @include mat.table-theme($default-theme);
   @include mat.tooltip-theme($default-theme);
   @include mat.progress-bar-theme($default-theme);
+  @include mat.dialog-theme($default-theme);
   @include custom-components-theme($default-theme);
 }
