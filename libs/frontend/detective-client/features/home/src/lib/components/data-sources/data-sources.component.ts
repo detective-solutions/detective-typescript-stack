@@ -99,17 +99,6 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
             date: String(dataSource.lastUpdated),
           },
         },
-        actions: {
-          columnName: 'Actions',
-          cellData: {
-            id: dataSource.id,
-            type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
-            buttons: [
-              { icon: 'edit', tooltipText: 'test' },
-              { icon: 'delete', tooltipText: 'test2' },
-            ],
-          },
-        },
       } as IDataSourceTableDef);
     });
     return tempTableItems;

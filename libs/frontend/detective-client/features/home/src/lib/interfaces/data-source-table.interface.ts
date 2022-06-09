@@ -4,5 +4,4 @@ export interface IDataSourceTableDef extends IAbstractTableDef {
   dataSourceInfo: IColumnDef;
   access: IColumnDef;
   lastUpdated: IColumnDef;
-  actions: IColumnDef;
 }
