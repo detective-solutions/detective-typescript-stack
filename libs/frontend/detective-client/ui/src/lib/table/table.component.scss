@@ -3,7 +3,7 @@
 $row-height: 120px;
 
 .component-wrapper {
-  height: calc(100vh - $navigation-toolbar-height - 20px);
+  height: inherit; // Total height is set on parent component
   padding: 0 40px;
 
   .table-container {
