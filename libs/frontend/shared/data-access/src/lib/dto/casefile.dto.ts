@@ -7,7 +7,7 @@ export class Casefile implements ICasefile {
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
-    public id = '',
+    public xid = '',
     public title = '',
     public description = '',
     public thumbnailSrc = '',
@@ -17,20 +17,20 @@ export class Casefile implements ICasefile {
     public lastUpdated: Date | null = null
   ) {}
 
-  static Build(casefile: Casefile) {
-    if (!casefile) {
+  static Build(casefileInput: ICasefile) {
+    if (!casefileInput) {
       return new Casefile();
     }
 
     return new Casefile(
-      casefile.id,
-      casefile.title,
-      casefile.description ?? '',
-      casefile.thumbnailSrc ?? Casefile.thumbnailPlaceholder,
-      User.Build(casefile.author as IUser),
-      casefile.views,
-      casefile.editors as IUser[],
-      casefile.lastUpdated as Date
+      casefileInput.xid,
+      casefileInput.title,
+      casefileInput.description ?? '',
+      casefileInput.thumbnailSrc ?? Casefile.thumbnailPlaceholder,
+      User.Build(casefileInput.author as IUser),
+      casefileInput.views,
+      casefileInput.editors as IUser[],
+      casefileInput.lastUpdated as Date
     );
   }
 

@@ -12,7 +12,7 @@ export class GetAllCasefilesGQL extends Query<Response> {
   override document = gql`
     query casefiles($paginationOffset: Int, $pageSize: Int) {
       queryCasefile(offset: $paginationOffset, first: $pageSize) {
-        id
+        xid
         title
         description
         thumbnailSrc

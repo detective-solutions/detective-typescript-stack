@@ -58,9 +58,9 @@ export class BaseCasefileListComponent implements OnDestroy {
     const tempTileItems = [] as ITile[];
     originalCasefiles.forEach((casefile: Casefile) => {
       tempTileItems.push({
-        id: casefile.id,
+        id: casefile.xid,
         title: casefile.title,
-        targetUrl: Casefile.basePath + casefile.id,
+        targetUrl: Casefile.basePath + casefile.xid,
         description: casefile.description,
         thumbnailSrc: casefile.thumbnailSrc,
       });
@@ -69,13 +69,14 @@ export class BaseCasefileListComponent implements OnDestroy {
   }
 
   protected transformToTableStructure(originalCasefiles: Casefile[]): ICasefileTableDef[] {
+    // TODO: Translate column headers
     const tempTableItems = [] as ICasefileTableDef[];
     originalCasefiles.forEach((casefile: Casefile) => {
       tempTableItems.push({
         casefileInfo: {
           columnName: '',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: casefile.thumbnailSrc,
             name: casefile.title,
@@ -85,16 +86,16 @@ export class BaseCasefileListComponent implements OnDestroy {
         access: {
           columnName: 'Access',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.ACCESS_TABLE_CELL,
-            targetUrl: Casefile.basePath + casefile.id,
+            targetUrl: Casefile.basePath + casefile.xid,
             accessState: AccessState.ACCESS_GRANTED,
           },
         },
         owner: {
           columnName: 'Owner',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: casefile.author.fullName,
           },
@@ -102,7 +103,7 @@ export class BaseCasefileListComponent implements OnDestroy {
         starred: {
           columnName: 'Starred',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.FAVORIZED_TABLE_CELL,
             isFavorized: false,
           },
@@ -110,7 +111,7 @@ export class BaseCasefileListComponent implements OnDestroy {
         views: {
           columnName: 'Views',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.TEXT_TABLE_CELL,
             text: String(casefile.views),
           },
@@ -118,7 +119,7 @@ export class BaseCasefileListComponent implements OnDestroy {
         lastUpdated: {
           columnName: 'Last Updated',
           cellData: {
-            id: casefile.id,
+            id: casefile.xid,
             type: TableCellTypes.DATE_TABLE_CELL,
             date: String(casefile.lastUpdated),
           },
