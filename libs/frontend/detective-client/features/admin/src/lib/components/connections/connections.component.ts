@@ -1,7 +1,8 @@
 import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfaces';
-import { Observable, Subject, Subscription, map } from 'rxjs';
+import { Observable, Subject, Subscription, map, shareReplay } from 'rxjs';
 
 import { ConnectionsDialogComponent } from './dialog';
 import { ConnectionsService } from '../../services';
@@ -25,7 +26,18 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
 
-  constructor(private readonly connectionsService: ConnectionsService, private readonly connectionsDialog: MatDialog) {}
+  isMobile$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
+
+  constructor(
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly connectionsService: ConnectionsService,
+    private readonly connectionsDialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.connections$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize);

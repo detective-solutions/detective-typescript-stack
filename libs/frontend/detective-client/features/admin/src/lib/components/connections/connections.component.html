@@ -1,9 +1,13 @@
-<button mat-stroked-button (click)="openConnectionsDialog()">
-  <mat-icon>description</mat-icon>
-  New Connection
-</button>
-<table-view
-  [tableRows$]="tableItems$"
-  [pageSize]="pageSize"
-  [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
-></table-view>
+<div class="connections-wrapper" [class.is-mobile]="isMobile$ | async">
+  <div class="add-connection-button-wrapper">
+    <button mat-stroked-button (click)="openConnectionsDialog()">
+      <mat-icon>add</mat-icon>
+      New Connection
+    </button>
+  </div>
+  <table-view
+    [tableRows$]="tableItems$"
+    [pageSize]="pageSize"
+    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+  ></table-view>
+</div>
