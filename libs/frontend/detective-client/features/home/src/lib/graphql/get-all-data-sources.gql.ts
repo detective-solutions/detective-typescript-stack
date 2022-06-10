@@ -12,7 +12,7 @@ export class GetAllDataSourcesGQL extends Query<Response> {
   override document = gql`
     query dataSources($paginationOffset: Int, $pageSize: Int) {
       querySourceConnection(offset: $paginationOffset, first: $pageSize) {
-        id
+        xid
         name
         description
         connectorName

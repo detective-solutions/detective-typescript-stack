@@ -33,7 +33,7 @@ export class SourceConnection implements ISourceConnection {
   static readonly defaultThumbnail = SourceConnection.iconBasePath + 'default.svg';
 
   constructor(
-    public id = '',
+    public xid = '',
     public name = '',
     public connectorName = '',
     public description = '',
@@ -41,18 +41,18 @@ export class SourceConnection implements ISourceConnection {
     public lastUpdated: Date | null = null
   ) {}
 
-  static Build(sourceConnection: ISourceConnection) {
-    if (!sourceConnection) {
+  static Build(sourceConnectionInput: ISourceConnection) {
+    if (!sourceConnectionInput) {
       return new SourceConnection();
     }
 
     return new SourceConnection(
-      sourceConnection.id,
-      sourceConnection.name,
-      sourceConnection.connectorName,
-      sourceConnection.description,
-      sourceConnection.iconSrc ?? SourceConnection.getIconSrc(sourceConnection.connectorName),
-      (sourceConnection.lastUpdated as Date) ?? new Date()
+      sourceConnectionInput.xid,
+      sourceConnectionInput.name,
+      sourceConnectionInput.connectorName,
+      sourceConnectionInput.description,
+      sourceConnectionInput.iconSrc ?? SourceConnection.getIconSrc(sourceConnectionInput.connectorName),
+      (sourceConnectionInput.lastUpdated as Date) ?? new Date()
     );
   }
 

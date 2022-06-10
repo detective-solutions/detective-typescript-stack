@@ -75,7 +75,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
         dataSourceInfo: {
           columnName: '',
           cellData: {
-            id: connection.id,
+            id: connection.xid,
             type: TableCellTypes.MULTI_TABLE_CELL,
             thumbnailSrc: connection.iconSrc,
             name: connection.name,
@@ -85,7 +85,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
         state: {
           columnName: 'Access',
           cellData: {
-            id: connection.id,
+            id: connection.xid,
             type: TableCellTypes.ACCESS_TABLE_CELL,
             accessState: AccessState.NO_ACCESS,
           },
@@ -93,7 +93,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
         lastUpdated: {
           columnName: 'Last Updated',
           cellData: {
-            id: connection.id,
+            id: connection.xid,
             type: TableCellTypes.DATE_TABLE_CELL,
             date: String(connection.lastUpdated),
           },
@@ -101,7 +101,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
         actions: {
           columnName: 'Actions',
           cellData: {
-            id: connection.id,
+            id: connection.xid,
             type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
             buttons: [
               { icon: 'edit', tooltipText: 'test' },

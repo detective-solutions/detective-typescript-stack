@@ -1,5 +1,5 @@
 export interface ISourceConnection {
-  id: string;
+  xid: string;
   name: string;
   connectorName: string;
   description?: string;
