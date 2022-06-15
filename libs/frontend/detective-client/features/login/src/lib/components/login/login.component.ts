@@ -2,7 +2,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { LoginEmailValidation, LoginPasswordValidation } from '@detective.solutions/frontend/shared/utils';
-import { Subscription, combineLatest, debounceTime, filter } from 'rxjs';
+import { Subscription, combineLatest, debounceTime, filter, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 
@@ -46,16 +46,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   login(submittedForm: FormGroup) {
-    this.subscriptions.add(
-      this.authService
-        .login(submittedForm.value.email, submittedForm.value.password)
-        .pipe(debounceTime(1000))
-        .subscribe()
-    );
-    this.subscriptions.add(
-      combineLatest([this.authService.authStatus$, this.authService.currentUser$])
-        .pipe(filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''))
-        .subscribe(() => this.router.navigateByUrl(this.redirectUrl))
-    );
+    this.authService
+      .login(submittedForm.value.email, submittedForm.value.password)
+      .pipe(debounceTime(1000), take(1))
+      .subscribe();
+    combineLatest([this.authService.authStatus$, this.authService.currentUser$])
+      .pipe(
+        filter(([authStatus, user]) => authStatus.isAuthenticated && user?.email !== ''),
+        take(1)
+      )
+      .subscribe(() => this.router.navigateByUrl(this.redirectUrl));
   }
 }
