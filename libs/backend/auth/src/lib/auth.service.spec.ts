@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '@detective.solutions/backend/users';
 import jwtDecode from 'jwt-decode';
+import { v4 as uuidv4 } from 'uuid';
 
 const mockUserService = {
   getJwtUserInfoByEmail: jest.fn(),
@@ -20,12 +21,12 @@ const mockUserService = {
 
 describe('AuthService', () => {
   const testUser = {
-    id: '1x0',
+    id: uuidv4(),
     email: 'test@test.com',
     password: 'test',
-    tenantId: '2x0',
+    tenantId: uuidv4(),
     role: UserRole.BASIC,
-    refreshTokenId: '123',
+    refreshTokenId: uuidv4(),
   };
 
   let authService: AuthService;
