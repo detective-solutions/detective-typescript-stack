@@ -41,7 +41,7 @@ export class UserService {
     }
 
     if (response.passwordCheck.length > 1) {
-      this.logger.error(`Found more than one user with email address ${email} during password check. Aborting ...`);
+      this.logger.error(`Found more than one user with email address ${email} during password check`);
       throw new InternalServerErrorException();
     }
 
@@ -64,10 +64,10 @@ export class UserService {
     const query = `
       query jwtUserInfo($email: string) {
         jwtUserInfo(func: eq(User.email, $email)) @normalize {
-          id: uid
+          id: User.xid
           User.tenants
             {
-              tenantId: uid
+              tenantId: Tenant.xid
             }
           role: User.role
         }
@@ -88,7 +88,7 @@ export class UserService {
     }
 
     if (response.jwtUserInfo.length > 1) {
-      this.logger.error(`Found more than one user with email address ${email}. Aborting ...`);
+      this.logger.error(`Found more than one user with email address ${email}`);
       throw new InternalServerErrorException();
     }
 
@@ -112,11 +112,11 @@ export class UserService {
     // Make sure the query matches JWTUserInfo properties
     const query = `
       query jwtUserInfo($id: string) {
-        jwtUserInfo(func: uid($id)) @normalize {
-          id: uid
+        jwtUserInfo(func: eq(User.xid, $id)) @normalize {
+          id: User.xid
           User.tenants
             {
-              tenantId: uid
+              tenantId: Tenant.xid
             }
           role: User.role
           refreshTokenId: User.refreshTokenId
@@ -138,7 +138,7 @@ export class UserService {
     }
 
     if (response.jwtUserInfo.length > 1) {
-      this.logger.error(`Found more than one user with id ${id}. Aborting ...`);
+      this.logger.error(`Found more than one user with id ${id}`);
       throw new InternalServerErrorException();
     }
 
@@ -156,7 +156,7 @@ export class UserService {
 
   async removeRefreshTokenId(id: string): Promise<void | null> {
     const mutationJson = {
-      uid: id,
+      uid: await this.getUserUid(id),
       'User.refreshTokenId': '',
     };
 
@@ -168,13 +168,50 @@ export class UserService {
 
   async updateRefreshTokenId(id: string, refreshTokenId: string): Promise<Record<string, any> | null> {
     const mutationJson = {
-      uid: id,
+      uid: await this.getUserUid(id),
       'User.refreshTokenId': refreshTokenId,
     };
 
     return this.sendMutation(mutationJson).catch(() => {
       return null;
     });
+  }
+
+  private async getUserUid(id: string): Promise<string> {
+    interface IApiResponse {
+      getUserUid: { uid: string }[];
+    }
+
+    const query = 'query getUserUid($id: string) { getUserUid(func: eq(User.xid, $id)) { uid }}';
+    const queryVariables = { $id: id };
+
+    const queryResponse = (await this.sendQuery(query, queryVariables)) as IApiResponse;
+    if (!queryResponse) {
+      return null;
+    }
+
+    if (!queryResponse.getUserUid) {
+      this.logger.error('Incoming database response object is missing "getUserUid" property');
+      throw new InternalServerErrorException();
+    }
+
+    if (queryResponse.getUserUid.length > 1) {
+      this.logger.error(`Found more than one user with id ${id} while fetching uid`);
+      throw new InternalServerErrorException();
+    }
+
+    if (queryResponse.getUserUid.length === 0) {
+      this.logger.error(`No user found for the given id ${id}`);
+      return null;
+    }
+
+    const userUid = queryResponse.getUserUid[0]?.uid;
+    if (!userUid) {
+      this.logger.error('"getUserUid" is missing "uid" property');
+      throw new InternalServerErrorException();
+    }
+
+    return userUid;
   }
 
   /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)

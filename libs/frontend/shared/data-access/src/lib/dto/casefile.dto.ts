@@ -7,7 +7,7 @@ export class Casefile implements ICasefile {
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
-    public xid = '',
+    public id = '',
     public title = '',
     public description = '',
     public thumbnailSrc = '',
@@ -23,7 +23,7 @@ export class Casefile implements ICasefile {
     }
 
     return new Casefile(
-      casefileInput.xid,
+      casefileInput.id,
       casefileInput.title,
       casefileInput.description ?? '',
       casefileInput.thumbnailSrc ?? Casefile.thumbnailPlaceholder,

@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   IsUrl,
   MaxLength,
   MinLength,
@@ -18,7 +19,7 @@ import { Type } from 'class-transformer';
 import { UserGroup } from './user-group.dto';
 
 export class User implements IUser {
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
   id: string;
 

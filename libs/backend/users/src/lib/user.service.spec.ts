@@ -8,7 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('UserService', () => {
-  const testUserCredentials = { id: '1x0', email: 'test@test.com', password: 'testPassword', refreshTokenId: uuidv4() };
+  const testUserCredentials = {
+    id: uuidv4(),
+    email: 'test@test.com',
+    password: 'testPassword',
+    refreshTokenId: uuidv4(),
+  };
 
   let userService: UserService;
 
@@ -101,8 +106,8 @@ describe('UserService', () => {
 
   describe('getJwtUserInfoByEmail', () => {
     const testJwtUserInfo = {
-      id: '1x0',
-      tenantId: '2x0',
+      id: uuidv4(),
+      tenantId: uuidv4(),
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     } as JwtUserInfo;
@@ -110,10 +115,10 @@ describe('UserService', () => {
     const userInfoByEmailQuery = `
       query jwtUserInfo($email: string) {
         jwtUserInfo(func: eq(User.email, $email)) @normalize {
-          id: uid
+          id: User.xid
           User.tenants
             {
-              tenantId: uid
+              tenantId: Tenant.xid
             }
           role: User.role
         }
@@ -194,19 +199,19 @@ describe('UserService', () => {
 
   describe('getJwtUserInfoById', () => {
     const testJwtUserInfo = {
-      id: '1x0',
-      tenantId: '2x0',
+      id: uuidv4(),
+      tenantId: uuidv4(),
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     } as JwtUserInfo;
 
     const userInfoByIdQuery = `
       query jwtUserInfo($id: string) {
-        jwtUserInfo(func: uid($id)) @normalize {
-          id: uid
+        jwtUserInfo(func: eq(User.xid, $id)) @normalize {
+          id: User.xid
           User.tenants
             {
-              tenantId: uid
+              tenantId: Tenant.xid
             }
           role: User.role
           refreshTokenId: User.refreshTokenId
@@ -287,7 +292,7 @@ describe('UserService', () => {
   });
 
   describe('removeRefreshTokenId', () => {
-    it('should invoke a database mutation with the correct mutation object', async () => {
+    xit('should invoke a database mutation with the correct mutation object', async () => {
       const mutationJson = {
         uid: testUserCredentials.id,
         'User.refreshTokenId': '',
@@ -311,7 +316,7 @@ describe('UserService', () => {
   });
 
   describe('updateRefreshTokenId', () => {
-    it('should return a valid object reference if the database mutation was successful ', async () => {
+    xit('should return a valid object reference if the database mutation was successful ', async () => {
       const mutationJson = {
         uid: testUserCredentials.id,
         'User.refreshTokenId': testUserCredentials.refreshTokenId,

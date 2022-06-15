@@ -9,12 +9,12 @@ export interface IGetCurrentUserGQLResponse {
 @Injectable()
 export class GetUserGQL extends Query<Response> {
   override document = gql`
-    query user($userId: ID!) {
-      getUser(id: $userId) {
-        id
+    query user($userId: String!) {
+      getUser(xid: $userId) {
+        id: xid
         email
         tenantIds: tenants {
-          id
+          id: xid
         }
         firstname
         lastname

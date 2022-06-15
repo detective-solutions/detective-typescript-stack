@@ -1,7 +1,7 @@
 import { IUser } from '../user/user.interface';
 
 export interface ICasefile {
-  xid: string;
+  id: string;
   title: string;
   description?: string;
   thumbnailSrc?: string;

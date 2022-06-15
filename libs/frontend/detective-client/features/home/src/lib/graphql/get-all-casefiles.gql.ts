@@ -10,9 +10,9 @@ export interface IGetAllCasefilesGQLResponse {
 @Injectable()
 export class GetAllCasefilesGQL extends Query<Response> {
   override document = gql`
-    query casefiles($paginationOffset: Int, $pageSize: Int) {
+    query casefiles($paginationOffset: Int!, $pageSize: Int!) {
       queryCasefile(offset: $paginationOffset, first: $pageSize) {
-        xid
+        id: xid
         title
         description
         thumbnailSrc

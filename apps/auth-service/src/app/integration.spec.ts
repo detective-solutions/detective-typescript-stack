@@ -51,8 +51,8 @@ describe('AppController', () => {
   describe('/POST login', () => {
     it('should return a valid access and refresh token', () => {
       const testJwtUserInfo = {
-        id: '1x0',
-        tenantId: '2x0',
+        id: uuidv4(),
+        tenantId: uuidv4(),
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -155,8 +155,8 @@ describe('AppController', () => {
 
     it('should return Unauthorized (401) if the given password does not match the password saved in the database', async () => {
       const testJwtUserInfo = {
-        id: '1x0',
-        tenantId: '2x0',
+        id: uuidv4(),
+        tenantId: uuidv4(),
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -184,8 +184,8 @@ describe('AppController', () => {
 
   describe('/POST logout', () => {
     const testJwtUserInfo = {
-      id: '1x0',
-      tenantId: '2x0',
+      id: uuidv4(),
+      tenantId: uuidv4(),
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     } as JwtUserInfo;
@@ -322,8 +322,8 @@ describe('AppController', () => {
 
   describe('/POST refresh', () => {
     const testJwtUserInfo = {
-      id: '1x0',
-      tenantId: '2x0',
+      id: uuidv4(),
+      tenantId: uuidv4(),
       role: UserRole.BASIC,
     } as JwtUserInfo;
 
