@@ -1,13 +1,10 @@
-import { Observable, ReplaySubject } from 'rxjs';
-
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { IAuthStatus } from './auth-status.interface';
-import { User } from '@detective.solutions/frontend/shared/data-access';
+import { Observable } from 'rxjs';
 
 export interface IAuthService {
   readonly authStatus$: BehaviorSubject<IAuthStatus>;
-  readonly currentUser$: ReplaySubject<User>;
-  login(email: string, password: string): Observable<void>;
+  login(email: string, password: string): Observable<IAuthStatus>;
   logout(clearToken?: boolean): void;
   getAccessToken(): string;
 }

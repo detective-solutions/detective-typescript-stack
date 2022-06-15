@@ -6,6 +6,7 @@ export interface IGetCurrentUserGQLResponse {
   getUser: IUser;
 }
 
+// TODO: This is not needed in this module anymore, but kept for future usage in other modules
 @Injectable()
 export class GetUserGQL extends Query<Response> {
   override document = gql`

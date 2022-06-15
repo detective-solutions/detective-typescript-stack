@@ -1,22 +1,10 @@
-import {
-  BehaviorSubject,
-  Observable,
-  ReplaySubject,
-  Subject,
-  catchError,
-  filter,
-  map,
-  mergeMap,
-  pipe,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, map, tap } from 'rxjs';
 import { IAuthServerResponse, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
 import { CacheService } from './cache.service';
 import { IAuthService } from '../interfaces/auth-service.interface';
 import { Injectable } from '@angular/core';
-import { User } from '@detective.solutions/frontend/shared/data-access';
 import jwtDecode from 'jwt-decode';
 import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
@@ -29,38 +17,23 @@ export abstract class AuthService extends CacheService implements IAuthService {
   isRefreshing = false;
   isLoggingOut = false;
 
-  private getAndUpdateUserIfAuthenticated = pipe(
-    filter((authStatus: IAuthStatus) => authStatus.isAuthenticated),
-    mergeMap((authStatus) => this.getCurrentUser(authStatus.userId)),
-    map((user: User) => this.currentUser$.next(user))
-  );
-
   readonly authStatus$ = new BehaviorSubject<IAuthStatus>(defaultAuthStatus);
-  readonly currentUser$ = new ReplaySubject<User>();
   readonly loggedOut$ = new Subject<boolean>();
-
-  protected readonly resumeCurrentUser$ = this.authStatus$.pipe(
-    this.getAndUpdateUserIfAuthenticated,
-    catchError(transformError)
-  );
 
   protected abstract loginProvider(email: string, password: string): Observable<IAuthServerResponse>;
   protected abstract logoutProvider(): Observable<void>;
   protected abstract refreshProvider(): Observable<IAuthServerResponse>;
   protected abstract transformJwtToken(token: IJwtTokenPayload): IAuthStatus;
-  protected abstract getCurrentUser(userId: string): Observable<User>;
 
   constructor() {
     super();
-    // Resume current user if a valid access token is available
+    // Resume auth status if a valid access token is available
     if (!this.hasExpiredToken(this.getAccessToken())) {
       this.authStatus$.next(this.getAuthStatusFromToken());
-      // Resume pipe must run on the next cycle to make sure all services are constructed correctly
-      setTimeout(() => this.resumeCurrentUser$.subscribe());
     }
   }
 
-  login(email: string, password: string): Observable<void> {
+  login(email: string, password: string): Observable<IAuthStatus> {
     this.clearAuthTokens();
     return this.loginProvider(email, password).pipe(
       map((response: IAuthServerResponse) => {
@@ -68,7 +41,6 @@ export abstract class AuthService extends CacheService implements IAuthService {
         return this.getAuthStatusFromToken();
       }),
       tap((status) => this.authStatus$.next(status)),
-      this.getAndUpdateUserIfAuthenticated,
       catchError(transformError)
     );
   }
