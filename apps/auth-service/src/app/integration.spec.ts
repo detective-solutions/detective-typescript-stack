@@ -64,6 +64,7 @@ describe('AppController', () => {
         });
 
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
+      jest.spyOn(UserService.prototype, 'getUserUid').mockResolvedValue('');
 
       return app
         .inject({
