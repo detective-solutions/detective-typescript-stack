@@ -177,7 +177,7 @@ export class UserService {
     });
   }
 
-  private async getUserUid(id: string): Promise<string> {
+  async getUserUid(id: string): Promise<string> {
     interface IApiResponse {
       getUserUid: { uid: string }[];
     }

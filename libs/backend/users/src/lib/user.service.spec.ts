@@ -348,4 +348,74 @@ describe('UserService', () => {
       expect(createMutationSpy).toBeCalledTimes(1);
     });
   });
+
+  describe('getUserUid', () => {
+    const testUserUid = {
+      uid: '123',
+    };
+    const getUserUidQuery = 'query getUserUid($id: string) { getUserUid(func: eq(User.xid, $id)) { uid }}';
+
+    it('should return a valid user uid', async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ getUserUid: [testUserUid] });
+
+      const res = await userService.getUserUid(testUserCredentials.id);
+
+      expect(res).toBe(testUserUid.uid);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+      expect(sendQuerySpy).toBeCalledWith(getUserUidQuery, {
+        $id: testUserCredentials.id,
+      });
+    });
+
+    it('should return null if the database query returns an empty response', async () => {
+      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue(undefined);
+
+      const res = await userService.getUserUid(testUserCredentials.id);
+
+      expect(res).toBe(null);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
+
+    it('should throw an InternalServerErrorException if the database response misses the "getUserUid" property', async () => {
+      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ testUserUid });
+
+      const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
+
+      await expect(getUserUidPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
+
+    it('should throw an InternalServerErrorException if more than one user uid is returned for the given id', async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ getUserUid: [testUserUid, testUserUid] });
+
+      const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
+
+      await expect(getUserUidPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
+
+    it('should return null if no user uid is returned for the given id', async () => {
+      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ getUserUid: [] });
+
+      const res = await userService.getUserUid(testUserCredentials.id);
+
+      expect(res).toBe(null);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
+
+    it('should throw an InternalServerErrorException if the returned object is missing a uid key', async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ getUserUid: [{}] });
+
+      const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
+
+      await expect(getUserUidPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
+  });
 });
