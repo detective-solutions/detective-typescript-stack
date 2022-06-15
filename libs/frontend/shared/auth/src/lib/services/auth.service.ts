@@ -10,8 +10,8 @@ import { transformError } from '@detective.solutions/frontend/shared/error-handl
 
 @Injectable()
 export abstract class AuthService extends CacheService implements IAuthService {
-  protected static ACCESS_TOKEN_STORAGE_KEY = 'access_token';
-  protected static REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
+  protected static ACCESS_TOKEN_STORAGE_KEY = 'detective_access_token';
+  protected static REFRESH_TOKEN_STORAGE_KEY = 'detective_refresh_token';
 
   // Flags to determine when to use refresh token as bearer token in AuthHttpInterceptor
   isRefreshing = false;
