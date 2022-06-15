@@ -19,7 +19,7 @@ export class MyCasefilesComponent extends BaseCasefileListComponent implements O
 
   ngOnInit() {
     this.casefiles$ = this.authService.authStatus$.pipe(
-      filter((authStatus) => authStatus.isAuthenticated && !!authStatus.userId),
+      filter((authStatus) => !!authStatus.userId),
       map((authStatus) => authStatus.userId),
       switchMap((userId) => {
         return this.casefileService.getCasefilesByAuthor(this.initialPageOffset, this.pageSize, userId);

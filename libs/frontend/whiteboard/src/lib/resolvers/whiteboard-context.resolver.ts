@@ -1,8 +1,9 @@
 import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
-import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
 
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { User } from '@detective.solutions/frontend/shared/data-access';
 import { WhiteboardContextActions } from '../state';
 import { take } from 'rxjs';
 
@@ -11,17 +12,17 @@ export class WhiteboardContextResolver implements Resolve<void> {
   constructor(private readonly authService: AuthService, private readonly store: Store) {}
 
   resolve(route: ActivatedRouteSnapshot) {
-    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) =>
+    this.authService.currentUser$.pipe(take(1)).subscribe((user: User) => {
       this.store.dispatch(
         WhiteboardContextActions.initializeWhiteboardContext({
           context: {
-            tenantId: authStatus.tenantId,
+            tenantId: user.tenantIds[0].id,
             casefileId: route.params['id'],
-            userId: authStatus.userId,
-            userRole: authStatus.userRole,
+            userId: user.id,
+            userRole: user.role,
           },
         })
-      )
-    );
+      );
+    });
   }
 }
