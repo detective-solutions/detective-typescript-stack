@@ -292,9 +292,12 @@ describe('UserService', () => {
   });
 
   describe('removeRefreshTokenId', () => {
-    xit('should invoke a database mutation with the correct mutation object', async () => {
+    it('should invoke a database mutation with the correct mutation object', async () => {
+      const userUid = '123';
+      jest.spyOn(userService, 'getUserUid').mockResolvedValue(userUid);
+
       const mutationJson = {
-        uid: testUserCredentials.id,
+        uid: userUid,
         'User.refreshTokenId': '',
       };
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
@@ -306,6 +309,8 @@ describe('UserService', () => {
     });
 
     it('should return null if an error occurred while removing the refresh token id from the database', async () => {
+      jest.spyOn(userService, 'getUserUid').mockResolvedValue('');
+
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockRejectedValue(null);
 
       const res = await userService.removeRefreshTokenId(testUserCredentials.id);
@@ -316,9 +321,12 @@ describe('UserService', () => {
   });
 
   describe('updateRefreshTokenId', () => {
-    xit('should return a valid object reference if the database mutation was successful ', async () => {
+    it('should return a valid object reference if the database mutation was successful ', async () => {
+      const userUid = '123';
+      jest.spyOn(userService, 'getUserUid').mockResolvedValue(userUid);
+
       const mutationJson = {
-        uid: testUserCredentials.id,
+        uid: userUid,
         'User.refreshTokenId': testUserCredentials.refreshTokenId,
       };
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
@@ -331,6 +339,7 @@ describe('UserService', () => {
     });
 
     it('should return null if an error occurred while updating the refresh token id in the database', async () => {
+      jest.spyOn(userService, 'getUserUid').mockResolvedValue('');
       const createMutationSpy = jest.spyOn(UserService.prototype as any, 'sendMutation').mockRejectedValue(null);
 
       const res = await userService.updateRefreshTokenId(testUserCredentials.id, testUserCredentials.refreshTokenId);
