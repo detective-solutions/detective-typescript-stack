@@ -1,0 +1,22 @@
+<div [formGroup]="form">
+  <mat-label [attr.for]="formFieldDefinition.key">{{ formFieldDefinition.label }}</mat-label>
+
+  <div [ngSwitch]="formFieldDefinition.controlType">
+    <mat-form-field [id]="formFieldDefinition.key" [formControlName]="formFieldDefinition.key">
+      <input
+        *ngSwitchCase="'textbox'"
+        matInput
+        [type]="formFieldDefinition.type"
+        [value]="formFieldValue"
+        [required]="formFieldDefinition.required"
+      />
+      <mat-select *ngSwitchCase="'dropdown'">
+        <mat-option *ngFor="let option of formFieldDefinition.options" [value]="option.key">{{
+          option.value
+        }}</mat-option>
+      </mat-select>
+
+      <!-- <mat-error class="errorMessage>{{ formFieldInfo.label }} is required</mat-error> -->
+    </mat-form-field>
+  </div>
+</div>

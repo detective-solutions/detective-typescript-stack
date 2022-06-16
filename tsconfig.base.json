@@ -34,6 +34,7 @@
       "@detective.solutions/frontend/detective-client/ui": ["libs/frontend/detective-client/ui/src/index.ts"],
       "@detective.solutions/frontend/shared/auth": ["libs/frontend/shared/auth/src/index.ts"],
       "@detective.solutions/frontend/shared/data-access": ["libs/frontend/shared/data-access/src/index.ts"],
+      "@detective.solutions/frontend/shared/dynamic-form": ["libs/frontend/shared/dynamic-form/src/index.ts"],
       "@detective.solutions/frontend/shared/environments": ["libs/frontend/shared/environments/src/index.ts"],
       "@detective.solutions/frontend/shared/error-handling": ["libs/frontend/shared/error-handling/src/index.ts"],
       "@detective.solutions/frontend/shared/page-not-found": ["libs/frontend/shared/page-not-found/src/index.ts"],

@@ -15,6 +15,7 @@
     "frontend-detective-client-features-login": "libs/frontend/detective-client/features/login",
     "frontend-shared-auth": "libs/frontend/shared/auth",
     "frontend-shared-data-access": "libs/frontend/shared/data-access",
+    "frontend-shared-dynamic-form": "libs/frontend/shared/dynamic-form",
     "frontend-shared-environments": "libs/frontend/shared/environments",
     "frontend-shared-error-handling": "libs/frontend/shared/error-handling",
     "frontend-shared-page-not-found": "libs/frontend/shared/page-not-found",
