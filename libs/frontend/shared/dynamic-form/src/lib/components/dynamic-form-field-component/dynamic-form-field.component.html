@@ -2,10 +2,11 @@
   <mat-label [attr.for]="formFieldDefinition.key">{{ formFieldDefinition.label }}</mat-label>
 
   <div [ngSwitch]="formFieldDefinition.controlType">
-    <mat-form-field [id]="formFieldDefinition.key" [formControlName]="formFieldDefinition.key">
+    <mat-form-field [id]="formFieldDefinition.key">
       <input
         *ngSwitchCase="'textbox'"
         matInput
+        [formControlName]="formFieldDefinition.key"
         [type]="formFieldDefinition.type"
         [value]="formFieldValue"
         [required]="formFieldDefinition.required"

@@ -6,6 +6,7 @@ import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'dynamic-form',
+  styleUrls: ['dynamic-form.component.scss'],
   templateUrl: './dynamic-form.component.html',
   providers: [DynamicFormControlService],
 })

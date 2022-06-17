@@ -1,7 +1,8 @@
 import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
-import { Observable, map } from 'rxjs';
+import { IConnectorTypesResponse, IGetAllConnectionsResponse } from '../interfaces';
+import { Observable, map, pluck } from 'rxjs';
 
-import { IGetAllConnectionsResponse } from '../interfaces';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
@@ -10,7 +11,7 @@ import { SourceConnection } from '@detective.solutions/frontend/shared/data-acce
 export class ConnectionsService {
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
 
-  constructor(private readonly getAllConnectionsGQL: GetAllConnectionsGQL) {}
+  constructor(private readonly getAllConnectionsGQL: GetAllConnectionsGQL, private readonly httpClient: HttpClient) {}
 
   getAllConnections(paginationOffset: number, pageSize: number): Observable<IGetAllConnectionsResponse> {
     this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch({
@@ -37,6 +38,11 @@ export class ConnectionsService {
     //   .catch((error) => this.handleError(error));
   }
 
+  getAvailableConnectorTypes(): Observable<string[]> {
+    return this.httpClient.get<IConnectorTypesResponse>('v1/catalog/connector/list').pipe(pluck('types'));
+  }
+
+  // TODO: Enable when state is added to connections list
   //   private handleError(error: string) {
   //     this.tableCellEventService.resetLoadingStates$.next(true);
   //     return transformError(error);

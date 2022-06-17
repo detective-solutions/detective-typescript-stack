@@ -1,18 +1,22 @@
 import { BaseFormField, DropdownFormField, TextBoxFormField } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { FormGroup } from '@angular/forms';
+import { ConnectionsService } from '../../../services';
+import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
   selector: 'connections-dialog',
+  styleUrls: ['connections-dialog.component.scss'],
   templateUrl: 'connections-dialog.component.html',
 })
 export class ConnectionsDialogComponent {
-  connectorTypeFormGroup = new FormGroup({});
+  connectorTypeFormGroup = this.formBuilder.group({ connectorType: 'connectorType' });
 
+  availableConnectorTypes$ = this.connectionsService.getAvailableConnectorTypes();
+  selectedConnectorType$ = this.connectorTypeFormGroup.get('connectorType')?.valueChanges;
   formFieldDefinitions$: Observable<BaseFormField<any>[]> = of([
     new DropdownFormField({
       key: 'connectorTypes',
@@ -32,5 +36,9 @@ export class ConnectionsDialogComponent {
     }),
   ]);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: object) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: object,
+    private readonly formBuilder: FormBuilder,
+    private readonly connectionsService: ConnectionsService
+  ) {}
 }

@@ -64,7 +64,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   }
 
   openConnectionsDialog() {
-    this.connectionsDialog.open(ConnectionsDialogComponent, {});
+    this.connectionsDialog.open(ConnectionsDialogComponent, { minWidth: 400 });
   }
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {
