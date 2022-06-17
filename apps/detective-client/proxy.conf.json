@@ -1,6 +1,10 @@
 {
-  "/v1/*": {
+  "/v1/auth/**": {
     "target": "http://localhost:1111",
+    "secure": false
+  },
+  "/v1/catalog/**": {
+    "target": "http://localhost:3003",
     "secure": false
   },
   "/graphql": {
