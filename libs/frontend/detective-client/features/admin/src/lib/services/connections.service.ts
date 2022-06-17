@@ -9,6 +9,8 @@ import { SourceConnection } from '@detective.solutions/frontend/shared/data-acce
 
 @Injectable()
 export class ConnectionsService {
+  private static catalogBasePath = 'v1/catalog';
+
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
 
   constructor(private readonly getAllConnectionsGQL: GetAllConnectionsGQL, private readonly httpClient: HttpClient) {}
@@ -39,11 +41,27 @@ export class ConnectionsService {
   }
 
   getAvailableConnectorTypes(): Observable<string[]> {
-    return this.httpClient.get<IConnectorTypesResponse>('v1/catalog/connector/list').pipe(pluck('types'));
+    return this.httpClient
+      .get<IConnectorTypesResponse>(`${ConnectionsService.catalogBasePath}/connector/list`)
+      .pipe(pluck('types'));
   }
 
   getConnectorProperties(connectorType: string) {
-    return this.httpClient.get(`v1/catalog/connector/schema/${connectorType}`);
+    return this.httpClient.get(`${ConnectionsService.catalogBasePath}/connector/schema/${connectorType}`);
+  }
+
+  updateConnection(connectionType: string, connectionId: string, payload: any) {
+    return this.httpClient.post(
+      `${ConnectionsService.catalogBasePath}/${connectionType}/update/${connectionId}`,
+      payload
+    );
+  }
+
+  deleteConnection(connectionId: string, connectionName: string) {
+    return this.httpClient.post(`${ConnectionsService.catalogBasePath}/delete`, {
+      source_connection_xid: connectionId,
+      source_connection_name: connectionName,
+    });
   }
 
   // TODO: Enable when state is added to connections list
