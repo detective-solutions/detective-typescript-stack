@@ -1,5 +1,12 @@
-h1,
-mat-form-field,
-dynamic-form {
+.mat-dialog-content {
   width: 80%;
+
+  form,
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.shadow-highlight {
+  box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.14);
 }

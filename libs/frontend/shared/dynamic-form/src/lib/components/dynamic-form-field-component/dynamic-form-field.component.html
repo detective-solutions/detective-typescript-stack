@@ -1,8 +1,7 @@
-<div [formGroup]="form">
-  <mat-label [attr.for]="formFieldDefinition.key">{{ formFieldDefinition.label }}</mat-label>
-
-  <div [ngSwitch]="formFieldDefinition.controlType">
-    <mat-form-field [id]="formFieldDefinition.key">
+<div class="form-group-wrapper" [formGroup]="form">
+  <div class="form-field-wrapper" [ngSwitch]="formFieldDefinition.controlType">
+    <mat-form-field *ngSwitchCase="'textbox'" [id]="formFieldDefinition.key">
+      <mat-label [attr.for]="formFieldDefinition.key">{{ formFieldDefinition.label }}</mat-label>
       <input
         *ngSwitchCase="'textbox'"
         matInput
@@ -16,8 +15,26 @@
           option.value
         }}</mat-option>
       </mat-select>
-
       <!-- <mat-error class="errorMessage>{{ formFieldInfo.label }} is required</mat-error> -->
     </mat-form-field>
+
+    <mat-form-field *ngSwitchCase="'dropdown'" [id]="formFieldDefinition.key">
+      <mat-label [attr.for]="formFieldDefinition.key">{{ formFieldDefinition.label }}</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let option of formFieldDefinition.options" [value]="option.key">{{
+          option.value
+        }}</mat-option>
+      </mat-select>
+      <!-- <mat-error class="errorMessage>{{ formFieldInfo.label }} is required</mat-error> -->
+    </mat-form-field>
+
+    <mat-checkbox
+      *ngSwitchCase="'checkbox'"
+      [id]="formFieldDefinition.key"
+      [formControlName]="formFieldDefinition.key"
+      [checked]="!!formFieldValue"
+    >
+      {{ formFieldDefinition.label }}</mat-checkbox
+    >
   </div>
 </div>

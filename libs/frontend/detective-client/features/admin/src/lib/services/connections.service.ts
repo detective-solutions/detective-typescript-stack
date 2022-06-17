@@ -42,6 +42,10 @@ export class ConnectionsService {
     return this.httpClient.get<IConnectorTypesResponse>('v1/catalog/connector/list').pipe(pluck('types'));
   }
 
+  getConnectorProperties(connectorType: string) {
+    return this.httpClient.get(`v1/catalog/connector/schema/${connectorType}`);
+  }
+
   // TODO: Enable when state is added to connections list
   //   private handleError(error: string) {
   //     this.tableCellEventService.resetLoadingStates$.next(true);

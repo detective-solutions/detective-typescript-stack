@@ -1,19 +1,18 @@
-<h1 mat-dialog-title fxLayoutAlign="center center">Add a new connection</h1>
-<div mat-dialog-content>
-  <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
-    <mat-form-field class="form-wrapper">
-      <mat-label>Choose a connector type</mat-label>
-      <mat-select formControlName="connectorType">
-        <mat-option *ngFor="let connectorType of availableConnectorTypes$ | async" [value]="connectorType">{{
-          connectorType
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
-  <dynamic-form
-    *ngIf="selectedConnectorType$ | async"
-    class="form-wrapper"
-    [formFieldDefinitions]="formFieldDefinitions$ | async"
-    fxLayoutAlign="center center"
-  ></dynamic-form>
+<div fxLayout="column" fxLayoutAlign="center center">
+  <h1 mat-dialog-title>Add a new connection</h1>
+  <div mat-dialog-content>
+    <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
+      <mat-form-field>
+        <mat-label>Choose a connector type</mat-label>
+        <mat-select formControlName="connectorType">
+          <mat-option *ngFor="let connectorType of availableConnectorTypes$ | async" [value]="connectorType">{{
+            connectorType
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+    <div *ngIf="formFieldDefinitionsByConnectorType | async as formFieldDefinitions" class="shadow-highlight">
+      <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
+    </div>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
 import { BaseFormField } from '../../models';
 import { DynamicFormControlService } from '../../services';
@@ -10,14 +10,21 @@ import { FormGroup } from '@angular/forms';
   templateUrl: './dynamic-form.component.html',
   providers: [DynamicFormControlService],
 })
-export class DynamicFormComponent implements OnInit {
-  @Input() formFieldDefinitions: BaseFormField<string>[] | null = [];
+export class DynamicFormComponent implements OnInit, OnChanges {
+  @Input() formFieldDefinitions!: BaseFormField<string>[];
   form!: FormGroup;
 
   constructor(private readonly formControlService: DynamicFormControlService) {}
 
   ngOnInit() {
-    this.form = this.formControlService.toFormGroup(this.formFieldDefinitions as BaseFormField<string>[]);
+    this.form = this.formControlService.toFormGroup(this.formFieldDefinitions);
+  }
+
+  ngOnChanges() {
+    if (this.form) {
+      // Update form controls on input changes
+      this.form = this.formControlService.toFormGroup(this.formFieldDefinitions);
+    }
   }
 
   submitForm() {

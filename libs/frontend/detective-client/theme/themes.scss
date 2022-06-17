@@ -20,5 +20,6 @@
   @include mat.progress-bar-theme($default-theme);
   @include mat.dialog-theme($default-theme);
   @include mat.select-theme($default-theme);
+  @include mat.checkbox-theme($default-theme);
   @include custom-components-theme($default-theme);
 }
