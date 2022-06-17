@@ -11,9 +11,9 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 // Custom implementation of abstract AuthService to communicate with detective.solutions AuthService backend
 @Injectable()
 export class CustomAuthService extends AuthService {
-  private readonly loginUrl = `${environment.apiBaseUrl}/v1/auth/login`;
-  private readonly logoutUrl = `${environment.apiBaseUrl}/v1/auth/logout`;
-  private readonly refreshUrl = `${environment.apiBaseUrl}/v1/auth/refresh`;
+  private readonly loginUrl = `${environment.apiBasePath}/v1/auth/login`;
+  private readonly logoutUrl = `${environment.apiBasePath}/v1/auth/logout`;
+  private readonly refreshUrl = `${environment.apiBasePath}/v1/auth/refresh`;
 
   constructor(private readonly httpClient: HttpClient) {
     super();

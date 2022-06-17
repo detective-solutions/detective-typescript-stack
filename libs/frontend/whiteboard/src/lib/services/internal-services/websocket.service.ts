@@ -38,7 +38,7 @@ export class WebSocketService implements OnDestroy {
   readonly webSocketConnectionFailedEventually$ = new Subject<boolean>();
 
   get websocketUrl() {
-    return `${environment.webSocketBaseUrl}/?token=${this.authService.getAccessToken()}`;
+    return `${environment.webSocketBasePath}/?token=${this.authService.getAccessToken()}`;
   }
 
   constructor(
