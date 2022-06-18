@@ -7,8 +7,9 @@ import {
   TableCellEventType,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { BehaviorSubject, Subject, Subscription, filter, tap } from 'rxjs';
-import { Component, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subject, Subscription, filter, take, tap } from 'rxjs';
+import { Component, Inject, OnDestroy } from '@angular/core';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
@@ -45,7 +46,9 @@ export class BaseCasefileListComponent implements OnDestroy {
     protected readonly authService: AuthService,
     protected readonly casefileService: CasefileService,
     protected readonly navigationEventService: NavigationEventService,
-    protected readonly tableCellEventService: TableCellEventService
+    protected readonly tableCellEventService: TableCellEventService,
+    protected readonly translationService: TranslocoService,
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {
     this.showTableView$ = this.navigationEventService.showTableView$;
   }
@@ -69,63 +72,68 @@ export class BaseCasefileListComponent implements OnDestroy {
   }
 
   protected transformToTableStructure(originalCasefiles: Casefile[]): ICasefileTableDef[] {
-    // TODO: Translate column headers
     const tempTableItems = [] as ICasefileTableDef[];
-    originalCasefiles.forEach((casefile: Casefile) => {
-      tempTableItems.push({
-        casefileInfo: {
-          columnName: '',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.MULTI_TABLE_CELL,
-            thumbnailSrc: casefile.thumbnailSrc,
-            name: casefile.title,
-            description: casefile.description,
-          },
-        },
-        access: {
-          columnName: 'Access',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.ACCESS_TABLE_CELL,
-            targetUrl: Casefile.basePath + casefile.id,
-            accessState: AccessState.ACCESS_GRANTED,
-          },
-        },
-        owner: {
-          columnName: 'Owner',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.TEXT_TABLE_CELL,
-            text: casefile.author.fullName,
-          },
-        },
-        starred: {
-          columnName: 'Starred',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.FAVORIZED_TABLE_CELL,
-            isFavorized: false,
-          },
-        },
-        views: {
-          columnName: 'Views',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.TEXT_TABLE_CELL,
-            text: String(casefile.views),
-          },
-        },
-        lastUpdated: {
-          columnName: 'Last Updated',
-          cellData: {
-            id: casefile.id,
-            type: TableCellTypes.DATE_TABLE_CELL,
-            date: String(casefile.lastUpdated),
-          },
-        },
-      } as ICasefileTableDef);
-    });
+
+    this.translationService
+      .selectTranslateObject(`${this.translationScope.scope}.casefileList.columnNames`)
+      .pipe(take(1))
+      .subscribe((translation: { [key: string]: string }) => {
+        originalCasefiles.forEach((casefile: Casefile) => {
+          tempTableItems.push({
+            casefileInfo: {
+              columnName: '',
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.MULTI_TABLE_CELL,
+                thumbnailSrc: casefile.thumbnailSrc,
+                name: casefile.title,
+                description: casefile.description,
+              },
+            },
+            access: {
+              columnName: translation['accessColumn'],
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.ACCESS_TABLE_CELL,
+                targetUrl: Casefile.basePath + casefile.id,
+                accessState: AccessState.ACCESS_GRANTED,
+              },
+            },
+            owner: {
+              columnName: translation['ownerColumn'],
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.TEXT_TABLE_CELL,
+                text: casefile.author.fullName,
+              },
+            },
+            starred: {
+              columnName: '',
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.FAVORIZED_TABLE_CELL,
+                isFavorized: false,
+              },
+            },
+            views: {
+              columnName: translation['viewsColumn'],
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.TEXT_TABLE_CELL,
+                text: String(casefile.views),
+              },
+            },
+            lastUpdated: {
+              columnName: translation['lastUpdatedColumn'],
+              cellData: {
+                id: casefile.id,
+                type: TableCellTypes.DATE_TABLE_CELL,
+                date: String(casefile.lastUpdated),
+              },
+            },
+          } as ICasefileTableDef);
+        });
+      });
     return tempTableItems;
   }
 }
