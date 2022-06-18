@@ -14,5 +14,11 @@
       "viewsColumn": "Views",
       "lastUpdatedColumn": "Last Updated"
     }
+  },
+  "dataSourcesList": {
+    "columnNames": {
+      "accessColumn": "Access",
+      "lastUpdatedColumn": "Last Updated"
+    }
   }
 }

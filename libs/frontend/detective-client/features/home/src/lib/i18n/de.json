@@ -14,5 +14,11 @@
       "viewsColumn": "Aufrufe",
       "lastUpdatedColumn": "Zuletzt aktualisiert"
     }
+  },
+  "dataSourcesList": {
+    "columnNames": {
+      "accessColumn": "Zugriff",
+      "lastUpdatedColumn": "Zuletzt aktualisiert"
+    }
   }
 }

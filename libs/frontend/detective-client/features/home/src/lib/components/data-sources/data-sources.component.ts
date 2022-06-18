@@ -6,9 +6,10 @@ import {
   TableCellEventType,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { IDataSourceTableDef, IGetAllDataSourcesResponse } from '../../interfaces';
-import { Observable, Subject, Subscription, filter, map, tap } from 'rxjs';
+import { Observable, Subject, Subscription, filter, map, take, tap } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { DataSourceService } from '../../services';
 import { ISourceConnection } from '@detective.solutions/shared/data-access';
@@ -41,7 +42,9 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly dataSourceService: DataSourceService,
-    private readonly tableCellEventService: TableCellEventService
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly translationService: TranslocoService,
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
 
   ngOnInit() {
@@ -70,37 +73,42 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
 
   private transformToTableStructure(originalDataSources: ISourceConnection[]): IDataSourceTableDef[] {
     const tempTableItems = [] as IDataSourceTableDef[];
-    // TODO: Translate column headers
-    originalDataSources.forEach((dataSource: ISourceConnection) => {
-      tempTableItems.push({
-        dataSourceInfo: {
-          columnName: '',
-          cellData: {
-            id: dataSource.xid,
-            type: TableCellTypes.MULTI_TABLE_CELL,
-            thumbnailSrc: dataSource.iconSrc,
-            name: dataSource.name,
-            description: dataSource.description,
-          },
-        },
-        access: {
-          columnName: 'Access',
-          cellData: {
-            id: dataSource.xid,
-            type: TableCellTypes.ACCESS_TABLE_CELL,
-            accessState: AccessState.NO_ACCESS,
-          },
-        },
-        lastUpdated: {
-          columnName: 'Last Updated',
-          cellData: {
-            id: dataSource.xid,
-            type: TableCellTypes.DATE_TABLE_CELL,
-            date: String(dataSource.lastUpdated),
-          },
-        },
-      } as IDataSourceTableDef);
-    });
+
+    this.translationService
+      .selectTranslateObject(`${this.translationScope.scope}.dataSourcesList.columnNames`)
+      .pipe(take(1))
+      .subscribe((translation: { [key: string]: string }) => {
+        originalDataSources.forEach((dataSource: ISourceConnection) => {
+          tempTableItems.push({
+            dataSourceInfo: {
+              columnName: '',
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.MULTI_TABLE_CELL,
+                thumbnailSrc: dataSource.iconSrc,
+                name: dataSource.name,
+                description: dataSource.description,
+              },
+            },
+            access: {
+              columnName: translation['accessColumn'],
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.ACCESS_TABLE_CELL,
+                accessState: AccessState.NO_ACCESS,
+              },
+            },
+            lastUpdated: {
+              columnName: translation['lastUpdatedColumn'],
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.DATE_TABLE_CELL,
+                date: String(dataSource.lastUpdated),
+              },
+            },
+          } as IDataSourceTableDef);
+        });
+      });
     return tempTableItems;
   }
 }
