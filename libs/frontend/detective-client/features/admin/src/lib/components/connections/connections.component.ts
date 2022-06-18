@@ -1,8 +1,9 @@
 import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfaces';
-import { Observable, Subject, Subscription, map, shareReplay } from 'rxjs';
+import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { ConnectionsDialogComponent } from './dialog';
 import { ConnectionsService } from '../../services';
@@ -36,7 +37,9 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
     private readonly connectionsService: ConnectionsService,
-    private readonly connectionsDialog: MatDialog
+    private readonly connectionsDialog: MatDialog,
+    private readonly translationService: TranslocoService,
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
 
   ngOnInit() {
@@ -69,48 +72,50 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {
     const tempTableItems = [] as IConnectionsTableDef[];
-    // TODO: Translate column headers
-    originalConnection.forEach((connection: ISourceConnection) => {
-      tempTableItems.push({
-        dataSourceInfo: {
-          columnName: '',
-          cellData: {
-            id: connection.xid,
-            type: TableCellTypes.MULTI_TABLE_CELL,
-            thumbnailSrc: connection.iconSrc,
-            name: connection.name,
-            description: connection.description,
-          },
-        },
-        state: {
-          columnName: 'Access',
-          cellData: {
-            id: connection.xid,
-            type: TableCellTypes.ACCESS_TABLE_CELL,
-            accessState: AccessState.NO_ACCESS,
-          },
-        },
-        lastUpdated: {
-          columnName: 'Last Updated',
-          cellData: {
-            id: connection.xid,
-            type: TableCellTypes.DATE_TABLE_CELL,
-            date: String(connection.lastUpdated),
-          },
-        },
-        actions: {
-          columnName: 'Actions',
-          cellData: {
-            id: connection.xid,
-            type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
-            buttons: [
-              { icon: 'edit', tooltipText: 'test' },
-              { icon: 'delete', tooltipText: 'test2' },
-            ],
-          },
-        },
-      } as IConnectionsTableDef);
-    });
+
+    this.translationService
+      .selectTranslateObject(`${this.translationScope.scope}.connections.columnNames`)
+      .pipe(take(1))
+      .subscribe((translation: { [key: string]: string }) => {
+        originalConnection.forEach((connection: ISourceConnection) => {
+          tempTableItems.push({
+            dataSourceInfo: {
+              columnName: '',
+              cellData: {
+                id: connection.xid,
+                type: TableCellTypes.MULTI_TABLE_CELL,
+                thumbnailSrc: connection.iconSrc,
+                name: connection.name,
+                description: connection.description,
+              },
+            },
+            state: {
+              columnName: translation['stateColumn'],
+              cellData: {
+                id: connection.xid,
+                type: TableCellTypes.ACCESS_TABLE_CELL,
+                accessState: AccessState.ACCESS_PENDING,
+              },
+            },
+            lastUpdated: {
+              columnName: translation['lastUpdatedColumn'],
+              cellData: {
+                id: connection.xid,
+                type: TableCellTypes.DATE_TABLE_CELL,
+                date: String(connection.lastUpdated),
+              },
+            },
+            actions: {
+              columnName: '',
+              cellData: {
+                id: connection.xid,
+                type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
+                buttons: [{ icon: 'edit' }, { icon: 'delete' }],
+              },
+            },
+          } as IConnectionsTableDef);
+        });
+      });
     return tempTableItems;
   }
 }

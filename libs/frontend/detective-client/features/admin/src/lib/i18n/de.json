@@ -5,6 +5,10 @@
   },
   "connections": {
     "addConnectionButtonText": "Neue Verbindung anlegen",
+    "columnNames": {
+      "stateColumn": "Status",
+      "lastUpdatedColumn": "Zuletzt aktualisiert"
+    },
     "connectionsDialog": {
       "addDialogHeader": "Neue Verbindung anlegen",
       "connectorTypeDropdownLabel": "Wählen Sie einen Connector-Typ",
