@@ -1,9 +1,9 @@
-<div fxLayout="column" fxLayoutAlign="center center">
-  <h1 mat-dialog-title>Add a new connection</h1>
+<div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.connections.connectionsDialog'">
+  <h1 mat-dialog-title>{{ t('addDialogHeader') }}</h1>
   <div mat-dialog-content>
     <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
       <mat-form-field>
-        <mat-label>Choose a connector type</mat-label>
+        <mat-label>{{ t('connectorTypeDropdownLabel') }}</mat-label>
         <mat-select formControlName="connectorType">
           <mat-option *ngFor="let connectorType of availableConnectorTypes$ | async" [value]="connectorType">{{
             connectorType
@@ -16,6 +16,6 @@
     </div>
   </div>
   <div *ngIf="formFieldDefinitionsByConnectorType | async" mat-dialog-actions align="center">
-    <button mat-raised-button color="accent" (click)="submitForm()">Save</button>
+    <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
   </div>
 </div>

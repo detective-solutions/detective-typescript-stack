@@ -2,5 +2,13 @@
   "navigation": {
     "sidenavItems": { "connections": "Verbindungen", "groups": "Gruppen", "masks": "Masken" },
     "sidenavBottomItem": "Home"
+  },
+  "connections": {
+    "addConnectionButtonText": "Neue Verbindung anlegen",
+    "connectionsDialog": {
+      "addDialogHeader": "Neue Verbindung anlegen",
+      "connectorTypeDropdownLabel": "Wählen Sie einen Connector-Typ",
+      "saveButtonText": "Speichern"
+    }
   }
 }

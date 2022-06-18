@@ -1,5 +1,6 @@
 import { AdminContainerComponent, ConnectionsComponent, GroupsComponent, MasksComponent } from './components';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
+import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
@@ -10,7 +11,6 @@ import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-
 import { GetAllConnectionsGQL } from './graphql';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
@@ -24,6 +24,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
   imports: [
     CommonModule,
     AdminRoutingModule,
+    TranslocoModule,
     NavigationModule,
     TableModule,
     ReactiveFormsModule,
