@@ -1,13 +1,9 @@
-<form (ngSubmit)="submitForm()" [formGroup]="form">
+<form [formGroup]="form">
   <div class="form-field-wrapper">
     <dynamic-form-field
       *ngFor="let formFieldDefinition of formFieldDefinitions"
       [formFieldDefinition]="formFieldDefinition"
       [form]="form"
     ></dynamic-form-field>
-  </div>
-
-  <div fxLayoutAlign="center center">
-    <button mat-raised-button color="accent" type="submit">Save</button>
   </div>
 </form>

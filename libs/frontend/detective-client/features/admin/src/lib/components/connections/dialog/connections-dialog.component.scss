@@ -5,8 +5,15 @@
   mat-form-field {
     width: 100%;
   }
+
+  .shadow-highlight {
+    box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.14);
+  }
 }
 
-.shadow-highlight {
-  box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.14);
+.mat-dialog-actions {
+  button {
+    margin: 15px 0;
+    width: 100px;
+  }
 }

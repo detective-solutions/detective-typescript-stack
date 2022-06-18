@@ -7,6 +7,8 @@ import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 @Injectable()
 export class ConnectionsService {
   private static catalogBasePath = 'v1/catalog';
@@ -21,7 +23,6 @@ export class ConnectionsService {
       pageSize: pageSize,
     });
     return this.getAllConnectionsWatchQuery.valueChanges.pipe(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       map((response: any) => response.data),
       map((response: IGetAllConnectionsGQLResponse) => {
         return {
@@ -48,6 +49,13 @@ export class ConnectionsService {
 
   getConnectorProperties(connectorType: string) {
     return this.httpClient.get(`${ConnectionsService.catalogBasePath}/connector/schema/${connectorType}`);
+  }
+
+  addConnection(connectionType: string, connectionName: string, payload: any) {
+    return this.httpClient.post(
+      `${ConnectionsService.catalogBasePath}/${connectionType}/insert/${connectionName}`,
+      payload
+    );
   }
 
   updateConnection(connectionType: string, connectionId: string, payload: any) {

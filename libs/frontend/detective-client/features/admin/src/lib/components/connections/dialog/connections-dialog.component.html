@@ -15,4 +15,7 @@
       <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
     </div>
   </div>
+  <div *ngIf="formFieldDefinitionsByConnectorType | async" mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="submitForm()">Save</button>
+  </div>
 </div>

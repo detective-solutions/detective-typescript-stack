@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 
 import { BaseFormField } from '../../models';
 import { DynamicFormControlService } from '../../services';
@@ -8,9 +8,8 @@ import { FormGroup } from '@angular/forms';
   selector: 'dynamic-form',
   styleUrls: ['dynamic-form.component.scss'],
   templateUrl: './dynamic-form.component.html',
-  providers: [DynamicFormControlService],
 })
-export class DynamicFormComponent implements OnInit, OnChanges {
+export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() formFieldDefinitions!: BaseFormField<string>[];
   form!: FormGroup;
 
@@ -27,7 +26,7 @@ export class DynamicFormComponent implements OnInit, OnChanges {
     }
   }
 
-  submitForm() {
-    console.log('SUBMIT');
+  ngOnDestroy() {
+    this.formControlService.resetForm();
   }
 }
