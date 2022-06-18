@@ -20,6 +20,11 @@
             "output": "./"
           },
           {
+            "glob": "manifest.json",
+            "input": "libs/shared/assets/src",
+            "output": "./"
+          },
+          {
             "glob": "**/*",
             "input": "libs/shared/assets/src/assets",
             "output": "assets"
@@ -84,7 +89,7 @@
       "defaultConfiguration": "production"
     },
     "dockerize": {
-      "builder": "@nrwl/workspace:run-commands",
+      "executor": "@nrwl/workspace:run-commands",
       "options": {
         "commands": [
           "nx build detective-client",
