@@ -1,6 +1,6 @@
 import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
 import { IConnectorTypesResponse, IGetAllConnectionsResponse } from '../interfaces';
-import { Observable, map, pluck } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -41,10 +41,8 @@ export class ConnectionsService {
     //   .catch((error) => this.handleError(error));
   }
 
-  getAvailableConnectorTypes(): Observable<string[]> {
-    return this.httpClient
-      .get<IConnectorTypesResponse>(`${ConnectionsService.catalogBasePath}/connector/list`)
-      .pipe(pluck('types'));
+  getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
+    return this.httpClient.get<IConnectorTypesResponse[]>(`${ConnectionsService.catalogBasePath}/connector/list`);
   }
 
   getConnectorProperties(connectorType: string) {

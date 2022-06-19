@@ -1,3 +1,4 @@
 export interface IConnectorTypesResponse {
-  types: string[];
+  connectorName: string;
+  displayName: string;
 }

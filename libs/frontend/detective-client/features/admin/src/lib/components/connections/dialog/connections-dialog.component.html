@@ -5,9 +5,11 @@
       <mat-form-field>
         <mat-label>{{ t('connectorTypeDropdownLabel') }}</mat-label>
         <mat-select formControlName="connectorType">
-          <mat-option *ngFor="let connectorType of availableConnectorTypes$ | async" [value]="connectorType">{{
-            connectorType
-          }}</mat-option>
+          <mat-option
+            *ngFor="let connectorTypeInfo of availableConnectorTypes$ | async"
+            [value]="connectorTypeInfo.connectorName"
+            >{{ connectorTypeInfo.displayName }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
     </form>
