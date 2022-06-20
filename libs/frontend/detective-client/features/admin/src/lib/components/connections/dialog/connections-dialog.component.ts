@@ -5,11 +5,11 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Subscription, map, pluck, switchMap } from 'rxjs';
 import { ConnectionsService } from '../../../services';
 import { FormBuilder } from '@angular/forms';
 import { IConnectorPropertiesResponse } from '../../../interfaces';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -42,7 +42,8 @@ export class ConnectionsDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: object,
     private readonly formBuilder: FormBuilder,
     private readonly connectionsService: ConnectionsService,
-    private readonly dynamicFormControlService: DynamicFormControlService
+    private readonly dynamicFormControlService: DynamicFormControlService,
+    private readonly dialogRef: MatDialog
   ) {}
 
   submitForm() {
@@ -54,6 +55,7 @@ export class ConnectionsDialogComponent {
           .addConnection(this.connectorTypeFormGroup.value.connectorType, connectionName, form.value)
           .subscribe((res) => {
             console.log(res);
+            this.dialogRef.closeAll();
           })
       );
     } else {
