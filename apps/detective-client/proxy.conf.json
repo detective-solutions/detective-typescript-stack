@@ -1,14 +1,17 @@
 {
-  "/v1/auth/**": {
+  "**/auth/**": {
     "target": "http://localhost:1111",
-    "secure": false
+    "secure": false,
+    "logLevel": "debug"
   },
-  "/v1/catalog/**": {
+  "**/catalog/**": {
     "target": "http://localhost:3003",
-    "secure": false
+    "secure": false,
+    "logLevel": "debug"
   },
   "/graphql": {
     "target": "http://localhost:8080",
-    "secure": false
+    "secure": false,
+    "logLevel": "debug"
   }
 }
