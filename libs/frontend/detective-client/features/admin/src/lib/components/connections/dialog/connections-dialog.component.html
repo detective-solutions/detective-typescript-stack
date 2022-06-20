@@ -13,9 +13,12 @@
         </mat-select>
       </mat-form-field>
     </form>
-    <div *ngIf="formFieldDefinitionsByConnectorType$ | async as formFieldDefinitions" class="shadow-highlight">
-      <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
-    </div>
+    <ng-container *ngIf="formFieldDefinitionsByConnectorType$ | async as formFieldDefinitions">
+      <dynamic-form
+        [formFieldDefinitions]="formFieldDefinitions"
+        [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
+      ></dynamic-form>
+    </ng-container>
   </div>
   <div *ngIf="formFieldDefinitionsByConnectorType$ | async" mat-dialog-actions align="center">
     <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>

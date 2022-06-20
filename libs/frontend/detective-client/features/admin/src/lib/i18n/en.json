@@ -12,6 +12,7 @@
     "connectionsDialog": {
       "addDialogHeader": "Add a new connection",
       "connectorTypeDropdownLabel": "Choose a connector type",
+      "optionalFieldsPanelName": "Advanced settings",
       "saveButtonText": "Save"
     }
   }

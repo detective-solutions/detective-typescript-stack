@@ -21,5 +21,6 @@
   @include mat.dialog-theme($default-theme);
   @include mat.select-theme($default-theme);
   @include mat.checkbox-theme($default-theme);
+  @include mat.expansion-theme($default-theme);
   @include custom-components-theme($default-theme);
 }

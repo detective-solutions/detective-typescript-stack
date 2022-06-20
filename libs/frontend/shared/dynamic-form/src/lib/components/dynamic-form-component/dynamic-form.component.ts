@@ -11,7 +11,17 @@ import { FormGroup } from '@angular/forms';
 })
 export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() formFieldDefinitions!: BaseFormField<string>[];
+  @Input() optionalFieldsPanelName!: string;
+
   form!: FormGroup;
+
+  get requiredFormFields() {
+    return this.formFieldDefinitions.filter((formFieldDefinition) => formFieldDefinition.required);
+  }
+
+  get optionalFormFields() {
+    return this.formFieldDefinitions.filter((formFieldDefinition) => !formFieldDefinition.required);
+  }
 
   constructor(private readonly formControlService: DynamicFormControlService) {}
 
