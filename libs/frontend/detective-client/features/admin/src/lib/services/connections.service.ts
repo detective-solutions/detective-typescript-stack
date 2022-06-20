@@ -1,5 +1,5 @@
 import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
-import { IConnectorTypesResponse, IGetAllConnectionsResponse } from '../interfaces';
+import { IConnectorPropertiesResponse, IConnectorTypesResponse, IGetAllConnectionsResponse } from '../interfaces';
 import { Observable, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
@@ -45,8 +45,10 @@ export class ConnectionsService {
     return this.httpClient.get<IConnectorTypesResponse[]>(`${ConnectionsService.catalogBasePath}/connector/list`);
   }
 
-  getConnectorProperties(connectorType: string) {
-    return this.httpClient.get(`${ConnectionsService.catalogBasePath}/connector/schema/${connectorType}`);
+  getConnectorProperties(connectorType: string): Observable<{ properties: IConnectorPropertiesResponse[] }> {
+    return this.httpClient.get<{ properties: IConnectorPropertiesResponse[] }>(
+      `${ConnectionsService.catalogBasePath}/connector/schema/${connectorType}`
+    );
   }
 
   addConnection(connectionType: string, connectionName: string, payload: any) {
