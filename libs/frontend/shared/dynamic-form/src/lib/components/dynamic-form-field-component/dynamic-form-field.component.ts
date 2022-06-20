@@ -19,4 +19,8 @@ export class DynamicFormFieldComponent {
   get formFieldValue() {
     return this.formFieldDefinition.value ?? '';
   }
+
+  get errorMessage() {
+    return `${this.formFieldDefinition.label} is required`;
+  }
 }
