@@ -1,8 +1,14 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
-import { ITableInput, SourceConnectionState, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
-import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
+import { ConnectionsClickEvent, IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
+import {
+  ITableCellEvent,
+  ITableInput,
+  SourceConnectionState,
+  TableCellEventService,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
+import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { ConnectionsDialogComponent } from './dialog';
@@ -16,13 +22,21 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./connections.component.scss'],
 })
 export class ConnectionsComponent implements OnInit, OnDestroy {
+  readonly pageSize = 10;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
   connections$!: Observable<IGetAllConnectionsResponse>;
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
 
-  readonly pageSize = 10;
+  editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.EDIT_CONNECTION),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
+  deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.DELETE_CONNECTION),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
 
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
@@ -37,6 +51,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
     private readonly connectionsService: ConnectionsService,
+    private readonly tableCellEventService: TableCellEventService,
     private readonly connectionsDialog: MatDialog,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
@@ -59,6 +74,17 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
       this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
         this.connectionsService.getAllConnectionsNextPage(pageOffset, this.pageSize)
       )
+    );
+
+    this.subscriptions.add(
+      this.editButtonClicks$.subscribe((connectionId: string) => {
+        console.log(connectionId);
+      })
+    );
+    this.subscriptions.add(
+      this.deleteButtonClicks$.subscribe((connectionId: string) => {
+        console.log(connectionId);
+      })
     );
   }
 
@@ -111,7 +137,10 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
               cellData: {
                 id: connection.xid,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
-                buttons: [{ icon: 'edit' }, { icon: 'delete' }],
+                buttons: [
+                  { icon: 'edit', clickEventKey: ConnectionsClickEvent.EDIT_CONNECTION },
+                  { icon: 'delete', clickEventKey: ConnectionsClickEvent.DELETE_CONNECTION },
+                ],
               },
             },
           } as IConnectionsTableDef);

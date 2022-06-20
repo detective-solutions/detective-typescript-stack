@@ -17,12 +17,11 @@ export class IconButtonTableCellComponent {
 
   constructor(private readonly tableCellEventService: TableCellEventService) {}
 
-  onClick(eventKey: string) {
-    console.log(eventKey);
+  onClick(clickEventKey: string) {
     this.tableCellEventService.tableCellEvents$.next({
       id: this.cellData.id,
       type: TableCellEventType.ICON_BUTTON_CLICK,
-      value: true,
+      value: clickEventKey,
     });
   }
 }
