@@ -4,10 +4,9 @@ import {
   ITile,
   NavigationEventService,
   TableCellEventService,
-  TableCellEventType,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { BehaviorSubject, Subject, Subscription, filter, take, tap } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, take, tap } from 'rxjs';
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
@@ -24,22 +23,12 @@ export class BaseCasefileListComponent implements OnDestroy {
   protected readonly initialPageOffset = 0;
   protected readonly subscriptions = new Subscription();
 
-  protected readonly casefileAccessRequested$ = this.subscriptions.add(
-    this.tableCellEventService.tableCellEvents$
-      .pipe(
-        filter((event: ITableCellEvent) => !!event.id && event.type === TableCellEventType.REQUEST_ACCESS),
-        tap((event: ITableCellEvent) => console.log(event))
-      )
-      .subscribe()
+  protected readonly accessRequests$ = this.tableCellEventService.accessRequests$.pipe(
+    tap((event: ITableCellEvent) => console.log(event))
   );
 
-  protected readonly casefileFavorized$ = this.subscriptions.add(
-    this.tableCellEventService.tableCellEvents$
-      .pipe(
-        filter((event: ITableCellEvent) => event.type === TableCellEventType.FAVORIZE && event.value !== undefined),
-        tap((event: ITableCellEvent) => console.log(event))
-      )
-      .subscribe()
+  protected readonly favorized$ = this.tableCellEventService.favorized$.pipe(
+    tap((event: ITableCellEvent) => console.log(event))
   );
 
   constructor(

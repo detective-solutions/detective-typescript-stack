@@ -3,12 +3,11 @@ import {
   ITableCellEvent,
   ITableInput,
   TableCellEventService,
-  TableCellEventType,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { IDataSourceTableDef, IGetAllDataSourcesResponse } from '../../interfaces';
-import { Observable, Subject, Subscription, filter, map, take, tap } from 'rxjs';
+import { Observable, Subject, Subscription, map, take, tap } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { DataSourceService } from '../../services';
@@ -31,13 +30,8 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
 
-  readonly accessRequested$ = this.subscriptions.add(
-    this.tableCellEventService.tableCellEvents$
-      .pipe(
-        filter((event: ITableCellEvent) => !!event.id && event.type === TableCellEventType.REQUEST_ACCESS),
-        tap((event: ITableCellEvent) => console.log(event))
-      )
-      .subscribe()
+  readonly accessRequests$ = this.tableCellEventService.accessRequests$.pipe(
+    tap((event: ITableCellEvent) => console.log(event))
   );
 
   constructor(
