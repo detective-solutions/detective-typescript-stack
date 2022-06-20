@@ -1,0 +1,17 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin state-table-cell-component-theme($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $warn-palette: map.get($color-config, 'warn');
+  $default-warn-color: mat.get-color-from-palette($warn-palette);
+
+  .error-state {
+    color: $default-warn-color;
+
+    &:hover {
+      color: darken($default-warn-color, 20%);
+    }
+  }
+}

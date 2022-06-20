@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IAbstractTableDef, IMatColumnDef, ITableInput } from './interfaces';
+import { IAbstractTableDef, IMatColumnDef, ITableInput } from './models';
 import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';

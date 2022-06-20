@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IIconButtonTableCell, TableCellEventType } from '../../interfaces';
+import { IIconButtonTableCell, TableCellEventType } from '../../models';
 
 import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
 import { TableCellEventService } from '../../services';
@@ -18,6 +18,7 @@ export class IconButtonTableCellComponent {
   constructor(private readonly tableCellEventService: TableCellEventService) {}
 
   onClick(eventKey: string) {
+    console.log(eventKey);
     this.tableCellEventService.tableCellEvents$.next({
       id: this.cellData.id,
       type: TableCellEventType.ICON_BUTTON_CLICK,

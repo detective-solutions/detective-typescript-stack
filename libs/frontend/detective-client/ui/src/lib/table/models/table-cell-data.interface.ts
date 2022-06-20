@@ -4,6 +4,7 @@ export type TableCellData =
   | IFavorizedTableCell
   | IIconButtonTableCell
   | IMultiTableCell
+  | IStateTableCell
   | ITextTableCell
   | IUserAvatarListTableCell;
 
@@ -13,6 +14,7 @@ export enum TableCellTypes {
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
   ICON_BUTTON_TABLE_CELL = 'iconButtonTableCell',
   MULTI_TABLE_CELL = 'multiTableCell',
+  STATE_TABLE_CELL = 'stateTableCell',
   TEXT_TABLE_CELL = 'textTableCell',
   USER_AVATAR_LIST_TABLE_CELL = 'userIconListTableCell',
 }
@@ -21,6 +23,13 @@ export enum AccessState {
   ACCESS_GRANTED = 'granted',
   ACCESS_PENDING = 'pending',
   NO_ACCESS = 'noAccess',
+}
+
+// TODO: Move to source connection
+export enum SourceConnectionState {
+  INITIALIZING = 'init',
+  READY = 'ready',
+  ERROR = 'error',
 }
 
 interface IBaseTableCell {
@@ -54,6 +63,12 @@ export interface IMultiTableCell extends IBaseTableCell {
   thumbnailSrc: string;
   name: string;
   description: string;
+}
+
+export interface IStateTableCell extends IBaseTableCell {
+  type: TableCellTypes.STATE_TABLE_CELL;
+  state: SourceConnectionState;
+  message?: string;
 }
 
 export interface ITextTableCell extends IBaseTableCell {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Observable, debounceTime, distinctUntilChanged, filter, fromEvent, map, share } from 'rxjs';
 
-import { IMultiTableCell } from '../../interfaces';
+import { IMultiTableCell } from '../../models';
 import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
 
 @Component({

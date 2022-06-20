@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { IDateTableCell } from '../../interfaces';
+import { IDateTableCell } from '../../models';
 
 @Component({
   selector: 'date-table-cell',

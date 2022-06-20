@@ -1,15 +1,16 @@
 import {
   AccessIndicatorTableCellComponent,
   DateTableCellComponent,
-  DynamicTableCellDirective,
   FavorizedTableCellComponent,
   IconButtonTableCellComponent,
   MultiTableCellComponent,
+  StateTableCellComponent,
   TextTableCellComponent,
   UserAvatarListTableCellComponent,
 } from './components';
 
 import { CommonModule } from '@angular/common';
+import { DynamicTableCellDirective } from './directives';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TableCellEventService } from './services';
@@ -25,8 +26,9 @@ import { TranslocoModule } from '@ngneat/transloco';
     DateTableCellComponent,
     FavorizedTableCellComponent,
     IconButtonTableCellComponent,
-    TextTableCellComponent,
     MultiTableCellComponent,
+    StateTableCellComponent,
+    TextTableCellComponent,
     UserAvatarListTableCellComponent,
   ],
   imports: [CommonModule, TranslocoModule, RouterModule, TableMaterialModule],

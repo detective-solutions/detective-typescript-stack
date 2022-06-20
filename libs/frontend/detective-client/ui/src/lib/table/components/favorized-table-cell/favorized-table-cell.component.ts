@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IFavorizedTableCell, TableCellEventType } from '../../interfaces';
+import { IFavorizedTableCell, TableCellEventType } from '../../models';
 
 import { TableCellEventService } from '../../services';
 

@@ -1,4 +1,4 @@
-import { AccessState, IAccessTableCell, TableCellEventType } from '../../interfaces';
+import { AccessState, IAccessTableCell, TableCellEventType } from '../../models';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { Router } from '@angular/router';

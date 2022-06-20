@@ -1,7 +1,7 @@
-import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfaces';
+import { ITableInput, SourceConnectionState, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
@@ -93,8 +93,9 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
               columnName: translation['stateColumn'],
               cellData: {
                 id: connection.xid,
-                type: TableCellTypes.ACCESS_TABLE_CELL,
-                accessState: AccessState.ACCESS_PENDING,
+                type: TableCellTypes.STATE_TABLE_CELL,
+                state: SourceConnectionState.READY, // TODO: Get this value from database
+                message: 'An error occurred while initializing', // TODO: Get this value from database
               },
             },
             lastUpdated: {

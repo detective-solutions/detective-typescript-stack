@@ -1,4 +1,4 @@
-import { ITableCellEvent } from '../interfaces';
+import { ITableCellEvent } from '../models';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 

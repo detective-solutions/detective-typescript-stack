@@ -1,23 +1,17 @@
+import {
+  AccessIndicatorTableCellComponent,
+  DateTableCellComponent,
+  FavorizedTableCellComponent,
+  IconButtonTableCellComponent,
+  MultiTableCellComponent,
+  StateTableCellComponent,
+  TextTableCellComponent,
+  UserAvatarListTableCellComponent,
+} from '../components';
 import { ComponentRef, Directive, Input, OnInit, ViewContainerRef } from '@angular/core';
-import { TableCellData, TableCellTypes } from '../interfaces/table-cell-data.interface';
+import { TableCellComponents, TableCellData, TableCellTypes } from '../models';
 
-import { AccessIndicatorTableCellComponent } from './access-indicator-table-cell/access-indicator-table-cell.component';
-import { DateTableCellComponent } from './date-table-cell/date-table-cell.component';
-import { FavorizedTableCellComponent } from './favorized-table-cell/favorized-table-cell.component';
-import { IconButtonTableCellComponent } from './icon-button-table-cell/icon-button-table-cell.component';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { MultiTableCellComponent } from './multi-table-cell/multi-table-cell.component';
-import { TextTableCellComponent } from './text-table-cell/text-table-cell.component';
-import { UserAvatarListTableCellComponent } from './user-avatar-list-table-cell/user-avatar-list-table-cell.component';
-
-type TableCellComponents =
-  | AccessIndicatorTableCellComponent
-  | DateTableCellComponent
-  | FavorizedTableCellComponent
-  | IconButtonTableCellComponent
-  | MultiTableCellComponent
-  | TextTableCellComponent
-  | UserAvatarListTableCellComponent;
 
 @Directive({
   selector: '[dynamicTableCell]',
@@ -49,6 +43,9 @@ export class DynamicTableCellDirective implements OnInit {
       }
       case TableCellTypes.FAVORIZED_TABLE_CELL: {
         return this.viewContainerRef.createComponent(FavorizedTableCellComponent);
+      }
+      case TableCellTypes.STATE_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(StateTableCellComponent);
       }
       case TableCellTypes.ICON_BUTTON_TABLE_CELL: {
         return this.viewContainerRef.createComponent(IconButtonTableCellComponent);
