@@ -1,12 +1,14 @@
 import {
+  BaseFormField,
   CheckboxFormField,
   DynamicFormControlService,
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
-import { Subscription, map, switchMap } from 'rxjs';
+import { Subscription, map, pluck, switchMap } from 'rxjs';
 import { ConnectionsService } from '../../../services';
 import { FormBuilder } from '@angular/forms';
+import { IConnectorPropertiesResponse } from '../../../interfaces';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -17,14 +19,22 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   templateUrl: 'connections-dialog.component.html',
 })
 export class ConnectionsDialogComponent {
-  connectorTypeFormGroup = this.formBuilder.group({ connectorType: 'connectorType' });
+  private static readonly connectorTypeFormFieldName = 'connectorType';
 
-  availableConnectorTypes$ = this.connectionsService.getAvailableConnectorTypes();
+  readonly connectorTypeFormGroup = this.formBuilder.group({
+    connectorType: ConnectionsDialogComponent.connectorTypeFormFieldName,
+  });
 
-  formFieldDefinitionsByConnectorType = this.connectorTypeFormGroup.get('connectorType')?.valueChanges.pipe(
-    switchMap((selectedConnectorType: string) => this.connectionsService.getConnectorProperties(selectedConnectorType)),
-    map(this.getFormFieldByType)
-  );
+  readonly availableConnectorTypes$ = this.connectionsService.getAvailableConnectorTypes();
+  readonly formFieldDefinitionsByConnectorType$ = this.connectorTypeFormGroup
+    .get(ConnectionsDialogComponent.connectorTypeFormFieldName)
+    ?.valueChanges.pipe(
+      switchMap((selectedConnectorType: string) =>
+        this.connectionsService.getConnectorProperties(selectedConnectorType)
+      ),
+      pluck('properties'),
+      map(this.getFormFieldByType)
+    );
 
   private readonly subscriptions = new Subscription();
 
@@ -38,24 +48,10 @@ export class ConnectionsDialogComponent {
   submitForm() {
     const form = this.dynamicFormControlService.currentFormGroup;
     if (form.valid) {
-      // TODO: This should not be necessary anymore after DET-884 is fixed
-      const payload = {
-        connectorName: form.value['Connectorname'],
-        databaseSchema: form.value['database schema'],
-        database: form.value['database name'],
-        host: form.value['host address'],
-        user: form.value['username'],
-        password: form.value['password'],
-        port: form.value['port'],
-        ssl: form.value['ssl security'],
-        metaDataCacheMaximumSize: form.value['Metadata cache size'],
-        batchSize: form.value['batch size'],
-      };
-
-      const connectionName = form.value.Connectorname;
+      const connectionName = form.value.connectorName;
       this.subscriptions.add(
         this.connectionsService
-          .addConnection(this.connectorTypeFormGroup.value.connectorType, connectionName, payload)
+          .addConnection(this.connectorTypeFormGroup.value.connectorType, connectionName, form.value)
           .subscribe((res) => {
             console.log(res);
           })
@@ -66,45 +62,52 @@ export class ConnectionsDialogComponent {
     }
   }
 
-  private getFormFieldByType(formFieldData: any): any[] {
-    const formFieldDefinition: any[] = [];
-    Object.values(formFieldData.properties).forEach((data: any) => {
+  private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string>[] {
+    const formFields: BaseFormField<string>[] = [];
+
+    formFieldData.forEach((data: IConnectorPropertiesResponse) => {
       switch (data.type) {
         case 'boolean': {
-          formFieldDefinition.push(
-            new CheckboxFormField({ key: data.title, label: data.title, type: 'checkbox', value: data.default })
+          formFields.push(
+            new CheckboxFormField({
+              key: data.propertyName,
+              label: data.displayName,
+              type: 'checkbox',
+              value: data.default,
+              required: data.required,
+            })
           );
-          return;
+          break;
         }
         case 'string': {
-          formFieldDefinition.push(
+          formFields.push(
             new TextBoxFormField({
-              key: data.title,
-              label: data.title,
+              key: data.propertyName,
+              label: data.displayName,
               type: 'text',
               value: data.default,
-              required: true,
+              required: data.required,
             })
           );
-          return;
+          break;
         }
         case 'integer': {
-          formFieldDefinition.push(
+          formFields.push(
             new TextBoxFormField({
-              key: data.title,
-              label: data.title,
+              key: data.propertyName,
+              label: data.displayName,
               type: 'number',
               value: data.default,
-              required: true,
+              required: data.required,
             })
           );
-          return;
+          break;
         }
         default: {
           throw new Error(`Unknown connector property type ${data?.type}`);
         }
       }
     });
-    return formFieldDefinition;
+    return formFields;
   }
 }
