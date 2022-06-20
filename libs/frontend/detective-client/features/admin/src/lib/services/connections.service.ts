@@ -1,5 +1,5 @@
 import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
-import { IConnectorPropertiesResponse, IConnectorTypesResponse, IGetAllConnectionsResponse } from '../interfaces';
+import { IConnectorPropertiesResponse, IConnectorTypesResponse, IGetAllConnectionsResponse } from '../models';
 import { Observable, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';

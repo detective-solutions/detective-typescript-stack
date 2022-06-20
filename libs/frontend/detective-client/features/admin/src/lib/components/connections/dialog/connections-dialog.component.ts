@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Subscription, map, pluck, switchMap } from 'rxjs';
 import { ConnectionsService } from '../../../services';
 import { FormBuilder } from '@angular/forms';
-import { IConnectorPropertiesResponse } from '../../../interfaces';
+import { IConnectorPropertiesResponse } from '../../../models';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

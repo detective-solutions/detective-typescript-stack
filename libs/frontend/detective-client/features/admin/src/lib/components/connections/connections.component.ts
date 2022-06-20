@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../interfaces';
+import { IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
 import { ITableInput, SourceConnectionState, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
 import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
