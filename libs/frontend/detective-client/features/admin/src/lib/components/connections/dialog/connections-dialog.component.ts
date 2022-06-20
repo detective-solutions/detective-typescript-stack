@@ -60,6 +60,7 @@ export class ConnectionsDialogComponent {
       );
     } else {
       // TODO: Handle invalid form
+      form.markAllAsTouched();
       console.log(form.valid);
     }
   }
