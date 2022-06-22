@@ -39,4 +39,8 @@ export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     this.formControlService.resetForm();
   }
+
+  submitForm() {
+    this.formControlService.submitForm();
+  }
 }

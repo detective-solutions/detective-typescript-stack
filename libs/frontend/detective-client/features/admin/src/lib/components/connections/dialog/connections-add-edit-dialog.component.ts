@@ -5,12 +5,12 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import { Subscription, map, pluck, switchMap, take, tap } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { map, pluck, switchMap, take, tap } from 'rxjs';
 import { ConnectionsService } from '../../../services';
-import { FormBuilder } from '@angular/forms';
 import { IConnectorPropertiesResponse } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 
@@ -40,6 +40,8 @@ export class ConnectionsAddEditDialogComponent {
       map(this.getFormFieldByType)
     );
 
+  private readonly subscriptions = new Subscription();
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
@@ -50,13 +52,17 @@ export class ConnectionsAddEditDialogComponent {
     private readonly formBuilder: FormBuilder,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly logger: LogService
-  ) {}
+  ) {
+    this.subscriptions.add(
+      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
+    );
+  }
 
-  submitForm() {
-    const form = this.dynamicFormControlService.currentFormGroup;
-    if (form.valid) {
+  submitForm(formGroup?: FormGroup) {
+    formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
+    if (formGroup.valid) {
       this.connectionsService
-        .addConnection(this.connectorTypeFormGroup.value.connectorType, form.value)
+        .addConnection(this.connectorTypeFormGroup.value.connectorType, formGroup.value)
         .pipe(
           tap(() => (this.isSubmitting = true)),
           take(1)
@@ -67,7 +73,7 @@ export class ConnectionsAddEditDialogComponent {
           this.dialogRef.close();
         });
     } else {
-      form.markAllAsTouched();
+      formGroup.markAllAsTouched();
       this.logger.info('Could not submit. Form is invalid,');
     }
   }

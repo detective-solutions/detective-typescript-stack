@@ -2,12 +2,14 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { BaseFormField } from '../models';
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
 export class DynamicFormControlService {
   formGroup!: FormGroup;
+  formSubmit$ = new Subject<FormGroup>();
 
   get currentFormGroup(): FormGroup {
     if (this.formGroup) {
@@ -26,6 +28,10 @@ export class DynamicFormControlService {
     });
     this.formGroup = new FormGroup(group);
     return this.formGroup;
+  }
+
+  submitForm() {
+    this.formSubmit$.next(this.formGroup);
   }
 
   resetForm() {
