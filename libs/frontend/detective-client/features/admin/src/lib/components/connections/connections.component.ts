@@ -1,5 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
 import { ConnectionsClickEvent, IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
 import {
   ITableCellEvent,
@@ -8,13 +9,12 @@ import {
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-
-import { ConnectionsDialogComponent } from './dialog';
+import { ComponentType } from '@angular/cdk/portal';
 import { ConnectionsService } from '../../services';
 import { ISourceConnection } from '@detective.solutions/shared/data-access';
-import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'connections',
@@ -25,18 +25,18 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   readonly pageSize = 10;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
-  connections$!: Observable<IGetAllConnectionsResponse>;
-  tableItems$!: Observable<ITableInput>;
-  totalElementsCount$!: Observable<number>;
-
-  editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+  readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.EDIT_CONNECTION),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
-  deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+  readonly deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.DELETE_CONNECTION),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
+
+  connections$!: Observable<IGetAllConnectionsResponse>;
+  tableItems$!: Observable<ITableInput>;
+  totalElementsCount$!: Observable<number>;
 
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
@@ -52,7 +52,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     private readonly breakpointObserver: BreakpointObserver,
     private readonly connectionsService: ConnectionsService,
     private readonly tableCellEventService: TableCellEventService,
-    private readonly connectionsDialog: MatDialog,
+    private readonly matDialog: MatDialog,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
@@ -77,14 +77,14 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.editButtonClicks$.subscribe((connectionId: string) => {
-        console.log(connectionId);
-      })
+      this.editButtonClicks$.subscribe((connectionId: string) =>
+        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, { data: { id: connectionId }, minWidth: 400 })
+      )
     );
     this.subscriptions.add(
-      this.deleteButtonClicks$.subscribe((connectionId: string) => {
-        console.log(connectionId);
-      })
+      this.deleteButtonClicks$.subscribe((connectionId: string) =>
+        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, { data: { id: connectionId }, minWidth: 300 })
+      )
     );
   }
 
@@ -92,8 +92,9 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  openConnectionsDialog() {
-    this.connectionsDialog.open(ConnectionsDialogComponent, { minWidth: 400 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  openConnectionsDialog(componentToOpen?: ComponentType<any>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, config ?? { minWidth: 400 });
   }
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {

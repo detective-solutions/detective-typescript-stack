@@ -1,11 +1,23 @@
-import { GetAllConnectionsGQL, IGetAllConnectionsGQLResponse } from '../graphql';
-import { IConnectorPropertiesResponse, IConnectorTypesResponse, IGetAllConnectionsResponse } from '../models';
-import { Observable, map } from 'rxjs';
+import {
+  GetAllConnectionsGQL,
+  GetConnectionByIdGQL,
+  IGetAllConnectionsGQLResponse,
+  IGetConnectionByIdGQLResponse,
+} from '../graphql';
+import {
+  IConnectorPropertiesResponse,
+  IConnectorTypesResponse,
+  IGetAllConnectionsResponse,
+  IGetConnectionByIdResponse,
+} from '../models';
+import { Observable, catchError, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
+import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -13,9 +25,23 @@ import { SourceConnection } from '@detective.solutions/frontend/shared/data-acce
 export class ConnectionsService {
   private static catalogBasePath = 'v1/catalog';
 
+  private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
 
-  constructor(private readonly getAllConnectionsGQL: GetAllConnectionsGQL, private readonly httpClient: HttpClient) {}
+  constructor(
+    private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
+    private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
+    private readonly httpClient: HttpClient,
+    private readonly tableCellEventService: TableCellEventService
+  ) {}
+
+  getConnectionById(id: string): Observable<IGetConnectionByIdResponse> {
+    this.getConnectionByIdWatchQuery = this.getConnectionByIdGQL.watch({ id: id });
+    return this.getConnectionByIdWatchQuery.valueChanges.pipe(
+      map((response: any) => response.data),
+      map((response: IGetConnectionByIdGQLResponse) => response.getSourceConnection)
+    );
+  }
 
   getAllConnections(paginationOffset: number, pageSize: number): Observable<IGetAllConnectionsResponse> {
     this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch({
@@ -29,16 +55,17 @@ export class ConnectionsService {
           connections: response.querySourceConnection.map(SourceConnection.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
         };
-      })
-      //   catchError((error) => this.handleError(error))
+      }),
+      catchError((error) => this.handleError(error))
     );
   }
 
   getAllConnectionsNextPage(paginationOffset: number, pageSize: number) {
-    this.getAllConnectionsWatchQuery.fetchMore({
-      variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-    });
-    //   .catch((error) => this.handleError(error));
+    this.getAllConnectionsWatchQuery
+      .fetchMore({
+        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
+      })
+      .catch((error) => this.handleError(error));
   }
 
   getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
@@ -51,11 +78,8 @@ export class ConnectionsService {
     );
   }
 
-  addConnection(connectionType: string, connectionName: string, payload: any) {
-    return this.httpClient.post(
-      `${ConnectionsService.catalogBasePath}/${connectionType}/insert/${connectionName}`,
-      payload
-    );
+  addConnection(connectionType: string, payload: any) {
+    return this.httpClient.post(`${ConnectionsService.catalogBasePath}/${connectionType}/insert`, payload);
   }
 
   updateConnection(connectionType: string, connectionId: string, payload: any) {
@@ -72,9 +96,8 @@ export class ConnectionsService {
     });
   }
 
-  // TODO: Enable when state is added to connections list
-  //   private handleError(error: string) {
-  //     this.tableCellEventService.resetLoadingStates$.next(true);
-  //     return transformError(error);
-  //   }
+  private handleError(error: string) {
+    this.tableCellEventService.resetLoadingStates$.next(true);
+    return transformError(error);
+  }
 }

@@ -9,11 +9,21 @@
       "stateColumn": "State",
       "lastUpdatedColumn": "Last Updated"
     },
-    "connectionsDialog": {
+    "addEditDialog": {
       "addDialogHeader": "Add a new connection",
+      "editDialogHeader": "Edit a connection",
       "connectorTypeDropdownLabel": "Choose a connector type",
       "optionalFieldsPanelName": "Advanced settings",
       "saveButtonText": "Save"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Delete connection",
+      "deleteDialogText": "You are about to delete {{connectionName}}.",
+      "deleteButtonText": "I want to delete this connection"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed"
     }
   }
 }
