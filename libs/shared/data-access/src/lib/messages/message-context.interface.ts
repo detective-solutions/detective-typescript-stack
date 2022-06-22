@@ -1,4 +1,5 @@
 export interface IMessageContext {
+  eventType: string;
   tenantId: string;
   casefileId: string;
   userId: string;
