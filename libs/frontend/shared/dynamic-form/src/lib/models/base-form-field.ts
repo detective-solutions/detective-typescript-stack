@@ -1,11 +1,12 @@
 export class BaseFormField<T> {
-  value: T | undefined;
+  type: string;
   key: string;
   label: string;
+  value: T | undefined;
   required: boolean;
-  controlType: string;
-  type: string;
+  hint: string;
   options: { key: string; value: string }[];
+  controlType: string;
 
   constructor(
     options: {
@@ -16,6 +17,7 @@ export class BaseFormField<T> {
       controlType?: string;
       type?: string;
       options?: { key: string; value: string }[];
+      hint?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -25,5 +27,6 @@ export class BaseFormField<T> {
     this.controlType = options.controlType || '';
     this.type = options.type || '';
     this.options = options.options || [];
+    this.hint = options.hint || '';
   }
 }
