@@ -142,10 +142,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     webSocketClientContext: WebSocketClientContext,
     contextKeysToCheck: string[]
   ): boolean {
-    console.log(
-      contextKeysToCheck.some((contextKey) => messageContext[contextKey] !== webSocketClientContext[contextKey])
-    );
-    return !contextKeysToCheck.some((contextKey) => messageContext[contextKey] !== webSocketClientContext[contextKey]);
+    return contextKeysToCheck.every((contextKey) => messageContext[contextKey] === webSocketClientContext[contextKey]);
   }
 
   private checkEventTypeMatch(messageContext: IMessageContext, targetEventType: string) {
