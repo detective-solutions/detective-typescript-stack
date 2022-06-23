@@ -19,9 +19,7 @@ export class WhiteboardProducer {
   client: ClientKafka;
 
   sendKafkaMessage(topicName: string, payload: IMessage<any>) {
-    this.logger.log(`${buildLogContext(payload.context)} - Forwarding Kafka message to topic: ${topicName}`);
-    this.logger.debug(payload.body);
-
+    this.logger.debug(`${buildLogContext(payload.context)} Forwarding Kafka message to topic ${topicName}`);
     this.client.emit(topicName, payload);
   }
 }

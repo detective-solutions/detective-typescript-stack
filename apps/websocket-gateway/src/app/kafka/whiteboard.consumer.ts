@@ -1,9 +1,9 @@
 import { Controller, Logger } from '@nestjs/common';
+import { broadcastWebSocketContext, buildLogContext } from '../utils';
 
 import { EventPattern } from '@nestjs/microservices';
 import { IKafkaMessage } from '@detective.solutions/shared/data-access';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
-import { buildLogContext } from '../utils';
 
 @Controller()
 export class WhiteboardConsumer {
@@ -18,6 +18,6 @@ export class WhiteboardConsumer {
         data.topic
       } with timestamp ${data.timestamp}`
     );
-    this.webSocketGateway.broadcastMessage(data.value);
+    this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
   }
 }

@@ -3,9 +3,10 @@ import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/dat
 import { Test } from '@nestjs/testing';
 import { WhiteboardConsumer } from './whiteboard.consumer';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
+import { broadcastWebSocketContext } from '../utils';
 
 const mockWebSocketGateway = {
-  broadcastMessage: jest.fn(),
+  sendMessageByContext: jest.fn(),
 };
 
 describe('WhiteboardConsumer', () => {
@@ -52,12 +53,12 @@ describe('WhiteboardConsumer', () => {
         topic: 'testTopic',
       };
 
-      const broadcastSpy = jest.spyOn(webSocketGateway, 'broadcastMessage');
+      const broadcastSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
 
       expect(whiteboardConsumer.forwardQueryExecution(testKafkaMessage));
 
       expect(broadcastSpy).toBeCalledTimes(1);
-      expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value);
+      expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value, broadcastWebSocketContext);
     });
   });
 });
