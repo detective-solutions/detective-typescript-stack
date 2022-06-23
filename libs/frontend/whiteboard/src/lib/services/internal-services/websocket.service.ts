@@ -28,6 +28,7 @@ export class WebSocketService implements OnDestroy {
   private subscriptions!: Subscription;
 
   readonly webSocket$ = this.webSocketSubject$.pipe(
+    filter(() => !!this.currentWebSocket$),
     switchMap(() => this.currentWebSocket$),
     catchError(() => {
       this.logger.error(`${WebSocketService.loggingPrefix} No WebSocket available in WebSocket service!`);
