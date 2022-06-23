@@ -39,9 +39,12 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
   onEvent(_client: WebSocket, message: IMessage<any>) {
-    this.checkEventTypeMatch(message.context, EventTypeTopicMapping.queryTable.eventType);
+    message.context = this.mergeEventTypeIntoMessageContext(
+      EventTypeTopicMapping.queryTable.eventType,
+      message.context
+    );
     this.logger.verbose(
-      `${buildLogContext(message.context)} Routing ${EventTypeTopicMapping.queryTable.eventType} event to topic ${
+      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
         EventTypeTopicMapping.queryTable.targetTopic
       }`
     );
@@ -151,15 +154,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     return contextKeysToCheck.every((contextKey) => messageContext[contextKey] === webSocketClientContext[contextKey]);
   }
 
-  private checkEventTypeMatch(messageContext: IMessageContext, targetEventType: string) {
-    const receivedEventType = messageContext?.eventType;
-    if (receivedEventType !== targetEventType) {
-      this.logger.error(
-        `${buildLogContext(
-          messageContext
-        )} Received event type ${receivedEventType} is not matching with channel event type ${targetEventType}`
-      );
-      throw new InternalServerErrorException();
-    }
+  private mergeEventTypeIntoMessageContext(eventType: string, messageContext: IMessageContext): IMessageContext {
+    return { eventType, ...messageContext };
   }
 }
