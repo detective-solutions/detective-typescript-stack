@@ -92,22 +92,40 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     });
   }
 
-  private extractAccessTokenFromUrl(connectionUrl: string): string | null {
-    try {
-      return connectionUrl.split('token=')[1];
-    } catch {
-      return null;
-    }
-  }
-
   private async verifyAndExtractAccessToken(accessToken: string): Promise<IJwtTokenPayload> | null {
     try {
-      return await this.jwtService.verifyAsync(accessToken, {
+      return this.jwtService.verifyAsync(accessToken, {
         secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
       });
     } catch (e) {
       this.logger.warn(`An error occurred while verifying access token ${accessToken}`);
       this.logger.warn(e);
+      return null;
+    }
+  }
+
+  private async buildClientContext(
+    url: string,
+    tokenPayload: IJwtTokenPayload
+  ): Promise<WebSocketClientContext | null> {
+    return new Promise((resolve, reject) => {
+      const tenantId = this.extractUrlPathParameter(url, 'tenant');
+      const casefileId = this.extractUrlPathParameter(url, 'casefile');
+      tokenPayload?.sub && tenantId && casefileId
+        ? resolve({
+            tenantId: tenantId,
+            casefileId: casefileId,
+            userId: tokenPayload.sub,
+            userRole: tokenPayload.role,
+          })
+        : reject(null);
+    });
+  }
+
+  private extractAccessTokenFromUrl(connectionUrl: string): string | null {
+    try {
+      return connectionUrl.split('token=')[1];
+    } catch {
       return null;
     }
   }
@@ -118,23 +136,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
 
     // Return value after path parameter title
     return parameterTitleIndex ? splittedUrl[parameterTitleIndex + 1] : null;
-  }
-
-  private async buildClientContext(
-    url: string,
-    tokenPayload: IJwtTokenPayload
-  ): Promise<WebSocketClientContext | null> {
-    const tenantId = this.extractUrlPathParameter(url, 'tenant');
-    const casefileId = this.extractUrlPathParameter(url, 'casefile');
-
-    return tokenPayload?.sub && tenantId && casefileId
-      ? {
-          tenantId: tenantId,
-          casefileId: casefileId,
-          userId: tokenPayload.sub,
-          userRole: tokenPayload.role,
-        }
-      : null;
   }
 
   private isContextMatch(
