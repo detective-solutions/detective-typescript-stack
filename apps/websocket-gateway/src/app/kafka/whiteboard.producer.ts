@@ -2,7 +2,7 @@ import { Client, ClientKafka, Transport } from '@nestjs/microservices';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { IMessage } from '@detective.solutions/shared/data-access';
-import { buildLogContext } from '../utils';
+import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardProducer } from '../kafka/whiteboard.producer';
-import { buildLogContext } from '../utils';
+import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
