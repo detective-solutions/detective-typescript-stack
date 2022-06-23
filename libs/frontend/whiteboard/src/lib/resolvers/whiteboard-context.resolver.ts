@@ -15,8 +15,8 @@ export class WhiteboardContextResolver implements Resolve<void> {
       this.store.dispatch(
         WhiteboardContextActions.initializeWhiteboardContext({
           context: {
-            tenantId: authStatus.tenantId,
-            casefileId: route.params['id'],
+            tenantId: route.params['tenantId'],
+            casefileId: route.params['casefileId'],
             userId: authStatus.userId,
             userRole: authStatus.userRole,
           },

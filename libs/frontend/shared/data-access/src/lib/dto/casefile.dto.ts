@@ -3,7 +3,6 @@ import { ICasefile, IUser } from '@detective.solutions/shared/data-access';
 import { User } from './user.dto';
 
 export class Casefile implements ICasefile {
-  static readonly basePath = '/casefile/';
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(

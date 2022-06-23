@@ -6,11 +6,10 @@ import {
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { BehaviorSubject, Subject, Subscription, take, tap } from 'rxjs';
+import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
+import { BehaviorSubject, Subject, Subscription, combineLatest, take, tap } from 'rxjs';
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-
-import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from '../../services';
 import { ICasefileTableDef } from '../../interfaces';
@@ -48,13 +47,16 @@ export class BaseCasefileListComponent implements OnDestroy {
 
   protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {
     const tempTileItems = [] as ITile[];
-    originalCasefiles.forEach((casefile: Casefile) => {
-      tempTileItems.push({
-        id: casefile.id,
-        title: casefile.title,
-        targetUrl: Casefile.basePath + casefile.id,
-        description: casefile.description,
-        thumbnailSrc: casefile.thumbnailSrc,
+
+    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
+      originalCasefiles.forEach((casefile: Casefile) => {
+        tempTileItems.push({
+          id: casefile.id,
+          title: casefile.title,
+          targetUrl: this.buildCasefileUrl(authStatus.tenantId, casefile.id),
+          description: casefile.description,
+          thumbnailSrc: casefile.thumbnailSrc,
+        });
       });
     });
     return tempTileItems;
@@ -63,10 +65,12 @@ export class BaseCasefileListComponent implements OnDestroy {
   protected transformToTableStructure(originalCasefiles: Casefile[]): ICasefileTableDef[] {
     const tempTableItems = [] as ICasefileTableDef[];
 
-    this.translationService
-      .selectTranslateObject(`${this.translationScope.scope}.casefileList.columnNames`)
+    combineLatest([
+      this.translationService.selectTranslateObject(`${this.translationScope.scope}.casefileList.columnNames`),
+      this.authService.authStatus$,
+    ])
       .pipe(take(1))
-      .subscribe((translation: { [key: string]: string }) => {
+      .subscribe(([translation, authStatus]) => {
         originalCasefiles.forEach((casefile: Casefile) => {
           tempTableItems.push({
             casefileInfo: {
@@ -84,7 +88,7 @@ export class BaseCasefileListComponent implements OnDestroy {
               cellData: {
                 id: casefile.id,
                 type: TableCellTypes.ACCESS_TABLE_CELL,
-                targetUrl: Casefile.basePath + casefile.id,
+                targetUrl: this.buildCasefileUrl(authStatus.tenantId, casefile.id),
                 accessState: AccessState.ACCESS_GRANTED,
               },
             },
@@ -124,5 +128,9 @@ export class BaseCasefileListComponent implements OnDestroy {
         });
       });
     return tempTableItems;
+  }
+
+  private buildCasefileUrl(tenantId: string, casefileId: string): string {
+    return `tenant/${tenantId}/casefile/${casefileId}`;
   }
 }
