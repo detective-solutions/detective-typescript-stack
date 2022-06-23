@@ -1,4 +1,4 @@
-import { EventTypes, WebSocketClient, WebSocketClientContext } from '../models';
+import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
 import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -7,6 +7,7 @@ import { Server, WebSocket } from 'ws';
 import { AuthEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardProducer } from '../kafka/whiteboard.producer';
 import { buildLogContext } from '../utils';
 
@@ -17,7 +18,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   private readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
-  server: Server<WebSocketClient>;
+  server: Server<IWebSocketClient>;
 
   constructor(
     private readonly whiteboardProducer: WhiteboardProducer,
@@ -30,51 +31,25 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     // Setting server options afterwards to be able to call internal methods
     server.options = {
       // TODO: Investigate objects & define interfaces
-      verifyClient: async (info: { origin: string; secure: boolean; req: any }, cb) => {
-        const requestUrl = info.req.url;
-        this.logger.debug(`Incoming connection request on url ${requestUrl}`);
-
-        const accessToken = this.extractAccessTokenFromUrl(requestUrl);
-        if (!accessToken) {
-          this.logger.warn(`Denied invalid connection. Cannot extract access token from url ${requestUrl}`);
-          cb(false, 401, 'Unauthorized');
-        }
-
-        const decodedAccessToken = await this.verifyAndExtractAccessToken(accessToken);
-        if (decodedAccessToken) {
-          const clientContext = await this.buildClientContext(requestUrl, decodedAccessToken);
-          if (!clientContext) {
-            this.logger.warn(`Denied invalid connection. Cannot build client context from url ${requestUrl}`);
-            cb(false, 401, 'Unauthorized');
-          }
-          info.req.client.context = clientContext; // Assign context to client that requests to connect
-
-          this.logger.verbose(
-            `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
-          );
-          this.logger.log(`Currently handling ${server.clients.size + 1} simultaneous client connections`);
-          cb(true, 200, 'Verified');
-        } else {
-          this.logger.warn(`Denied invalid connection. Cannot verify access token ${accessToken}`);
-          cb(false, 401, 'Unauthorized');
-        }
+      verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => any) => {
+        await this.handleNewClientConnection(server, info, cb);
       },
     };
   }
 
-  @SubscribeMessage(EventTypes.queryTable.type)
+  @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
   onEvent(_client: WebSocket, message: IMessage<any>) {
-    this.checkEventTypeMatch(message.context, EventTypes.queryTable.type);
+    this.checkEventTypeMatch(message.context, EventTypeTopicMapping.queryTable.eventType);
     this.logger.verbose(
-      `${buildLogContext(message.context)} Routing ${EventTypes.queryTable.type} event to topic ${
-        EventTypes.queryTable.targetTopic
+      `${buildLogContext(message.context)} Routing ${EventTypeTopicMapping.queryTable.eventType} event to topic ${
+        EventTypeTopicMapping.queryTable.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypes.queryTable.targetTopic, message);
+    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
   }
 
   sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
-    this.server.clients.forEach((client: WebSocketClient) => {
+    this.server.clients.forEach((client: IWebSocketClient) => {
       const clientContext = client._socket.context;
       if (!clientContext) {
         this.logger.error(
@@ -90,6 +65,36 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
         client.send(JSON.stringify({ event: message.context.eventType, data: message }));
       }
     });
+  }
+
+  private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => any) {
+    const requestUrl = info.req.url;
+    this.logger.debug(`Incoming connection request on url ${requestUrl}`);
+
+    const accessToken = this.extractAccessTokenFromUrl(requestUrl);
+    if (!accessToken) {
+      this.logger.warn(`Denied invalid connection. Cannot extract access token from url ${requestUrl}`);
+      cb(false, 401, 'Unauthorized');
+    }
+
+    const decodedAccessToken = await this.verifyAndExtractAccessToken(accessToken);
+    if (decodedAccessToken) {
+      const clientContext = await this.buildClientContext(requestUrl, decodedAccessToken);
+      if (!clientContext) {
+        this.logger.warn(`Denied invalid connection. Cannot build client context from url ${requestUrl}`);
+        cb(false, 401, 'Unauthorized');
+      }
+      (info.req as any).client.context = clientContext; // Assign context to client that requests to connect
+
+      this.logger.verbose(
+        `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
+      );
+      this.logger.log(`Currently handling ${server.clients.size + 1} simultaneous client connections`);
+      cb(true, 200, 'Verified');
+    } else {
+      this.logger.warn(`Denied invalid connection. Cannot verify access token ${accessToken}`);
+      cb(false, 401, 'Unauthorized');
+    }
   }
 
   private async verifyAndExtractAccessToken(accessToken: string): Promise<IJwtTokenPayload> | null {
