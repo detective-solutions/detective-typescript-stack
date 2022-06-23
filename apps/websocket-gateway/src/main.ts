@@ -1,4 +1,5 @@
 import { AppModule } from './app/app.module';
+import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { MicroserviceOptions } from '@nestjs/microservices';
 import { NestFactory } from '@nestjs/core';
@@ -10,7 +11,10 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app));
 
   await app.listen();
-  Logger.log('🚀 Application is running'); // TODO: App port info from env into log message
+
+  const webSocketPort = app.get(ConfigService).get('WEBSOCKET_PORT');
+  const kafkaPort = app.get(ConfigService).get('KAFKA_PORT');
+  Logger.log(`🚀 Application is running on ports ${webSocketPort} (WebSockets) and ${kafkaPort} (Kafka)`);
 }
 
 bootstrap();
