@@ -1,6 +1,7 @@
 import { ClientKafka } from '@nestjs/microservices';
 import { Test } from '@nestjs/testing';
 import { WhiteboardProducer } from './whiteboard.producer';
+import { kafkaClientInjectionToken } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('WhiteboardProducer', () => {
@@ -12,7 +13,7 @@ describe('WhiteboardProducer', () => {
       providers: [
         WhiteboardProducer,
         {
-          provide: 'CLIENT_KAFKA',
+          provide: kafkaClientInjectionToken,
           useValue: {
             emit: jest.fn(),
           },
@@ -21,7 +22,7 @@ describe('WhiteboardProducer', () => {
     }).compile();
 
     whiteboardProducer = moduleRef.get<WhiteboardProducer>(WhiteboardProducer);
-    client = moduleRef.get<ClientKafka>('CLIENT_KAFKA');
+    client = moduleRef.get<ClientKafka>(kafkaClientInjectionToken);
   });
 
   afterEach(() => {

@@ -3,6 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { IMessage } from '@detective.solutions/shared/data-access';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
+import { kafkaClientInjectionToken } from '../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -10,7 +11,7 @@ import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 export class WhiteboardProducer {
   private readonly logger = new Logger(WhiteboardProducer.name);
 
-  constructor(@Inject('CLIENT_KAFKA') private readonly client: ClientKafka) {}
+  constructor(@Inject(kafkaClientInjectionToken) private readonly client: ClientKafka) {}
 
   sendKafkaMessage(topicName: string, payload: IMessage<any>) {
     this.logger.debug(`${buildLogContext(payload.context)} Forwarding Kafka message to topic ${topicName}`);

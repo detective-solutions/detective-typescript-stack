@@ -7,6 +7,7 @@ import { WhiteboardConsumer } from './kafka/whiteboard.consumer';
 import { WhiteboardProducer } from './kafka/whiteboard.producer';
 import { WhiteboardWebSocketGateway } from './websocket/whiteboard-websocket.gateway';
 import { defaultEnvConfig } from './default-env.config';
+import { kafkaClientInjectionToken } from './utils';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { defaultEnvConfig } from './default-env.config';
     }),
     ClientsModule.register([
       {
-        name: 'CLIENT_KAFKA',
+        name: kafkaClientInjectionToken,
         transport: Transport.KAFKA,
         options: {
           client: {
