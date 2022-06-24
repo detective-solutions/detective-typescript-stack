@@ -32,7 +32,7 @@ describe('WhiteboardConsumer', () => {
   });
 
   describe('forwardQueryExecution', () => {
-    it('should correctly forward the value property of an incoming Kafka message', async () => {
+    it('should correctly forward the value property of an incoming Kafka message', () => {
       const testKafkaMessage: IKafkaMessage = {
         timestamp: '123456',
         offset: '212',
