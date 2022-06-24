@@ -1,6 +1,6 @@
-import { Client, ClientKafka, Transport } from '@nestjs/microservices';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
+import { ClientKafka } from '@nestjs/microservices';
 import { IMessage } from '@detective.solutions/shared/data-access';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
@@ -10,13 +10,7 @@ import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 export class WhiteboardProducer {
   private readonly logger = new Logger(WhiteboardProducer.name);
 
-  @Client({
-    transport: Transport.KAFKA,
-    options: {
-      client: { brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`] },
-    },
-  })
-  client: ClientKafka;
+  constructor(@Inject('CLIENT_KAFKA') private readonly client: ClientKafka) {}
 
   sendKafkaMessage(topicName: string, payload: IMessage<any>) {
     this.logger.debug(`${buildLogContext(payload.context)} Forwarding Kafka message to topic ${topicName}`);
