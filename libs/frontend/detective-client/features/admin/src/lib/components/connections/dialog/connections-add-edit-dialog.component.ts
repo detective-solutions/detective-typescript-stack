@@ -78,8 +78,8 @@ export class ConnectionsAddEditDialogComponent {
     }
   }
 
-  private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string>[] {
-    const formFields: BaseFormField<string>[] = [];
+  private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string | boolean>[] {
+    const formFields: BaseFormField<string | boolean>[] = [];
 
     formFieldData.forEach((data: IConnectorPropertiesResponse) => {
       switch (data.type) {
@@ -89,7 +89,7 @@ export class ConnectionsAddEditDialogComponent {
               type: 'checkbox',
               key: data.propertyName,
               label: data.displayName,
-              value: data.default,
+              value: !!data.default,
               required: data.required,
               hint: data.description,
             })
@@ -102,7 +102,7 @@ export class ConnectionsAddEditDialogComponent {
               type: 'text',
               key: data.propertyName,
               label: data.displayName,
-              value: data.default,
+              value: String(data.default),
               required: data.required,
               hint: data.description,
             })
@@ -115,7 +115,7 @@ export class ConnectionsAddEditDialogComponent {
               type: 'number',
               key: data.propertyName,
               label: data.displayName,
-              value: data.default,
+              value: String(data.default),
               required: data.required,
               hint: data.description,
             })

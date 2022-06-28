@@ -3,6 +3,6 @@ export interface IConnectorPropertiesResponse {
   displayName: string;
   type: string;
   description: string;
-  default: string;
+  default: string | number | boolean;
   required: boolean;
 }

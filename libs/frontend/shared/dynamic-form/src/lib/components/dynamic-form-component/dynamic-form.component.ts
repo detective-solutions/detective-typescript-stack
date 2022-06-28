@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
   templateUrl: './dynamic-form.component.html',
 })
 export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() formFieldDefinitions!: BaseFormField<string>[];
+  @Input() formFieldDefinitions!: BaseFormField<string | boolean>[];
   @Input() optionalFieldsPanelName!: string;
 
   form!: FormGroup;

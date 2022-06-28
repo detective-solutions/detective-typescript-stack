@@ -18,13 +18,13 @@ export class DynamicFormControlService {
     throw new Error('No dynamic form group available');
   }
 
-  toFormGroup(inputFormFields: BaseFormField<string>[]): FormGroup {
+  toFormGroup(inputFormFields: BaseFormField<string | boolean>[]): FormGroup {
     const group: any = {};
 
     inputFormFields.forEach((formField) => {
       group[formField.key] = formField.required
-        ? new FormControl(formField.value || '', Validators.required)
-        : new FormControl(formField.value || '');
+        ? new FormControl(formField.value, Validators.required)
+        : new FormControl(formField.value);
     });
     this.formGroup = new FormGroup(group);
     return this.formGroup;

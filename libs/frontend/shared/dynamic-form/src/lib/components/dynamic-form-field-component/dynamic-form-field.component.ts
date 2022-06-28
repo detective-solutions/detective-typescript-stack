@@ -9,7 +9,7 @@ import { FormGroup } from '@angular/forms';
   templateUrl: './dynamic-form-field.component.html',
 })
 export class DynamicFormFieldComponent {
-  @Input() formFieldDefinition!: BaseFormField<string>;
+  @Input() formFieldDefinition!: BaseFormField<string | boolean>;
   @Input() form!: FormGroup;
 
   get isValid() {
@@ -17,7 +17,7 @@ export class DynamicFormFieldComponent {
   }
 
   get formFieldValue() {
-    return this.formFieldDefinition.value ?? '';
+    return this.formFieldDefinition?.value;
   }
 
   get errorMessage() {
