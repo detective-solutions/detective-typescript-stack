@@ -1,12 +1,12 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
 import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws';
+import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 
 import { AuthEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardProducer } from '../kafka/whiteboard.producer';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
@@ -38,7 +38,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
-  onEvent(_client: WebSocket, message: IMessage<any>) {
+  onEvent(@MessageBody() message: IMessage<any>) {
     message.context = this.mergeEventTypeIntoMessageContext(
       EventTypeTopicMapping.queryTable.eventType,
       message.context
