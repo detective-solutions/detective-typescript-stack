@@ -49,6 +49,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
       }`
     );
     this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
+    // TODO: Return acknowledgement to sending client for robust collaboration
   }
 
   sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
