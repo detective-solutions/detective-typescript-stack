@@ -1,8 +1,9 @@
 <div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.connections.addEditDialog'">
-  <h1 mat-dialog-title *ngIf="!isEditDialog">{{ t('addDialogHeader') }}</h1>
-  <h1 mat-dialog-title *ngIf="isEditDialog">{{ t('editDialogHeader') }}</h1>
-  <div mat-dialog-content>
-    <form *ngIf="!isEditDialog" [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
+  <h1 mat-dialog-title *ngIf="isAddDialog">{{ t('addDialogHeader') }}</h1>
+  <h1 mat-dialog-title *ngIf="!isAddDialog">{{ t('editDialogHeader') }}</h1>
+
+  <div *ngIf="isAddDialog; else editDialog" mat-dialog-content>
+    <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
       <mat-form-field>
         <mat-label>{{ t('connectorTypeDropdownLabel') }}</mat-label>
         <mat-select formControlName="connectorType">
@@ -22,8 +23,21 @@
       ></dynamic-form>
     </ng-container>
   </div>
-  <div *ngIf="formFieldDefinitionsByConnectorType$ | async" mat-dialog-actions align="center">
+
+  <ng-template #editDialog>
+    <div mat-dialog-content>
+      <ng-container *ngIf="existingFormFieldData$ | async as formFieldDefinitions">
+        <dynamic-form
+          [formFieldDefinitions]="formFieldDefinitions"
+          [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
+        ></dynamic-form>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <div *ngIf="showSubmitButton" mat-dialog-actions align="center">
     <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
   </div>
+
   <mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
 </div>

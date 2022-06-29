@@ -2,14 +2,16 @@ import {
   BaseFormField,
   CheckboxFormField,
   DynamicFormControlService,
+  DynamicFormError,
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
+import { EMPTY, Subscription, catchError, map, pluck, switchMap, take, tap } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { Subscription, map, pluck, switchMap, take, tap } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+
 import { ConnectionsService } from '../../../services';
 import { IConnectorPropertiesResponse } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
@@ -22,7 +24,8 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 export class ConnectionsAddEditDialogComponent {
   private static readonly connectorTypeFormFieldName = 'connectorType';
 
-  isEditDialog = !!this.dialogInputData?.id;
+  isAddDialog = !this.dialogInputData?.id;
+  showSubmitButton = false;
   isSubmitting = false;
 
   readonly connectorTypeFormGroup = this.formBuilder.group({
@@ -30,6 +33,7 @@ export class ConnectionsAddEditDialogComponent {
   });
 
   readonly availableConnectorTypes$ = this.connectionsService.getAvailableConnectorTypes();
+
   readonly formFieldDefinitionsByConnectorType$ = this.connectorTypeFormGroup
     .get(ConnectionsAddEditDialogComponent.connectorTypeFormFieldName)
     ?.valueChanges.pipe(
@@ -37,7 +41,24 @@ export class ConnectionsAddEditDialogComponent {
         this.connectionsService.getConnectorProperties(selectedConnectorType)
       ),
       pluck('properties'),
-      map(this.getFormFieldByType)
+      map(this.getFormFieldByType),
+      tap(() => (this.showSubmitButton = true)),
+      catchError((error) => {
+        this.handleError(DynamicFormError.FORM_INIT_ERROR, error);
+        return EMPTY;
+      })
+    );
+
+  readonly existingFormFieldData$ = this.connectionsService
+    .getExistingConnectorPropertiesById(this.dialogInputData?.id)
+    .pipe(
+      pluck('properties'),
+      map(this.getFormFieldByType),
+      tap(() => (this.showSubmitButton = true)),
+      catchError((error: Error) => {
+        this.handleError(DynamicFormError.FORM_INIT_ERROR, error);
+        return EMPTY;
+      })
     );
 
   private readonly subscriptions = new Subscription();
@@ -61,17 +82,17 @@ export class ConnectionsAddEditDialogComponent {
   submitForm(formGroup?: FormGroup) {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
     if (formGroup.valid) {
+      this.isSubmitting = true;
       this.connectionsService
         .addConnection(this.connectorTypeFormGroup.value.connectorType, formGroup.value)
         .pipe(
-          tap(() => (this.isSubmitting = true)),
-          take(1)
+          take(1),
+          catchError((error: Error) => {
+            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
+            return EMPTY;
+          })
         )
-        .subscribe((response: object) => {
-          this.isSubmitting = false;
-          this.handleResponse(response);
-          this.dialogRef.close();
-        });
+        .subscribe((response: object) => this.handleResponse(response));
     } else {
       formGroup.markAllAsTouched();
       this.logger.info('Could not submit. Form is invalid,');
@@ -131,18 +152,47 @@ export class ConnectionsAddEditDialogComponent {
   }
 
   private handleResponse(response: object) {
+    this.isSubmitting = false;
     if (Object.keys(response).includes('success')) {
       this.translationService
         .selectTranslate('connections.toastMessages.actionSuccessful', {}, this.translationScope)
         .pipe(take(1))
-        .subscribe((translation: string) =>
-          this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 })
-        );
-    } else {
+        .subscribe((translation: string) => {
+          this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
+          this.dialogRef.close();
+        });
+    }
+
+    // TODO: Handle error code in response and fetch error message to display
+    if (Object.keys(response).includes('error')) {
+      this.logger.error('Connection could not be added/edited');
       this.translationService
         .selectTranslate('connections.toastMessages.actionFailed', {}, this.translationScope)
         .pipe(take(1))
         .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+    }
+  }
+
+  private handleError(errorType: DynamicFormError, error: Error) {
+    let translationKey;
+    if (errorType === DynamicFormError.FORM_INIT_ERROR) {
+      translationKey = 'connections.toastMessages.formInitError';
+      this.logger.error('Encountered an error while fetching the form data');
+    }
+    if (errorType === DynamicFormError.FORM_SUBMIT_ERROR) {
+      this.isSubmitting = false;
+      translationKey = 'connections.toastMessages.formSubmitError';
+      this.logger.error('Encountered an error while submitting the form data');
+    }
+    console.error(error);
+
+    if (translationKey) {
+      this.translationService
+        .selectTranslate(translationKey, {}, this.translationScope)
+        .pipe(take(1))
+        .subscribe((translation: string) => {
+          this.toastService.showToast(translation, 'Close', ToastType.ERROR);
+        });
     }
   }
 }

@@ -78,6 +78,13 @@ export class ConnectionsService {
     );
   }
 
+  getExistingConnectorPropertiesById(connectionId: string): Observable<{ properties: IConnectorPropertiesResponse[] }> {
+    // TODO: Add correct url after backend fix
+    return this.httpClient.get<{ properties: IConnectorPropertiesResponse[] }>(
+      `${ConnectionsService.catalogBasePath}/schema/{source_connection_xid}?source_id=${connectionId}`
+    );
+  }
+
   addConnection(connectionType: string, payload: any) {
     return this.httpClient.post(`${ConnectionsService.catalogBasePath}/${connectionType}/insert`, payload);
   }

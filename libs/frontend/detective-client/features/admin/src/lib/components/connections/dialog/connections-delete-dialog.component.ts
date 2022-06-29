@@ -1,10 +1,12 @@
 import { Component, Inject } from '@angular/core';
+import { EMPTY, catchError, map, switchMap, take } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { map, switchMap, take } from 'rxjs';
+
 import { ConnectionsService } from '../../../services';
 import { IGetConnectionByIdResponse } from '../../../models';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 
 @Component({
   selector: 'connections-delete-dialog',
@@ -22,7 +24,8 @@ export class ConnectionsDeleteDialogComponent {
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService,
     private readonly connectionsService: ConnectionsService,
-    private readonly dialogRef: MatDialogRef<ConnectionsDeleteDialogComponent>
+    private readonly dialogRef: MatDialogRef<ConnectionsDeleteDialogComponent>,
+    private readonly logger: LogService
   ) {}
 
   deleteConnection() {
@@ -31,7 +34,11 @@ export class ConnectionsDeleteDialogComponent {
         switchMap((connectionName: string) =>
           this.connectionsService.deleteConnection(this.dialogInputData.id, connectionName)
         ),
-        take(1)
+        take(1),
+        catchError((error: Error) => {
+          this.handleError(error);
+          return EMPTY;
+        })
       )
       .subscribe((response: object) => {
         this.handleResponse(response);
@@ -47,11 +54,26 @@ export class ConnectionsDeleteDialogComponent {
         .subscribe((translation: string) =>
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 })
         );
-    } else {
+    }
+
+    // TODO: Handle error code in response and fetch error message to display
+    if (Object.keys(response).includes('error')) {
+      this.logger.error('Connection could not be deleted');
       this.translationService
         .selectTranslate('connections.toastMessages.actionFailed', {}, this.translationScope)
         .pipe(take(1))
         .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
+  }
+
+  private handleError(error: Error) {
+    this.logger.error('Encountered an error while submitting connection deletion request');
+    console.error(error);
+    this.translationService
+      .selectTranslate('connections.toastMessages.formSubmitError', {}, this.translationScope)
+      .pipe(take(1))
+      .subscribe((translation: string) => {
+        this.toastService.showToast(translation, 'Close', ToastType.ERROR);
+      });
   }
 }

@@ -23,7 +23,9 @@
     },
     "toastMessages": {
       "actionSuccessful": "Action performed successfully",
-      "actionFailed": "Action could not be performed"
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch connection data. Please contact support",
+      "formSubmitError": "Could not submit connection data. Please contact support"
     }
   }
 }
