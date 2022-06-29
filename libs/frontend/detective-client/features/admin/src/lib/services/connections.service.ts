@@ -6,6 +6,7 @@ import {
 } from '../graphql';
 import {
   IConnectorPropertiesResponse,
+  IConnectorSchemaResponse,
   IConnectorTypesResponse,
   IGetAllConnectionsResponse,
   IGetConnectionByIdResponse,
@@ -78,10 +79,9 @@ export class ConnectionsService {
     );
   }
 
-  getExistingConnectorPropertiesById(connectionId: string): Observable<{ properties: IConnectorPropertiesResponse[] }> {
-    // TODO: Add correct url after backend fix
-    return this.httpClient.get<{ properties: IConnectorPropertiesResponse[] }>(
-      `${ConnectionsService.catalogBasePath}/schema/{source_connection_xid}?source_id=${connectionId}`
+  getExistingConnectorPropertiesById(connectionId: string): Observable<IConnectorSchemaResponse> {
+    return this.httpClient.get<IConnectorSchemaResponse>(
+      `${ConnectionsService.catalogBasePath}/schema/${connectionId}`
     );
   }
 
