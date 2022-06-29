@@ -37,6 +37,7 @@ export class ConnectionsAddEditDialogComponent {
   readonly formFieldDefinitionsByConnectorType$ = this.connectorTypeFormGroup
     .get(ConnectionsAddEditDialogComponent.connectorTypeFormFieldName)
     ?.valueChanges.pipe(
+      tap((selectedConnectorType: string) => (this.connectorType = selectedConnectorType)),
       switchMap((selectedConnectorType: string) =>
         this.connectionsService.getConnectorProperties(selectedConnectorType)
       ),
@@ -52,6 +53,7 @@ export class ConnectionsAddEditDialogComponent {
   readonly existingFormFieldData$ = this.connectionsService
     .getExistingConnectorPropertiesById(this.dialogInputData?.id)
     .pipe(
+      tap((response) => (this.connectorType = response.connectorType)),
       pluck('properties'),
       map(this.getFormFieldByType),
       tap(() => (this.showSubmitButton = true)),
@@ -61,6 +63,7 @@ export class ConnectionsAddEditDialogComponent {
       })
     );
 
+  private connectorType!: string;
   private readonly subscriptions = new Subscription();
 
   constructor(
@@ -84,16 +87,29 @@ export class ConnectionsAddEditDialogComponent {
     if (formGroup.valid) {
       const formValues = this.removeEmptyStringFormValues(formGroup.value);
       this.isSubmitting = true;
-      this.connectionsService
-        .addConnection(this.connectorTypeFormGroup.value.connectorType, formGroup.value)
-        .pipe(
-          take(1),
-          catchError((error: Error) => {
-            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-            return EMPTY;
-          })
-        )
-        .subscribe((response: object) => this.handleResponse(response));
+      if (this.isAddDialog) {
+        this.connectionsService
+          .addConnection(this.connectorType, formValues)
+          .pipe(
+            take(1),
+            catchError((error: Error) => {
+              this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
+              return EMPTY;
+            })
+          )
+          .subscribe((response: object) => this.handleResponse(response));
+      } else {
+        this.connectionsService
+          .updateConnection(this.connectorType, this.dialogInputData.id, formValues)
+          .pipe(
+            take(1),
+            catchError((error: Error) => {
+              this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
+              return EMPTY;
+            })
+          )
+          .subscribe((response: object) => this.handleResponse(response));
+      }
     } else {
       formGroup.markAllAsTouched();
       this.logger.info('Could not submit. Form is invalid,');
