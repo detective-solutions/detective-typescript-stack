@@ -82,6 +82,7 @@ export class ConnectionsAddEditDialogComponent {
   submitForm(formGroup?: FormGroup) {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
     if (formGroup.valid) {
+      const formValues = this.removeEmptyStringFormValues(formGroup.value);
       this.isSubmitting = true;
       this.connectionsService
         .addConnection(this.connectorTypeFormGroup.value.connectorType, formGroup.value)
@@ -149,6 +150,15 @@ export class ConnectionsAddEditDialogComponent {
       }
     });
     return formFields;
+  }
+
+  private removeEmptyStringFormValues(formValues: { [key: string]: string | number }) {
+    for (const key in formValues) {
+      if (formValues[key] === '') {
+        delete formValues[key];
+      }
+    }
+    return formValues;
   }
 
   private handleResponse(response: object) {
