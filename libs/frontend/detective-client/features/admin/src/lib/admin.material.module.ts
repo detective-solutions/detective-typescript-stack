@@ -1,8 +1,19 @@
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { NgModule } from '@angular/core';
 
 const modules = [
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-] as any[];
+  MatButtonModule,
+  MatIconModule,
+  MatDialogModule,
+  MatSelectModule,
+  MatProgressBarModule,
+  FlexLayoutModule,
+];
 
 @NgModule({
   exports: modules,

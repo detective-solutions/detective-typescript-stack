@@ -1,7 +1,7 @@
-import { CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IFavorizedTableCell, TableCellEventType } from '../../models';
 
-import { IFavorizedTableCell } from '../../interfaces';
+import { TableCellEventService } from '../../services';
 
 @Component({
   selector: 'favorized-table-cell',
@@ -12,20 +12,20 @@ import { IFavorizedTableCell } from '../../interfaces';
 export class FavorizedTableCellComponent {
   cellData!: IFavorizedTableCell; // Will be populated by the DynamicTableDirective
 
-  constructor(private readonly eventService: EventService) {}
+  constructor(private readonly tableCellEventService: TableCellEventService) {}
 
   favorize() {
     // TODO: Handle error case
     this.cellData.isFavorized = !this.cellData.isFavorized;
     this.cellData.isFavorized
-      ? this.eventService.tableCellEvents$.next({
+      ? this.tableCellEventService.tableCellEvents$.next({
           id: this.cellData.id,
-          type: CasefileEventType.FAVORIZE,
+          type: TableCellEventType.FAVORIZE,
           value: true,
         })
-      : this.eventService.tableCellEvents$.next({
+      : this.tableCellEventService.tableCellEvents$.next({
           id: this.cellData.id,
-          type: CasefileEventType.FAVORIZE,
+          type: TableCellEventType.FAVORIZE,
           value: false,
         });
   }

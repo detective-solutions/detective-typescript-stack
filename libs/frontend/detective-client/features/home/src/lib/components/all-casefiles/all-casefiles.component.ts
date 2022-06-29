@@ -3,7 +3,7 @@ import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detectiv
 import { Observable, map } from 'rxjs';
 
 import { BaseCasefileListComponent } from '../base/base-casefile-list.component';
-import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-response.interface';
+import { IGetAllCasefilesResponse } from '../../interfaces';
 
 @Component({
   selector: 'all-casefiles',

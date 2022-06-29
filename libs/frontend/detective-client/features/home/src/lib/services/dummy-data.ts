@@ -1,4 +1,4 @@
-import { ICasefile, IDataSource } from '@detective.solutions/shared/data-access';
+import { ICasefile, ISourceConnection } from '@detective.solutions/shared/data-access';
 
 function randomDate() {
   const start = new Date(2021, 0, 1);
@@ -148,7 +148,7 @@ export const DUMMY_CASEFILE_DATA: ICasefile[] = [
   },
 ];
 
-export const DUMMY_DATASOURCE_DATA: IDataSource[] = [
+export const DUMMY_DATASOURCE_DATA: ISourceConnection[] = [
   {
     id: '1',
     name: 'SAP COPA',

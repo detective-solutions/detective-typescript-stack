@@ -50,7 +50,9 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   }
 
   isAuthorizationError(error: HttpErrorResponse, request: HttpRequest<any>): boolean {
-    return error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.apiBaseUrl);
+    return (
+      error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.apiBasePath)
+    );
   }
 
   handleAuthorizationError(request: HttpRequest<any>, next: HttpHandler) {

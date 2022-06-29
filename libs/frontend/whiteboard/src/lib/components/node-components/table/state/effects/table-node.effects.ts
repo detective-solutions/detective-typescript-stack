@@ -21,9 +21,12 @@ export class TableNodeEffects {
           this.whiteboardFacade.sendWebsocketMessage({
             event: MessageEventType.QueryTable,
             data: {
-              context: { nodeId: action.addedNode.id, ...context } as IMessageContext,
+              context: {
+                nodeId: action.addedNode.id,
+                ...context,
+              } as IMessageContext,
               body: {
-                query_type: QueryType.SqlQuery,
+                queryType: QueryType.SqlQuery,
                 query: ['SELECT * FROM freequery LIMIT 100'], // TODO: Fetch query/table info from node object
                 tableId: ['59c9547a-dea7-11ec-ac54-287fcf6e439d'],
                 groupId: ['68c127fc-dea7-11ec-8d94-287fcf6e439d'], // TODO: Can be removed after backend adjustments

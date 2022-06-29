@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 
-import { EventService } from '@detective.solutions/frontend/shared/data-access';
 import { ITilesInput } from './interfaces/tile.interface';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
 import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
+import { TileEventService } from './services';
 
 @Component({
   selector: 'tiles-view',
@@ -30,7 +30,7 @@ export class TilesComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly router: Router,
-    private readonly eventService: EventService,
+    private readonly tileEventService: TileEventService,
     private readonly logService: LogService
   ) {}
 
@@ -48,7 +48,7 @@ export class TilesComponent implements OnInit, OnDestroy {
 
     // Handle resetting of fetching state flag in case of an error
     this.subscriptions.add(
-      this.eventService.resetLoadingStates$.subscribe(() => {
+      this.tileEventService.resetLoadingStates$.subscribe(() => {
         this.isFetchingMoreData = false;
         this.logService.debug('Resetting loading indicator due to error');
       })

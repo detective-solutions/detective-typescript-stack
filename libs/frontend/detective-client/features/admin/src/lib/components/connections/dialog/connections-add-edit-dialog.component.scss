@@ -1,0 +1,19 @@
+.mat-dialog-content {
+  width: 90%;
+
+  form,
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.mat-dialog-actions {
+  button {
+    margin: 15px 0;
+    width: 100px;
+  }
+}
+
+.mat-progress-bar {
+  margin-top: 25px;
+}

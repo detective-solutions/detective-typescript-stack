@@ -22,7 +22,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'casefile/:id',
+    path: 'tenant/:tenantId/casefile/:casefileId',
     loadChildren: () => import('@detective.solutions/frontend/whiteboard').then((m) => m.WhiteboardModule),
     canActivate: [AuthGuard],
   },

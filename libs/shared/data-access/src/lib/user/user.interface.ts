@@ -2,7 +2,7 @@ import { ITenant } from './tenant.interface';
 import { IUserGroup } from './user-group.interface';
 
 export interface IUser {
-  id?: string;
+  id: string;
   email: string;
   tenantIds?: ITenant[];
   role?: UserRole;

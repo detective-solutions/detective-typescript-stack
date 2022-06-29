@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:1111',
-  webSocketBaseUrl: 'ws://localhost:7777/ws',
+  apiBasePath: 'http://localhost:1111',
+  webSocketBasePath: 'ws://localhost:7777/ws',
   whiteboardUrlPath: '/casefile', // Used to identify whiteboard routes
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
 };

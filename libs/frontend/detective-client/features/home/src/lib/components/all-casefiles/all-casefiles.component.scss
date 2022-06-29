@@ -1,0 +1,5 @@
+@import 'variables';
+
+table-view {
+  height: calc(100vh - $navigation-toolbar-height - 20px);
+}

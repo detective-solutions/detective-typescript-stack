@@ -1,8 +1,8 @@
-import { AccessState, IAccessTableCell } from '../../interfaces';
-import { CasefileEventType, EventService } from '@detective.solutions/frontend/shared/data-access';
+import { AccessState, IAccessTableCell, TableCellEventType } from '../../models';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { TableCellEventService } from '../../services';
 
 @Component({
   selector: 'access-indicator-table-cell',
@@ -18,7 +18,7 @@ export class AccessIndicatorTableCellComponent implements OnInit {
   accessPending = false;
   accessGranted = false;
 
-  constructor(private readonly router: Router, private readonly eventService: EventService) {}
+  constructor(private readonly router: Router, private readonly tableCellEventService: TableCellEventService) {}
 
   ngOnInit() {
     switch (this.cellData.accessState) {
@@ -39,7 +39,7 @@ export class AccessIndicatorTableCellComponent implements OnInit {
 
   requestAccess() {
     // TODO: Handle error case
-    this.eventService.tableCellEvents$.next({ id: this.cellData.id, type: CasefileEventType.REQUEST_ACCESS });
+    this.tableCellEventService.tableCellEvents$.next({ id: this.cellData.id, type: TableCellEventType.REQUEST_ACCESS });
     this.noAccess = false;
     this.accessPending = true;
   }

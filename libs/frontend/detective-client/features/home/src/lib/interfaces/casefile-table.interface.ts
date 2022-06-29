@@ -1,16 +1,11 @@
-import { IAbstractTableDef, TableCellData } from '@detective.solutions/frontend/detective-client/ui';
+import { IAbstractTableDef, IColumnDef } from '@detective.solutions/frontend/detective-client/ui';
 
 export interface ICasefileTableDef extends IAbstractTableDef {
-  casefileInfo: ICasefileColumnDef;
-  access: ICasefileColumnDef;
-  owner: ICasefileColumnDef;
-  starred: ICasefileColumnDef;
-  views: ICasefileColumnDef;
-  investigators: ICasefileColumnDef;
-  lastUpdated: ICasefileColumnDef;
-}
-
-export interface ICasefileColumnDef {
-  columnName: string;
-  cellData: TableCellData;
+  casefileInfo: IColumnDef;
+  access: IColumnDef;
+  owner: IColumnDef;
+  starred: IColumnDef;
+  views: IColumnDef;
+  investigators: IColumnDef;
+  lastUpdated: IColumnDef;
 }

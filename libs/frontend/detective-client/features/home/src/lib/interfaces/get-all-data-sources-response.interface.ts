@@ -1,6 +1,6 @@
-import { DataSource } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetAllDataSourcesResponse {
-  dataSources: DataSource[];
+  dataSources: SourceConnection[];
   totalElementsCount: number;
 }

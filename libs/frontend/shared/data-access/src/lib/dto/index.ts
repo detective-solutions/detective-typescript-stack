@@ -1,3 +1,3 @@
 export * from './casefile.dto';
-export * from './data-source.dto';
+export * from './source-connection.dto';
 export * from './user.dto';

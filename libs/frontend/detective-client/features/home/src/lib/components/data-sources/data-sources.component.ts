@@ -1,12 +1,17 @@
-import { AccessState, ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
-import { CasefileEventType, EventService, ICasefileEvent } from '@detective.solutions/frontend/shared/data-access';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, filter, map, tap } from 'rxjs';
+import {
+  AccessState,
+  ITableCellEvent,
+  ITableInput,
+  TableCellEventService,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { IDataSourceTableDef, IGetAllDataSourcesResponse } from '../../interfaces';
+import { Observable, Subject, Subscription, map, take, tap } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
-import { DataSourceService } from '../../services/data-source.service';
-import { IDataSource } from '@detective.solutions/shared/data-access';
-import { IDataSourceTableDef } from '../../interfaces';
-import { IGetAllDataSourcesResponse } from '../../interfaces/get-all-data-sources-response.interface';
+import { DataSourceService } from '../../services';
+import { ISourceConnection } from '@detective.solutions/shared/data-access';
 
 @Component({
   selector: 'data-sources',
@@ -25,16 +30,16 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
   private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
 
-  readonly accessRequested$ = this.subscriptions.add(
-    this.eventService.tableCellEvents$
-      .pipe(
-        filter((event: ICasefileEvent) => !!event.id && event.type === CasefileEventType.REQUEST_ACCESS),
-        tap((event: ICasefileEvent) => console.log(event))
-      )
-      .subscribe()
+  readonly accessRequests$ = this.tableCellEventService.accessRequests$.pipe(
+    tap((event: ITableCellEvent) => console.log(event))
   );
 
-  constructor(private readonly dataSourceService: DataSourceService, private readonly eventService: EventService) {}
+  constructor(
+    private readonly dataSourceService: DataSourceService,
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly translationService: TranslocoService,
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
+  ) {}
 
   ngOnInit() {
     this.dataSources$ = this.dataSourceService.getAllDataSources(this.initialPageOffset, this.pageSize);
@@ -60,38 +65,44 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private transformToTableStructure(originalDataSources: IDataSource[]): IDataSourceTableDef[] {
+  private transformToTableStructure(originalDataSources: ISourceConnection[]): IDataSourceTableDef[] {
     const tempTableItems = [] as IDataSourceTableDef[];
-    originalDataSources.forEach((dataSource: IDataSource) => {
-      tempTableItems.push({
-        dataSourceInfo: {
-          columnName: '',
-          cellData: {
-            id: dataSource.id,
-            type: TableCellTypes.MULTI_TABLE_CELL,
-            thumbnailSrc: dataSource.iconSrc,
-            name: dataSource.name,
-            description: dataSource.description,
-          },
-        },
-        access: {
-          columnName: 'Access',
-          cellData: {
-            id: dataSource.id,
-            type: TableCellTypes.ACCESS_TABLE_CELL,
-            accessState: AccessState.NO_ACCESS,
-          },
-        },
-        lastUpdated: {
-          columnName: 'Last Updated',
-          cellData: {
-            id: dataSource.id,
-            type: TableCellTypes.DATE_TABLE_CELL,
-            date: String(dataSource.lastUpdated),
-          },
-        },
-      } as IDataSourceTableDef);
-    });
+
+    this.translationService
+      .selectTranslateObject(`${this.translationScope.scope}.dataSourcesList.columnNames`)
+      .pipe(take(1))
+      .subscribe((translation: { [key: string]: string }) => {
+        originalDataSources.forEach((dataSource: ISourceConnection) => {
+          tempTableItems.push({
+            dataSourceInfo: {
+              columnName: '',
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.MULTI_TABLE_CELL,
+                thumbnailSrc: dataSource.iconSrc,
+                name: dataSource.name,
+                description: dataSource.description,
+              },
+            },
+            access: {
+              columnName: translation['accessColumn'],
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.ACCESS_TABLE_CELL,
+                accessState: AccessState.NO_ACCESS,
+              },
+            },
+            lastUpdated: {
+              columnName: translation['lastUpdatedColumn'],
+              cellData: {
+                id: dataSource.xid,
+                type: TableCellTypes.DATE_TABLE_CELL,
+                date: String(dataSource.lastUpdated),
+              },
+            },
+          } as IDataSourceTableDef);
+        });
+      });
     return tempTableItems;
   }
 }

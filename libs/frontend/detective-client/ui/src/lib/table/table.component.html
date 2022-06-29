@@ -1,4 +1,4 @@
-<div class="component-wrapper" [class.isMobile]="isMobile$ | async">
+<div class="component-wrapper" [class.is-mobile]="isMobile$ | async">
   <div
     *ngIf="(tableRows$ | async) && tableDataSource; else isLoading"
     class="table-container"

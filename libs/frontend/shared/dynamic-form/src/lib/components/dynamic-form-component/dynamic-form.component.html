@@ -1,0 +1,19 @@
+<form [formGroup]="form" (keydown.enter)="submitForm()">
+  <dynamic-form-field
+    *ngFor="let formFieldDefinition of requiredFormFields"
+    [formFieldDefinition]="formFieldDefinition"
+    [form]="form"
+  ></dynamic-form-field>
+  <mat-accordion *ngIf="optionalFormFields.length > 0">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{ optionalFieldsPanelName }}</mat-panel-title>
+      </mat-expansion-panel-header>
+      <dynamic-form-field
+        *ngFor="let formFieldDefinition of optionalFormFields"
+        [formFieldDefinition]="formFieldDefinition"
+        [form]="form"
+      ></dynamic-form-field>
+    </mat-expansion-panel>
+  </mat-accordion>
+</form>

@@ -6,5 +6,19 @@
       "dataSources": "Data Sources"
     },
     "sidenavBottomItem": "Admin"
+  },
+  "casefileList": {
+    "columnNames": {
+      "accessColumn": "Access",
+      "ownerColumn": "Owner",
+      "viewsColumn": "Views",
+      "lastUpdatedColumn": "Last Updated"
+    }
+  },
+  "dataSourcesList": {
+    "columnNames": {
+      "accessColumn": "Access",
+      "lastUpdatedColumn": "Last Updated"
+    }
   }
 }

@@ -1,1 +1,13 @@
-<img width="1500px" src="assets/images/mocks/connections-mock.jpg" />
+<div class="connections-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.connections'">
+  <div class="add-connection-button-wrapper">
+    <button mat-stroked-button (click)="openConnectionsDialog()">
+      <mat-icon>add</mat-icon>
+      {{ t('addConnectionButtonText') }}
+    </button>
+  </div>
+  <table-view
+    [tableRows$]="tableItems$"
+    [pageSize]="pageSize"
+    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+  ></table-view>
+</div>

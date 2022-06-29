@@ -11,17 +11,17 @@ export class WhiteboardContextResolver implements Resolve<void> {
   constructor(private readonly authService: AuthService, private readonly store: Store) {}
 
   resolve(route: ActivatedRouteSnapshot) {
-    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) =>
+    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
       this.store.dispatch(
         WhiteboardContextActions.initializeWhiteboardContext({
           context: {
-            tenantId: authStatus.tenantId,
-            casefileId: route.params['id'],
+            tenantId: route.params['tenantId'],
+            casefileId: route.params['casefileId'],
             userId: authStatus.userId,
             userRole: authStatus.userRole,
           },
         })
-      )
-    );
+      );
+    });
   }
 }

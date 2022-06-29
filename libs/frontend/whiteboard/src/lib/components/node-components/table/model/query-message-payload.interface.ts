@@ -1,4 +1,4 @@
 export interface IQueryMessagePayload {
-  query_type: string;
+  queryType: string;
   query: string[];
 }

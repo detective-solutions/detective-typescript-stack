@@ -1,6 +1,7 @@
 import { AppController } from './app.controller';
 import { AuthService } from '@detective.solutions/backend/auth';
 import { Test } from '@nestjs/testing';
+import { v4 as uuidv4 } from 'uuid';
 
 const mockAuthService = {
   login: jest.fn(),
@@ -33,7 +34,7 @@ describe('AppController', () => {
   describe('login', () => {
     it('should invoke the authService login method with correct input parameters', async () => {
       const testServerResponse = { access_token: 'test1', refresh_token: 'test2' };
-      const testRequest = { user: { id: '1' }, meta: { test: '1' } };
+      const testRequest = { user: { id: uuidv4() }, meta: { test: '1' } };
       const testIpAddress = '127.0.0.1';
 
       const loginSpy = jest.spyOn(authService, 'login').mockResolvedValue(testServerResponse);
@@ -46,7 +47,7 @@ describe('AppController', () => {
 
   describe('logout', () => {
     it('should invoke the authService logout method with correct input parameters', async () => {
-      const testRequest = { user: { id: '1' }, meta: { test: '1' } };
+      const testRequest = { user: { id: uuidv4() }, meta: { test: '1' } };
       const loginSpy = jest.spyOn(authService, 'logout');
 
       await appController.logout(testRequest);
@@ -59,7 +60,7 @@ describe('AppController', () => {
   describe('refresh', () => {
     it('should invoke the authService refresh method with correct input parameters', async () => {
       const testServerResponse = { access_token: 'test1', refresh_token: 'test2' };
-      const testRequest = { user: { id: '1' }, meta: { test: '1' } };
+      const testRequest = { user: { id: uuidv4() }, meta: { test: '1' } };
       const testIpAddress = '127.0.0.1';
 
       const loginSpy = jest.spyOn(authService, 'refreshTokens').mockResolvedValue(testServerResponse);

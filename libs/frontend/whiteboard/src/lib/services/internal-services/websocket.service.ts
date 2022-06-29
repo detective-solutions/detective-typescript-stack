@@ -9,10 +9,12 @@ import { MatSnackBarConfig, MatSnackBarRef, TextOnlySnackBar } from '@angular/ma
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { Subject, Subscription, catchError, filter, switchMap, take, tap, throwError } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-
+import { IWhiteboardContextState } from '../../state/interfaces';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { environment } from '@detective.solutions/frontend/shared/environments';
+import { selectWhiteboardContextState } from '../../state';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -28,6 +30,7 @@ export class WebSocketService implements OnDestroy {
   private subscriptions!: Subscription;
 
   readonly webSocket$ = this.webSocketSubject$.pipe(
+    filter(() => !!this.currentWebSocket$),
     switchMap(() => this.currentWebSocket$),
     catchError(() => {
       this.logger.error(`${WebSocketService.loggingPrefix} No WebSocket available in WebSocket service!`);
@@ -37,12 +40,9 @@ export class WebSocketService implements OnDestroy {
   readonly isConnectedToWebSocketServer$ = new Subject<boolean>();
   readonly webSocketConnectionFailedEventually$ = new Subject<boolean>();
 
-  get websocketUrl() {
-    return `${environment.webSocketBaseUrl}/?token=${this.authService.getAccessToken()}`;
-  }
-
   constructor(
     private readonly authService: AuthService,
+    private readonly store: Store,
     private readonly logger: LogService,
     private readonly router: Router,
     private readonly toastService: ToastService,
@@ -51,59 +51,68 @@ export class WebSocketService implements OnDestroy {
   ) {}
 
   establishWebsocketConnection() {
+    console.log(this.authService.getRefreshToken()); // TODO: Remove me
+
     // Need to create a new instance after calling unsubscribe() when resetting connection
     this.subscriptions = new Subscription();
 
-    this.currentWebSocket$ = initRxWebSocketWrapper({
-      url: this.websocketUrl,
-      reconnectInterval: 4000,
-      reconnectAttempts: 1,
-    });
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1))
+      .subscribe((whiteboardContext: IWhiteboardContextState) => {
+        this.logger.debug(
+          `${WebSocketService.loggingPrefix} Establishing connection to ${this.buildWebSocketUrl(whiteboardContext)}`
+        );
 
-    // Handle interrupted connections, if necessary refresh access token
-    this.subscriptions.add(
-      this.currentWebSocket$.connectionStatus$
-        .pipe(
-          tap((isConnected: boolean) => this.isConnectedToWebSocketServer$.next(isConnected)),
-          tap((isConnected: boolean) => {
-            if (isConnected) {
-              this.handleSuccessfulConnection();
-            } else {
-              this.handleReconnection();
-            }
-          }),
-          filter((isConnected: boolean) => !isConnected),
-          filter(() => this.authService.hasExpiredToken(this.authService.getAccessToken())),
-          switchMap(() => this.authService.refreshTokens())
-        )
-        .subscribe(() => {
-          // Set websocket url with updated access token
-          this.currentWebSocket$.config = { url: this.websocketUrl };
-        })
-    );
+        this.currentWebSocket$ = initRxWebSocketWrapper<any>({
+          url: this.buildWebSocketUrl(whiteboardContext),
+          reconnectInterval: 4000,
+          reconnectAttempts: 3,
+        });
 
-    // Reset connection and subscriptions if websocket connection failed eventually
-    this.subscriptions.add(
-      this.currentWebSocket$.connectionFailedEventually$.subscribe(() => this.handleConnectionError())
-    );
+        // Handle interrupted connections, if necessary refresh access token
+        this.subscriptions.add(
+          this.currentWebSocket$.connectionStatus$
+            .pipe(
+              tap((isConnected: boolean) => this.isConnectedToWebSocketServer$.next(isConnected)),
+              tap((isConnected: boolean) => {
+                if (isConnected) {
+                  this.handleSuccessfulConnection();
+                } else {
+                  this.handleReconnection();
+                }
+              }),
+              filter((isConnected: boolean) => !isConnected),
+              filter(() => this.authService.hasExpiredToken(this.authService.getAccessToken())),
+              switchMap(() => this.authService.refreshTokens())
+            )
+            .subscribe(() => {
+              // Set websocket url with updated access token
+              this.currentWebSocket$.config = { url: this.buildWebSocketUrl(whiteboardContext) };
+            })
+        );
 
-    // Set timers to update refresh token to ensure that a user can always reconnect
-    // Given that a connection has been authenticated once
-    this.subscriptions.add(
-      this.authService.authStatus$
-        .pipe(filter((authStatus: IAuthStatus) => authStatus.isAuthenticated))
-        .subscribe(() => this.startRefreshTokenTimer())
-    );
-    this.subscriptions.add(
-      this.authService.authStatus$
-        .pipe(filter((authStatus: IAuthStatus) => !authStatus.isAuthenticated))
-        .subscribe(() => this.stopRefreshTokenTimer())
-    );
+        // Reset connection and subscriptions if websocket connection failed eventually
+        this.subscriptions.add(
+          this.currentWebSocket$.connectionFailedEventually$.subscribe(() => this.handleConnectionError())
+        );
 
-    // Subscribe to logout to reset whiteboard websocket connection
-    this.subscriptions.add(this.authService.loggedOut$.subscribe(() => this.resetWebsocketConnection()));
+        // Set timers to update refresh token to ensure that a user can always reconnect
+        // Given that a connection has been authenticated once
+        this.subscriptions.add(
+          this.authService.authStatus$
+            .pipe(filter((authStatus: IAuthStatus) => authStatus.isAuthenticated))
+            .subscribe(() => this.startRefreshTokenTimer())
+        );
+        this.subscriptions.add(
+          this.authService.authStatus$
+            .pipe(filter((authStatus: IAuthStatus) => !authStatus.isAuthenticated))
+            .subscribe(() => this.stopRefreshTokenTimer())
+        );
 
-    return this.currentWebSocket$;
+        // Subscribe to logout to reset whiteboard websocket connection
+        this.subscriptions.add(this.authService.loggedOut$.subscribe(() => this.resetWebsocketConnection()));
+      });
   }
 
   resetWebsocketConnection() {
@@ -176,6 +185,12 @@ export class WebSocketService implements OnDestroy {
     return !!this.router.url.includes(environment.whiteboardUrlPath);
   }
 
+  private buildWebSocketUrl(whiteboardContext: IWhiteboardContextState) {
+    return `${environment.webSocketBasePath}/tenant/${whiteboardContext.tenantId}/casefile/${
+      whiteboardContext.casefileId
+    }?token=${this.authService.getAccessToken()}`;
+  }
+
   private startRefreshTokenTimer() {
     const refreshToken = JSON.parse(atob(this.authService.getRefreshToken().split('.')[1]));
     if (!refreshToken) {
@@ -193,9 +208,13 @@ export class WebSocketService implements OnDestroy {
           .refreshTokens()
           .pipe(
             tap(() => this.logger.info(`${WebSocketService.loggingPrefix} Refreshing access tokens`)),
+            switchMap(() => this.store.select(selectWhiteboardContextState)),
             take(1)
           )
-          .subscribe(() => (this.currentWebSocket$.config = { url: this.websocketUrl })),
+          .subscribe(
+            (whiteboardContext: IWhiteboardContextState) =>
+              (this.currentWebSocket$.config = { url: this.buildWebSocketUrl(whiteboardContext) })
+          ),
       timeout
     );
   }

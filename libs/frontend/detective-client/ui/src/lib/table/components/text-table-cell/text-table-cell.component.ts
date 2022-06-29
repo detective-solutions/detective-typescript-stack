@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { ITextTableCell } from '../../interfaces';
+import { ITextTableCell } from '../../models';
 
 @Component({
   selector: 'text-table-cell',

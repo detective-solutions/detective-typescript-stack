@@ -3,7 +3,7 @@ import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detectiv
 import { Observable, filter, map, switchMap } from 'rxjs';
 
 import { BaseCasefileListComponent } from '../base/base-casefile-list.component';
-import { IGetAllCasefilesResponse } from '../../interfaces/get-all-casefiles-response.interface';
+import { IGetAllCasefilesResponse } from '../../interfaces';
 
 @Component({
   selector: 'my-casefiles',
@@ -19,7 +19,7 @@ export class MyCasefilesComponent extends BaseCasefileListComponent implements O
 
   ngOnInit() {
     this.casefiles$ = this.authService.authStatus$.pipe(
-      filter((authStatus) => authStatus.isAuthenticated && !!authStatus.userId),
+      filter((authStatus) => !!authStatus.userId),
       map((authStatus) => authStatus.userId),
       switchMap((userId) => {
         return this.casefileService.getCasefilesByAuthor(this.initialPageOffset, this.pageSize, userId);

@@ -1,0 +1,7 @@
+<div *transloco="let t; read: 'table.stateTableCell'">
+  <span *ngIf="isInitializing" class="initializing-state">{{ t('initializing') }}</span>
+  <span *ngIf="isReady" class="ready-state">{{ t('ready') }}</span>
+  <span *ngIf="hasError" class="error-state" [matTooltip]="errorMessage" [matTooltipShowDelay]="tooltipDelay">{{
+    t('error')
+  }}</span>
+</div>

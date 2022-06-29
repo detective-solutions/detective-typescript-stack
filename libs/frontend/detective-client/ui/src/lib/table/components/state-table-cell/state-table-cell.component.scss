@@ -1,0 +1,11 @@
+span {
+  font-weight: 500;
+
+  &.initializing-state {
+    color: orange;
+  }
+
+  &.ready-state {
+    color: green;
+  }
+}

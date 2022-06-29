@@ -26,6 +26,11 @@
     "multiTableCell": {
       "noName": "Kein Name verfügbar",
       "noDescription": "Keine Beschreibung verfügbar."
+    },
+    "stateTableCell": {
+      "initializing": "Wird initialisiert",
+      "ready": "Bereit",
+      "error": "Fehler"
     }
   }
 }

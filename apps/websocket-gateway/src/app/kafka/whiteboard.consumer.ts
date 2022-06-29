@@ -1,9 +1,10 @@
 import { Controller, Logger } from '@nestjs/common';
 
 import { EventPattern } from '@nestjs/microservices';
+import { IKafkaMessage } from '@detective.solutions/shared/data-access';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { broadcastWebSocketContext } from '../utils';
+import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 @Controller()
 export class WhiteboardConsumer {
@@ -12,9 +13,12 @@ export class WhiteboardConsumer {
   constructor(private readonly webSocketGateway: WhiteboardWebSocketGateway) {}
 
   @EventPattern('casefile')
-  // TODO: Investigate response type
-  forwardQueryExecution(data: any) {
-    console.log('FORWARD EVENT WITH DATA', data.value);
-    this.webSocketGateway.broadcastMessage(data.value);
+  forwardQueryExecution(data: IKafkaMessage) {
+    this.logger.verbose(
+      `${buildLogContext(data.value.context)} Consuming message ${data.offset} from topic ${
+        data.topic
+      } with timestamp ${data.timestamp}`
+    );
+    this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
   }
 }

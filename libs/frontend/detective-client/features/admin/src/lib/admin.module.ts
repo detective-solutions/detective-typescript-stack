@@ -1,18 +1,37 @@
-import { AdminContainerComponent } from './components/admin-container.component';
+import { AdminContainerComponent, ConnectionsComponent, GroupsComponent, MasksComponent } from './components';
+import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
+import { GetAllConnectionsGQL, GetConnectionByIdGQL } from './graphql';
+import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
+import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
-import { ConnectionsComponent } from './components/connections/connections.component';
-import { GroupsComponent } from './components/groups/groups.component';
-import { MasksComponent } from './components/masks/masks.component';
-import { NavigationModule } from '@detective.solutions/frontend/detective-client/ui';
+import { ConnectionsService } from './services';
+import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { NgModule } from '@angular/core';
-import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { ReactiveFormsModule } from '@angular/forms';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
-  declarations: [AdminContainerComponent, ConnectionsComponent, GroupsComponent, MasksComponent],
-  imports: [CommonModule, AdminRoutingModule, AdminMaterialModule, NavigationModule],
+  declarations: [
+    AdminContainerComponent,
+    ConnectionsComponent,
+    ConnectionsAddEditDialogComponent,
+    ConnectionsDeleteDialogComponent,
+    GroupsComponent,
+    MasksComponent,
+  ],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    TranslocoModule,
+    NavigationModule,
+    TableModule,
+    ReactiveFormsModule,
+    DynamicFormModule,
+    AdminMaterialModule,
+  ],
   providers: [
     {
       provide: TRANSLOCO_SCOPE,
@@ -21,6 +40,9 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
         loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
       },
     },
+    ConnectionsService,
+    GetConnectionByIdGQL,
+    GetAllConnectionsGQL,
   ],
 })
 export class AdminModule {}

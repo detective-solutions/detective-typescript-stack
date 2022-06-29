@@ -1,10 +1,11 @@
-import { DataSource, EventService } from '@detective.solutions/frontend/shared/data-access';
-import { GetAllDataSourcesGQL, IGetAllDataSourcesGQLResponse } from '../graphql/get-all-data-sources-gql';
+import { GetAllDataSourcesGQL, IGetAllDataSourcesGQLResponse } from '../graphql';
 import { Observable, catchError, map } from 'rxjs';
 
-import { IGetAllDataSourcesResponse } from '../interfaces/get-all-data-sources-response.interface';
+import { IGetAllDataSourcesResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
+import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class DataSourceService {
 
   constructor(
     private readonly getAllDataSourcesGQL: GetAllDataSourcesGQL,
-    private readonly eventService: EventService
+    private readonly tableCellEventService: TableCellEventService
   ) {}
 
   getAllDataSources(paginationOffset: number, pageSize: number): Observable<IGetAllDataSourcesResponse> {
@@ -26,7 +27,7 @@ export class DataSourceService {
       map((response: any) => response.data),
       map((response: IGetAllDataSourcesGQLResponse) => {
         return {
-          dataSources: response.querySourceConnection.map(DataSource.Build),
+          dataSources: response.querySourceConnection.map(SourceConnection.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
         };
       }),
@@ -43,7 +44,7 @@ export class DataSourceService {
   }
 
   private handleError(error: string) {
-    this.eventService.resetLoadingStates$.next(true);
+    this.tableCellEventService.resetLoadingStates$.next(true);
     return transformError(error);
   }
 }

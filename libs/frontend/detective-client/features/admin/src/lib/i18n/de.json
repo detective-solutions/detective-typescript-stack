@@ -2,5 +2,30 @@
   "navigation": {
     "sidenavItems": { "connections": "Verbindungen", "groups": "Gruppen", "masks": "Masken" },
     "sidenavBottomItem": "Home"
+  },
+  "connections": {
+    "addConnectionButtonText": "Neue Verbindung anlegen",
+    "columnNames": {
+      "stateColumn": "Status",
+      "lastUpdatedColumn": "Zuletzt aktualisiert"
+    },
+    "addEditDialog": {
+      "addDialogHeader": "Neue Verbindung anlegen",
+      "editDialogHeader": "Verbindung bearbeiten",
+      "connectorTypeDropdownLabel": "Wählen Sie einen Connector-Typ",
+      "optionalFieldsPanelName": "Erweiterte Einstellungen",
+      "saveButtonText": "Speichern"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Verbindung entfernen",
+      "deleteDialogText": "Sie sind dabei die Verbindung {{connectionName}} zu entfernen.",
+      "deleteButtonText": "Ich möchte diese Verbindung entfernen"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Verbindungsdaten konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
+    }
   }
 }

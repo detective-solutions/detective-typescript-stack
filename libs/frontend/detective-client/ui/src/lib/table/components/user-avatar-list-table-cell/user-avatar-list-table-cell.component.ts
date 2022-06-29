@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { IUserAvatarListTableCell } from '../../interfaces';
+import { IUserAvatarListTableCell } from '../../models';
 
 @Component({
   selector: 'user-avatar-list-table-cell',
