@@ -18,7 +18,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - run: npm ci
+      - run: npm i --ignore-scripts --no-audit --no-fund # Install without scripts
+      - run: npm rebuild && npm run prepare --if-present # Run scripts here to prevent access to NODE_AUTH_TOKEN
       - run: npx nx affected --target=test --parallel=2
       - run: npx nx affected --target=build --parallel=2
       - run: npx nx affected --target=docker
