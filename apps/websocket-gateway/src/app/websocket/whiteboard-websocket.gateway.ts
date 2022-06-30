@@ -69,7 +69,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     });
   }
 
-  private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => any) {
+  private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {
     const requestUrl = info.req.url;
     this.logger.debug(`Incoming connection request on url ${requestUrl}`);
 
