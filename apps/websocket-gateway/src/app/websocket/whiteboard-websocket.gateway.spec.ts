@@ -1,4 +1,4 @@
-import { IWebSocketClient, WebSocketClientContext } from '../models';
+import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
@@ -22,6 +22,34 @@ describe('WhiteboardWebsocketGateway', () => {
   const webSocketUrl = 'ws://localhost:1234';
   const testEventType = 'TEST_EVENT';
   const testMessageBody = { test: 'test' };
+
+  const context1 = {
+    tenantId: uuidv4(),
+    casefileId: uuidv4(),
+    nodeId: uuidv4(),
+    userId: uuidv4(),
+    userRole: 'basic',
+    eventType: testEventType,
+    timestamp: 123,
+  };
+  const context2 = {
+    tenantId: uuidv4(),
+    casefileId: uuidv4(),
+    nodeId: uuidv4(),
+    userId: uuidv4(),
+    userRole: 'basic',
+    eventType: testEventType,
+    timestamp: 123,
+  };
+  const context3 = {
+    tenantId: uuidv4(),
+    casefileId: uuidv4(),
+    nodeId: uuidv4(),
+    userId: uuidv4(),
+    userRole: 'basic',
+    eventType: testEventType,
+    timestamp: 123,
+  };
 
   let webSocketGateway: WhiteboardWebSocketGateway;
 
@@ -49,35 +77,34 @@ describe('WhiteboardWebsocketGateway', () => {
     expect(webSocketGateway).toBeDefined();
   });
 
-  describe('sendMessageByContext', () => {
-    const context1 = {
-      tenantId: uuidv4(),
-      casefileId: uuidv4(),
-      nodeId: uuidv4(),
-      userId: uuidv4(),
-      userRole: 'basic',
-      eventType: testEventType,
-      timestamp: 123,
-    };
-    const context2 = {
-      tenantId: uuidv4(),
-      casefileId: uuidv4(),
-      nodeId: uuidv4(),
-      userId: uuidv4(),
-      userRole: 'basic',
-      eventType: testEventType,
-      timestamp: 123,
-    };
-    const context3 = {
-      tenantId: uuidv4(),
-      casefileId: uuidv4(),
-      nodeId: uuidv4(),
-      userId: uuidv4(),
-      userRole: 'basic',
-      eventType: testEventType,
-      timestamp: 123,
-    };
+  describe('OnQueryTableEvent', () => {
+    it('should forward QUERY_TABLE events to the correct target topic', () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const testMessage = { context: context1, body: { test: 'test' } };
 
+      webSocketGateway.onQueryTableEvent(testMessage);
+
+      expect(producerMock).toBeCalledTimes(1);
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.queryTable.targetTopic, testMessage);
+    });
+
+    it('should merge the eventType into the message context', () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const context = context1;
+      delete context['eventType'];
+
+      expect(context).not.toHaveProperty('eventType');
+
+      webSocketGateway.onQueryTableEvent({ context: context, body: {} });
+
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.queryTable.targetTopic, {
+        context: { eventType: EventTypeTopicMapping.queryTable.eventType, ...context },
+        body: {},
+      });
+    });
+  });
+
+  describe('sendMessageByContext', () => {
     it('should only broadcast messages to clients with matching context', async () => {
       const client1 = await createWebSocketClient(context1);
       const client1Spy = jest.spyOn(client1, 'send').mockImplementation();
