@@ -52,10 +52,9 @@ describe('WhiteboardConsumer', () => {
         headers: {},
         topic: 'testTopic',
       };
-
       const broadcastSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
 
-      expect(whiteboardConsumer.forwardQueryExecution(testKafkaMessage));
+      whiteboardConsumer.forwardQueryExecution(testKafkaMessage);
 
       expect(broadcastSpy).toBeCalledTimes(1);
       expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value, broadcastWebSocketContext);
