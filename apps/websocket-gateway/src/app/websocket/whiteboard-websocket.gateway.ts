@@ -30,10 +30,8 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   afterInit(server: Server) {
     // Setting server options afterwards to be able to call internal methods
     server.options = {
-      // TODO: Investigate objects & define interfaces
-      verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => any) => {
-        await this.handleNewClientConnection(server, info, cb);
-      },
+      verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
+        this.handleNewClientConnection(server, info, cb),
     };
   }
 
