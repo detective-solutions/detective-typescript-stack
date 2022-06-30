@@ -106,19 +106,19 @@ describe('WhiteboardWebsocketGateway', () => {
 
   describe('sendMessageByContext', () => {
     it('should only broadcast messages to clients with matching context', async () => {
-      const client1 = await createWebSocketClient(context1);
+      const client1 = await _createWebSocketClient(context1);
       const client1Spy = jest.spyOn(client1, 'send').mockImplementation();
 
-      const client2 = await createWebSocketClient(context2);
+      const client2 = await _createWebSocketClient(context2);
       const client2Spy = jest.spyOn(client2, 'send').mockImplementation();
 
-      const client3 = await createWebSocketClient(context2);
+      const client3 = await _createWebSocketClient(context2);
       const client3Spy = jest.spyOn(client3, 'send').mockImplementation();
 
-      const client4 = await createWebSocketClient(context2);
+      const client4 = await _createWebSocketClient(context2);
       const client4Spy = jest.spyOn(client4, 'send').mockImplementation();
 
-      const client5 = await createWebSocketClient(context3);
+      const client5 = await _createWebSocketClient(context3);
       const client5Spy = jest.spyOn(client5, 'send').mockImplementation();
 
       const testMessage = {
@@ -142,23 +142,23 @@ describe('WhiteboardWebsocketGateway', () => {
 
     it('should only unicast messages to single clients with matching context', async () => {
       const client1Context = { ...context1, userId: 'user1', userRole: 'basic' };
-      const client1 = await createWebSocketClient(client1Context);
+      const client1 = await _createWebSocketClient(client1Context);
       const client1Spy = jest.spyOn(client1, 'send').mockImplementation();
 
       const client2Context = { ...context1, userId: 'user2', userRole: 'admin' };
-      const client2 = await createWebSocketClient(client2Context);
+      const client2 = await _createWebSocketClient(client2Context);
       const client2Spy = jest.spyOn(client2, 'send').mockImplementation();
 
       const client3Context = { ...context2, userId: 'user3', userRole: 'basic' };
-      const client3 = await createWebSocketClient(client3Context);
+      const client3 = await _createWebSocketClient(client3Context);
       const client3Spy = jest.spyOn(client3, 'send').mockImplementation();
 
       const client4Context = { ...context2, userId: 'user4', userRole: 'basic' };
-      const client4 = await createWebSocketClient(client4Context);
+      const client4 = await _createWebSocketClient(client4Context);
       const client4Spy = jest.spyOn(client4, 'send').mockImplementation();
 
       const client5Context = { ...context2, userId: 'user4', userRole: 'admin' };
-      const client5 = await createWebSocketClient(client5Context);
+      const client5 = await _createWebSocketClient(client5Context);
       const client5Spy = jest.spyOn(client5, 'send').mockImplementation();
 
       const testMessage = {
@@ -179,7 +179,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
     it('should throw an InternalErrorException when no context could be retrieved from a client connection', async () => {
       const loggerSpy = jest.spyOn(Logger.prototype, 'error');
-      const client = await createWebSocketClient(context1);
+      const client = await _createWebSocketClient(context1);
       client._socket.context = undefined;
 
       const testMessage = {
@@ -198,7 +198,7 @@ describe('WhiteboardWebsocketGateway', () => {
     });
   });
 
-  async function createWebSocketClient(clientContext: WebSocketClientContext): Promise<IWebSocketClient> {
+  async function _createWebSocketClient(clientContext: WebSocketClientContext): Promise<IWebSocketClient> {
     const client = new WebSocket(webSocketUrl) as IWebSocketClient;
     client._socket = { context: clientContext };
     webSocketGateway.server.clients.add(client);
