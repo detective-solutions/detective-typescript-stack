@@ -38,7 +38,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
-  onEvent(@MessageBody() message: IMessage<any>) {
+  onQueryTableEvent(@MessageBody() message: IMessage<any>) {
     message.context = this.mergeEventTypeIntoMessageContext(
       EventTypeTopicMapping.queryTable.eventType,
       message.context
