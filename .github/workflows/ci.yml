@@ -23,5 +23,5 @@ jobs:
       - run: npx nx affected --target=test --parallel=2
       - run: npx nx affected --target=build --parallel=2
       - run: npx nx affected --target=docker
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
