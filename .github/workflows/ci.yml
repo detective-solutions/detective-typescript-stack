@@ -67,8 +67,7 @@ jobs:
       - name: Convert changed apps to array
         run: |
           read -a array <<< "${{steps.nx-changes.outputs.changed-apps}}"
-          echo ${array[@]}
-          echo "::set-output name=changed-apps::${array[@]}"
+          echo "::set-output name=changed-apps::${{toJSON(${array[@]})}}"
         id: convert-changed-apps
 
     outputs:
