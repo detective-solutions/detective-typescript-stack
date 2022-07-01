@@ -65,7 +65,7 @@ jobs:
         id: nx-changes
 
       - name: Print output
-        run: echo ${{steps.convert-changed-apps.outputs.changed-apps}}
+        run: echo ${{steps.nx-changes.outputs.changed-apps}}
 
       # - name: Convert changed apps to array
       #   run: |
@@ -76,7 +76,7 @@ jobs:
       #   id: convert-changed-apps
 
     outputs:
-      changed-apps: steps.convert-changed-apps.outputs.changed-apps
+      changed-apps: steps.nx-changes.outputs.changed-apps
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
