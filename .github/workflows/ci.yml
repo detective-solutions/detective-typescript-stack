@@ -65,7 +65,7 @@ jobs:
         id: nx-changes
 
       - name: Create JSON matrix for changed apps
-        run: echo "::set-output name=changed-apps-array::$(${{steps.nx-changes.outputs.changed-apps}})"
+        run: echo "::set-output name=changed-apps-array::(${{steps.nx-changes.outputs.changed-apps}})"
         id: create-changed-apps-array
 
     outputs:
