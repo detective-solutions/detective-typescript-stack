@@ -17,18 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup nodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - name: Lint NX workspace
-        run: npx nx workspace-lint
-
-      - name: Run NX format check
-        run: npx nx format:check
-
       - name: Detect changed apps
         uses: gagle/nx-check-changes@v1.0.0
         id: nx-changes
