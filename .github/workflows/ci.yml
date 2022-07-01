@@ -12,11 +12,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Lint NX workspace
-        run: npx nx workspace-lint
+      # - name: Lint NX workspace
+      #   run: npx nx workspace-lint
 
-      - name: Run NX format check
-        run: npx nx format:check
+      # - name: Run NX format check
+      #   run: npx nx format:check
 
       - name: Detect changed apps
         uses: gagle/nx-check-changes@v1.0.0
