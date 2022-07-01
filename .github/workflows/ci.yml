@@ -27,7 +27,7 @@ jobs:
 
   CI:
     runs-on: ubuntu-latest
-    needs: [pre-run]
+    needs: [Detect-Changes]
     strategy:
       matrix:
         app: ${{ needs.Detect-Changes.outputs.changed-apps }}
