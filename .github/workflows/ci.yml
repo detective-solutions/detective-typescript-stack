@@ -9,6 +9,8 @@ concurrency:
 
 env:
   NODE_VERSION: 16
+  DOCKER_REGISTRY: quay.io
+  COMPANY_NAME: detective.solutions
 
 jobs:
   Detect-Changes:
@@ -65,7 +67,8 @@ jobs:
         id: package-info
 
       - name: Create image tag for ${{ matrix.app }}
-        run: echo "::set-output name=image-tag::detective.solutions/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
+        run: |
+          echo "::set-output name=image-tag::${{ env.DOCKER_REGISTRY}}/${{ env.COMPANY_NAME }}/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
         id: image-tag
 
       - name: Build and push docker image for ${{ matrix.app }}
