@@ -32,6 +32,7 @@ jobs:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v2
 
+      # TODO: Explicitly cache installed packages
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
 
