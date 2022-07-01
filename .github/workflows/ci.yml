@@ -68,10 +68,18 @@ jobs:
         run: echo "::set-output name=image-tag::detective.solutions/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
         id: image-tag
 
-      - name: Build and push docker image for ${{ matrix.app }}
-        uses: docker/build-push-action@v3
-        with:
-          file: ./apps/${{ matrix.app }}/docker/Dockerfile
-          tags: ${{ steps.image-tag.outputs.image-tag}}
-          context: /
-          push: false
+      - name: Print files
+        run: |
+          ls
+          cd ./dist
+          ls
+          cd ${{ matrix.app }}
+          ls
+
+      # - name: Build and push docker image for ${{ matrix.app }}
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     file: ./apps/${{ matrix.app }}/docker/Dockerfile
+      #     tags: ${{ steps.image-tag.outputs.image-tag}}
+      #     context: .
+      #     push: false
