@@ -93,8 +93,6 @@
     "@nrwl/nest": "13.10.2",
     "@nrwl/node": "13.10.2",
     "@nrwl/workspace": "13.10.2",
-    "@nx-tools/docker-metadata": "3.0.0",
-    "@nx-tools/nx-docker": "3.0.0",
     "@types/d3-drag": "3.0.1",
     "@types/d3-force": "3.0.3",
     "@types/d3-quadtree": "3.0.2",
