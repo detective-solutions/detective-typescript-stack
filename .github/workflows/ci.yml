@@ -70,7 +70,7 @@ jobs:
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
-        app: ${{ needs.Detect-Changed-Apps.outputs.changed-apps }}
+        app: [needs.Detect-Changed-Apps.outputs.changed-apps]
         # app: [auth-service]
     steps:
       - name: Checkout source code
