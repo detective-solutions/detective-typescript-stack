@@ -58,7 +58,7 @@ jobs:
         run: npx nx test ${{ matrix.app }}
 
       - name: Build ${{ matrix.app }}
-        run: npx nx build --prod ${{ matrix.app }}
+        run: npx nx build ${{ matrix.app }} --prod
 
       - name: Get version from package.json
         uses: codex-team/action-nodejs-package-info@v1
@@ -68,18 +68,10 @@ jobs:
         run: echo "::set-output name=image-tag::detective.solutions/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
         id: image-tag
 
-      - name: Print files
-        run: |
-          ls
-          cd ./dist/apps
-          ls
-          cd ${{ matrix.app }}
-          ls
-
-      # - name: Build and push docker image for ${{ matrix.app }}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     file: ./apps/${{ matrix.app }}/docker/Dockerfile
-      #     tags: ${{ steps.image-tag.outputs.image-tag}}
-      #     context: .
-      #     push: false
+      - name: Build and push docker image for ${{ matrix.app }}
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./apps/${{ matrix.app }}/docker/Dockerfile
+          tags: ${{ steps.image-tag.outputs.image-tag}}
+          push: false
