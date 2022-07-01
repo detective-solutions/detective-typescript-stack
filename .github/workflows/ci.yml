@@ -6,22 +6,68 @@ on:
   workflow_dispatch:
 
 jobs:
-  Main:
+  Detect-Changes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout [main]
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Lint NX workspace
+        run: npx nx workspace-lint
+
+      - name: Run NX format check
+        run: npx nx format:check
+
+      - name: Detect changed apps
+        uses: gagle/nx-check-changes@v1.0.0
+        id: nx-changes
+
+    outputs:
+      changed-apps: ${{ steps.nx-changes.outputs.changed-apps }}
+
+  CI:
+    runs-on: ubuntu-latest
+    needs: [pre-run]
+    strategy:
+      matrix:
+        app: ${{ needs.Detect-Changes.outputs.changed-apps }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v2
-      - uses: actions/setup-node@v3
+
+      - name: Setup nodeJS
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
-      - run: npm i --ignore-scripts --no-audit --no-fund # Install without scripts
-      - run: npm rebuild && npm run prepare --if-present # Run scripts here to prevent access to NODE_AUTH_TOKEN
-      - run: npx nx affected --target=test --parallel=2
-      - run: npx nx affected --target=build --parallel=2
-      - run: npx nx affected --target=dockerize
-        env:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 16
+
+      - name: Install npm dependencies (without scripts)
+        run: npm i --ignore-scripts --no-audit --no-fund
+
+      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Lint ${{ matrix.app }}
+        run: npx nx lint ${{ matrix.app }}
+
+      - name: Test ${{ matrix.app }}
+        run: npx nx test ${{ matrix.app }}
+
+      - name: Build ${{ matrix.app }}
+        run: npx nx build --prod ${{ matrix.app }}
+
+      - name: Get version from package.json
+        uses: codex-team/action-nodejs-package-info@v1
+        id: package-info
+
+      - name: Create image tag for ${{ matrix.app }}
+        run: echo "::set-output name=image-tag::detective.solutions/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
+        id: image-tag
+
+      - name: Build and push docker image for ${{ matrix.app }}
+        uses: docker/build-push-action@v3
+        with:
+          file: ./apps/${{ matrix.app }}/docker/Dockerfile
+          tags: ${{ steps.image-tag.outputs.image-tag}}
+          push: false
