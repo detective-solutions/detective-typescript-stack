@@ -37,21 +37,6 @@
         "parallel": false
       }
     },
-    "docker": {
-      "executor": "@nx-tools/nx-docker:build",
-      "options": {
-        "push": true,
-        "metadata": {
-          "images": ["quay.io/detective.solutions/auth-service"],
-          "tags": [
-            "type=schedule",
-            "type=semver,pattern={{version}}",
-            "type=semver,pattern={{major}}.{{minor}}",
-            "type=semver,pattern={{major}}"
-          ]
-        }
-      }
-    },
     "serve": {
       "executor": "@nrwl/node:node",
       "options": {
