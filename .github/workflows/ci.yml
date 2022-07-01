@@ -64,9 +64,6 @@ jobs:
         uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
 
-      - name: Print output
-        run: echo "${{steps.nx-changes.outputs.changed-apps}}"
-
       # - name: Convert changed apps to array
       #   run: |
       #     echo ${{steps.nx-changes.outputs.changed-apps}}
@@ -82,8 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
-      matrix:
-        app: ${{needs.Detect-Changed-Apps.outputs.changed-apps}}
+      matrix: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps)}}
 
     steps:
       - name: Checkout source code
