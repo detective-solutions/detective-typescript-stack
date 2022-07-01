@@ -76,7 +76,7 @@ jobs:
       #   id: convert-changed-apps
 
     outputs:
-      changed-apps: steps.nx-changes.outputs.changed-apps
+      changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
