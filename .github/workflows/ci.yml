@@ -65,17 +65,18 @@ jobs:
         id: nx-changes
 
       - name: Create JSON matrix for changed apps
-        run: echo "::set-output name=matrix::{\"app\":[${{toJSON(steps.nx-changes.outputs.changed-apps)}}]}"
-        id: create-json-matrix
+        run: echo "::set-output name=changed-apps-array::$(${{steps.nx-changes.outputs.changed-apps}})"
+        id: create-changed-apps-array
 
     outputs:
-      changed-apps-matrix: steps.create-json-matrix.outputs.matrix
+      changed-apps: steps.create-changed-apps-array.outputs.changed-apps-array
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
-      matrix: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps-matrix)}}
+      matrix:
+        app: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps)}}
 
     steps:
       - name: Checkout source code
