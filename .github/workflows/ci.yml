@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow || github.ref_name }}
+  group: ${{github.workflow || github.ref_name}}
   cancel-in-progress: true
 
 env:
@@ -15,6 +15,7 @@ env:
 jobs:
   Check-Affected-Files:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -24,7 +25,7 @@ jobs:
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{env.NODE_VERSION}}
           cache: npm
           cache-dependency-path: ./package-lock.json
 
@@ -52,6 +53,7 @@ jobs:
   Detect-Changed-Apps:
     runs-on: ubuntu-latest
     needs: [Check-Affected-Files]
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -62,16 +64,19 @@ jobs:
         uses: gagle/nx-check-changes@v1.0.0
         id: nx-changes
 
+      - name: Create JSON matrix for changed apps
+        run: echo "::set-output name=matrix::{\"app\":${{steps.nx-changes.outputs.changed-apps}}}"
+        id: create-json-matrix
+
     outputs:
-      changed-apps: ${{ steps.nx-changes.outputs.changed-apps }}
+      changed-apps-matrix: steps.create-json-matrix.outputs.matrix
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
-      matrix:
-        app: ${{ fromJson(needs.Detect-Changed-Apps.outputs.changed-apps) }}
-        # app: [auth-service]
+      matrix: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps-matrix)}}
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -81,7 +86,7 @@ jobs:
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{env.NODE_VERSION}}
           cache: npm
           cache-dependency-path: ./package-lock.json
 
@@ -91,22 +96,22 @@ jobs:
       - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
         run: npm rebuild && npm run prepare --if-present
 
-      - name: Build ${{ matrix.app }}
-        run: npx nx build ${{ matrix.app }} --prod
+      - name: Build ${{matrix.app}}
+        run: npx nx build ${{matrix.app}} --prod
 
       - name: Get version from package.json
         uses: codex-team/action-nodejs-package-info@v1
         id: package-info
 
-      - name: Create image tag for ${{ matrix.app }}
+      - name: Create image tag for ${{matrix.app}}
         run: |
-          echo "::set-output name=image-tag::${{ env.DOCKER_REGISTRY}}/${{ env.COMPANY_NAME }}/${{ matrix.app }}:${{ steps.package-info.outputs.version }}"
+          echo "::set-output name=image-tag::${{env.DOCKER_REGISTRY}}/${{env.COMPANY_NAME}}/${{matrix.app}}:${{steps.package-info.outputs.version}}"
         id: image-tag
 
-      - name: Build and push docker image for ${{ matrix.app }}
+      - name: Build and push docker image for ${{matrix.app}}
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./apps/${{ matrix.app }}/docker/Dockerfile
-          tags: ${{ steps.image-tag.outputs.image-tag}}
+          file: ./apps/${{matrix.app}}/docker/Dockerfile
+          tags: ${{steps.image-tag.outputs.image-tag}}
           push: false
