@@ -73,5 +73,5 @@ jobs:
         with:
           file: ./apps/${{ matrix.app }}/docker/Dockerfile
           tags: ${{ steps.image-tag.outputs.image-tag}}
-          context: .
+          context: /
           push: false
