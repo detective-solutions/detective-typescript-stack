@@ -31,8 +31,6 @@
       "executor": "@nrwl/workspace:run-commands",
       "options": {
         "commands": [
-          "nx build auth-service",
-          "echo $(node --eval='process.stdout.write(require('./dist/auth-service/package.json').version)')",
           "docker build -f ./apps/auth-service/docker/Dockerfile -t quay.io/detective.solutions/auth-service:1.0.0-beta ."
         ],
         "parallel": false
