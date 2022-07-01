@@ -34,8 +34,8 @@ jobs:
       - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
         run: npm rebuild && npm run prepare --if-present
 
-      - name: Lint NX workspace
-        run: npx nx workspace-lint
+      # - name: Lint NX workspace
+      #   run: npx nx workspace-lint
 
       - name: Check file formats
         run: npx nx format:check
