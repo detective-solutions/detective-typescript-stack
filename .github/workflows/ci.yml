@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{env.NODE_VERSION}}
-          cache: npm
+          cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
@@ -65,7 +65,7 @@ jobs:
         id: nx-changes
 
       - name: Create JSON matrix for changed apps
-        run: echo "::set-output name=matrix::{\"app\":${{steps.nx-changes.outputs.changed-apps}}}"
+        run: echo "::set-output name=matrix::{\"app\":[${{steps.nx-changes.outputs.changed-apps}}]}"
         id: create-json-matrix
 
     outputs:
@@ -87,7 +87,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{env.NODE_VERSION}}
-          cache: npm
+          cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
       - name: Install npm dependencies (without scripts)
