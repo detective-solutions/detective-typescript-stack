@@ -71,7 +71,7 @@ jobs:
       - name: Print files
         run: |
           ls
-          cd ./dist
+          cd ./dist/apps
           ls
           cd ${{ matrix.app }}
           ls
