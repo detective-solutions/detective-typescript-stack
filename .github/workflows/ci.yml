@@ -61,19 +61,22 @@ jobs:
           fetch-depth: 0
 
       - name: Detect changed apps
-        uses: gagle/nx-check-changes@v1.0.0
+        uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
 
-      - name: Convert changed apps to array
-        run: |
-          echo ${{steps.nx-changes.outputs.changed-apps}}
-          read -a array <<< "${{steps.nx-changes.outputs.changed-apps}}"
-          echo ${array[@]}
-          echo "::set-output name=changed-apps::${array[@]}"
-        id: convert-changed-apps
+      - name: Print output
+        run: echo ${{steps.convert-changed-apps.outputs.changed-apps}}
+
+      # - name: Convert changed apps to array
+      #   run: |
+      #     echo ${{steps.nx-changes.outputs.changed-apps}}
+      #     read -a array <<< "${{steps.nx-changes.outputs.changed-apps}}"
+      #     echo ${array[@]}
+      #     echo "::set-output name=changed-apps::${array[@]}"
+      #   id: convert-changed-apps
 
     outputs:
-      changed-apps: ${{toJSON(steps.convert-changed-apps.outputs.changed-apps)}}
+      changed-apps: steps.convert-changed-apps.outputs.changed-apps
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
