@@ -61,7 +61,7 @@ jobs:
           fetch-depth: 0
 
       - name: Detect changed apps
-        uses: detective-solutions/nx-check-changes@v1.0.0
+        uses: detective-solutions/nx-check-changes@v1.0.0-alpha
         id: nx-changes
 
       # - name: Convert changed apps to array
