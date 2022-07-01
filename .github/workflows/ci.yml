@@ -5,6 +5,9 @@ on:
     types: [opened, reopened, synchronize]
   workflow_dispatch:
 
+env:
+  NODE_VERSION: 16
+
 jobs:
   Detect-Changes:
     runs-on: ubuntu-latest
@@ -43,7 +46,8 @@ jobs:
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
