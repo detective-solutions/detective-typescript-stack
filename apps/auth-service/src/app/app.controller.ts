@@ -10,7 +10,6 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Header('Cache-Control', 'no-store') // according to OAuth 2.0 RFC 6749
   async login(@Request() request, @Ip() ipAddress: string): Promise<IAuthServerResponse> {
-    console.log('IP Address:', ipAddress);
     return this.authService.login(request.user, ipAddress);
   }
 
