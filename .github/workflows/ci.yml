@@ -104,14 +104,14 @@ jobs:
         id: image-tag
 
       - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tag.outputs.image-tag}}-fat .
+        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tag.outputs.image-tag}} .
 
       - name: Build optimized docker image
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
             --http-probe=false \
-            --target=${{steps.image-tag.outputs.image-tag}}-fat \
+            --target=${{steps.image-tag.outputs.image-tag}} \
             --tag=${{steps.image-tag.outputs.image-tag}}
           docker images
 
