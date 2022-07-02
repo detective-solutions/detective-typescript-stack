@@ -102,6 +102,7 @@ jobs:
       - name: Build docker image
         run: docker build -f ./apps/${{matrix.app}}/docker/Dockerfile -t ${{steps.image-tag.outputs.image-tag}}-raw .
 
+      # TODO: Disable HTTP probing for websocket-gateway
       - name: Optimize docker image
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
