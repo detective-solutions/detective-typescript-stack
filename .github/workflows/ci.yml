@@ -104,7 +104,7 @@ jobs:
         id: image-tag
 
       - name: Build fat docker image
-        run: docker build -t ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tag.outputs.image-tag}}-fat .
+        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tag.outputs.image-tag}}-fat .
 
       - name: Build optimized docker image
         run: |
