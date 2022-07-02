@@ -99,27 +99,27 @@ jobs:
           echo "::set-output name=image-tag::${{env.DOCKER_REGISTRY}}/${{env.COMPANY_NAME}}/${{matrix.app}}:${{steps.package-info.outputs.version}}"
         id: image-tag
 
-      - name: Build docker image
-        run: docker build -f ./apps/${{matrix.app}}/docker/Dockerfile -t ${{steps.image-tag.outputs.image-tag}}-raw .
-
-      # TODO: Disable HTTP probing for websocket-gateway
-      - name: Optimize docker image
+      - name: Build optimized docker image
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
-          docker-slim build --target=${{steps.image-tag.outputs.image-tag}}-raw --tag=${{steps.image-tag.outputs.image-tag}}
+          docker-slim build \
+            --http-probe-exit-on-failure false \
+            --dockerfile ./apps/${{matrix.app}}/docker/Dockerfile \
+            --tag=${{steps.image-tag.outputs.image-tag}} \
+            .
           docker images
 
-      - name: Login to quay.io
-        uses: docker/login-action@v2
-        with:
-          registry: ${{env.DOCKER_REGISTRY}}
-          username: ${{secrets.DOCKER_REGISTRY_USER}}
-          password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
+      # - name: Login to quay.io
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ${{env.DOCKER_REGISTRY}}
+      #     username: ${{secrets.DOCKER_REGISTRY_USER}}
+      #     password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      - name: Build and push docker image for ${{matrix.app}}
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./apps/${{matrix.app}}/docker/Dockerfile
-          tags: ${{steps.image-tag.outputs.image-tag}}
-          push: false
+      # - name: Build and push docker image for ${{matrix.app}}
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     file: ./apps/${{matrix.app}}/docker/Dockerfile
+      #     tags: ${{steps.image-tag.outputs.image-tag}}
+      #     push: false
