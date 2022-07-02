@@ -95,6 +95,20 @@ jobs:
         uses: codex-team/action-nodejs-package-info@v1
         id: package-info
 
+      - name: Create image tag for ${{matrix.app}}
+        run: |
+          echo "::set-output name=image-tag::${{env.DOCKER_REGISTRY}}/${{env.COMPANY_NAME}}/${{matrix.app}}:${{steps.package-info.outputs.version}}"
+        id: image-tag
+
+      - name: Build docker image
+        run: docker build -f ./apps/${{matrix.app}}/docker/Dockerfile -t ${{steps.image-tag.outputs.image-tag}}-raw .
+
+      - name: Optimize docker image
+        run: |
+          curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
+          docker-slim build --target=${{steps.image-tag.outputs.image-tag}}-raw --tag=${{steps.image-tag.outputs.image-tag}}
+          docker images
+
       - name: Login to quay.io
         uses: docker/login-action@v2
         with:
@@ -102,15 +116,10 @@ jobs:
           username: ${{secrets.DOCKER_REGISTRY_USER}}
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      - name: Create image tag for ${{matrix.app}}
-        run: |
-          echo "::set-output name=image-tag::${{env.DOCKER_REGISTRY}}/${{env.COMPANY_NAME}}/${{matrix.app}}:${{steps.package-info.outputs.version}}"
-        id: image-tag
-
       - name: Build and push docker image for ${{matrix.app}}
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./apps/${{matrix.app}}/docker/Dockerfile
           tags: ${{steps.image-tag.outputs.image-tag}}
-          push: true
+          push: false
