@@ -110,9 +110,9 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
+            --http-probe=false \
             --target=${{steps.image-tag.outputs.image-tag}}-fat \
-            --tag=${{steps.image-tag.outputs.image-tag}} \
-            --http-probe-exit-on-failure=false
+            --tag=${{steps.image-tag.outputs.image-tag}}
           docker images
 
       # - name: Login to quay.io
