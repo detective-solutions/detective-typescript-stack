@@ -1,5 +1,5 @@
 # node:lts-alpine.3.15
-FROM node@sha256:bb776153f81d6e931211e3cadd7eef92c811e7086993b685d1f40242d486b9bb
+FROM node@sha256:ef9e0abfa1aa07d23cc51b69820885fc83f51c10fab463aec5a56f282dca744f
 
 # Set up container environment
 WORKDIR /app
