@@ -103,6 +103,7 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
+            --pull true \
             --http-probe-exit-on-failure false \
             --dockerfile ./apps/${{matrix.app}}/docker/Dockerfile \
             --tag=${{steps.image-tag.outputs.image-tag}} \
