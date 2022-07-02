@@ -32,6 +32,7 @@ jobs:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v2
 
+      # TODO: Use npm ci when after updating nx
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
 
@@ -81,6 +82,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
+      # TODO: Use npm ci when after updating nx
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
 
