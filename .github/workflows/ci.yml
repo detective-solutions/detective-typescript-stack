@@ -174,3 +174,38 @@ jobs:
 
       - name: Push all docker available docker tags
         run: docker push -a ${{steps.image-metadata.outputs.image-name}}
+
+  Dependabot-Checks:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
+      - name: Setup nodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          cache: 'npm'
+          cache-dependency-path: ./package-lock.json
+
+      # TODO: Use npm ci when after updating nx
+      - name: Install npm dependencies (without scripts)
+        run: npm i --ignore-scripts --no-audit --no-fund
+
+      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Lint all apps
+        run: npx nx run-many --all --target=lint --parallel=3
+
+      - name: Test all apps
+        run: npx nx run-many --all --target=test --parallel=3 --ci
