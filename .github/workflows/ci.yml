@@ -173,7 +173,7 @@ jobs:
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
       - name: Push all docker available docker tags
-        run: docker push -a ${{steps.image-metadata.outputs.image-name}}
+        run: docker push ${{steps.image-metadata.outputs.all-tags}}
 
   Dependabot-Checks:
     runs-on: ubuntu-latest
