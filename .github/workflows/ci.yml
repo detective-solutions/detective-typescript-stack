@@ -129,31 +129,31 @@ jobs:
           CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
         run: |
           APP_VERSION=$(node --print "require('./package.json').version")
-          echo "::set-output name=base-tag::${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}"
+          BASE_TAG=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            tags="--tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}"
+            ALL_TAGS="--tag=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            tags=" \
-              --tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION} \
+            ALL_TAGS=" \
+              --tag=${BASE_TAG} \
               --tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
-            sanitized_branch_name=${CURRENT_BRANCH//\//-}
-            tags="--tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}-${sanitized_branch_name}"
+            SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
+            ALL_TAGS="--tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}"
           fi
-          echo $tags
-          echo "::set-output name=tags::$final-tags"
+          echo "::set-output name=base-tag::${BASE_TAG}"
+          echo "::set-output name=all-tags::${ALL_TAGS}"
 
       - name: Build fat docker image
         run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tags.outputs.base-tag}} .
 
-      - name: Build optimized docker image
+      - name: Build & tag optimized docker images
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
             --http-probe=false \
             --target=${{steps.image-tags.outputs.base-tag}} \
-            ${{steps.image-tags.final-tags}}
+            ${{steps.image-tags.outputs.all-tags}}
           docker images
 
       - name: Login to quay.io
@@ -163,5 +163,5 @@ jobs:
           username: ${{secrets.DOCKER_REGISTRY_USER}}
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      - name: Push docker image
+      - name: Push all docker available docker tags
         run: docker push ${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
