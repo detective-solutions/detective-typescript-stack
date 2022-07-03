@@ -156,7 +156,6 @@ jobs:
             --http-probe=false \
             --target=${{steps.image-metadata.outputs.base-tag}} \
             ${{steps.image-metadata.outputs.all-tags}}
-          docker images
 
       - name: Login to quay.io
         uses: docker/login-action@v2
