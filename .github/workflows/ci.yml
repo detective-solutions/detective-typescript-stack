@@ -145,16 +145,15 @@ jobs:
           echo "::set-output name=tags::$final-tags"
 
       - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} ${{steps.image-tag.outputs.base-tag}} .
+        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tags.outputs.base-tag}} .
 
       - name: Build optimized docker image
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
             --http-probe=false \
-            --target=${{steps.image-tag.outputs.base-tag}} \
+            --target=${{steps.image-tags.outputs.base-tag}} \
             ${{steps.image-tags.final-tags}}
-            # --tag=${{steps.image-tag.outputs.image-tag}}
           docker images
 
       - name: Login to quay.io
