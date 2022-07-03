@@ -146,13 +146,13 @@ jobs:
           APP_VERSION=$(node --print "require('./package.json').version")
           BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            ALL_TAGS="--tag=${BASE_TAG}"
+            ALL_TAGS="-t=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            ALL_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
+            ALL_TAGS="-t=${BASE_TAG} --tag=${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
-            ALL_TAGS="--tag=${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
+            ALL_TAGS="-t=${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
           fi
           echo "::set-output name=image-name::${IMAGE_NAME}"
           echo "::set-output name=base-tag::${BASE_TAG}"
