@@ -127,21 +127,19 @@ jobs:
         id: image-tags
         env:
           CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
-          DOCKER_REGISTRY: ${{env.DOCKER_REGISTRY}}
-          ORGANIZATION_NAME: ${env.ORGANIZATION_NAME}
-          APP_NAME: ${{matrix.app}}
         run: |
           APP_VERSION=$(node --print "require('./package.json').version")
-          echo ${APP_VERSION}
-          echo "::set-output name=base-tag::$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}"
+          echo "::set-output name=base-tag::${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}"
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}"
+            tags="--tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION} --tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:development"
+            tags=" \
+              --tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION} \
+              --tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             sanitized_branch_name=${CURRENT_BRANCH//\//-}
-            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}-${sanitized_branch_name}"
+            tags="--tag=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}:${APP_VERSION}-${sanitized_branch_name}"
           fi
           echo $tags
           echo "::set-output name=tags::$final-tags"
