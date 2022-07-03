@@ -144,9 +144,7 @@ jobs:
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             ALL_TAGS="--tag=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            ALL_TAGS=" \
-              --tag=${BASE_TAG} \
-              --tag=${IMAGE_NAME}:development"
+            ALL_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
