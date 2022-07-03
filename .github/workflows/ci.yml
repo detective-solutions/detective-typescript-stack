@@ -132,6 +132,8 @@ jobs:
           APP_NAME: ${{matrix.app}}
         run: |
           APP_VERSION=$(node --print "require('./package.json').version")
+          echo ${APP_VERSION}
+          echo "::set-output name=base-tag::$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}"
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
@@ -141,18 +143,19 @@ jobs:
             sanitized_branch_name=${CURRENT_BRANCH//\//-}
             tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:${APP_VERSION}-${sanitized_branch_name}"
           fi
-          echo "::set-output name=tags::$tags"
+          echo $tags
+          echo "::set-output name=tags::$final-tags"
 
       - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} ${{steps.image-tag.outputs.tags}} .
+        run: docker build -f ${{env.DOCKERFILE_PATH}} ${{steps.image-tag.outputs.base-tag}} .
 
       - name: Build optimized docker image
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
             --http-probe=false \
-            --target=${{steps.image-tag.outputs.image-tag}} \
-            ${{steps.image-tags.tags}}
+            --target=${{steps.image-tag.outputs.base-tag}} \
+            ${{steps.image-tags.final-tags}}
             # --tag=${{steps.image-tag.outputs.image-tag}}
           docker images
 
