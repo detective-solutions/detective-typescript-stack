@@ -28,6 +28,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
 
   // TODO: Evaluate if it is possible to log when clients disconnect
   afterInit(server: Server) {
+    console.log();
     // Setting server options afterwards to be able to call internal methods
     server.options = {
       // TODO: Investigate objects & define interfaces
