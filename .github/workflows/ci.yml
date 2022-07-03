@@ -71,15 +71,13 @@ jobs:
         uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
 
-      - name: Cancel workflow if no apps were changed
-        if: steps.nx-changes.outputs.not-affected
-        run: exit 0
-
     outputs:
       changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
+      skip: ${{steps.nx-changes.outputs.not-affected}}
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
+    if: needs.Detect-Changed-Apps.outputs.skip == 'false'
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
