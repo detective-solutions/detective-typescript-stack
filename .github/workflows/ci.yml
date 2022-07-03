@@ -62,6 +62,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
       - name: Detect changed apps
         uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
@@ -90,6 +95,11 @@ jobs:
       - name: Get branch name
         uses: tj-actions/branch-names@v5
         id: branch-name
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
 
       # Get the branch we want to build. In case of a PR we want the source branch.
       # This is necessary to see on which branch we are after step "Switch branch to PR". Otherwise, we'd
