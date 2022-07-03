@@ -1,7 +1,9 @@
 name: CI
 on:
-  - push
-  - workflow_dispatch
+  push:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
 
 concurrency:
   group: ${{github.workflow || github.ref_name}}
@@ -9,8 +11,8 @@ concurrency:
 
 env:
   NODE_VERSION: 16
-  DOCKER_REGISTRY: quay.io
-  COMPANY_NAME: detective.solutions
+  DOCKER_REGISTRY_PREFIX: quay.io
+  ORGANIZATION_NAME: detective.solutions
 
 jobs:
   Check-Affected-Files:
@@ -21,6 +23,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
 
       - name: Setup nodeJS
         uses: actions/setup-node@v3
@@ -77,6 +84,49 @@ jobs:
         with:
           fetch-depth: 0
 
+      # a push initiated by dependabot do not yield enough rights to successfully build. Due to that, we're using
+      # pull_request_target events for that - since these are running in the target of a PR,
+      # we need to manually switch back to the source (feat/fix branch)
+      - name: Get branch name
+        uses: tj-actions/branch-names@v5
+        id: branch-name
+
+      # Get the branch we want to build. In case of a PR we want the source branch.
+      # This is necessary to see on which branch we are after step "Switch branch to PR". Otherwise, we'd
+      # look at the branch the event yields, which could lead to building a fix/feat state into the development image
+      - name: Get actual branch name
+        id: actual-branch-name
+        env:
+          ACTUAL_BRANCH: ${{ steps.branch-name.outputs.head_ref_branch }}
+          CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
+        run: |
+          if [[ ${{github.event_name}} == 'pull_request_target' ]]; then
+            echo "::set-output name=actual_branch::${ACTUAL_BRANCH}"
+          else
+            echo "::set-output name=actual_branch::${CURRENT_BRANCH}"
+          fi
+
+      - name: Create docker image tags based on branch name
+        id: image-tags
+        env:
+          CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
+          DOCKER_REGISTRY: ${{env.DOCKER_REGISTRY}}
+          ORGANIZATION_NAME: ${env.ORGANIZATION_NAME}
+          APP_NAME: ${{matrix.app}}
+          APP_VERSION: $(node --print "require('./package.json').version")
+        run: |
+          # version=$(node --print "require('./package.json').version")
+          if [[ $CURRENT_BRANCH == 'main' ]]; then
+            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:$APP_VERSION"
+          elif [[ $CURRENT_BRANCH == 'development' ]]; then
+            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:$APP_VERSION --tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:development"
+          else
+            # Sanitize branch name by replacing / (slash) with - (hyphen)
+            sanitized_branch_name=${CURRENT_BRANCH//\//-}
+            tags="--tag=$DOCKER_REGISTRY/$ORGANIZATION_NAME/$APP_NAME:$APP_VERSION-${sanitized_branch_name}"
+          fi
+          echo "::set-output name=tags::$tags"
+
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
@@ -94,17 +144,8 @@ jobs:
       - name: Build ${{matrix.app}}
         run: npx nx build ${{matrix.app}} --prod
 
-      - name: Get version from package.json
-        uses: codex-team/action-nodejs-package-info@v1
-        id: package-info
-
-      - name: Create image tag for ${{matrix.app}}
-        run: |
-          echo "::set-output name=image-tag::${{env.DOCKER_REGISTRY}}/${{env.COMPANY_NAME}}/${{matrix.app}}:${{steps.package-info.outputs.version}}"
-        id: image-tag
-
       - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-tag.outputs.image-tag}} .
+        run: docker build -f ${{env.DOCKERFILE_PATH}} ${{steps.image-tag.outputs.tags}} .
 
       - name: Build optimized docker image
         run: |
@@ -112,23 +153,16 @@ jobs:
           docker-slim build \
             --http-probe=false \
             --target=${{steps.image-tag.outputs.image-tag}} \
-            --tag=${{steps.image-tag.outputs.image-tag}}
+            ${{steps.image-tags.tags}}
+            # --tag=${{steps.image-tag.outputs.image-tag}}
           docker images
 
-      # - name: Login to quay.io
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ${{env.DOCKER_REGISTRY}}
-      #     username: ${{secrets.DOCKER_REGISTRY_USER}}
-      #     password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
+      - name: Login to quay.io
+        uses: docker/login-action@v2
+        with:
+          registry: ${{env.DOCKER_REGISTRY}}
+          username: ${{secrets.DOCKER_REGISTRY_USER}}
+          password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      # - name: Push docker image
-      #   run: docker push ${{steps.image-tag.outputs.image-tag}}
-
-      # - name: Build and push docker image for ${{matrix.app}}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     file: ./apps/${{matrix.app}}/docker/Dockerfile
-      #     tags: ${{steps.image-tag.outputs.image-tag}}
-      #     push: false
+      - name: Push docker image
+        run: docker push ${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
