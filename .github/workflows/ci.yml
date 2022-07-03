@@ -11,7 +11,7 @@ concurrency:
 
 env:
   NODE_VERSION: 16
-  DOCKER_REGISTRY_PREFIX: quay.io
+  DOCKER_REGISTRY: quay.io
   ORGANIZATION_NAME: detective.solutions
 
 jobs:
