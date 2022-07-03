@@ -12,6 +12,8 @@ import { WhiteboardWebSocketGateway } from './whiteboard-websocket.gateway';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const mockWhiteboardProducer = {
   sendKafkaMessage: jest.fn(),
 };
