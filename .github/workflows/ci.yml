@@ -72,10 +72,12 @@ jobs:
         id: nx-changes
 
     outputs:
+      skip-build: ${{steps.nx-changes.outputs.not-affected}}
       changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
+    if: needs.Detect-Changed-Apps.outputs.skip-build == 'false'
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
@@ -133,26 +135,28 @@ jobs:
       - name: Build ${{matrix.app}}
         run: npx nx build ${{matrix.app}} --prod
 
-      - name: Create docker image tags based on branch name
+      - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
         env:
           CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
         run: |
           IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
-          BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            ALL_TAGS="--tag=${BASE_TAG}"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            ALL_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
-            ALL_TAGS="--tag=${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           fi
           echo "::set-output name=image-name::${IMAGE_NAME}"
           echo "::set-output name=base-tag::${BASE_TAG}"
-          echo "::set-output name=all-tags::${ALL_TAGS}"
+          echo "::set-output name=target-tags::${TARGET_TAGS}"
 
       - name: Build fat docker image
         run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-metadata.outputs.base-tag}} .
@@ -163,7 +167,7 @@ jobs:
           docker-slim build \
             --http-probe=false \
             --target=${{steps.image-metadata.outputs.base-tag}} \
-            ${{steps.image-metadata.outputs.all-tags}}
+            ${{steps.image-metadata.outputs.target-tags}}
 
       - name: Login to quay.io
         uses: docker/login-action@v2
