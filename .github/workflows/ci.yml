@@ -72,8 +72,8 @@ jobs:
         id: nx-changes
 
       - name: Cancel workflow if no apps were changed
-        uses: andymckay/cancel-action@0.2
-        if: ${{steps.nx-changes.outputs.skip}}
+        if: steps.nx-changes.outputs.not-affected
+        run: exit 0
 
     outputs:
       changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
