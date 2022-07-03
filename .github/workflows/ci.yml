@@ -1,40 +1,211 @@
 name: CI
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  - push
+  - pull_request_target
+  - workflow_dispatch
+
+concurrency:
+  group: ${{github.workflow || github.ref_name}}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 16
+  DOCKER_REGISTRY: quay.io
+  ORGANIZATION_NAME: detective.solutions
 
 jobs:
-  Main:
+  Check-Affected-Files:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' }}
+    if: github.actor != 'dependabot[bot]'
+
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout [main]
+      - name: Checkout source code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
+      - name: Setup nodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          cache: 'npm'
+          cache-dependency-path: ./package-lock.json
+
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-      - run: npm install
-      - run: npx nx affected --target=test --parallel=2
-      - run: npx nx affected --target=build --parallel=3
-  PR:
+
+      # TODO: Use npm ci when after updating nx
+      - name: Install npm dependencies (without scripts)
+        run: npm i --ignore-scripts --no-audit --no-fund
+
+      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Lint affected files
+        run: npx nx affected --target=lint --parallel=3
+
+      - name: Test affected files
+        run: npx nx affected --target=test --parallel=3 --ci --code-coverage
+
+  Detect-Changed-Apps:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
+    needs: [Check-Affected-Files]
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v2
-      - uses: actions/setup-node@v3
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
+      - name: Detect changed apps
+        uses: detective-solutions/nx-check-changes@v1.0.0
+        id: nx-changes
+
+    outputs:
+      changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
+
+  Build-Affected-Apps:
+    runs-on: ubuntu-latest
+    needs: [Check-Affected-Files, Detect-Changed-Apps]
+    strategy:
+      matrix:
+        app: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps)}}
+    env:
+      DOCKERFILE_PATH: ./apps/${{matrix.app}}/docker/Dockerfile
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
         with:
-          node-version: '16'
-      - run: npm install
-      - run: npx nx affected --target=test --parallel=2
-      - run: npx nx affected --target=build --parallel=3
+          fetch-depth: 0
+
+      # a push initiated by dependabot do not yield enough rights to successfully build. Due to that, we're using
+      # pull_request_target events for that - since these are running in the target of a PR,
+      # we need to manually switch back to the source (feat/fix branch)
+      - name: Get branch name
+        uses: tj-actions/branch-names@v5
+        id: branch-name
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
+      # Get the branch we want to build. In case of a PR we want the source branch.
+      # This is necessary to see on which branch we are after step "Switch branch to PR". Otherwise, we'd
+      # look at the branch the event yields, which could lead to building a fix/feat state into the development image
+      - name: Get actual branch name
+        id: actual-branch-name
+        env:
+          ACTUAL_BRANCH: ${{ steps.branch-name.outputs.head_ref_branch }}
+          CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
+        run: |
+          if [[ ${{github.event_name}} == 'pull_request_target' ]]; then
+            echo "::set-output name=actual_branch::${ACTUAL_BRANCH}"
+          else
+            echo "::set-output name=actual_branch::${CURRENT_BRANCH}"
+          fi
+
+      - name: Setup nodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          cache: 'npm'
+          cache-dependency-path: ./package-lock.json
+
+      # TODO: Use npm ci when after updating nx
+      - name: Install npm dependencies (without scripts)
+        run: npm i --ignore-scripts --no-audit --no-fund
+
+      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Build ${{matrix.app}}
+        run: npx nx build ${{matrix.app}} --prod
+
+      - name: Create docker image tags based on branch name
+        id: image-metadata
+        env:
+          CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
+        run: |
+          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
+          APP_VERSION=$(node --print "require('./package.json').version")
+          BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+          if [[ $CURRENT_BRANCH == 'main' ]]; then
+            ALL_TAGS="--tag=${BASE_TAG}"
+          elif [[ $CURRENT_BRANCH == 'development' ]]; then
+            ALL_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
+          else
+            # Sanitize branch name by replacing slashes with hyphens
+            SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
+            ALL_TAGS="--tag=${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
+          fi
+          echo "::set-output name=image-name::${IMAGE_NAME}"
+          echo "::set-output name=base-tag::${BASE_TAG}"
+          echo "::set-output name=all-tags::${ALL_TAGS}"
+
+      - name: Build fat docker image
+        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-metadata.outputs.base-tag}} .
+
+      - name: Build & tag optimized docker images
+        run: |
+          curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
+          docker-slim build \
+            --http-probe=false \
+            --target=${{steps.image-metadata.outputs.base-tag}} \
+            ${{steps.image-metadata.outputs.all-tags}}
+
+      - name: Login to quay.io
+        uses: docker/login-action@v2
+        with:
+          registry: ${{env.DOCKER_REGISTRY}}
+          username: ${{secrets.DOCKER_REGISTRY_USER}}
+          password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
+
+      - name: Push all docker available docker tags
+        run: docker push -a ${{steps.image-metadata.outputs.image-name}}
+
+  Dependabot-Checks:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # PRs with event_name 'pull_request_target' always run in the PR target branch
+      - name: Switch branch on PR
+        if: github.event_name == 'pull_request_target'
+        run: git checkout ${{github.event.pull_request.head.sha}}
+
+      - name: Setup nodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          cache: 'npm'
+          cache-dependency-path: ./package-lock.json
+
+      # TODO: Use npm ci when after updating nx
+      - name: Install npm dependencies (without scripts)
+        run: npm i --ignore-scripts --no-audit --no-fund
+
+      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Lint all apps
+        run: npx nx run-many --all --target=lint --parallel=3
+
+      - name: Test all apps
+        run: npx nx run-many --all --target=test --parallel=3 --ci
