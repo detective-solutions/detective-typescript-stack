@@ -71,11 +71,9 @@ jobs:
         uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
 
-      - run: echo ${{steps.nx-changes.outputs.changed-apps}}
-
       - name: Cancel workflow if no apps were changed
         uses: andymckay/cancel-action@0.2
-        if: ${{steps.nx-changes.outputs.changed-apps}}
+        if: ${{steps.nx-changes.outputs.changed-apps}} == []
 
     outputs:
       changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
