@@ -124,7 +124,7 @@ jobs:
         run: npx nx build ${{matrix.app}} --prod
 
       - name: Create docker image tags based on branch name
-        id: image-tags
+        id: image-metadata
         env:
           CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
         run: |
