@@ -135,30 +135,28 @@ jobs:
       - name: Build ${{matrix.app}}
         run: npx nx build ${{matrix.app}} --prod
 
-      - name: Create docker image tags based on branch name
+      - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
         env:
           CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
         run: |
           IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
-          BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            SLIM_TAGS="--tag=${BASE_TAG}"
-            PUSH_TAGS="-t ${BASE_TAG}"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            SLIM_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
-            PUSH_TAGS="-t ${BASE_TAG} -t ${IMAGE_NAME}:development"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
-            SLIM_TAGS="--tag=${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
-            PUSH_TAGS="-t ${BASE_TAG}-${SANITIZED_BRANCH_NAME}"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           fi
           echo "::set-output name=image-name::${IMAGE_NAME}"
           echo "::set-output name=base-tag::${BASE_TAG}"
-          echo "::set-output name=slim-tags::${SLIM_TAGS}"
-          echo "::set-output name=push-tags::${PUSH_TAGS}"
+          echo "::set-output name=target-tags::${TARGET_TAGS}"
 
       - name: Build fat docker image
         run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-metadata.outputs.base-tag}} .
@@ -169,7 +167,7 @@ jobs:
           docker-slim build \
             --http-probe=false \
             --target=${{steps.image-metadata.outputs.base-tag}} \
-            ${{steps.image-metadata.outputs.slim-tags}}
+            ${{steps.image-metadata.outputs.target-tags}}
 
       - name: Login to quay.io
         uses: docker/login-action@v2
@@ -179,7 +177,7 @@ jobs:
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
       - name: Push all docker available docker tags
-        run: docker push ${{steps.image-metadata.outputs.push-tags}}
+        run: docker push -a ${{steps.image-metadata.outputs.image-name}}
 
   Dependabot-Checks:
     runs-on: ubuntu-latest
