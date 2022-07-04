@@ -133,7 +133,7 @@ jobs:
         run: npm rebuild && npm run prepare --if-present
 
       - name: Build ${{matrix.app}}
-        run: npx nx build ${{matrix.app}} --prod
+        run: npx nx build ${{matrix.app}} --prod && npm run transloco:optimize
 
       - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
