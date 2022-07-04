@@ -21,11 +21,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # PRs with event_name 'pull_request_target' always run in the PR target branch
-      - name: Switch branch on PR
-        if: github.event_name == 'pull_request_target'
-        run: git checkout ${{github.event.pull_request.head.sha}}
-
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
@@ -59,11 +54,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # PRs with event_name 'pull_request_target' always run in the PR target branch
-      - name: Switch branch on PR
-        if: github.event_name == 'pull_request_target'
-        run: git checkout ${{github.event.pull_request.head.sha}}
-
       - name: Detect changed apps
         uses: detective-solutions/nx-check-changes@v1.0.0
         id: nx-changes
@@ -88,33 +78,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # a push initiated by dependabot do not yield enough rights to successfully build. Due to that, we're using
-      # pull_request_target events for that - since these are running in the target of a PR,
-      # we need to manually switch back to the source (feat/fix branch)
-      - name: Get branch name
-        uses: tj-actions/branch-names@v5
-        id: branch-name
-
-      # PRs with event_name 'pull_request_target' always run in the PR target branch
-      - name: Switch branch on PR
-        if: github.event_name == 'pull_request_target'
-        run: git checkout ${{github.event.pull_request.head.sha}}
-
-      # Get the branch we want to build. In case of a PR we want the source branch.
-      # This is necessary to see on which branch we are after step "Switch branch to PR". Otherwise, we'd
-      # look at the branch the event yields, which could lead to building a fix/feat state into the development image
-      - name: Get actual branch name
-        id: actual-branch-name
-        env:
-          ACTUAL_BRANCH: ${{ steps.branch-name.outputs.head_ref_branch }}
-          CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
-        run: |
-          if [[ ${{github.event_name}} == 'pull_request_target' ]]; then
-            echo "::set-output name=actual_branch::${ACTUAL_BRANCH}"
-          else
-            echo "::set-output name=actual_branch::${CURRENT_BRANCH}"
-          fi
-
       - name: Setup nodeJS
         uses: actions/setup-node@v3
         with:
@@ -135,7 +98,7 @@ jobs:
       - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
         env:
-          CURRENT_BRANCH: ${{ steps.actual-branch-name.outputs.actual_branch }}
+          CURRENT_BRANCH: ${{ github.ref_name }}
         run: |
           IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
