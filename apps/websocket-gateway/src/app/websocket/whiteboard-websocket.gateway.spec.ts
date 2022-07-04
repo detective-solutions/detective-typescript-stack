@@ -18,8 +18,6 @@ const mockWhiteboardProducer = {
   sendKafkaMessage: jest.fn(),
 };
 
-const mockJwtService = {};
-
 describe('WhiteboardWebsocketGateway', () => {
   const webSocketUrl = 'ws://localhost:1234';
   const testEventType = 'TEST_EVENT';
@@ -60,7 +58,7 @@ describe('WhiteboardWebsocketGateway', () => {
       providers: [
         WhiteboardWebSocketGateway,
         { provide: WhiteboardProducer, useValue: mockWhiteboardProducer },
-        { provide: JwtService, useValue: mockJwtService },
+        { provide: JwtService, useValue: {} },
         ConfigService,
       ],
     }).compile();
