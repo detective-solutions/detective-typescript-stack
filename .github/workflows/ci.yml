@@ -6,12 +6,12 @@ on:
 env:
   NODE_VERSION: 16
   DOCKER_REGISTRY: quay.io
-  ORGANIZATION_NAME: detective.solutions
+  ORGANIZATION: detective.solutions
 
 jobs:
   Check-Affected-Files:
     runs-on: ubuntu-latest
-    # Only run for human users on a push event
+    # Run only on manual push events
     if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
 
     steps:
@@ -99,7 +99,7 @@ jobs:
         env:
           CURRENT_BRANCH: ${{ github.ref_name }}
         run: |
-          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
+          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
