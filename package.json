@@ -7,7 +7,7 @@
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
     "start": "nx serve",
-    "build": "nx build && npm run transloco:optimize",
+    "build": "nx build --prod && npm run transloco:optimize",
     "test": "nx test",
     "prepare": "husky install",
     "test:a11y:ci": "pa11y-ci",
