@@ -30,15 +30,13 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   afterInit(server: Server) {
     // Setting server options afterwards to be able to call internal methods
     server.options = {
-      // TODO: Investigate objects & define interfaces
-      verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => any) => {
-        await this.handleNewClientConnection(server, info, cb);
-      },
+      verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
+        this.handleNewClientConnection(server, info, cb),
     };
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
-  onEvent(@MessageBody() message: IMessage<any>) {
+  onQueryTableEvent(@MessageBody() message: IMessage<any>) {
     message.context = this.mergeEventTypeIntoMessageContext(
       EventTypeTopicMapping.queryTable.eventType,
       message.context
@@ -71,7 +69,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     });
   }
 
-  private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => any) {
+  private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {
     const requestUrl = info.req.url;
     this.logger.debug(`Incoming connection request on url ${requestUrl}`);
 
