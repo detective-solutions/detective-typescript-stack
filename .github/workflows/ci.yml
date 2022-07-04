@@ -16,7 +16,8 @@ env:
 jobs:
   Check-Affected-Files:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
+    # Only run for human users on a push event
+    if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
 
     steps:
       - name: Checkout source code
@@ -181,7 +182,8 @@ jobs:
 
   Dependabot-Checks:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    # Only run for dependabot on a pull request event
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request_target'
 
     steps:
       - name: Checkout source code
