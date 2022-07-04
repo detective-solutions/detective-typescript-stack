@@ -97,7 +97,7 @@ jobs:
       - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
         env:
-          CURRENT_BRANCH: ${{ github.ref_name }}
+          CURRENT_BRANCH: ${{github.ref_name}}
         run: |
           IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
