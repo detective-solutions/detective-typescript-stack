@@ -18,4 +18,10 @@ RUN npm ci --no-audit --no-fund
 # Copy built code
 COPY ./dist/apps/auth-service ./
 
+# Run node prune
+RUN apt-get update && \
+    apt-get install curl && \
+    curl -sf https://gobinaries.com/tj/node-prune | sh && \
+    node-prune
+
 CMD node ./main.js
