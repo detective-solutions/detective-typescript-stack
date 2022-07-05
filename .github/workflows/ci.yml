@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup nodeJS
         uses: actions/setup-node@v3
@@ -48,8 +50,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Detect changed apps
         uses: detective-solutions/nx-check-changes@v1.0.0
