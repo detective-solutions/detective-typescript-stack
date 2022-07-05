@@ -123,7 +123,7 @@ jobs:
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
             --http-probe-off \
-            --include-node-package={{matrix.app}}
+            --include-node-package={{matrix.app}} \
             --target=${{steps.image-metadata.outputs.base-tag}} \
             ${{steps.image-metadata.outputs.target-tags}}
 
