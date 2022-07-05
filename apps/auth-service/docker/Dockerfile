@@ -19,8 +19,8 @@ RUN npm ci --no-audit --no-fund
 COPY ./dist/apps/auth-service ./
 
 # Run node prune
-RUN apt-get update && \
-    apt-get install curl && \
+RUN apt update && \
+    apt install curl && \
     curl -sf https://gobinaries.com/tj/node-prune | sh && \
     node-prune
 
