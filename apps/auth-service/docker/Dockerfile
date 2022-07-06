@@ -1,12 +1,12 @@
 ### BASE IMAGE
-# node:lts-slim
-FROM node@sha256:ef9e0abfa1aa07d23cc51b69820885fc83f51c10fab463aec5a56f282dca744f AS base
+# node:lts-alpine
+FROM node@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c AS base
 
 WORKDIR /app
 
 # Update linux depenencies & install curl
-RUN apt-get update -y && \
-    apt-get install -y curl && \
+RUN apk add && \
+    apk add curl && \
     curl -sf https://gobinaries.com/tj/node-prune | sh
 
 # Install dependencies
@@ -23,8 +23,8 @@ RUN node-prune
 
 
 ### FINAL IMAGE
-# node:lts-slim
-FROM node@sha256:ef9e0abfa1aa07d23cc51b69820885fc83f51c10fab463aec5a56f282dca744f
+# node:lts-alpine
+FROM node@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c
 
 # Set up container environment
 WORKDIR /app
