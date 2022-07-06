@@ -1,4 +1,3 @@
-# nginx:alpine
-FROM nginx@sha256:20a1077e25510e824d6f9ce7af07aa02d86536848ddab3e4ef7d1804608d8125
+FROM nginx:stable-alpine@sha256:c90af9c78715f71ade64037ca54d3a0c0b6814362594b13643d03c5110085375
 
 COPY ./dist/apps/detective-client /usr/share/nginx/html
