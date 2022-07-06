@@ -5,8 +5,8 @@ FROM node@sha256:ef9e0abfa1aa07d23cc51b69820885fc83f51c10fab463aec5a56f282dca744
 WORKDIR /app
 
 # Update linux depenencies & install curl
-RUN apt-get update && \
-    apt-get install curl && \
+RUN apt-get update -y && \
+    apt-get install -y curl && \
     curl -sf https://gobinaries.com/tj/node-prune | sh
 
 # Install dependencies
