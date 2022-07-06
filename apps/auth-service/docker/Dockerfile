@@ -18,7 +18,7 @@ RUN npm ci --no-audit --no-fund
 # Copy built code
 COPY ./dist/apps/auth-service ./
 
-# Run node prune
+# Prune unused files from node_modules folder
 RUN node-prune
 
 
