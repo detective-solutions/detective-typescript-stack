@@ -19,7 +19,9 @@ RUN npm ci --no-audit --no-fund
 COPY ./dist/apps/auth-service ./
 
 # Run node prune
-RUN curl -sf https://gobinaries.com/tj/node-prune | sh && \
+RUN sudo apt-get update && \
+    sudo apt-get install curl && \
+    curl -sf https://gobinaries.com/tj/node-prune | sh && \
     node-prune
 
 CMD node ./main.js
