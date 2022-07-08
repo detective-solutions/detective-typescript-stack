@@ -12,7 +12,7 @@ async function bootstrap() {
 
   await app.listen();
 
-  const webSocketPort = app.get(ConfigService).get('WEBSOCKET_PORT');
+  const webSocketPort = app.get(ConfigService).get('SERVER_PORT');
   const kafkaPort = app.get(ConfigService).get('KAFKA_PORT');
   Logger.log(`🚀 Application is running on ports ${webSocketPort} (WebSockets) and ${kafkaPort} (Kafka)`);
 }

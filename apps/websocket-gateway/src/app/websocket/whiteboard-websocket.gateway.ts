@@ -13,7 +13,7 @@ import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-@WebSocketGateway(Number(process.env.WEBSOCKET_PORT))
+@WebSocketGateway(Number(process.env.SERVER_PORT))
 export class WhiteboardWebSocketGateway implements OnGatewayInit {
   private readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
