@@ -22,7 +22,7 @@ async function bootstrap() {
     })
   );
 
-  const port = 7777;
+  const port = 1111;
   await app.listen(port, '0.0.0.0');
   Logger.log(`🚀 Application is running on port ${port}`);
 }
