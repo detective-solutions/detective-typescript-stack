@@ -24,6 +24,9 @@ import { kafkaClientInjectionToken } from './utils';
           client: {
             brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`],
           },
+          consumer: {
+            groupId: 'websocket-gateway',
+          },
         },
       },
     ]),
