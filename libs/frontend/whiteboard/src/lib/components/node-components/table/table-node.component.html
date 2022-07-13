@@ -40,8 +40,8 @@
     <ag-grid-angular
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
-      [columnDefs]="columnDefs$ | async"
-      [rowData]="rowData$ | async"
+      [columnDefs]="colDefUpdates$ | async"
+      [rowData]="rowDataUpdates$ | async"
       (wheel)="preventZoom($event)"
     >
     </ag-grid-angular>

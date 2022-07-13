@@ -7,8 +7,9 @@ import {
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBarConfig, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { Subject, Subscription, catchError, filter, switchMap, take, tap, throwError } from 'rxjs';
+import { ReplaySubject, Subject, Subscription, filter, switchMap, take, tap } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
@@ -22,23 +23,15 @@ import { selectWhiteboardContextState } from '../../state';
 export class WebSocketService implements OnDestroy {
   private static readonly loggingPrefix = '[WebSocket Service]';
 
-  private readonly webSocketSubject$ = new Subject(); // Need to declare it here, so it can be accessed afterwards
-  private currentWebSocket$!: RxWebSocketWrapperSubject<any>; // Need to declare it here, so it can be accessed afterwards
+  currentWebSocket$!: RxWebSocketWrapperSubject<any>;
+  readonly isConnectedToWebSocketServer$ = new Subject<boolean>();
+  readonly webSocketConnectionFailedEventually$ = new Subject<boolean>();
+  readonly getWebSocketSubjectAsync$ = new ReplaySubject<RxWebSocketWrapperSubject<any>>();
+
   private isFirstConnection = true;
   private currentToast!: MatSnackBarRef<TextOnlySnackBar>;
   private refreshTokenTimeout!: number;
   private subscriptions!: Subscription;
-
-  readonly webSocket$ = this.webSocketSubject$.pipe(
-    filter(() => !!this.currentWebSocket$),
-    switchMap(() => this.currentWebSocket$),
-    catchError(() => {
-      this.logger.error(`${WebSocketService.loggingPrefix} No WebSocket available in WebSocket service!`);
-      return throwError(() => new Error(' '));
-    })
-  );
-  readonly isConnectedToWebSocketServer$ = new Subject<boolean>();
-  readonly webSocketConnectionFailedEventually$ = new Subject<boolean>();
 
   constructor(
     private readonly authService: AuthService,
@@ -77,6 +70,7 @@ export class WebSocketService implements OnDestroy {
               tap((isConnected: boolean) => this.isConnectedToWebSocketServer$.next(isConnected)),
               tap((isConnected: boolean) => {
                 if (isConnected) {
+                  this.getWebSocketSubjectAsync$.next(this.currentWebSocket$);
                   this.handleSuccessfulConnection();
                 } else {
                   this.handleReconnection();

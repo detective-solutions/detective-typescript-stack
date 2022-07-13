@@ -20,3 +20,8 @@ export const selectAllWhiteboardNodes = createSelector(
     return [];
   }
 );
+
+export const selectWhiteboardNodeById = (id: string) =>
+  createSelector(selectWhiteboardState, (state: IWhiteboardState) =>
+    Node.Build(state.nodes.entities[id] as INodeInput)
+  );

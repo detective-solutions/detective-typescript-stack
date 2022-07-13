@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
-import { Subscription, map } from 'rxjs';
+import { BehaviorSubject, Subscription, map } from 'rxjs';
 
-import { Actions } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Node } from '../../../models';
 import { Store } from '@ngrx/store';
@@ -14,11 +13,12 @@ import { WhiteboardFacadeService } from '../../../services';
 export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   @Input() node!: Node;
 
+  readonly isDragging$ = this.whiteboardFacade.isDragging$;
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
-  readonly isDragging$ = this.whiteboardFacade.isDragging$;
 
+  protected readonly nodeUpdates$ = new BehaviorSubject<Node>(this.node);
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
@@ -35,7 +35,6 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   constructor(
     public readonly elementRef: ElementRef,
     protected readonly store: Store,
-    protected readonly actions$: Actions,
     protected readonly whiteboardFacade: WhiteboardFacadeService,
     protected readonly keyboardService: KeyboardService
   ) {}
@@ -53,5 +52,11 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     if (!this.keyboardService.isSpaceKeyPressed) {
       event.stopPropagation();
     }
+  }
+
+  protected updateExistingNodeObject(updatedNode: Node) {
+    Object.keys(updatedNode).forEach((key: string) => {
+      (this.node as any)[key] = (updatedNode as any)[key];
+    });
   }
 }

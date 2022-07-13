@@ -1,14 +1,13 @@
 import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { map, tap } from 'rxjs';
+import { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
+import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
+import { WhiteboardNodeActions, selectWhiteboardNodeById } from '../../../state';
+import { filter, map, pluck, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
-import { GridOptions } from 'ag-grid-community';
-import { ITableNode } from './model';
+import { Node } from '../../../models';
 import { TableNodeActions } from './state';
-import { Update } from '@ngrx/entity';
-import { WhiteboardNodeActions } from '../../../state';
-import { ofType } from '@ngrx/effects';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -19,43 +18,57 @@ import { ofType } from '@ngrx/effects';
   encapsulation: ViewEncapsulation.None,
 })
 export class TableNodeComponent extends BaseNodeComponent implements OnInit, AfterViewInit {
+  // Use this observable for column updates to correctly toggle the table loading screen
+  readonly colDefUpdates$ = this.nodeUpdates$.pipe(
+    filter((node) => node?.colDefs.length !== 0),
+    map((node: Node) => node.colDefs)
+  );
+
+  // Use this observable for row data updates to correctly toggle the table loading screen
+  readonly rowDataUpdates$ = this.nodeUpdates$.pipe(
+    filter((node) => node?.rowData.length !== 0),
+    map((node: Node) => node.rowData)
+  );
+
   readonly gridOptions: GridOptions = {
     loadingOverlayComponent: CustomLoadingOverlayComponent,
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
 
-  readonly incomingWebsocketMessages$ = this.whiteboardFacade.webSocket$;
-
-  readonly getTableDataFromStore$ = this.actions$.pipe(
-    ofType(TableNodeActions.tableDataReceived),
-    map((data) => data.update.changes)
-  );
-
-  readonly columnDefs$ = this.getTableDataFromStore$.pipe(
-    tap(console.log),
-    map((data) => data.colDefs)
-  );
-
-  readonly rowData$ = this.getTableDataFromStore$.pipe(
-    tap(console.log),
-    map((data) => data.rowData)
-  );
-
   ngOnInit() {
+    // Node update subscription needs to be defined here, otherwise this.id would be undefined
     this.subscriptions.add(
-      // TODO: Add event keys to Kafka messages
-      this.incomingWebsocketMessages$
-        // .pipe(
-        // filter((message: WebsocketMessage<any>) => message.event === TableEvents.QueryTable),
-        // map((message: WebsocketMessage<ITableNodeDataInput>) => message.data)
-        // )
-        // TODO: Set correct type for incoming data
-        .subscribe((messageData: any) => {
-          const update: Update<ITableNode> = {
-            id: this.node.id,
-            changes: { colDefs: messageData.schema, rowData: messageData.data },
-          };
-          this.store.dispatch(TableNodeActions.tableDataReceived({ update: update }));
+      this.store.select(selectWhiteboardNodeById(this.node.id)).subscribe((updatedNode: Node) => {
+        // WARNING: It is not possible to simply reassign this.node reference when updating the node values
+        // Currently the rendering will break due to some conflicts between HTML and SVG handling
+        this.updateExistingNodeObject(updatedNode);
+        this.nodeUpdates$.next(updatedNode);
+      })
+    );
+
+    this.subscriptions.add(
+      this.nodeUpdates$.subscribe((node: Node) => {
+        this.updateExistingNodeObject(node);
+      })
+    );
+
+    // Listen to QUERY_TABLE websocket message events
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.QueryTable)),
+          filter((message: IMessage<any>) => message.context.nodeId === this.node.id),
+          pluck('body')
+        )
+        .subscribe((messageData: { tableSchema: (ColDef | ColGroupDef)[]; tableData: any[] }) => {
+          this.store.dispatch(
+            TableNodeActions.tableDataReceived({
+              update: {
+                id: this.node.id,
+                changes: { colDefs: messageData.tableSchema, rowData: messageData.tableData },
+              },
+            })
+          );
         })
     );
   }

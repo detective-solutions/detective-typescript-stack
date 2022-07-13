@@ -1,3 +1,4 @@
+import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { INode, INodeInput } from './node.interface';
 
 export class Node implements INode {
@@ -15,7 +16,9 @@ export class Node implements INode {
     public x = 0,
     public y = 0,
     public width = Node.defaultWidth,
-    public height = Node.defaultHeight
+    public height = Node.defaultHeight,
+    public colDefs: (ColDef | ColGroupDef)[] = [],
+    public rowData: object[] = []
   ) {}
 
   static Build(nodeInput: INodeInput) {
@@ -30,7 +33,9 @@ export class Node implements INode {
       nodeInput.layout.x,
       nodeInput.layout.y,
       nodeInput.layout.width,
-      nodeInput.layout.height
+      nodeInput.layout.height,
+      nodeInput.colDefs,
+      nodeInput.rowData
     );
   }
 }

@@ -30,10 +30,9 @@ export class WhiteboardFacadeService {
       ([isWhiteboardDataLoaded, isConnectedToWebSocketServer]) => isWhiteboardDataLoaded && isConnectedToWebSocketServer
     )
   );
-
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
   readonly isDragging$ = this.dragService.isDragging$;
-  readonly webSocket$ = this.webSocketService.webSocket$;
+  readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$;
   readonly isConnectedToWebSocketServer$ = this.webSocketService.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
 
