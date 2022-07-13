@@ -27,9 +27,6 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeLayoutUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
-  on(TableNodeActions.tableNodeAdded, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.addOne(action.tableElementAdded, state)
-  ),
   on(TableNodeActions.tableDataReceived, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   )
