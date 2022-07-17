@@ -47,8 +47,10 @@ export class DragService {
   }
 
   isDraggingAllowedOnTarget(targetElement: HTMLElement): boolean {
-    return (
-      targetElement.tagName !== 'MAT-ICON' && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'INPUT'
-    );
+    const isNoForbiddenIcon = (elem: HTMLElement) => elem.tagName !== 'MAT-ICON' || elem.innerText === 'drag_indicator';
+    const isNoButton = (elem: HTMLElement) => elem.tagName !== 'BUTTON';
+    const isNoInput = (elem: HTMLElement) => elem.tagName !== 'INPUT';
+
+    return isNoForbiddenIcon(targetElement) && isNoButton(targetElement) && isNoInput(targetElement);
   }
 }
