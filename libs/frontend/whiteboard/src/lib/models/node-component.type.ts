@@ -1,3 +1,3 @@
-import { BaseNodeComponent, TableNodeComponent } from '../components';
+import { EmbeddingNodeComponent, TableNodeComponent } from '../components';
 
-export type NodeComponent = BaseNodeComponent | TableNodeComponent;
+export type NodeComponent = TableNodeComponent | EmbeddingNodeComponent;

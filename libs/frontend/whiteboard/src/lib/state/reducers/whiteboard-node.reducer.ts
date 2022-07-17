@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 
-import { INodeInput } from '../../models';
+import { AbstractNodeInput } from '../../models';
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components/node-components/table/state';
 import { WhiteboardNodeActions } from '../actions';
@@ -8,7 +8,7 @@ import { createEntityAdapter } from '@ngrx/entity';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const whiteboardNodeEntityAdapter = createEntityAdapter<INodeInput>();
+export const whiteboardNodeEntityAdapter = createEntityAdapter<AbstractNodeInput>();
 
 export const whiteboardNodeReducer = createReducer(
   whiteboardNodeEntityAdapter.getInitialState(),

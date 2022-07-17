@@ -1,9 +1,9 @@
-import { INodeInput, Node } from '../../models';
-
+import { AbstractNodeInput } from '../../models';
 import { Dictionary } from '@ngrx/entity';
 import { IWhiteboardState } from '../interfaces';
 import { createSelector } from '@ngrx/store';
 import { selectWhiteboardState } from './whiteboard-selector';
+import { serializeNodeForWhiteboard } from '../../utils';
 import { whiteboardNodeEntityAdapter } from '../reducers';
 
 const { selectEntities } = whiteboardNodeEntityAdapter.getSelectors();
@@ -13,9 +13,11 @@ const selectWhiteboardNodeEntities = createSelector(selectWhiteboardNodeState, s
 
 export const selectAllWhiteboardNodes = createSelector(
   selectWhiteboardNodeEntities,
-  (entities: Dictionary<INodeInput>) => {
+  (entities: Dictionary<AbstractNodeInput>) => {
     if (Object.keys(entities).length > 0) {
-      return (Object.values(entities) as INodeInput[]).map(Node.Build);
+      return (Object.values(entities) as AbstractNodeInput[]).map((nodeInput: AbstractNodeInput) =>
+        serializeNodeForWhiteboard(nodeInput)
+      );
     }
     return [];
   }
@@ -23,5 +25,5 @@ export const selectAllWhiteboardNodes = createSelector(
 
 export const selectWhiteboardNodeById = (id: string) =>
   createSelector(selectWhiteboardState, (state: IWhiteboardState) =>
-    Node.Build(state.nodes.entities[id] as INodeInput)
+    serializeNodeForWhiteboard(state.nodes.entities[id] as AbstractNodeInput)
   );

@@ -1,7 +1,9 @@
-import { ColDef, ColGroupDef } from 'ag-grid-community';
-import { INode, INodeInput } from './node.interface';
+import { INode } from './node.interface';
+import { INodeInput } from './node-input.interface';
 
-export class Node implements INode {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+export abstract class Node implements INode {
   static defaultWidth = 900;
   static defaultHeight = 500;
 
@@ -16,26 +18,10 @@ export class Node implements INode {
     public x = 0,
     public y = 0,
     public width = Node.defaultWidth,
-    public height = Node.defaultHeight,
-    public colDefs: (ColDef | ColGroupDef)[] = [],
-    public rowData: object[] = []
+    public height = Node.defaultHeight
   ) {}
 
-  static Build(nodeInput: INodeInput) {
-    if (!nodeInput) {
-      return new Node();
-    }
-    return new Node(
-      nodeInput.id,
-      nodeInput.type,
-      nodeInput.title,
-      nodeInput.locked,
-      nodeInput.layout.x,
-      nodeInput.layout.y,
-      nodeInput.layout.width,
-      nodeInput.layout.height,
-      nodeInput.colDefs,
-      nodeInput.rowData
-    );
+  static Build(_nodeInput: INodeInput) {
+    throw new Error('Build method is not implemented');
   }
 }

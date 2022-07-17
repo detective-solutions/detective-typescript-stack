@@ -1,6 +1,6 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
-import { IQueryMessagePayload, QueryType } from '../../model';
+import { IQueryMessagePayload, QueryType } from '../../models';
 import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../../../state';
 import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 

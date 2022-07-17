@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-import { ITableNode } from '../../model';
+import { ITableNode } from '../../models';
 import { Update } from '@ngrx/entity';
 
 export const tableDataReceived = createAction(

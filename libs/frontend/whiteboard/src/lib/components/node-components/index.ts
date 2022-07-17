@@ -1,2 +1,3 @@
-export * from './base/base-node.component';
-export * from './table/table-node.component';
+export * from './base';
+export * from './embedding';
+export * from './table';

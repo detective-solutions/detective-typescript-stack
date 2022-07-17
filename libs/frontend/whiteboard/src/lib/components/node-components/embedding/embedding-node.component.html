@@ -3,21 +3,6 @@
   <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
     <div class="node-actions-wrapper table-actions">
       <div fxFlex fxLayout="column" fxLayoutAlign="center center">
-        <button mat-icon-button>
-          <mat-icon fxFlex>filter_alt</mat-icon>
-        </button>
-        <button mat-icon-button>
-          <mat-icon fxFlex>info</mat-icon>
-        </button>
-        <button mat-icon-button>
-          <mat-icon fxFlex>addchart</mat-icon>
-        </button>
-        <button mat-icon-button>
-          <mat-icon fxFlex>text_fields</mat-icon>
-        </button>
-        <button mat-icon-button>
-          <mat-icon fxFlex>analytics</mat-icon>
-        </button>
         <button mat-icon-button (click)="toggleLock()">
           <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
           <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
@@ -31,13 +16,11 @@
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
     <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
     <node-header [title]="node.title"></node-header>
-    <ag-grid-angular
-      class="ag-theme-alpine"
-      [gridOptions]="gridOptions"
-      [columnDefs]="colDefUpdates$ | async"
-      [rowData]="rowDataUpdates$ | async"
-      (wheel)="preventZoom($event)"
-    >
-    </ag-grid-angular>
+    <iframe
+      IFrameClickTracker
+      src="http://detective.solutions"
+      style="height: inherit; width: inherit"
+      frameBorder="0"
+    ></iframe>
   </foreignObject>
 </svg:g>
