@@ -16,6 +16,7 @@ export class GetAllConnectionsGQL extends Query<Response> {
         name
         description
         connectorName
+        status
       }
       aggregateSourceConnection {
         count

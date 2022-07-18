@@ -4,7 +4,7 @@ import {
   FavorizedTableCellComponent,
   IconButtonTableCellComponent,
   MultiTableCellComponent,
-  StateTableCellComponent,
+  StatusTableCellComponent,
   TextTableCellComponent,
   UserAvatarListTableCellComponent,
 } from '../components';
@@ -15,6 +15,6 @@ export type TableCellComponents =
   | FavorizedTableCellComponent
   | IconButtonTableCellComponent
   | MultiTableCellComponent
-  | StateTableCellComponent
+  | StatusTableCellComponent
   | TextTableCellComponent
   | UserAvatarListTableCellComponent;

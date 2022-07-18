@@ -5,7 +5,7 @@
 @import '../ui/src/lib/table/components/access-indicator-table-cell/access-indicator-table-cell.component-theme';
 @import '../ui/src/lib/table/components/favorized-table-cell/favorized-table-cell.component-theme';
 @import '../ui/src/lib/table/components/multi-table-cell/multi-table-cell.component-theme';
-@import '../ui/src/lib/table/components/state-table-cell/state-table-cell.component-theme';
+@import '../ui/src/lib/table/components/status-table-cell/status-table-cell.component-theme';
 @import '../ui/src/lib/table/components/user-avatar-list-table-cell/user-avatar-list-table-cell.component-theme';
 
 @mixin custom-components-theme($theme) {
@@ -16,6 +16,6 @@
   @include access-indicator-table-cell-component-theme($theme);
   @include favorized-table-cell-component-theme($theme);
   @include multi-table-cell-component-theme($theme);
-  @include state-table-cell-component-theme($theme);
+  @include status-table-cell-component-theme($theme);
   @include user-avatar-list-table-cell-component-theme($theme);
 }

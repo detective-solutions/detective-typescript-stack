@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { IStateTableCell, SourceConnectionState } from '../../models';
 
+import { IStateTableCell } from '../../models';
+import { SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 import { TOOLTIP_DELAY } from '@detective.solutions/frontend/shared/ui';
 
 @Component({
-  selector: 'state-table-cell',
-  templateUrl: 'state-table-cell.component.html',
-  styleUrls: ['state-table-cell.component.scss'],
+  selector: 'status-table-cell',
+  templateUrl: 'status-table-cell.component.html',
+  styleUrls: ['status-table-cell.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StateTableCellComponent implements OnInit {
+export class StatusTableCellComponent implements OnInit {
   readonly tooltipDelay = TOOLTIP_DELAY;
 
   cellData!: IStateTableCell; // Will be populated by the DynamicTableDirective
@@ -23,11 +24,11 @@ export class StateTableCellComponent implements OnInit {
   }
 
   ngOnInit() {
-    switch (this.cellData.state) {
-      case SourceConnectionState.READY:
+    switch (this.cellData.status) {
+      case SourceConnectionStatus.AVAILABLE:
         this.isReady = true;
         break;
-      case SourceConnectionState.ERROR:
+      case SourceConnectionStatus.ERROR:
         this.hasError = true;
         break;
       default:

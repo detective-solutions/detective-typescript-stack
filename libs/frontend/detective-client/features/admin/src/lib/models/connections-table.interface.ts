@@ -2,7 +2,7 @@ import { IAbstractTableDef, IColumnDef } from '@detective.solutions/frontend/det
 
 export interface IConnectionsTableDef extends IAbstractTableDef {
   dataSourceInfo: IColumnDef;
-  state: IColumnDef;
+  status: IColumnDef;
   lastUpdated: IColumnDef;
   actions: IColumnDef;
 }

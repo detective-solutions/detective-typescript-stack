@@ -4,7 +4,7 @@ import {
   FavorizedTableCellComponent,
   IconButtonTableCellComponent,
   MultiTableCellComponent,
-  StateTableCellComponent,
+  StatusTableCellComponent,
   TextTableCellComponent,
   UserAvatarListTableCellComponent,
 } from './components';
@@ -27,7 +27,7 @@ import { TranslocoModule } from '@ngneat/transloco';
     FavorizedTableCellComponent,
     IconButtonTableCellComponent,
     MultiTableCellComponent,
-    StateTableCellComponent,
+    StatusTableCellComponent,
     TextTableCellComponent,
     UserAvatarListTableCellComponent,
   ],

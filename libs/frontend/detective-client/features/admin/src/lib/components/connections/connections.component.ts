@@ -5,7 +5,6 @@ import { ConnectionsClickEvent, IConnectionsTableDef, IGetAllConnectionsResponse
 import {
   ITableCellEvent,
   ITableInput,
-  SourceConnectionState,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
@@ -116,12 +115,12 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
                 description: connection.description,
               },
             },
-            state: {
-              columnName: translation['stateColumn'],
+            status: {
+              columnName: translation['statusColumn'],
               cellData: {
                 id: connection.xid,
-                type: TableCellTypes.STATE_TABLE_CELL,
-                state: SourceConnectionState.READY, // TODO: Get this value from database
+                type: TableCellTypes.STATUS_TABLE_CELL,
+                status: connection.status,
                 message: 'An error occurred while initializing', // TODO: Get this value from database
               },
             },
