@@ -120,5 +120,5 @@
     }
   },
   "tags": ["scope:frontend", "type:app"],
-  "implicitDependencies": ["frontend-whiteboard", "shared-assets", "frontend-shared-styles"]
+  "implicitDependencies": ["shared-assets", "frontend-shared-styles"]
 }
