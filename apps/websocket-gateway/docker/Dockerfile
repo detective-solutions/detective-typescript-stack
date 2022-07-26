@@ -1,5 +1,5 @@
 ### BASE IMAGE
-FROM node:lts-alpine@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c AS base
+FROM node:lts-alpine@sha256:9a2db0008b592cfde1b98aa8972a8051ccb80bb51dde8b06c3a2e3762794e89c AS base
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN node-prune
 
 
 ### FINAL IMAGE
-FROM node:lts-alpine@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c
+FROM node:lts-alpine@sha256:9a2db0008b592cfde1b98aa8972a8051ccb80bb51dde8b06c3a2e3762794e89c
 
 # Set up container environment
 WORKDIR /app
