@@ -180,6 +180,13 @@ export class WebSocketService implements OnDestroy {
   }
 
   private buildWebSocketUrl(whiteboardContext: IWhiteboardContextState) {
+    // TODO: Remove me (only for k8s debugging purposes)
+    console.log(
+      `${environment.webSocketBasePath}/tenant/${whiteboardContext.tenantId}/casefile/${
+        whiteboardContext.casefileId
+      }?token=${this.authService.getAccessToken()}`
+    );
+
     return `${environment.webSocketBasePath}/tenant/${whiteboardContext.tenantId}/casefile/${
       whiteboardContext.casefileId
     }?token=${this.authService.getAccessToken()}`;
