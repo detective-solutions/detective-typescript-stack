@@ -111,23 +111,7 @@ jobs:
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
             TARGET_TAGS="--tag=${BASE_TAG}"
           fi
-          echo "::set-output name=image-name::${IMAGE_NAME}"
-          echo "::set-output name=base-tag::${BASE_TAG}"
           echo "::set-output name=target-tags::${TARGET_TAGS}"
-
-      - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-metadata.outputs.base-tag}} .
-
-      - name: Build & tag optimized docker images
-        run: |
-          curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
-          docker-slim build \
-            --http-probe-off \
-            --include-path /app \
-            --include-path /usr/share \
-            --include-path /etc/nginx \
-            --target ${{steps.image-metadata.outputs.base-tag}} \
-            ${{steps.image-metadata.outputs.target-tags}}
 
       - name: Login to quay.io
         uses: docker/login-action@v2
@@ -136,8 +120,12 @@ jobs:
           username: ${{secrets.DOCKER_REGISTRY_USER}}
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      - name: Push all docker available docker tags
-        run: docker push -a ${{steps.image-metadata.outputs.image-name}}
+      - name: Build and push docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{steps.image-metadata.outputs.target-tags}}
 
   Dependabot-Checks:
     runs-on: ubuntu-latest
