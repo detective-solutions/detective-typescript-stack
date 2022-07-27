@@ -7,7 +7,6 @@ import { environment } from '@detective.solutions/backend/shared/environments';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }));
-  app.enableCors({ origin: ['http://localhost:4200', 'http://localhost:1111'], methods: ['OPTIONS', 'POST'] });
 
   app.enableVersioning({
     type: VersioningType.URI,
