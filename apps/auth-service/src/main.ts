@@ -7,7 +7,7 @@ import { environment } from '@detective.solutions/backend/shared/environments';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }), {
-    cors: environment.production ? false : true,
+    cors: false,
   });
 
   app.enableVersioning({
