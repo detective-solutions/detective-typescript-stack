@@ -111,6 +111,8 @@ jobs:
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
             TARGET_TAGS="--tag=${BASE_TAG}"
           fi
+          echo "::set-output name=image-name::${IMAGE_NAME}"
+          echo "::set-output name=base-tag::${BASE_TAG}"
           echo "::set-output name=target-tags::${TARGET_TAGS}"
 
       - name: Build fat docker image
