@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'detective-client';
   theme = 'default-theme';
+  test = true; // TODO: Remove me!
 }
