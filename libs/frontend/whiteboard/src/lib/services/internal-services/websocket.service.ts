@@ -176,18 +176,13 @@ export class WebSocketService implements OnDestroy {
   }
 
   private isUserStillOnWhiteboard(): boolean {
-    return !!this.router.url.includes(environment.whiteboardUrlPath);
+    return !!this.router.url.includes(environment.whiteboardPath);
   }
 
   private buildWebSocketUrl(whiteboardContext: IWhiteboardContextState) {
-    // TODO: Remove me (only for k8s debugging purposes)
-    console.log(
-      `${environment.webSocketBasePath}/tenant/${whiteboardContext.tenantId}/casefile/${
-        whiteboardContext.casefileId
-      }?token=${this.authService.getAccessToken()}`
-    );
-
-    return `${environment.webSocketBasePath}/tenant/${whiteboardContext.tenantId}/casefile/${
+    const protocolUsed = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const basePathV1 = `${protocolUsed}${environment.webSocketHost}${environment.baseApiPath}${environment.webSocketApiPathV1}`;
+    return `${basePathV1}/tenant/${whiteboardContext.tenantId}/casefile/${
       whiteboardContext.casefileId
     }?token=${this.authService.getAccessToken()}`;
   }

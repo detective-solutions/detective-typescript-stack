@@ -12,19 +12,20 @@ import {
   IGetConnectionByIdResponse,
 } from '../models';
 import { Observable, catchError, map } from 'rxjs';
+import { QueryRef, gql } from 'apollo-angular';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
+import { environment } from '@detective.solutions/frontend/shared/environments';
 import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
 export class ConnectionsService {
-  private static catalogBasePath = 'v1/catalog';
+  private static catalogBasePath = `${environment.baseApiPath}${environment.catalogApiPathV1}`;
 
   private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
@@ -49,6 +50,25 @@ export class ConnectionsService {
       paginationOffset: paginationOffset,
       pageSize: pageSize,
     });
+
+    const subscriptionGQL = gql`
+      subscription onConnectionChanged {
+        querySourceConnection {
+          xid
+          name
+          description
+          connectorName
+          status
+        }
+      }
+    `;
+
+    this.getAllConnectionsWatchQuery.subscribeToMore({
+      document: subscriptionGQL,
+      updateQuery: (prev, { subscription }) =>
+        subscription && subscription.data ? { ...prev, querySourceConnection: subscription.data } : prev,
+    });
+
     return this.getAllConnectionsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetAllConnectionsGQLResponse) => {
