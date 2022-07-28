@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockModule, ngMocks } from 'ng-mocks';
+import { MockModule, MockService, ngMocks } from 'ng-mocks';
 
 import { Apollo } from 'apollo-angular';
 import { ConnectionsComponent } from './connections.component';
@@ -21,7 +21,7 @@ xdescribe('ConnectionsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MockModule(TableModule), materialModules],
       declarations: [ConnectionsComponent],
-      providers: [ConnectionsService, GetAllConnectionsGQL, Apollo],
+      providers: [MockService(ConnectionsService), GetAllConnectionsGQL, Apollo],
     }).compileComponents();
   });
 
