@@ -63,11 +63,11 @@ export class ConnectionsService {
       }
     `;
 
-    this.getAllConnectionsWatchQuery.subscribeToMore({
-      document: subscriptionGQL,
-      updateQuery: (prev, { subscription }) =>
-        subscription && subscription.data ? { ...prev, querySourceConnection: subscription.data } : prev,
-    });
+    // this.getAllConnectionsWatchQuery.subscribeToMore({
+    //   document: subscriptionGQL,
+    //   updateQuery: (prev, { subscription }) =>
+    //     subscription && subscription.data ? { ...prev, querySourceConnection: subscription.data } : prev,
+    // });
 
     return this.getAllConnectionsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
