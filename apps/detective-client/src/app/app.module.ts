@@ -14,6 +14,7 @@ import { SharedErrorHandlingModule } from '@detective.solutions/frontend/shared/
 import { SharedUiModule } from '@detective.solutions/frontend/shared/ui';
 import { TranslocoRootModule } from './transloco-root.module';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import { buildWebSocketHost } from '@detective.solutions/frontend/shared/utils';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { offsetLimitPagination } from '@apollo/client/utilities';
@@ -38,12 +39,14 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
         const http = httpLink.create({
           uri: `${environment.baseApiPath}${environment.dbApiPath}`,
         });
+
         const ws = new WebSocketLink({
-          uri: `ws://${environment.webSocketHost}${environment.baseApiPath}${environment.dbApiPath}`,
+          uri: `${buildWebSocketHost()}${environment.baseApiPath}${environment.dbApiPath}`,
           options: {
             reconnect: true,
           },
         });
+
         // Using the ability to split links, you can send data to each link
         // depending on what kind of operation is being sent
         const link = split(

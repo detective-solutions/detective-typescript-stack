@@ -14,6 +14,7 @@ import { IWhiteboardContextState } from '../../state/interfaces';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { buildWebSocketHost } from '@detective.solutions/frontend/shared/utils';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 import { selectWhiteboardContextState } from '../../state';
 
@@ -180,8 +181,7 @@ export class WebSocketService implements OnDestroy {
   }
 
   private buildWebSocketUrl(whiteboardContext: IWhiteboardContextState) {
-    const protocolUsed = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const basePathV1 = `${protocolUsed}${environment.webSocketHost}${environment.baseApiPath}${environment.webSocketApiPathV1}`;
+    const basePathV1 = `${buildWebSocketHost()}${environment.baseApiPath}${environment.webSocketApiPathV1}`;
     return `${basePathV1}/tenant/${whiteboardContext.tenantId}/casefile/${
       whiteboardContext.casefileId
     }?token=${this.authService.getAccessToken()}`;
