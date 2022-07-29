@@ -2,6 +2,7 @@ import { LogLevel } from '@detective.solutions/frontend/shared/error-handling';
 
 export const environment = {
   production: true,
+  devApiHost: '',
   baseApiPath: '/api',
   dbApiPath: '/v1/graphql',
   authApiPathV1: '/v1/auth',
