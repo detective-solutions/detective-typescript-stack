@@ -4,11 +4,11 @@
 
 export const environment = {
   production: false,
+  devApiHost: 'dev.detective.solutions',
   baseApiPath: '/api',
   dbApiPath: '/v1/graphql',
   authApiPathV1: '/v1/auth',
   catalogApiPathV1: '/v1/catalog',
-  webSocketHost: 'dev.detective.solutions',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
