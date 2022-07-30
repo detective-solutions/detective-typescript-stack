@@ -50,9 +50,9 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   }
 
   isAuthorizationError(error: HttpErrorResponse, request: HttpRequest<any>): boolean {
-    return error instanceof HttpErrorResponse && error.status === 401 && environment.production
-      ? request.url.startsWith(`${window.location.origin}${environment.baseApiPath}`)
-      : request.url.startsWith(`${environment.devApiHost}${environment.baseApiPath}`);
+    return (
+      error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.baseApiPath)
+    );
   }
 
   handleAuthorizationError(request: HttpRequest<any>, next: HttpHandler) {
