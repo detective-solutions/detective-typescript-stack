@@ -8,12 +8,12 @@ import {
 import { Component, Inject } from '@angular/core';
 import { EMPTY, Subscription, catchError, map, pluck, switchMap, take, tap } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { IConnectionsAddEditResponse, IConnectorPropertiesResponse } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { ConnectionsService } from '../../../services';
-import { IConnectorPropertiesResponse } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 
 @Component({
@@ -97,7 +97,7 @@ export class ConnectionsAddEditDialogComponent {
               return EMPTY;
             })
           )
-          .subscribe((response: object) => this.handleResponse(response));
+          .subscribe((response: IConnectionsAddEditResponse) => this.handleResponse(response));
       } else {
         this.connectionsService
           .updateConnection(this.connectorType, this.dialogInputData.id, formValues)
@@ -108,7 +108,7 @@ export class ConnectionsAddEditDialogComponent {
               return EMPTY;
             })
           )
-          .subscribe((response: object) => this.handleResponse(response));
+          .subscribe((response: IConnectionsAddEditResponse) => this.handleResponse(response));
       }
     } else {
       formGroup.markAllAsTouched();
@@ -177,8 +177,9 @@ export class ConnectionsAddEditDialogComponent {
     return formValues;
   }
 
-  private handleResponse(response: object) {
+  private handleResponse(response: IConnectionsAddEditResponse) {
     this.isSubmitting = false;
+    // TODO: Unify response in catalog service (differs from delete response)
     if (Object.keys(response).includes('success')) {
       this.translationService
         .selectTranslate('connections.toastMessages.actionSuccessful', {}, this.translationScope)
