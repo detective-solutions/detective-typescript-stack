@@ -13,6 +13,7 @@ import {
   IGetAllConnectionsResponse,
   IGetConnectionByIdResponse,
 } from '../models';
+import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
 import { Observable, catchError, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
@@ -21,7 +22,6 @@ import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
-import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -36,7 +36,8 @@ export class ConnectionsService {
     private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
     private readonly httpClient: HttpClient,
-    private readonly tableCellEventService: TableCellEventService
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly logger: LogService
   ) {}
 
   getConnectionById(id: string): Observable<IGetConnectionByIdResponse> {
@@ -71,7 +72,15 @@ export class ConnectionsService {
   }
 
   refreshConnections() {
-    this.getAllConnectionsWatchQuery.refetch();
+    const currentResult = this.getAllConnectionsWatchQuery.getCurrentResult()?.data as any;
+    const alreadyLoadedConnectionCount = (currentResult as IGetAllConnectionsGQLResponse)?.querySourceConnection
+      ?.length;
+    if (alreadyLoadedConnectionCount) {
+      this.getAllConnectionsWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedConnectionCount });
+    } else {
+      this.logger.error('Could not determine currently loaded connection count. Reusing values of last query...');
+      this.getAllConnectionsWatchQuery.refetch();
+    }
   }
 
   getAllConnectionsNextPage(paginationOffset: number, pageSize: number) {
