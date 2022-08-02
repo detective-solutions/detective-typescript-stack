@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { SharedErrorHandlingModule } from '@detective.solutions/frontend/shared/error-handling';
 import { SharedUiModule } from '@detective.solutions/frontend/shared/ui';
 import { TranslocoRootModule } from './transloco-root.module';
+import { environment } from '@detective.solutions/frontend/shared/environments';
 import { offsetLimitPagination } from '@apollo/client/utilities';
 
 @NgModule({
@@ -30,21 +31,22 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
     Apollo,
     {
       provide: APOLLO_OPTIONS,
-      useFactory: (httpLink: HttpLink) => {
+      useFactory(httpLink: HttpLink) {
         return {
+          link: httpLink.create({
+            uri: `${environment.baseApiPath}${environment.dbApiPath}`,
+          }),
           cache: new InMemoryCache({
             addTypename: false,
             typePolicies: {
               Query: {
+                keyFields: ['xid'],
                 fields: {
                   queryCasefile: offsetLimitPagination(),
                   querySourceConnection: offsetLimitPagination(),
                 },
               },
             },
-          }),
-          link: httpLink.create({
-            uri: '/graphql',
           }),
         };
       },

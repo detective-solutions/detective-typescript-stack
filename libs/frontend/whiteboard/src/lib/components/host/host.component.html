@@ -15,7 +15,12 @@
   height="100%"
 >
   <g #zoomContainer id="zoom-container">
-    <g nodeGenerator [node]="node" *ngFor="let node of whiteboardNodes$ | async"></g>
+    <ng-container *ngFor="let node of whiteboardNodes$ | async">
+      <ng-container [ngSwitch]="node.type">
+        <g *ngSwitchCase="nodeType.TABLE" tableNode [node]="node"></g>
+        <g *ngSwitchCase="nodeType.EMBEDDING" embeddingNode [node]="node"></g>
+      </ng-container>
+    </ng-container>
     <!-- <g [linkVisual]="link" *ngFor="let link of links$ | async"></g> -->
   </g>
 </svg>

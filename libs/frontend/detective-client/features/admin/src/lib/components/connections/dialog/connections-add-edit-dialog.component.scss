@@ -15,5 +15,8 @@
 }
 
 .mat-progress-bar {
-  margin-top: 25px;
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
 }

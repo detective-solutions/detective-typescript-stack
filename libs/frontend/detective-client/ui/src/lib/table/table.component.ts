@@ -56,7 +56,7 @@ export class TableComponent implements OnInit, OnDestroy {
           this.columnDefinitions = this.createMatColumnDefs(tableInput.tableItems);
           this.columnIds = this.extractColumnIds(this.columnDefinitions);
           this.totalElementsCount = tableInput.totalElementsCount;
-          this.alreadyLoadedElementsCount += tableInput.tableItems.length;
+          this.alreadyLoadedElementsCount = tableInput.tableItems.length;
           this.tableDataSource = new MatTableDataSource(tableInput.tableItems);
         })
     );
@@ -81,9 +81,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
     // If the user has scrolled between the bottom and the loadingScrollBuffer range, add more data
     if (currentScrollLocation > limit) {
-      this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
       if (!this.isFetchingMoreData && this.alreadyLoadedElementsCount < this.totalElementsCount) {
+        this.currentPageOffset += this.pageSize;
         this.fetchMoreDataByOffset$.next(this.currentPageOffset);
         this.isFetchingMoreData = true;
       }

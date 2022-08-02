@@ -5,8 +5,8 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './services/internal-services';
-import { DynamicNodeGeneratorDirective, IFrameTrackerDirective } from './directives';
 import {
+  EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
   NodeSelectionHaloComponent,
@@ -20,6 +20,7 @@ import { WHITEBOARD_STORE_NAME, WhiteboardMetadataEffects, WhiteboardNodeEffects
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
+import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
@@ -49,8 +50,8 @@ import { whiteboardFeatureReducers } from './state/reducers';
     NodeSelectionHaloComponent,
     TestLinkComponent,
     TableNodeComponent,
+    EmbeddingNodeComponent,
     IFrameTrackerDirective,
-    DynamicNodeGeneratorDirective,
   ],
   providers: [
     WhiteboardContextResolver,

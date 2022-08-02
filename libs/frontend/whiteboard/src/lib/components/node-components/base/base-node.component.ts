@@ -1,24 +1,32 @@
+import { AbstractNode, INode } from '../../../models';
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
-import { Subscription, map } from 'rxjs';
+import { BehaviorSubject, Subscription, filter, map, pluck } from 'rxjs';
 
-import { Actions } from '@ngrx/effects';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
-import { Node } from '../../../models';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
+import { WhiteboardNodeActions } from '../../../state';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
   template: '',
   styleUrls: ['./base-node.component.scss'],
 })
 export class BaseNodeComponent implements AfterViewInit, OnDestroy {
-  @Input() node!: Node;
+  @Input() node!: AbstractNode;
 
+  readonly isDragging$ = this.whiteboardFacade.isDragging$;
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
-  readonly isDragging$ = this.whiteboardFacade.isDragging$;
 
+  protected readonly nodeUpdates$ = new BehaviorSubject<AbstractNode>(this.node);
+  protected readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
+    filter((node: AbstractNode) => !!node?.temporary),
+    pluck('temporary'),
+    filter(Boolean)
+  );
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
@@ -35,7 +43,6 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   constructor(
     public readonly elementRef: ElementRef,
     protected readonly store: Store,
-    protected readonly actions$: Actions,
     protected readonly whiteboardFacade: WhiteboardFacadeService,
     protected readonly keyboardService: KeyboardService
   ) {}
@@ -53,5 +60,22 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     if (!this.keyboardService.isSpaceKeyPressed) {
       event.stopPropagation();
     }
+  }
+
+  toggleLock() {
+    this.store.dispatch(
+      WhiteboardNodeActions.WhiteboardNodeUpdate({
+        update: {
+          id: this.node.id,
+          changes: { locked: !this.node.locked },
+        },
+      })
+    );
+  }
+
+  protected updateExistingNodeObject(updatedNode: INode) {
+    Object.keys(updatedNode).forEach((key: string) => {
+      (this.node as Record<string, any>)[key] = (updatedNode as Record<string, any>)[key];
+    });
   }
 }

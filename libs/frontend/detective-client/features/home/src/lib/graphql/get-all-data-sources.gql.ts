@@ -11,7 +11,7 @@ export interface IGetAllDataSourcesGQLResponse {
 export class GetAllDataSourcesGQL extends Query<Response> {
   override document = gql`
     query dataSources($paginationOffset: Int, $pageSize: Int) {
-      querySourceConnection(offset: $paginationOffset, first: $pageSize) {
+      querySourceConnection(offset: $paginationOffset, first: $pageSize, order: { asc: name }) {
         xid
         name
         description

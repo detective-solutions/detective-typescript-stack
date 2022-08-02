@@ -23,6 +23,12 @@ import { kafkaClientInjectionToken } from './utils';
         options: {
           client: {
             brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`],
+            retry: {
+              retries: 30,
+            },
+          },
+          consumer: {
+            groupId: 'websocket-gateway',
           },
         },
       },

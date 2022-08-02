@@ -2,9 +2,14 @@ import { LogLevel } from '@detective.solutions/frontend/shared/error-handling';
 
 export const environment = {
   production: true,
-  apiBasePath: '', // TODO: Configure /api base path in k8s ingress controller
-  webSocketBasePath: '/ws',
-  whiteboardUrlPath: '/casefile', // Used to identify whiteboard routes
+  devApiHost: '',
+  baseApiPath: '/api',
+  dbApiPath: '/v1/graphql',
+  authApiPathV1: '/v1/auth',
+  catalogApiPathV1: '/v1/catalog',
+  webSocketHost: 'dev.detective.solutions',
+  webSocketApiPathV1: '/v1/ws',
+  whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
   logLevel: LogLevel.Info,
 };

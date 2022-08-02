@@ -1,4 +1,7 @@
-# nginx:alpine
-FROM nginx@sha256:20a1077e25510e824d6f9ce7af07aa02d86536848ddab3e4ef7d1804608d8125
+FROM nginx:stable-alpine@sha256:1aeb5626e29b4f463ce25fc4b07c85eb231f50494d2f46d9184153a4e938302e
 
 COPY ./dist/apps/detective-client /usr/share/nginx/html
+COPY ./apps/detective-client/docker/security-headers.conf /etc/nginx/security-headers.conf
+COPY ./apps/detective-client/docker/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80

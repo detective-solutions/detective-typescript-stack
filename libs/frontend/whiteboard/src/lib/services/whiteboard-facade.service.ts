@@ -1,3 +1,4 @@
+import { AbstractNode, ForceDirectedGraph, Link, NodeComponent, WhiteboardOptions } from '../models';
 import { Actions, ofType } from '@ngrx/effects';
 import {
   BufferService,
@@ -6,7 +7,6 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
-import { ForceDirectedGraph, Link, Node, NodeComponent, WhiteboardOptions } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 import { WhiteboardNodeActions, selectAllWhiteboardNodes } from '../state';
 
@@ -19,7 +19,7 @@ import { dummyNodes } from './whiteboard-dummy-data';
 
 @Injectable()
 export class WhiteboardFacadeService {
-  readonly whiteboardNodes$: Observable<Node[]> = this.store.select(selectAllWhiteboardNodes);
+  readonly whiteboardNodes$: Observable<AbstractNode[]> = this.store.select(selectAllWhiteboardNodes);
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
@@ -30,10 +30,9 @@ export class WhiteboardFacadeService {
       ([isWhiteboardDataLoaded, isConnectedToWebSocketServer]) => isWhiteboardDataLoaded && isConnectedToWebSocketServer
     )
   );
-
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
   readonly isDragging$ = this.dragService.isDragging$;
-  readonly webSocket$ = this.webSocketService.webSocket$;
+  readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$;
   readonly isConnectedToWebSocketServer$ = this.webSocketService.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
 
@@ -81,7 +80,7 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addToNodeLayoutUpdateBuffer(node: Node) {
+  addToNodeLayoutUpdateBuffer(node: AbstractNode) {
     this.bufferService.addToNodeLayoutUpdateBuffer(node);
   }
 

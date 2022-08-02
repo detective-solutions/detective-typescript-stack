@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, catchError, filter, of, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, of, take, tap, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
@@ -40,7 +40,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
         if (this.isAuthorizationError(error, request)) {
           this.handleAuthorizationError(request, next);
         }
-        return of(error);
+        return throwError(() => error.message);
       })
     );
   }
@@ -51,7 +51,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
 
   isAuthorizationError(error: HttpErrorResponse, request: HttpRequest<any>): boolean {
     return (
-      error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.apiBasePath)
+      error instanceof HttpErrorResponse && error.status === 401 && request.url.startsWith(environment.baseApiPath)
     );
   }
 

@@ -1,11 +1,15 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ConnectionDialogComponent,
+  ConnectionsClickEvent,
+  IConnectionsTableDef,
+  IGetAllConnectionsResponse,
+} from '../../models';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
-import { ConnectionsClickEvent, IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
 import {
   ITableCellEvent,
   ITableInput,
-  SourceConnectionState,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
@@ -34,12 +38,15 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
 
-  connections$!: Observable<IGetAllConnectionsResponse>;
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
 
-  private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
+  private readonly initialPageOffset = 0;
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
 
   isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
@@ -58,9 +65,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.connections$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize);
-
-    this.tableItems$ = this.connections$.pipe(
+    this.tableItems$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize).pipe(
       map((connections: IGetAllConnectionsResponse) => {
         return {
           tableItems: this.transformToTableStructure(connections.connections),
@@ -78,12 +83,18 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.editButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, { data: { id: connectionId }, minWidth: 400 })
+        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
+          data: { id: connectionId },
+        })
       )
     );
+
     this.subscriptions.add(
       this.deleteButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, { data: { id: connectionId }, minWidth: 300 })
+        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
+          data: { id: connectionId },
+          width: '500px',
+        })
       )
     );
   }
@@ -92,9 +103,11 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  openConnectionsDialog(componentToOpen?: ComponentType<any>, config?: MatDialogConfig) {
-    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, config ?? { minWidth: 400 });
+  openConnectionsDialog(componentToOpen?: ComponentType<ConnectionDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
   }
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {
@@ -116,12 +129,12 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
                 description: connection.description,
               },
             },
-            state: {
-              columnName: translation['stateColumn'],
+            status: {
+              columnName: translation['statusColumn'],
               cellData: {
                 id: connection.xid,
-                type: TableCellTypes.STATE_TABLE_CELL,
-                state: SourceConnectionState.READY, // TODO: Get this value from database
+                type: TableCellTypes.STATUS_TABLE_CELL,
+                status: connection.status,
                 message: 'An error occurred while initializing', // TODO: Get this value from database
               },
             },

@@ -1,3 +1,5 @@
+import { SourceConnectionStatus } from './source-connection-status.enum';
+
 export interface ISourceConnection {
   xid: string;
   name: string;
@@ -5,4 +7,5 @@ export interface ISourceConnection {
   description?: string;
   iconSrc?: string;
   lastUpdated?: Date | null | string;
+  status: SourceConnectionStatus;
 }

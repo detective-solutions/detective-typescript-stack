@@ -2,17 +2,16 @@ name: CI
 on:
   - push
   - pull_request_target
-  - workflow_dispatch
 
 env:
   NODE_VERSION: 16
   DOCKER_REGISTRY: quay.io
-  ORGANIZATION_NAME: detective.solutions
+  ORGANIZATION: detective.solutions
 
 jobs:
   Check-Affected-Files:
     runs-on: ubuntu-latest
-    # Only run for human users on a push event
+    # Run only on manual push events
     if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
 
     steps:
@@ -75,8 +74,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Setup nodeJS
         uses: actions/setup-node@v3
@@ -85,7 +82,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
-      # TODO: Use npm ci when after updating nx
+      # TODO: Use npm ci after updating nx
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
 
@@ -98,9 +95,9 @@ jobs:
       - name: Create docker image metadata (name & tags based on branch name)
         id: image-metadata
         env:
-          CURRENT_BRANCH: ${{ github.ref_name }}
+          CURRENT_BRANCH: ${{github.ref_name}}
         run: |
-          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION_NAME}}/${{matrix.app}}
+          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
@@ -125,8 +122,11 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
           docker-slim build \
-            --http-probe=false \
-            --target=${{steps.image-metadata.outputs.base-tag}} \
+            --http-probe-off \
+            --include-path /app \
+            --include-path /usr/share \
+            --include-path /etc/nginx \
+            --target ${{steps.image-metadata.outputs.base-tag}} \
             ${{steps.image-metadata.outputs.target-tags}}
 
       - name: Login to quay.io
@@ -162,7 +162,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
-      # TODO: Use npm ci when after updating nx
+      # TODO: Use npm ci after updating nx
       - name: Install npm dependencies (without scripts)
         run: npm i --ignore-scripts --no-audit --no-fund
 

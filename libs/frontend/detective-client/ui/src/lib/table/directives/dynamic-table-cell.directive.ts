@@ -4,7 +4,7 @@ import {
   FavorizedTableCellComponent,
   IconButtonTableCellComponent,
   MultiTableCellComponent,
-  StateTableCellComponent,
+  StatusTableCellComponent,
   TextTableCellComponent,
   UserAvatarListTableCellComponent,
 } from '../components';
@@ -44,8 +44,8 @@ export class DynamicTableCellDirective implements OnInit {
       case TableCellTypes.FAVORIZED_TABLE_CELL: {
         return this.viewContainerRef.createComponent(FavorizedTableCellComponent);
       }
-      case TableCellTypes.STATE_TABLE_CELL: {
-        return this.viewContainerRef.createComponent(StateTableCellComponent);
+      case TableCellTypes.STATUS_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(StatusTableCellComponent);
       }
       case TableCellTypes.ICON_BUTTON_TABLE_CELL: {
         return this.viewContainerRef.createComponent(IconButtonTableCellComponent);

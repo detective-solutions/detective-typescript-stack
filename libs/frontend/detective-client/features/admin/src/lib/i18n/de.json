@@ -6,7 +6,7 @@
   "connections": {
     "addConnectionButtonText": "Neue Verbindung anlegen",
     "columnNames": {
-      "stateColumn": "Status",
+      "statusColumn": "Status",
       "lastUpdatedColumn": "Zuletzt aktualisiert"
     },
     "addEditDialog": {

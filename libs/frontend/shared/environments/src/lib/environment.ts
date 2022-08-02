@@ -4,9 +4,13 @@
 
 export const environment = {
   production: false,
-  apiBasePath: 'http://localhost:1111',
-  webSocketBasePath: 'ws://localhost:7777/ws',
-  whiteboardUrlPath: '/casefile', // Used to identify whiteboard routes
+  devApiHost: 'dev.detective.solutions',
+  baseApiPath: '/api',
+  dbApiPath: '/v1/graphql',
+  authApiPathV1: '/v1/auth',
+  catalogApiPathV1: '/v1/catalog',
+  webSocketApiPathV1: '/v1/ws',
+  whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
 };
 

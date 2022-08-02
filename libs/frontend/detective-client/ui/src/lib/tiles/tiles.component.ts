@@ -70,9 +70,9 @@ export class TilesComponent implements OnInit, OnDestroy {
 
     // If the user has scrolled between the bottom and the loadingScrollBuffer range, add more data
     if (currentScrollLocation > limit) {
-      this.currentPageOffset += this.pageSize;
       // Check if all available data was already fetched
       if (!this.isFetchingMoreData && this.alreadyLoadedElementsCount < this.totalElementsCount) {
+        this.currentPageOffset += this.pageSize;
         this.fetchMoreDataByOffset$.next(this.currentPageOffset);
         this.isFetchingMoreData = true;
       }

@@ -31,17 +31,11 @@
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
     <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
     <node-header [title]="node.title"></node-header>
-    <!-- <iframe
-      IFrameClickTracker
-      src="http://detective.solutions"
-      style="height: inherit; width: inherit"
-      frameBorder="0"
-    ></iframe> -->
     <ag-grid-angular
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
-      [columnDefs]="columnDefs$ | async"
-      [rowData]="rowData$ | async"
+      [columnDefs]="colDefUpdates$ | async"
+      [rowData]="rowDataUpdates$ | async"
       (wheel)="preventZoom($event)"
     >
     </ag-grid-angular>

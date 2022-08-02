@@ -1,4 +1,4 @@
-import { INodeInput, Node } from '../../models';
+import { AbstractNodeInput, INode } from '../../models';
 
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -7,17 +7,17 @@ import { WhiteboardNodeActions } from '../../state';
 
 @Injectable()
 export class BufferService {
-  private readonly nodeLayoutUpdateBuffer: Set<Node> = new Set();
+  private readonly nodeLayoutUpdateBuffer: Set<INode> = new Set();
 
   constructor(private readonly store: Store) {}
 
-  addToNodeLayoutUpdateBuffer(node: Node) {
+  addToNodeLayoutUpdateBuffer(node: INode) {
     this.nodeLayoutUpdateBuffer.add(node);
   }
 
   updateNodeLayoutsFromBuffer() {
-    const updates: Update<INodeInput>[] = [];
-    this.nodeLayoutUpdateBuffer.forEach((node: Node) =>
+    const updates: Update<AbstractNodeInput>[] = [];
+    this.nodeLayoutUpdateBuffer.forEach((node: INode) =>
       updates.push({
         id: node.id,
         changes: {

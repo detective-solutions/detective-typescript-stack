@@ -11,7 +11,7 @@ export interface IGetAllCasefilesGQLResponse {
 export class GetAllCasefilesGQL extends Query<Response> {
   override document = gql`
     query casefiles($paginationOffset: Int!, $pageSize: Int!) {
-      queryCasefile(offset: $paginationOffset, first: $pageSize) {
+      queryCasefile(offset: $paginationOffset, first: $pageSize, order: { asc: title }) {
         id: xid
         title
         description

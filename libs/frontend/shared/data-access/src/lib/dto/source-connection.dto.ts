@@ -1,4 +1,4 @@
-import { ISourceConnection } from '@detective.solutions/shared/data-access';
+import { ISourceConnection, SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 
 export enum SourceConnectorName {
   EXCEL = 'excel',
@@ -38,7 +38,8 @@ export class SourceConnection implements ISourceConnection {
     public connectorName = '',
     public description = '',
     public iconSrc = '',
-    public lastUpdated: Date | null = null
+    public lastUpdated: Date | null = null,
+    public status = SourceConnectionStatus.PENDING
   ) {}
 
   static Build(sourceConnectionInput: ISourceConnection) {
@@ -52,7 +53,8 @@ export class SourceConnection implements ISourceConnection {
       sourceConnectionInput.connectorName,
       sourceConnectionInput.description,
       sourceConnectionInput.iconSrc ?? SourceConnection.getIconSrc(sourceConnectionInput.connectorName),
-      (sourceConnectionInput.lastUpdated as Date) ?? new Date()
+      (sourceConnectionInput.lastUpdated as Date) ?? new Date(),
+      sourceConnectionInput.status
     );
   }
 

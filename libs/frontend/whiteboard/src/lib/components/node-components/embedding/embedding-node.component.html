@@ -1,0 +1,26 @@
+<svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
+  <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
+  <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
+    <div class="node-actions-wrapper table-actions">
+      <div fxFlex fxLayout="column" fxLayoutAlign="center center">
+        <button mat-icon-button (click)="toggleLock()">
+          <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
+          <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon fxFlex>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </foreignObject>
+  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
+    <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
+    <node-header [title]="node.title"></node-header>
+    <iframe
+      IFrameClickTracker
+      src="http://detective.solutions"
+      style="height: inherit; width: inherit"
+      frameBorder="0"
+    ></iframe>
+  </foreignObject>
+</svg:g>

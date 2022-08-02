@@ -1,3 +1,4 @@
+import { AbstractNode, ForceDirectedGraph, NodeType, WhiteboardOptions } from '../../models';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -9,7 +10,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ForceDirectedGraph, Node, NodeType, WhiteboardOptions } from '../../models';
 import { Subscription, delayWhen, distinctUntilChanged, filter, tap } from 'rxjs';
 
 import { Store } from '@ngrx/store';
@@ -47,14 +47,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
     // Update underlying graph nodes
-    tap((nodes: Node[]) => this.forceGraph.updateNodes(nodes)),
+    tap((nodes: AbstractNode[]) => this.forceGraph.updateNodes(nodes)),
     // Update layouts for nodes moved by graph force
     tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
   );
   readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
   readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
+
   readonly forceGraph: ForceDirectedGraph = this.whiteboardFacade.getForceGraph(HostComponent.options);
+  readonly nodeType = NodeType;
   readonly whiteboardHtmlId = 'whiteboard';
 
   private readonly subscriptions = new Subscription();
@@ -78,7 +80,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$
         .pipe(distinctUntilChanged())
-        .subscribe((node: Node) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
+        .subscribe((node: AbstractNode) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
     );
   }
 
