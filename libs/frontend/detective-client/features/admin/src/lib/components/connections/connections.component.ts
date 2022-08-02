@@ -33,7 +33,6 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
 
-  connections$!: Observable<IGetAllConnectionsResponse>;
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
 
@@ -57,9 +56,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.connections$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize);
-
-    this.tableItems$ = this.connections$.pipe(
+    this.tableItems$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize).pipe(
       map((connections: IGetAllConnectionsResponse) => {
         return {
           tableItems: this.transformToTableStructure(connections.connections),
