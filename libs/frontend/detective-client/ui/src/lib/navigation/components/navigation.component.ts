@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
-import { Observable, Subscription, map, shareReplay } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Observable, map, shareReplay, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { ISidenavItem } from '../interfaces';
@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./navigation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavigationComponent implements OnDestroy {
+export class NavigationComponent {
   @Input()
   sidenavItems!: ISidenavItem[];
   @Input()
@@ -28,8 +28,6 @@ export class NavigationComponent implements OnDestroy {
   searchValue = '';
   logoutErrorToastMessage!: string;
   logoutErrorToastAction!: string;
-
-  subscriptions = new Subscription();
 
   showTableView$: Observable<boolean>;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
@@ -58,10 +56,11 @@ export class NavigationComponent implements OnDestroy {
   }
 
   logout() {
-    this.subscriptions.add(this.authService.logout(true).subscribe(() => this.router.navigateByUrl('login')));
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.unsubscribe();
+    this.authService
+      .logout(true)
+      .pipe(take(1))
+      .subscribe(() => {
+        this.router.navigateByUrl('login');
+      });
   }
 }
