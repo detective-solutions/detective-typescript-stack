@@ -188,6 +188,7 @@ export class ConnectionsAddEditDialogComponent {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
           this.dialogRef.close();
         });
+      this.connectionsService.refreshConnections();
     }
 
     // TODO: Handle error code in response and fetch error message to display

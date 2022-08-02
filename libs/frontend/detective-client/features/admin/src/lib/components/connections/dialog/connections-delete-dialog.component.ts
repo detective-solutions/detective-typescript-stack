@@ -59,6 +59,7 @@ export class ConnectionsDeleteDialogComponent {
         .subscribe((translation: string) =>
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 })
         );
+      this.connectionsService.refreshConnections();
     }
 
     // TODO: Handle error code in response and fetch error message to display
