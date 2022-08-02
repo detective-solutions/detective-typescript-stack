@@ -1,7 +1,12 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ConnectionDialogComponent,
+  ConnectionsClickEvent,
+  IConnectionsTableDef,
+  IGetAllConnectionsResponse,
+} from '../../models';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
-import { ConnectionsClickEvent, IConnectionsTableDef, IGetAllConnectionsResponse } from '../../models';
 import {
   ITableCellEvent,
   ITableInput,
@@ -36,8 +41,12 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
 
-  private readonly initialPageOffset = 0;
   private readonly subscriptions = new Subscription();
+  private readonly initialPageOffset = 0;
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
 
   isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
@@ -74,12 +83,18 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.editButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, { data: { id: connectionId }, minWidth: 400 })
+        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
+          data: { id: connectionId },
+        })
       )
     );
+
     this.subscriptions.add(
       this.deleteButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, { data: { id: connectionId }, minWidth: 300 })
+        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
+          data: { id: connectionId },
+          width: '500px',
+        })
       )
     );
   }
@@ -88,9 +103,11 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  openConnectionsDialog(componentToOpen?: ComponentType<any>, config?: MatDialogConfig) {
-    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, config ?? { minWidth: 400 });
+  openConnectionsDialog(componentToOpen?: ComponentType<ConnectionDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
   }
 
   private transformToTableStructure(originalConnection: ISourceConnection[]): IConnectionsTableDef[] {
