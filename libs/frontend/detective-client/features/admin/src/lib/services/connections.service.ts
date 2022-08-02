@@ -14,10 +14,10 @@ import {
   IGetConnectionByIdResponse,
 } from '../models';
 import { Observable, catchError, map } from 'rxjs';
-import { QueryRef, gql } from 'apollo-angular';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { QueryRef } from 'apollo-angular';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
@@ -48,28 +48,15 @@ export class ConnectionsService {
   }
 
   getAllConnections(paginationOffset: number, pageSize: number): Observable<IGetAllConnectionsResponse> {
-    this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch({
-      paginationOffset: paginationOffset,
-      pageSize: pageSize,
-    });
-
-    const subscriptionGQL = gql`
-      subscription onConnectionChanged {
-        querySourceConnection {
-          xid
-          name
-          description
-          connectorName
-          status
-        }
-      }
-    `;
-
-    // this.getAllConnectionsWatchQuery.subscribeToMore({
-    //   document: subscriptionGQL,
-    //   updateQuery: (prev, { subscription }) =>
-    //     subscription && subscription.data ? { ...prev, querySourceConnection: subscription.data } : prev,
-    // });
+    if (!this.getAllConnectionsWatchQuery) {
+      this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch(
+        {
+          paginationOffset: paginationOffset,
+          pageSize: pageSize,
+        },
+        { pollInterval: 10000 }
+      );
+    }
 
     return this.getAllConnectionsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
