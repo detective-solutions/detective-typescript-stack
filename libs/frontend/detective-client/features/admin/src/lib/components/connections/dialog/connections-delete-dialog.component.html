@@ -1,9 +1,12 @@
-<ng-container *transloco="let t; read: 'admin.connections.deleteDialog'">
+<div class="delete-dialog-wrapper" *transloco="let t; read: 'admin.connections.deleteDialog'">
   <h1 mat-dialog-title align="center">{{ t('deleteDialogHeader') }}</h1>
   <div mat-dialog-content align="center">
     {{ t('deleteDialogText', { connectionName: this.connectionName$ | async }) }}
   </div>
   <div mat-dialog-actions align="center">
-    <button mat-raised-button color="accent" (click)="deleteConnection()">{{ t('deleteButtonText') }}</button>
+    <button mat-raised-button color="accent" (click)="deleteConnection()">
+      {{ t('deleteButtonText') }}
+    </button>
   </div>
-</ng-container>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

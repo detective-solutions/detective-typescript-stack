@@ -5,6 +5,8 @@ import {
   IGetConnectionByIdGQLResponse,
 } from '../graphql';
 import {
+  IConnectionsAddEditResponse,
+  IConnectionsDeleteResponse,
   IConnectorPropertiesResponse,
   IConnectorSchemaResponse,
   IConnectorTypesResponse,
@@ -81,6 +83,10 @@ export class ConnectionsService {
     );
   }
 
+  refreshConnections() {
+    this.getAllConnectionsWatchQuery.refetch();
+  }
+
   getAllConnectionsNextPage(paginationOffset: number, pageSize: number) {
     this.getAllConnectionsWatchQuery
       .fetchMore({
@@ -105,19 +111,26 @@ export class ConnectionsService {
     );
   }
 
-  addConnection(connectionType: string, payload: any) {
-    return this.httpClient.post(`${ConnectionsService.catalogBasePath}/${connectionType}/insert`, payload);
+  addConnection(connectionType: string, payload: any): Observable<IConnectionsAddEditResponse> {
+    return this.httpClient.post<IConnectionsAddEditResponse>(
+      `${ConnectionsService.catalogBasePath}/${connectionType}/insert`,
+      payload
+    );
   }
 
-  updateConnection(connectionType: string, connectionId: string, payload: any) {
-    return this.httpClient.post(
+  updateConnection(
+    connectionType: string,
+    connectionId: string,
+    payload: any
+  ): Observable<IConnectionsAddEditResponse> {
+    return this.httpClient.post<IConnectionsAddEditResponse>(
       `${ConnectionsService.catalogBasePath}/${connectionType}/update/${connectionId}`,
       payload
     );
   }
 
-  deleteConnection(connectionId: string, connectionName: string) {
-    return this.httpClient.post(`${ConnectionsService.catalogBasePath}/delete`, {
+  deleteConnection(connectionId: string, connectionName: string): Observable<IConnectionsDeleteResponse> {
+    return this.httpClient.post<IConnectionsDeleteResponse>(`${ConnectionsService.catalogBasePath}/delete`, {
       source_connection_xid: connectionId,
       source_connection_name: connectionName,
     });
