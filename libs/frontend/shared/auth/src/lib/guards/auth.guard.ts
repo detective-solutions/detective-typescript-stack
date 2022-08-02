@@ -23,28 +23,26 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
     private readonly logger: LogService
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
-    return this.checkLogin();
+    return this.checkLogin(route.path ?? '');
   }
 
   canActivate(
-    route: ActivatedRouteSnapshot,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean | Observable<boolean> | Promise<boolean> {
-    return this.checkLogin(route);
+    const defaultPath = '/home/my-casefiles';
+    return this.checkLogin(state.url === defaultPath ? '' : state.url);
   }
 
   canActivateChild(
-    childRoute: ActivatedRouteSnapshot,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _childRoute: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean | Observable<boolean> | Promise<boolean> {
-    return this.checkLogin(childRoute);
+    return this.checkLogin(state.url);
   }
 
-  protected checkLogin(route?: ActivatedRouteSnapshot): Observable<boolean> {
+  protected checkLogin(redirectUrl: string): Observable<boolean> {
     this.logger.debug(`Access token expired: ${this.authService.hasExpiredToken(this.authService.getAccessToken())}`);
     this.logger.debug(`Refresh token expired: ${this.authService.hasExpiredToken(this.authService.getRefreshToken())}`);
 
@@ -58,26 +56,21 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
           );
         } else if (!loginAllowed) {
           this.authService.logout(true);
-          this.router.navigate(['login'], {
-            queryParams: {
-              redirectUrl: this.getResolvedUrl(route),
-            },
-          });
+          this.router.navigate(
+            ['login'],
+            redirectUrl
+              ? {
+                  queryParams: {
+                    redirectUrl: redirectUrl,
+                  },
+                }
+              : {}
+          );
+          this.logger.debug(`Redirected to -> ${redirectUrl}`);
         }
         return of(loginAllowed);
       }),
       take(1) // The observable must complete for the guard to work
     );
-  }
-
-  getResolvedUrl(route?: ActivatedRouteSnapshot): string {
-    if (!route) {
-      return '';
-    }
-
-    return route.pathFromRoot
-      .map((r) => r.url.map((segment) => segment.toString()).join('/'))
-      .join('/')
-      .replace('//', '/');
   }
 }

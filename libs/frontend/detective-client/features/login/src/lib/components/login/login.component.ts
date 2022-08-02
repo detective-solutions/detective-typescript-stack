@@ -24,13 +24,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly route: ActivatedRoute
-  ) {
-    this.subscriptions.add(
-      this.route.paramMap.subscribe((params) => (this.redirectUrl = params.get('redirectUrl') ?? ''))
-    );
-  }
+  ) {}
 
   ngOnInit() {
+    this.redirectUrl = this.route.snapshot.queryParams['redirectUrl'] ?? '';
     this.buildLoginForm();
   }
 
@@ -45,17 +42,21 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  login(submittedForm: FormGroup) {
-    this.authService
-      .login(submittedForm.value.email, submittedForm.value.password)
-      .pipe(debounceTime(1000), take(1))
-      .subscribe();
+  login() {
+    if (this.loginForm.valid) {
+      this.authService
+        .login(this.loginForm.value.email, this.loginForm.value.password)
+        .pipe(debounceTime(1000), take(1))
+        .subscribe();
 
-    this.authService.authStatus$
-      .pipe(
-        filter((authStatus) => authStatus.isAuthenticated),
-        take(1)
-      )
-      .subscribe(() => this.router.navigateByUrl(this.redirectUrl));
+      this.authService.authStatus$
+        .pipe(
+          filter((authStatus) => authStatus.isAuthenticated),
+          take(1)
+        )
+        .subscribe(() => this.router.navigateByUrl(this.redirectUrl));
+    } else {
+      this.loginForm.markAsDirty();
+    }
   }
 }
