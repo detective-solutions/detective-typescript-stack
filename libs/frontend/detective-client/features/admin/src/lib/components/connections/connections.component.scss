@@ -5,6 +5,9 @@
     display: flex;
 
     button {
+      position: absolute;
+      z-index: 150;
+      margin-top: 10px;
       margin-left: 40px;
       width: 250px;
       height: 45px;
@@ -18,16 +21,21 @@
   }
 
   table-view {
-    height: calc(100vh - $navigation-toolbar-height - 65px);
+    height: calc(100vh - $navigation-toolbar-height - 20px);
   }
 
   &.is-mobile {
     .add-connection-button-wrapper {
       justify-content: center;
+
+      button {
+        position: relative;
+        margin: 15px 0;
+      }
     }
 
-    button {
-      margin-bottom: 20px;
+    table-view {
+      height: calc(100vh - $navigation-toolbar-height - 95px);
     }
   }
 }

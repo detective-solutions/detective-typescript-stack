@@ -37,6 +37,12 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.DELETE_CONNECTION),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
+  readonly isMobile$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
 
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
@@ -47,13 +53,6 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     width: '650px',
     minWidth: '400px',
   };
-
-  isMobile$: Observable<boolean> = this.breakpointObserver
-    .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
-    .pipe(
-      map((result) => result.matches),
-      shareReplay()
-    );
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
