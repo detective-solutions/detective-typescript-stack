@@ -7,11 +7,11 @@
     "name": "detective.solutions GmbH"
   },
   "scripts": {
-    "ng": "nx",
+    "ng": "npx nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
-    "start": "nx serve",
-    "build": "nx build --prod && npm run transloco:optimize",
-    "test": "nx test",
+    "start": "npx nx serve",
+    "build": "npx nx build --prod && npm run transloco:optimize",
+    "test": "npx nx test",
     "prepare": "husky install",
     "test:a11y:ci": "pa11y-ci",
     "transloco:optimize": "transloco-optimize dist/apps/detective-client/assets/i18n"
@@ -131,9 +131,9 @@
   },
   "lint-staged": {
     "*": [
-      "nx format --uncommitted",
-      "nx affected:lint --uncommitted",
-      "nx affected:test --uncommitted --parallel --maxParallel=5"
+      "npx nx format --uncommitted",
+      "npx nx affected:lint --uncommitted",
+      "npx nx affected:test --uncommitted --parallel --maxParallel=5"
     ]
   },
   "browserslist": [

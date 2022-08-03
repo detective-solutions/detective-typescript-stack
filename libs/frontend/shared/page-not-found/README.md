@@ -2,4 +2,4 @@
 
 ## Running unit tests
 
-Run `nx test frontend-shared-page-not-found` to execute the unit tests.
+Run `npx nx test frontend-shared-page-not-found` to execute the unit tests.

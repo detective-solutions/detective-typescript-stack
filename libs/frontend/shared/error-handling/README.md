@@ -2,4 +2,4 @@
 
 ## Running unit tests
 
-Run `nx test frontend-shared-error-handling` to execute the unit tests.
+Run `npx nx test frontend-shared-error-handling` to execute the unit tests.

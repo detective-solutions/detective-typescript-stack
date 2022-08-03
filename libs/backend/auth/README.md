@@ -2,4 +2,4 @@
 
 ## Running unit tests
 
-Run `nx test backend-auth` to execute the unit tests via [Jest](https://jestjs.io).
+Run `npx nx test backend-auth` to execute the unit tests via [Jest](https://jestjs.io).
