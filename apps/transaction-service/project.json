@@ -10,7 +10,8 @@
         "outputPath": "dist/apps/transaction-service",
         "main": "apps/transaction-service/src/main.ts",
         "tsConfig": "apps/transaction-service/tsconfig.app.json",
-        "assets": ["apps/transaction-service/src/assets"]
+        "assets": ["apps/transaction-service/src/assets"],
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {
