@@ -63,7 +63,7 @@ jobs:
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
-    if: needs.Detect-Changed-Apps.outputs.skip-build == "false"
+    if: needs.Detect-Changed-Apps.outputs.skip-build == 'false'
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
