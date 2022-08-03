@@ -146,8 +146,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       # PRs with event_name 'pull_request_target' always run in the PR target branch
       - name: Switch branch on PR
