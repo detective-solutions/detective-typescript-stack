@@ -54,7 +54,7 @@ jobs:
           fetch-depth: 0
 
       - name: Detect changed apps
-        uses: detective-solutions/nx-check-changes@v1.0.0
+        uses: detective-solutions/nx-check-changes@v2.0.0
         id: nx-changes
 
     outputs:
@@ -63,7 +63,7 @@ jobs:
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
-    if: needs.Detect-Changed-Apps.outputs.skip-build == 'false'
+    if: needs.Detect-Changed-Apps.outputs.skip-build == false
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
