@@ -24,7 +24,6 @@ export class CasefileCreateDialogComponent {
   ) {}
 
   createCasefile() {
-    console.log('CREATE CASEFILE');
     this.isSubmitting = true;
   }
 
