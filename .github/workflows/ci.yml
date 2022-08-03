@@ -59,11 +59,11 @@ jobs:
 
     outputs:
       skip-build: ${{steps.nx-changes.outputs.not-affected}}
-      has-affected-apps: ${{steps.nx-changes.outputs.has-affected-apps}}
+      changed-apps: ${{steps.nx-changes.outputs.changed-apps}}
 
   Build-Affected-Apps:
     runs-on: ubuntu-latest
-    if: needs.Detect-Changed-Apps.outputs.has-affected-apps
+    if: needs.Detect-Changed-Apps.outputs.skip-build == false
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
       matrix:
