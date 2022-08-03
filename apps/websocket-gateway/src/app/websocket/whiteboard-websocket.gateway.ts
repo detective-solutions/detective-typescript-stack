@@ -35,6 +35,21 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     };
   }
 
+  @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
+  onLoadWhiteboardDataEvent(@MessageBody() message: IMessage<any>) {
+    message.context = this.mergeEventTypeIntoMessageContext(
+      EventTypeTopicMapping.loadWhiteboardData.eventType,
+      message.context
+    );
+    this.logger.verbose(
+      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
+        EventTypeTopicMapping.loadWhiteboardData.targetTopic
+      }`
+    );
+    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
+    // TODO: Return acknowledgement to sending client for robust collaboration
+  }
+
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
   onQueryTableEvent(@MessageBody() message: IMessage<any>) {
     message.context = this.mergeEventTypeIntoMessageContext(
