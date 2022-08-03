@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detective-client/ui';
 import { Observable, map } from 'rxjs';
 
-import { BaseCasefileListComponent } from '../base/base-casefile-list.component';
+import { BaseCasefileListComponent } from '../base';
 import { IGetAllCasefilesResponse } from '../../interfaces';
 
 @Component({
   selector: 'all-casefiles',
   templateUrl: './all-casefiles.component.html',
-  styleUrls: ['./all-casefiles.component.scss'],
+  styleUrls: ['../base/base-casefile-list.component.scss'],
 })
 export class AllCasefilesComponent extends BaseCasefileListComponent implements OnInit {
   casefiles$!: Observable<IGetAllCasefilesResponse>;

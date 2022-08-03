@@ -7,9 +7,11 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
-import { BehaviorSubject, Subject, Subscription, combineLatest, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, combineLatest, map, shareReplay, take, tap } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from '../../services';
 import { ICasefileTableDef } from '../../interfaces';
@@ -18,6 +20,12 @@ import { ICasefileTableDef } from '../../interfaces';
 export class BaseCasefileListComponent implements OnDestroy {
   readonly showTableView$!: BehaviorSubject<boolean>;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly isMobile$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
 
   protected readonly initialPageOffset = 0;
   protected readonly subscriptions = new Subscription();
@@ -32,6 +40,7 @@ export class BaseCasefileListComponent implements OnDestroy {
 
   constructor(
     protected readonly authService: AuthService,
+    protected readonly breakpointObserver: BreakpointObserver,
     protected readonly casefileService: CasefileService,
     protected readonly navigationEventService: NavigationEventService,
     protected readonly tableCellEventService: TableCellEventService,
@@ -43,6 +52,10 @@ export class BaseCasefileListComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  createNewCasefile() {
+    console.log('NEW CASEFILE');
   }
 
   protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {

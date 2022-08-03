@@ -7,16 +7,25 @@ import {
 import { CasefileService, DataSourceService } from './services';
 import { GetAllCasefilesGQL, GetAllDataSourcesGQL, GetCasefilesByAuthorGQL } from './graphql';
 import { NavigationModule, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
+import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
+import { AdminMaterialModule } from './home.material.module';
 import { CommonModule } from '@angular/common';
 import { HomeRoutingModule } from './home-routing.module';
 import { NgModule } from '@angular/core';
-import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
   declarations: [HomeContainerComponent, MyCasefilesComponent, AllCasefilesComponent, DataSourcesComponent],
-  imports: [CommonModule, HomeRoutingModule, NavigationModule, TilesModule, TableModule],
+  imports: [
+    CommonModule,
+    HomeRoutingModule,
+    TranslocoModule,
+    NavigationModule,
+    TilesModule,
+    TableModule,
+    AdminMaterialModule,
+  ],
   providers: [
     {
       provide: TRANSLOCO_SCOPE,

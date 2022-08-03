@@ -1,13 +1,21 @@
-<table-view
-  *ngIf="showTableView$ | async; else showTileView"
-  [tableRows$]="tableItems$"
-  [pageSize]="pageSize"
-  [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
-></table-view>
-<ng-template #showTileView>
-  <tiles-view
-    [tilesInput$]="tileItems$"
+<div class="casefile-list-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'home.casefileList'">
+  <div *ngIf="showTableView$ | async" class="create-casefile-button-wrapper">
+    <button mat-stroked-button (click)="createNewCasefile()">
+      <mat-icon>add</mat-icon>
+      {{ t('createCasefileButtonText') }}
+    </button>
+  </div>
+  <table-view
+    *ngIf="showTableView$ | async; else showTileView"
+    [tableRows$]="tableItems$"
     [pageSize]="pageSize"
     [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
-  ></tiles-view>
-</ng-template>
+  ></table-view>
+  <ng-template #showTileView>
+    <tiles-view
+      [tilesInput$]="tileItems$"
+      [pageSize]="pageSize"
+      [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+    ></tiles-view>
+  </ng-template>
+</div>

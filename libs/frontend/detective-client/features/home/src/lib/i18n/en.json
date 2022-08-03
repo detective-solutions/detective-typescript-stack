@@ -8,6 +8,7 @@
     "sidenavBottomItem": "Admin"
   },
   "casefileList": {
+    "createCasefileButtonText": "New Casefile",
     "columnNames": {
       "accessColumn": "Access",
       "ownerColumn": "Owner",
