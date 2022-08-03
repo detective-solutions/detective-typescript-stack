@@ -65,6 +65,7 @@ jobs:
     if: needs.Detect-Changed-Apps.outputs.skip-build == 'false'
     needs: [Check-Affected-Files, Detect-Changed-Apps]
     strategy:
+      fail-fast: false
       matrix:
         app: ${{fromJSON(needs.Detect-Changed-Apps.outputs.changed-apps)}}
     env:
