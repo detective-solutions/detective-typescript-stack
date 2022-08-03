@@ -49,5 +49,6 @@
       }
     }
   },
-  "tags": ["scope:backend", "type:app"]
+  "tags": ["scope:backend", "type:app"],
+  "libFolderDependencies": ["backend", "shared"]
 }

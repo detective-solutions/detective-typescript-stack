@@ -50,5 +50,5 @@
     }
   },
   "tags": ["scope:backend", "type:app"],
-  "ciDependencyFolders": ["frontend", "shared"]
+  "libFolderDependencies": ["backend", "shared"]
 }
