@@ -1,11 +1,10 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { WhiteboardConsumer, WhiteboardProducer } from './kafka';
 
 import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { WhiteboardConsumer } from './kafka/whiteboard.consumer';
-import { WhiteboardProducer } from './kafka/whiteboard.producer';
-import { WhiteboardWebSocketGateway } from './websocket/whiteboard-websocket.gateway';
+import { WhiteboardWebSocketGateway } from './websocket';
 import { defaultEnvConfig } from './default-env.config';
 import { kafkaClientInjectionToken } from './utils';
 
