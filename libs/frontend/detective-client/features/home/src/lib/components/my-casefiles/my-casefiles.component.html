@@ -1,6 +1,6 @@
 <div class="casefile-list-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'home.casefileList'">
   <div *ngIf="showTableView$ | async" class="create-casefile-button-wrapper">
-    <button mat-stroked-button (click)="createNewCasefile()">
+    <button mat-stroked-button (click)="openNewCasefileDialog()">
       <mat-icon>add</mat-icon>
       {{ t('createCasefileButtonText') }}
     </button>

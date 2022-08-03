@@ -1,0 +1,10 @@
+<div class="casefile-create-dialog-wrapper" *transloco="let t; read: 'home.casefileList.createDialog'">
+  <h1 mat-dialog-title align="center">{{ t('createDialogHeader') }}</h1>
+  <div mat-dialog-content align="center"></div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="createCasefile()">
+      {{ t('createButtonText') }}
+    </button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

@@ -1,5 +1,6 @@
 import {
   AllCasefilesComponent,
+  CasefileCreateDialogComponent,
   DataSourcesComponent,
   HomeContainerComponent,
   MyCasefilesComponent,
@@ -16,7 +17,13 @@ import { NgModule } from '@angular/core';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
-  declarations: [HomeContainerComponent, MyCasefilesComponent, AllCasefilesComponent, DataSourcesComponent],
+  declarations: [
+    HomeContainerComponent,
+    MyCasefilesComponent,
+    AllCasefilesComponent,
+    CasefileCreateDialogComponent,
+    DataSourcesComponent,
+  ],
   imports: [
     CommonModule,
     HomeRoutingModule,

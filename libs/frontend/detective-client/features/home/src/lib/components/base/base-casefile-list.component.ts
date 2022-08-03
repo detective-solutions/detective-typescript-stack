@@ -10,10 +10,13 @@ import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/a
 import { BehaviorSubject, Observable, Subject, Subscription, combineLatest, map, shareReplay, take, tap } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { Casefile } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileCreateDialogComponent } from './dialog';
 import { CasefileService } from '../../services';
+import { ComponentType } from '@angular/cdk/portal';
 import { ICasefileTableDef } from '../../interfaces';
 
 @Component({ template: '' })
@@ -38,9 +41,15 @@ export class BaseCasefileListComponent implements OnDestroy {
     tap((event: ITableCellEvent) => console.log(event))
   );
 
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
+
   constructor(
     protected readonly authService: AuthService,
     protected readonly breakpointObserver: BreakpointObserver,
+    protected readonly matDialog: MatDialog,
     protected readonly casefileService: CasefileService,
     protected readonly navigationEventService: NavigationEventService,
     protected readonly tableCellEventService: TableCellEventService,
@@ -54,8 +63,11 @@ export class BaseCasefileListComponent implements OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  createNewCasefile() {
-    console.log('NEW CASEFILE');
+  openNewCasefileDialog(componentToOpen?: ComponentType<CasefileCreateDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? CasefileCreateDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
   }
 
   protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {

@@ -14,6 +14,14 @@
       "ownerColumn": "Owner",
       "viewsColumn": "Views",
       "lastUpdatedColumn": "Last Updated"
+    },
+    "createDialog": {
+      "createDialogHeader": "Create a new Casefile",
+      "createDialogText": "",
+      "createButtonText": "Create"
+    },
+    "toastMessages": {
+      "formSubmitError": "Could not submit data. Please contact support"
     }
   },
   "dataSourcesList": {
