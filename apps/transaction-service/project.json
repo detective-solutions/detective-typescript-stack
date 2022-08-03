@@ -1,0 +1,53 @@
+{
+  "root": "apps/transaction-service",
+  "sourceRoot": "apps/transaction-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/transaction-service",
+        "main": "apps/transaction-service/src/main.ts",
+        "tsConfig": "apps/transaction-service/tsconfig.app.json",
+        "assets": ["apps/transaction-service/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/transaction-service/src/environments/environment.ts",
+              "with": "apps/transaction-service/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "transaction-service:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/transaction-service/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/transaction-service"],
+      "options": {
+        "jestConfig": "apps/transaction-service/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:backend", "type:app"],
+  "libFolderDependencies": ["backend", "shared"]
+}
