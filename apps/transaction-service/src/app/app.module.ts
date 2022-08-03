@@ -1,6 +1,7 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TransactionConsumer, TransactionProducer } from './kafka';
 
+import { AppService } from './services';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { defaultEnvConfig } from './default-env.config';
@@ -32,6 +33,6 @@ import { kafkaClientInjectionToken } from './utils';
     ]),
   ],
   controllers: [TransactionConsumer],
-  providers: [TransactionProducer],
+  providers: [TransactionProducer, AppService],
 })
 export class AppModule {}
