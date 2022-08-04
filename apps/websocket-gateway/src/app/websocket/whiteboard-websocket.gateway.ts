@@ -1,5 +1,5 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, IMessage, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 
@@ -168,7 +168,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     return contextKeysToCheck.every((contextKey) => messageContext[contextKey] === webSocketClientContext[contextKey]);
   }
 
-  private mergeEventTypeIntoMessageContext(eventType: string, messageContext: IMessageContext): IMessageContext {
+  private mergeEventTypeIntoMessageContext(
+    eventType: MessageEventType,
+    messageContext: IMessageContext
+  ): IMessageContext {
     return { eventType, ...messageContext };
   }
 }
