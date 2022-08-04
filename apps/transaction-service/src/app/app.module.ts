@@ -1,4 +1,4 @@
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
 import { DatabaseService, EventCoordinatorService } from './services';
 import { TransactionConsumer, TransactionProducer } from './kafka';
 
@@ -7,7 +7,7 @@ import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc
 import { Module } from '@nestjs/common';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
-import { kafkaClientInjectionToken } from './utils';
+import { microserviceConfig } from './microservice-config';
 
 @Module({
   imports: [
@@ -16,24 +16,7 @@ import { kafkaClientInjectionToken } from './utils';
       cache: true,
       validationSchema: defaultEnvConfig,
     }),
-    ClientsModule.register([
-      {
-        name: kafkaClientInjectionToken,
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: 'transaction-service',
-            brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`],
-            retry: {
-              retries: +process.env.KAFKA_CONNECTION_RETRIES,
-            },
-          },
-          consumer: {
-            groupId: 'transaction-service-consumer',
-          },
-        },
-      },
-    ]),
+    ClientsModule.register([microserviceConfig] as ClientsModuleOptions),
     DGraphGrpcClientModule.register({
       stubs: [{ address: `${process.env.DATABASE_GRPC_SERVICE_NAME}:${process.env.DATABASE_GRPC_PORT}` }],
       debug: !environment.production,

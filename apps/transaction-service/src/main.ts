@@ -1,13 +1,13 @@
-import { Logger, applyDecorators } from '@nestjs/common';
+import { KafkaOptions, MicroserviceOptions } from '@nestjs/microservices';
 
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
-import { MicroserviceOptions } from '@nestjs/microservices';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { microserviceConfig } from './app/microservice-config';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, microserviceConfig);
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, microserviceConfig as KafkaOptions);
   await app.listen();
 
   const kafkaPort = app.get(ConfigService).get('KAFKA_PORT');
