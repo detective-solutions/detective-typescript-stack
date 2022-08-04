@@ -1,25 +1,25 @@
 import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 
-import { AppService } from '../services';
+import { EventCoordinatorService } from '../services';
 import { Test } from '@nestjs/testing';
 import { TransactionConsumer } from './transaction.consumer';
 
-const mockAppService = {
-  setData: jest.fn(),
+const mockEventCoordinatorService = {
+  handleTransactionByType: jest.fn(),
 };
 
 describe('TransactionConsumer', () => {
   let transactionConsumer: TransactionConsumer;
-  let appService: AppService;
+  let eventCoordinatorService: EventCoordinatorService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [TransactionConsumer],
-      providers: [{ provide: AppService, useValue: mockAppService }],
+      providers: [{ provide: EventCoordinatorService, useValue: mockEventCoordinatorService }],
     }).compile();
 
     transactionConsumer = moduleRef.get<TransactionConsumer>(TransactionConsumer);
-    appService = moduleRef.get<AppService>(AppService);
+    eventCoordinatorService = moduleRef.get<EventCoordinatorService>(EventCoordinatorService);
   });
 
   afterEach(() => {
@@ -38,7 +38,7 @@ describe('TransactionConsumer', () => {
         key: 'testKey',
         value: {
           context: {
-            eventType: MessageEventType.QueryTable,
+            eventType: MessageEventType.LoadWhiteboardData,
             tenantId: 'tenantId',
             casefileId: 'casefileId',
             userId: 'userId',
@@ -51,12 +51,12 @@ describe('TransactionConsumer', () => {
         headers: {},
         topic: 'testTopic',
       };
-      const appServiceSpy = jest.spyOn(appService, 'setData');
+      const eventCoordinatorSpy = jest.spyOn(eventCoordinatorService, 'handleTransactionByType');
 
       transactionConsumer.forwardTransaction(testKafkaMessage);
 
-      expect(appServiceSpy).toBeCalledTimes(1);
-      expect(appServiceSpy).toBeCalledWith(testKafkaMessage.value);
+      expect(eventCoordinatorSpy).toBeCalledTimes(1);
+      expect(eventCoordinatorSpy).toBeCalledWith(testKafkaMessage.value.context.eventType, testKafkaMessage.value);
     });
   });
 });

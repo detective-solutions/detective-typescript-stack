@@ -1,6 +1,6 @@
 import { Controller, Logger } from '@nestjs/common';
 
-import { AppService } from '../services';
+import { EventCoordinatorService } from '../services';
 import { EventPattern } from '@nestjs/microservices';
 import { IKafkaMessage } from '@detective.solutions/shared/data-access';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
@@ -9,7 +9,7 @@ import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 export class TransactionConsumer {
   private readonly logger = new Logger(TransactionConsumer.name);
 
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly eventTypeService: EventCoordinatorService) {}
 
   @EventPattern('transaction')
   forwardTransaction(data: IKafkaMessage) {
@@ -18,6 +18,7 @@ export class TransactionConsumer {
         data.topic
       } with timestamp ${data.timestamp}`
     );
-    this.appService.setData(data.value);
+    console.log('INCOMING DATA:', data);
+    this.eventTypeService.handleTransactionByType(data.value.context.eventType, data.value);
   }
 }
