@@ -2,6 +2,10 @@ import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc
 import { DatabaseService } from './database.service';
 import { EventCoordinatorService } from './event-coordinator.service';
 import { Test } from '@nestjs/testing';
+import { TransactionProducer } from '../kafka';
+
+const databaseServiceMock = {};
+const transactionProducerMock = {};
 
 describe('AppService', () => {
   let service: EventCoordinatorService;
@@ -9,7 +13,11 @@ describe('AppService', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       imports: [DGraphGrpcClientModule.register({ stubs: [{ address: 'test' }], debug: true })],
-      providers: [EventCoordinatorService, DatabaseService],
+      providers: [
+        EventCoordinatorService,
+        { provide: DatabaseService, useValue: databaseServiceMock },
+        { provide: TransactionProducer, useValue: transactionProducerMock },
+      ],
     }).compile();
 
     service = app.get<EventCoordinatorService>(EventCoordinatorService);
