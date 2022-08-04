@@ -11,8 +11,8 @@ export class TransactionConsumer {
 
   constructor(private readonly eventCoordinatorService: EventCoordinatorService) {}
 
-  @EventPattern('transaction')
-  consumeTransaction(data: IKafkaMessage) {
+  @EventPattern('transaction_input')
+  consumeTransactionInput(data: IKafkaMessage) {
     this.logger.verbose(
       `${buildLogContext(data.value.context)} Consuming message ${data.offset} from topic ${
         data.topic
