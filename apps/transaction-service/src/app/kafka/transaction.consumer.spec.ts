@@ -30,7 +30,7 @@ describe('TransactionConsumer', () => {
     expect(transactionConsumer).toBeDefined();
   });
 
-  describe('forwardTransaction', () => {
+  describe('consumeTransaction', () => {
     it('should correctly forward the value property of an incoming Kafka message', () => {
       const testKafkaMessage: IKafkaMessage = {
         timestamp: '123456',
@@ -53,7 +53,7 @@ describe('TransactionConsumer', () => {
       };
       const eventCoordinatorSpy = jest.spyOn(eventCoordinatorService, 'handleTransactionByType');
 
-      transactionConsumer.forwardTransaction(testKafkaMessage);
+      transactionConsumer.consumeTransaction(testKafkaMessage);
 
       expect(eventCoordinatorSpy).toBeCalledTimes(1);
       expect(eventCoordinatorSpy).toBeCalledWith(testKafkaMessage.value.context.eventType, testKafkaMessage.value);
