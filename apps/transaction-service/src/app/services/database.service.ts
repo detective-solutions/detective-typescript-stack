@@ -14,20 +14,37 @@ export class DatabaseService {
 
   async getCasefileDataById(id: string) {
     interface CasefileDataApiResponse {
-      id: string;
-      title: string;
+      casefileData: {
+        id: string;
+        title: string;
+        tableObjects: {
+          xid: string;
+          name: string;
+          layout: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+          };
+        }[];
+      };
     }
 
     const query = `
       query casefileData($id: string) {
-        casefileData(func: eq(Casefile.xid, $id)) @normalize {
+        casefileData(func: eq(Casefile.xid, $id)) {
           id: Casefile.xid
           title: Casefile.title
-          Casefile.tableObjects
+          tableObjects: Casefile.tableObjects
             {
               xid: TableObject.xid
               name: TableObject.name
-
+              layout: TableObject.layout {
+                x: TableNodeLayout.x
+                y: TableNodeLayout.y
+                width: TableNodeLayout.width
+                height: TableNodeLayout.height
+              }
             }
         }
       }
