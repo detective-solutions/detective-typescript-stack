@@ -1,4 +1,5 @@
 import { ClientKafka } from '@nestjs/microservices';
+import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { Test } from '@nestjs/testing';
 import { WhiteboardProducer } from './whiteboard.producer';
 import { kafkaClientInjectionToken } from '../utils';
@@ -40,7 +41,7 @@ describe('WhiteboardProducer', () => {
         context: {
           tenantId: uuidv4(),
           casefileId: uuidv4(),
-          eventType: 'testEvent',
+          eventType: MessageEventType.QueryTable,
           nodeId: uuidv4(),
           userId: uuidv4(),
           userRole: 'admin',

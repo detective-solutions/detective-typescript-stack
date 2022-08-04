@@ -4,6 +4,7 @@ import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { Test } from '@nestjs/testing';
 import { WS } from 'jest-websocket-mock';
 import { WebSocket } from 'ws';
@@ -20,7 +21,7 @@ const mockWhiteboardProducer = {
 
 describe('WhiteboardWebsocketGateway', () => {
   const webSocketUrl = 'ws://localhost:1234';
-  const testEventType = 'TEST_EVENT';
+  const testEventType = MessageEventType.QueryTable;
   const testMessageBody = { test: 'test' };
 
   const context1 = {
