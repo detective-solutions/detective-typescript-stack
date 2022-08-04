@@ -22,6 +22,6 @@ export class EventCoordinatorService {
     }
     this.logger.debug(casefileData);
     payload.body = casefileData;
-    this.transactionProducer.sendKafkaMessage('transaction_output', payload);
+    this.transactionProducer.sendKafkaMessage('transaction_output_unicast', payload);
   }
 }
