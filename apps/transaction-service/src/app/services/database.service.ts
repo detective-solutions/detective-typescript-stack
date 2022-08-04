@@ -1,6 +1,7 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
+import { ICasefileDataApiResponse } from '../models';
 import { TxnOptions } from 'dgraph-js';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -12,24 +13,7 @@ export class DatabaseService {
 
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
 
-  async getCasefileDataById(id: string) {
-    interface CasefileDataApiResponse {
-      casefileData: {
-        id: string;
-        title: string;
-        tableObjects: {
-          xid: string;
-          name: string;
-          layout: {
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-          };
-        }[];
-      };
-    }
-
+  async getCasefileDataById(id: string): Promise<ICasefileDataApiResponse> | null {
     const query = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
@@ -53,7 +37,7 @@ export class DatabaseService {
     this.logger.log(`Requesting data for casefile ${id} from the database`);
 
     const queryVariables = { $id: id };
-    const response = (await this.sendQuery(query, queryVariables)) as CasefileDataApiResponse;
+    const response = (await this.sendQuery(query, queryVariables)) as ICasefileDataApiResponse;
     if (!response) {
       return null;
     }
