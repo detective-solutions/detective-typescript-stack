@@ -21,13 +21,14 @@ import { kafkaClientInjectionToken } from './utils';
         transport: Transport.KAFKA,
         options: {
           client: {
+            clientId: 'websocket-gateway',
             brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`],
             retry: {
-              retries: 30,
+              retries: +process.env.KAFKA_CONNECTION_RETRIES,
             },
           },
           consumer: {
-            groupId: 'websocket-gateway',
+            groupId: 'websocket-gateway-consumer',
           },
         },
       },
