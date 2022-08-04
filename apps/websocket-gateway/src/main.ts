@@ -13,7 +13,7 @@ async function bootstrap() {
   await app.listen();
 
   const kafkaPort = app.get(ConfigService).get('KAFKA_PORT');
-  Logger.log(`🚀 Application is running on ports 7777 (WebSockets) and ${kafkaPort} (Kafka)`);
+  Logger.log(`🚀 Application is running on port 7777 (WebSockets) and listening to port ${kafkaPort} (Kafka)`);
 }
 
 bootstrap();
