@@ -1,8 +1,8 @@
 import { Controller, Logger } from '@nestjs/common';
+import { IKafkaMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { EventPattern } from '@nestjs/microservices';
-import { IKafkaMessage } from '@detective.solutions/shared/data-access';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
@@ -12,7 +12,7 @@ export class WhiteboardConsumer {
 
   constructor(private readonly webSocketGateway: WhiteboardWebSocketGateway) {}
 
-  @EventPattern('transaction_output_unicast')
+  @EventPattern(KafkaTopic.TransactionOutputUnicast)
   forwardUnicastTransactionOutput(data: IKafkaMessage) {
     this.logger.verbose(
       `${buildLogContext(data.value.context)} Consuming unicast message ${data.offset} from topic ${
@@ -22,7 +22,7 @@ export class WhiteboardConsumer {
     this.webSocketGateway.sendMessageByContext(data.value, unicastWebSocketContext);
   }
 
-  @EventPattern('transaction_output_broadcast')
+  @EventPattern(KafkaTopic.TransactionOutputBroadcast)
   forwardBroadcastTransactionOutput(data: IKafkaMessage) {
     this.logger.verbose(
       `${buildLogContext(data.value.context)} Consuming broadcast message ${data.offset} from topic ${
@@ -32,7 +32,7 @@ export class WhiteboardConsumer {
     this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
   }
 
-  @EventPattern('casefile')
+  @EventPattern(KafkaTopic.QueryOutput)
   forwardQueryExecution(data: IKafkaMessage) {
     this.logger.verbose(
       `${buildLogContext(data.value.context)} Consuming message ${data.offset} from topic ${

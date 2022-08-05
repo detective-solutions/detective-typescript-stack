@@ -1,6 +1,6 @@
-import { MessageEventType } from '@detective.solutions/shared/data-access';
+import { KafkaTopic, MessageEventType } from '@detective.solutions/shared/data-access';
 
 export const EventTypeTopicMapping = {
-  loadWhiteboardData: { eventType: MessageEventType.LoadWhiteboardData, targetTopic: 'transaction_input' },
-  queryTable: { eventType: MessageEventType.QueryTable, targetTopic: 'masking' },
+  loadWhiteboardData: { eventType: MessageEventType.LoadWhiteboardData, targetTopic: KafkaTopic.TransactionInput },
+  queryTable: { eventType: MessageEventType.QueryTable, targetTopic: KafkaTopic.QueryInput },
 };
