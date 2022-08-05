@@ -1,15 +1,19 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 
-import { EventCoordinatorService } from '../services';
 import { EventPattern } from '@nestjs/microservices';
 import { IKafkaMessage } from '@detective.solutions/shared/data-access';
+import { TransactionCoordinationService } from '../services';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
+import { coordinationServiceInjectionToken } from '../utils';
 
 @Controller()
 export class TransactionConsumer {
   private readonly logger = new Logger(TransactionConsumer.name);
 
-  constructor(private readonly eventCoordinatorService: EventCoordinatorService) {}
+  constructor(
+    @Inject(coordinationServiceInjectionToken)
+    private readonly coordinationService: TransactionCoordinationService
+  ) {}
 
   @EventPattern('transaction_input')
   consumeTransactionInput(data: IKafkaMessage) {
@@ -19,6 +23,6 @@ export class TransactionConsumer {
       } with timestamp ${data.timestamp}`
     );
     console.log('INCOMING DATA:', data);
-    this.eventCoordinatorService.handleTransactionByType(data.value.context.eventType, data.value);
+    this.coordinationService.handleTransactionByType(data.value.context.eventType, data.value);
   }
 }

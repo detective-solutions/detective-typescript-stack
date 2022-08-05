@@ -1,8 +1,8 @@
 import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 
-import { EventCoordinatorService } from '../services';
 import { Test } from '@nestjs/testing';
 import { TransactionConsumer } from './transaction.consumer';
+import { TransactionCoordinationService } from '../services';
 
 const mockEventCoordinatorService = {
   handleTransactionByType: jest.fn(),
@@ -10,16 +10,16 @@ const mockEventCoordinatorService = {
 
 xdescribe('TransactionConsumer', () => {
   let transactionConsumer: TransactionConsumer;
-  let eventCoordinatorService: EventCoordinatorService;
+  let eventCoordinatorService: TransactionCoordinationService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [TransactionConsumer],
-      providers: [{ provide: EventCoordinatorService, useValue: mockEventCoordinatorService }],
+      providers: [{ provide: TransactionCoordinationService, useValue: mockEventCoordinatorService }],
     }).compile();
 
     transactionConsumer = moduleRef.get<TransactionConsumer>(TransactionConsumer);
-    eventCoordinatorService = moduleRef.get<EventCoordinatorService>(EventCoordinatorService);
+    eventCoordinatorService = moduleRef.get<TransactionCoordinationService>(TransactionCoordinationService);
   });
 
   afterEach(() => {

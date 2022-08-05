@@ -1,10 +1,11 @@
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
-import { DatabaseService, EventCoordinatorService } from './services';
+import { DatabaseService, TransactionCoordinationService } from './services';
 import { TransactionConsumer, TransactionProducer } from './kafka';
 
 import { ConfigModule } from '@nestjs/config';
 import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { Module } from '@nestjs/common';
+import { coordinationServiceInjectionToken } from './utils';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
 import { microserviceConfig } from './microservice-config';
@@ -23,6 +24,10 @@ import { microserviceConfig } from './microservice-config';
     }),
   ],
   controllers: [TransactionConsumer],
-  providers: [TransactionProducer, EventCoordinatorService, DatabaseService],
+  providers: [
+    TransactionProducer,
+    { provide: coordinationServiceInjectionToken, useClass: TransactionCoordinationService },
+    DatabaseService,
+  ],
 })
 export class AppModule {}

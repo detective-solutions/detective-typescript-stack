@@ -7,8 +7,8 @@ import { TransactionProducer } from '../kafka';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
-export class EventCoordinatorService {
-  readonly logger = new Logger(EventCoordinatorService.name);
+export class TransactionCoordinationService {
+  readonly logger = new Logger(TransactionCoordinationService.name);
 
   constructor(
     private readonly databaseService: DatabaseService,

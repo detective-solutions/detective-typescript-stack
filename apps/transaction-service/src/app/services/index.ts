@@ -1,2 +1,2 @@
 export * from './database.service';
-export * from './event-coordinator.service';
+export * from './transaction-coordination.service';
