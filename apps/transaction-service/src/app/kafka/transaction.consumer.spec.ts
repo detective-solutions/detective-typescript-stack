@@ -1,25 +1,27 @@
 import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 
+import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionConsumer } from './transaction.consumer';
 import { TransactionCoordinationService } from '../services';
+import { coordinationServiceInjectionToken } from '../utils';
 
 const mockEventCoordinatorService = {
-  handleTransactionByType: jest.fn(),
+  createTransactionByEventType: jest.fn(),
 };
 
-xdescribe('TransactionConsumer', () => {
+describe('TransactionConsumer', () => {
   let transactionConsumer: TransactionConsumer;
-  let eventCoordinatorService: TransactionCoordinationService;
+  let coordinationService: TransactionCoordinationService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [TransactionConsumer],
-      providers: [{ provide: TransactionCoordinationService, useValue: mockEventCoordinatorService }],
+      providers: [{ provide: coordinationServiceInjectionToken, useValue: mockEventCoordinatorService }],
     }).compile();
 
     transactionConsumer = moduleRef.get<TransactionConsumer>(TransactionConsumer);
-    eventCoordinatorService = moduleRef.get<TransactionCoordinationService>(TransactionCoordinationService);
+    coordinationService = moduleRef.get<TransactionCoordinationService>(coordinationServiceInjectionToken);
   });
 
   afterEach(() => {
@@ -51,12 +53,56 @@ xdescribe('TransactionConsumer', () => {
         headers: {},
         topic: 'testTopic',
       };
-      const eventCoordinatorSpy = jest.spyOn(eventCoordinatorService, 'handleTransactionByType');
+      const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
 
       transactionConsumer.consumeTransactionInput(testKafkaMessage);
 
-      expect(eventCoordinatorSpy).toBeCalledTimes(1);
-      expect(eventCoordinatorSpy).toBeCalledWith(testKafkaMessage.value.context.eventType, testKafkaMessage.value);
+      expect(coordinationServiceSpy).toBeCalledTimes(1);
+      expect(coordinationServiceSpy).toBeCalledWith(testKafkaMessage.value.context.eventType, testKafkaMessage.value);
+    });
+
+    it('should thrown a BadRequestException if a consumed message is missing its context information', () => {
+      const testKafkaMessage: IKafkaMessage = {
+        timestamp: '123456',
+        offset: '212',
+        key: 'testKey',
+        value: {
+          context: undefined,
+          body: {},
+        },
+        headers: {},
+        topic: 'testTopic',
+      };
+      const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
+
+      expect(() => transactionConsumer.consumeTransactionInput(testKafkaMessage)).toThrow(BadRequestException);
+      expect(coordinationServiceSpy).toBeCalledTimes(0);
+    });
+
+    it('should thrown a BadRequestException if a consumed message is missing an event type', () => {
+      const testKafkaMessage: IKafkaMessage = {
+        timestamp: '123456',
+        offset: '212',
+        key: 'testKey',
+        value: {
+          context: {
+            eventType: undefined,
+            tenantId: 'tenantId',
+            casefileId: 'casefileId',
+            userId: 'userId',
+            userRole: 'admin',
+            nodeId: 'nodeId',
+            timestamp: 123456,
+          },
+          body: {},
+        },
+        headers: {},
+        topic: 'testTopic',
+      };
+      const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
+
+      expect(() => transactionConsumer.consumeTransactionInput(testKafkaMessage)).toThrow(BadRequestException);
+      expect(coordinationServiceSpy).toBeCalledTimes(0);
     });
   });
 });
