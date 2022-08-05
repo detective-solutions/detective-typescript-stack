@@ -13,32 +13,32 @@ export class WhiteboardConsumer {
   constructor(private readonly webSocketGateway: WhiteboardWebSocketGateway) {}
 
   @EventPattern(KafkaTopic.TransactionOutputUnicast)
-  forwardUnicastTransactionOutput(data: IKafkaMessage) {
+  forwardUnicastTransactionOutput(message: IKafkaMessage) {
     this.logger.verbose(
-      `${buildLogContext(data.value.context)} Consuming unicast message ${data.offset} from topic ${
-        data.topic
-      } with timestamp ${data.timestamp}`
+      `${buildLogContext(message.value.context)} Consuming unicast message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
     );
-    this.webSocketGateway.sendMessageByContext(data.value, unicastWebSocketContext);
+    this.webSocketGateway.sendMessageByContext(message.value, unicastWebSocketContext);
   }
 
   @EventPattern(KafkaTopic.TransactionOutputBroadcast)
-  forwardBroadcastTransactionOutput(data: IKafkaMessage) {
+  forwardBroadcastTransactionOutput(message: IKafkaMessage) {
     this.logger.verbose(
-      `${buildLogContext(data.value.context)} Consuming broadcast message ${data.offset} from topic ${
-        data.topic
-      } with timestamp ${data.timestamp}`
+      `${buildLogContext(message.value.context)} Consuming broadcast message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
     );
-    this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
+    this.webSocketGateway.sendMessageByContext(message.value, broadcastWebSocketContext);
   }
 
   @EventPattern(KafkaTopic.QueryOutput)
-  forwardQueryExecution(data: IKafkaMessage) {
+  forwardQueryExecution(message: IKafkaMessage) {
     this.logger.verbose(
-      `${buildLogContext(data.value.context)} Consuming message ${data.offset} from topic ${
-        data.topic
-      } with timestamp ${data.timestamp}`
+      `${buildLogContext(message.value.context)} Consuming message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
     );
-    this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
+    this.webSocketGateway.sendMessageByContext(message.value, broadcastWebSocketContext);
   }
 }
