@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { DatabaseService } from './database.service';
 import { TransactionProducer } from '../kafka';
+import { WhiteboardTransactionFactory } from '../transactions';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -15,13 +16,16 @@ export class TransactionCoordinationService {
     private readonly transactionProducer: TransactionProducer
   ) {}
 
-  async handleTransactionByType(transactionType: MessageEventType, payload: IMessage<any>): Promise<void> {
-    const casefileData = await this.databaseService.getCasefileDataById(payload.context.casefileId);
-    if (!casefileData) {
-      // TODO: Handle error case
-    }
-    this.logger.debug(casefileData);
-    payload.body = casefileData;
-    this.transactionProducer.sendKafkaMessage('transaction_output_unicast', payload);
+  async createTransactionByEventType(eventType: MessageEventType, messagePayload: IMessage<any>): Promise<void> {
+    WhiteboardTransactionFactory.createTransaction(eventType, messagePayload);
   }
+
+  // private async loadWhiteboardData(messagePayload: IMessage<any>) {
+  //   const casefileData = await this.databaseService.getCasefileDataById(messagePayload.context.casefileId);
+  //   if (!casefileData) {
+  //     // TODO: Handle error case
+  //   }
+  //   messagePayload.body = casefileData;
+  //   this.transactionProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, messagePayload);
+  // }
 }
