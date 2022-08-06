@@ -1,8 +1,8 @@
+import { Injectable, Logger } from '@nestjs/common';
 import { SingleTransactionKey, TransactionKeys, transactionMap } from './transaction-map';
 
 import { DatabaseService } from '../../services';
 import { IMessage } from '@detective.solutions/shared/data-access';
-import { Injectable } from '@nestjs/common';
 import { TransactionProducer } from '../../kafka';
 import { TransactionServiceRefs } from './transaction-service-refs.type';
 import { WhiteboardTransaction } from '../abstract';
@@ -11,6 +11,8 @@ import { WhiteboardTransaction } from '../abstract';
 
 @Injectable()
 export class WhiteboardTransactionFactory {
+  readonly logger = new Logger(WhiteboardTransactionFactory.name);
+
   serviceRefs: TransactionServiceRefs = {
     transactionProducer: this.transactionProducer,
     databaseService: this.databaseService,
@@ -26,8 +28,8 @@ export class WhiteboardTransactionFactory {
     eventType: SingleTransactionKey<K>,
     messagePayload: IMessage<any>
   ): void {
-    let transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
-    // Make sure to remove transaction reference after execution to allow successful garbage collection
-    transaction.execute().then(() => (transaction = null));
+    const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
+    this.logger.log(`Created transaction for event type ${eventType as string}`);
+    transaction.execute();
   }
 }
