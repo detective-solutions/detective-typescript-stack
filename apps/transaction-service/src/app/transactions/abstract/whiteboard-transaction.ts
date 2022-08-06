@@ -4,6 +4,8 @@ import { Transaction } from './transaction';
 import { TransactionProducer } from '../../kafka';
 import { TransactionServiceRefs } from '../factory';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export abstract class WhiteboardTransaction extends Transaction {
   transactionProducer: TransactionProducer;
   databaseService: DatabaseService;
