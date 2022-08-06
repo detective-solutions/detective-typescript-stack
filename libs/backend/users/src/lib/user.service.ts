@@ -60,7 +60,7 @@ export class UserService {
       jwtUserInfo: JwtUserInfo[];
     }
 
-    // Make sure the query matches JWTUserInfo properties
+    // Make sure the query matches JWTUserInfo DTO properties
     const query = `
       query jwtUserInfo($email: string) {
         jwtUserInfo(func: eq(User.email, $email)) @normalize {
@@ -109,7 +109,7 @@ export class UserService {
       jwtUserInfo: JwtUserInfo[];
     }
 
-    // Make sure the query matches JWTUserInfo properties
+    // Make sure the query matches JWTUserInfo DTO properties
     const query = `
       query jwtUserInfo($id: string) {
         jwtUserInfo(func: eq(User.xid, $id)) @normalize {
