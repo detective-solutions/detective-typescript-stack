@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { SingleTransactionKey, TransactionKeys, transactionMap } from './transaction-map';
 
 import { DatabaseService } from '../../services';
@@ -28,8 +28,15 @@ export class WhiteboardTransactionFactory {
     eventType: SingleTransactionKey<K>,
     messagePayload: IMessage<any>
   ): void {
-    const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
-    this.logger.log(`Created transaction for event type ${eventType as string}`);
-    transaction.execute();
+    try {
+      const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
+      this.logger.log(`Created transaction for event type ${eventType as string}`);
+      transaction.execute();
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(
+        `Could not map event type ${eventType as string} to a corresponding transaction`
+      );
+    }
   }
 }
