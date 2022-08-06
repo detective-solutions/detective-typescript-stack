@@ -3,9 +3,11 @@ import { DatabaseService } from './database.service';
 import { Test } from '@nestjs/testing';
 import { TransactionCoordinationService } from './transaction-coordination.service';
 import { TransactionProducer } from '../kafka';
+import { WhiteboardTransactionFactory } from '../transactions';
 
 const databaseServiceMock = {};
 const transactionProducerMock = {};
+const whiteboardTransactionFactoryMock = {};
 
 describe('AppService', () => {
   let service: TransactionCoordinationService;
@@ -17,6 +19,7 @@ describe('AppService', () => {
         TransactionCoordinationService,
         { provide: DatabaseService, useValue: databaseServiceMock },
         { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: WhiteboardTransactionFactory, useValue: whiteboardTransactionFactoryMock },
       ],
     }).compile();
 
