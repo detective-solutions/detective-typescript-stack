@@ -25,6 +25,9 @@ describe('TransactionProducer', () => {
 
     transactionProducer = moduleRef.get<TransactionProducer>(TransactionProducer);
     client = moduleRef.get<ClientKafka>(kafkaClientInjectionToken);
+
+    // Disable logger for test runs
+    transactionProducer.logger.localInstance.setLogLevels([]);
   });
 
   afterEach(() => {

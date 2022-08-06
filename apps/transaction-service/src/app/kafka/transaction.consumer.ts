@@ -9,7 +9,7 @@ import { coordinationServiceInjectionToken } from '../utils';
 
 @Controller()
 export class TransactionConsumer {
-  private readonly logger = new Logger(TransactionConsumer.name);
+  readonly logger = new Logger(TransactionConsumer.name);
 
   constructor(
     @Inject(coordinationServiceInjectionToken)

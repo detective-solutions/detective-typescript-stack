@@ -22,6 +22,9 @@ describe('TransactionConsumer', () => {
 
     transactionConsumer = moduleRef.get<TransactionConsumer>(TransactionConsumer);
     coordinationService = moduleRef.get<TransactionCoordinationService>(coordinationServiceInjectionToken);
+
+    // Disable logger for test runs
+    transactionConsumer.logger.localInstance.setLogLevels([]);
   });
 
   afterEach(() => {

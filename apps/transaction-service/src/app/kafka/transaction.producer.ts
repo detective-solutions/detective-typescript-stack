@@ -9,7 +9,7 @@ import { kafkaClientInjectionToken } from '../utils';
 
 @Injectable()
 export class TransactionProducer {
-  private readonly logger = new Logger(TransactionProducer.name);
+  readonly logger = new Logger(TransactionProducer.name);
 
   constructor(@Inject(kafkaClientInjectionToken) private readonly client: ClientKafka) {}
 
