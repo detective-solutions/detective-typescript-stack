@@ -27,10 +27,7 @@ export class WhiteboardTransactionFactory {
     messagePayload: IMessage<any>
   ): void {
     let transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
-    // Remove the reference after transaction execution to allow garbage collection
-    transaction.execute().then(() => {
-      transaction = null;
-      console.log('TRANSACTION REMOVED SUCCESSFULLY');
-    });
+    // Make sure to remove transaction reference after execution to allow successful garbage collection
+    transaction.execute().then(() => (transaction = null));
   }
 }
