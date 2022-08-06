@@ -37,7 +37,7 @@ describe('TransactionProducer', () => {
   describe('sendKafkaMessage', () => {
     it('should correctly forward the topic name and message payload to the client emit method', () => {
       const testTopicName = 'testTopic';
-      const testMessage = {
+      const testPayload = {
         context: {
           tenantId: uuidv4(),
           casefileId: uuidv4(),
@@ -51,10 +51,10 @@ describe('TransactionProducer', () => {
       };
       const emitSpy = jest.spyOn(client, 'emit');
 
-      transactionProducer.sendKafkaMessage(testTopicName, testMessage);
+      transactionProducer.sendKafkaMessage(testTopicName, testPayload);
 
       expect(emitSpy).toBeCalledTimes(1);
-      expect(emitSpy).toBeCalledWith(testTopicName, testMessage);
+      expect(emitSpy).toBeCalledWith(testTopicName, testPayload);
     });
   });
 });

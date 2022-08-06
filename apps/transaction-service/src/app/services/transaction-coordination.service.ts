@@ -11,7 +11,7 @@ export class TransactionCoordinationService {
 
   constructor(private readonly whiteboardTransactionFactory: WhiteboardTransactionFactory) {}
 
-  async createTransactionByEventType(eventType: MessageEventType, messagePayload: IMessage<any>): Promise<void> {
-    this.whiteboardTransactionFactory.createTransaction(eventType, messagePayload);
+  async createTransactionByEventType(eventType: MessageEventType, payload: IMessage<any>): Promise<void> {
+    this.whiteboardTransactionFactory.createTransaction(eventType, payload);
   }
 }
