@@ -1,4 +1,4 @@
-import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/data-access';
+import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -44,7 +44,7 @@ describe('TransactionConsumer', () => {
             tenantId: 'tenantId',
             casefileId: 'casefileId',
             userId: 'userId',
-            userRole: 'admin',
+            userRole: UserRole.ADMIN,
             nodeId: 'nodeId',
             timestamp: 123456,
           },
@@ -90,7 +90,7 @@ describe('TransactionConsumer', () => {
             tenantId: 'tenantId',
             casefileId: 'casefileId',
             userId: 'userId',
-            userRole: 'admin',
+            userRole: UserRole.ADMIN,
             nodeId: 'nodeId',
             timestamp: 123456,
           },

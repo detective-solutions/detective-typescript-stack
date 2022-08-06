@@ -1,4 +1,4 @@
-import { IKafkaMessage, MessageEventType } from '@detective.solutions/shared/data-access';
+import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { Test } from '@nestjs/testing';
 import { WhiteboardConsumer } from './whiteboard.consumer';
@@ -43,7 +43,7 @@ describe('WhiteboardConsumer', () => {
             tenantId: 'tenantId',
             casefileId: 'casefileId',
             userId: 'userId',
-            userRole: 'admin',
+            userRole: UserRole.ADMIN,
             nodeId: 'nodeId',
             timestamp: 123456,
           },

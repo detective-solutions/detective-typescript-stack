@@ -1,5 +1,6 @@
+import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+
 import { ClientKafka } from '@nestjs/microservices';
-import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { Test } from '@nestjs/testing';
 import { TransactionProducer } from './transaction.producer';
 import { kafkaClientInjectionToken } from '../utils';
@@ -44,7 +45,7 @@ describe('TransactionProducer', () => {
           eventType: MessageEventType.LoadWhiteboardData,
           nodeId: uuidv4(),
           userId: uuidv4(),
-          userRole: 'admin',
+          userRole: UserRole.ADMIN,
           timestamp: 123,
         },
         body: { test: '123' },

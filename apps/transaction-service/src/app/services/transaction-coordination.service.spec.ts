@@ -1,5 +1,6 @@
+import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+
 import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
-import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { Test } from '@nestjs/testing';
 import { TransactionCoordinationService } from './transaction-coordination.service';
 import { WhiteboardTransactionFactory } from '../transactions';
@@ -38,7 +39,7 @@ describe('TransactionCoordinationService', () => {
           eventType: MessageEventType.LoadWhiteboardData,
           nodeId: uuidv4(),
           userId: uuidv4(),
-          userRole: 'admin',
+          userRole: UserRole.ADMIN,
           timestamp: 123,
         },
         body: { test: '123' },
