@@ -9,4 +9,5 @@ export interface ICasefile {
   views?: number;
   editors?: IUser[];
   lastUpdated?: Date | null | string;
+  tableObjects: any[]; // TODO: Specify TableNodes type
 }

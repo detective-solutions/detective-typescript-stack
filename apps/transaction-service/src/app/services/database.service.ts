@@ -1,8 +1,10 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
+import { Casefile } from '@detective.solutions/backend/shared/data-access';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
-import { ICasefileDataApiResponse } from '../models';
+import { ICasefile } from '@detective.solutions/shared/data-access';
 import { TxnOptions } from 'dgraph-js';
+import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -13,7 +15,11 @@ export class DatabaseService {
 
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
 
-  async getCasefileDataById(id: string): Promise<ICasefileDataApiResponse> | null {
+  async getCasefileById(id: string): Promise<Casefile> | null {
+    interface ICasefileDataApiResponse {
+      casefileData: ICasefile[];
+    }
+
     const query = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
@@ -34,14 +40,34 @@ export class DatabaseService {
       }
     `;
 
-    this.logger.log(`Requesting data for casefile ${id} from the database`);
+    this.logger.verbose(`Requesting data for casefile ${id}`);
 
     const queryVariables = { $id: id };
     const response = (await this.sendQuery(query, queryVariables)) as ICasefileDataApiResponse;
     if (!response) {
       return null;
     }
-    return response;
+
+    if (!response.casefileData) {
+      this.logger.error('Incoming database response object is missing "jwtUserInfo" property');
+      throw new InternalServerErrorException();
+    }
+
+    if (response.casefileData.length > 1) {
+      this.logger.error(`Found more than one casefile with id ${id}`);
+      throw new InternalServerErrorException();
+    }
+
+    if (response.casefileData.length === 0) {
+      this.logger.warn(`No casefile found for the given id ${id}`);
+      return null;
+    }
+
+    this.logger.verbose(`Received data for casefile ${id}`);
+    const casefileData = response.casefileData[0];
+    await validateDto(Casefile, casefileData, this.logger);
+
+    return casefileData;
   }
 
   /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)
