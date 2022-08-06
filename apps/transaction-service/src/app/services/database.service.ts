@@ -20,6 +20,7 @@ export class DatabaseService {
       casefileData: ICasefile[];
     }
 
+    // Make sure the query matches Casefile DTO properties
     const query = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
