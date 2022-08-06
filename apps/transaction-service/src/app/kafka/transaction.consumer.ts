@@ -1,9 +1,10 @@
-import { BadRequestException, Controller, Inject, Logger } from '@nestjs/common';
+import { Controller, Inject, InternalServerErrorException, Logger } from '@nestjs/common';
 import { IKafkaMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { EventPattern } from '@nestjs/microservices';
+import { MessageContext } from '@detective.solutions/backend/shared/data-access';
 import { TransactionCoordinationService } from '../services';
-import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 import { coordinationServiceInjectionToken } from '../utils';
 
 @Controller()
@@ -16,24 +17,22 @@ export class TransactionConsumer {
   ) {}
 
   @EventPattern(KafkaTopic.TransactionInput)
-  consumeTransactionInput(message: IKafkaMessage) {
+  async consumeTransactionInput(message: IKafkaMessage) {
     this.logger.verbose(
       `${buildLogContext(message.value?.context)} Consuming message ${message.offset} of type ${
         message.value.context?.eventType
       } (timestamp: ${message.timestamp})`
     );
 
-    this.validateConsumedMessage(message);
+    await this.validateConsumedMessage(message);
     this.coordinationService.createTransactionByEventType(message.value.context.eventType, message.value);
   }
 
-  private validateConsumedMessage(message: IKafkaMessage) {
+  private async validateConsumedMessage(message: IKafkaMessage) {
     const context = message?.value?.context;
     if (!context) {
-      throw new BadRequestException('The consumed message is missing mandatory context information');
+      throw new InternalServerErrorException('The consumed message is missing mandatory context information');
     }
-    if (!context.eventType) {
-      throw new BadRequestException('The consumed message context is missing an event type and cannot be processed');
-    }
+    await validateDto(MessageContext, context, this.logger);
   }
 }

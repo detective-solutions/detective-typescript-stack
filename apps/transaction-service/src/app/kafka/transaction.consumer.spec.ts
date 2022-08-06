@@ -1,6 +1,6 @@
 import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
-import { BadRequestException } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionConsumer } from './transaction.consumer';
 import { TransactionCoordinationService } from '../services';
@@ -33,7 +33,7 @@ describe('TransactionConsumer', () => {
   });
 
   describe('consumeTransactionInput', () => {
-    it('should correctly forward the value property of an incoming Kafka message', () => {
+    it('should correctly forward the value property of an incoming Kafka message', async () => {
       const testKafkaMessage: IKafkaMessage = {
         timestamp: '123456',
         offset: '212',
@@ -55,13 +55,13 @@ describe('TransactionConsumer', () => {
       };
       const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
 
-      transactionConsumer.consumeTransactionInput(testKafkaMessage);
+      await transactionConsumer.consumeTransactionInput(testKafkaMessage);
 
       expect(coordinationServiceSpy).toBeCalledTimes(1);
       expect(coordinationServiceSpy).toBeCalledWith(testKafkaMessage.value.context.eventType, testKafkaMessage.value);
     });
 
-    it('should thrown a BadRequestException if a consumed message is missing its context information', () => {
+    it('should thrown an InternalServerErrorException if a consumed message is missing its context information', async () => {
       const testKafkaMessage: IKafkaMessage = {
         timestamp: '123456',
         offset: '212',
@@ -75,18 +75,19 @@ describe('TransactionConsumer', () => {
       };
       const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
 
-      expect(() => transactionConsumer.consumeTransactionInput(testKafkaMessage)).toThrow(BadRequestException);
+      const consumeTransactionInputPromise = transactionConsumer.consumeTransactionInput(testKafkaMessage);
+      await expect(consumeTransactionInputPromise).rejects.toThrow(InternalServerErrorException);
       expect(coordinationServiceSpy).toBeCalledTimes(0);
     });
 
-    it('should thrown a BadRequestException if a consumed message is missing an event type', () => {
+    it('should thrown an InternalServerErrorException if the context of a consumed message does not pass validation', async () => {
       const testKafkaMessage: IKafkaMessage = {
         timestamp: '123456',
         offset: '212',
         key: 'testKey',
         value: {
           context: {
-            eventType: undefined,
+            eventType: undefined, // eventType is mandatory
             tenantId: 'tenantId',
             casefileId: 'casefileId',
             userId: 'userId',
@@ -101,7 +102,8 @@ describe('TransactionConsumer', () => {
       };
       const coordinationServiceSpy = jest.spyOn(coordinationService, 'createTransactionByEventType');
 
-      expect(() => transactionConsumer.consumeTransactionInput(testKafkaMessage)).toThrow(BadRequestException);
+      const consumeTransactionInputPromise = transactionConsumer.consumeTransactionInput(testKafkaMessage);
+      await expect(consumeTransactionInputPromise).rejects.toThrow(InternalServerErrorException);
       expect(coordinationServiceSpy).toBeCalledTimes(0);
     });
   });
