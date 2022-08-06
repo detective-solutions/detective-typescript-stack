@@ -19,5 +19,5 @@
       }
     }
   },
-  "tags": ["scope:backend", "type:users"]
+  "tags": ["scope:backend", "scope:backend-shared", "type:utils"]
 }
