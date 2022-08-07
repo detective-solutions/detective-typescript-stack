@@ -29,6 +29,5 @@ export class LoadWhiteboardDataTransaction extends WhiteboardTransaction {
         KafkaTopic.TransactionOutputUnicast
       }`
     );
-    Promise.resolve();
   }
 }
