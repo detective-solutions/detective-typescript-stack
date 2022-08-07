@@ -25,6 +25,10 @@ describe('TransactionCoordinationService', () => {
     coordinationService = app.get<TransactionCoordinationService>(TransactionCoordinationService);
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should be defined', () => {
     expect(coordinationService).toBeDefined();
   });
