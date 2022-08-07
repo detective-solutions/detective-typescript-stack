@@ -13,7 +13,8 @@ export class Casefile implements ICasefile {
     public author = new User(),
     public views = 0,
     public editors = [{ email: '' }] as IUser[],
-    public lastUpdated: Date | null = null
+    public lastUpdated: Date | null = null,
+    public tableObjects = [] as any[] // TODO: Add correct tableNode type here
   ) {}
 
   static Build(casefileInput: ICasefile) {
@@ -29,7 +30,8 @@ export class Casefile implements ICasefile {
       User.Build(casefileInput.author as IUser),
       casefileInput.views,
       casefileInput.editors as IUser[],
-      casefileInput.lastUpdated as Date
+      casefileInput.lastUpdated as Date,
+      casefileInput.tableObjects
     );
   }
 

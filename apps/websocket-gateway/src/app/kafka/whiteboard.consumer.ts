@@ -1,9 +1,9 @@
 import { Controller, Logger } from '@nestjs/common';
+import { IKafkaMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { EventPattern } from '@nestjs/microservices';
-import { IKafkaMessage } from '@detective.solutions/shared/data-access';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
-import { broadcastWebSocketContext } from '../utils';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 @Controller()
@@ -12,13 +12,33 @@ export class WhiteboardConsumer {
 
   constructor(private readonly webSocketGateway: WhiteboardWebSocketGateway) {}
 
-  @EventPattern('casefile')
-  forwardQueryExecution(data: IKafkaMessage) {
+  @EventPattern(KafkaTopic.TransactionOutputUnicast)
+  forwardUnicastTransactionOutput(message: IKafkaMessage) {
     this.logger.verbose(
-      `${buildLogContext(data.value.context)} Consuming message ${data.offset} from topic ${
-        data.topic
-      } with timestamp ${data.timestamp}`
+      `${buildLogContext(message.value.context)} Consuming unicast message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
     );
-    this.webSocketGateway.sendMessageByContext(data.value, broadcastWebSocketContext);
+    this.webSocketGateway.sendMessageByContext(message.value, unicastWebSocketContext);
+  }
+
+  @EventPattern(KafkaTopic.TransactionOutputBroadcast)
+  forwardBroadcastTransactionOutput(message: IKafkaMessage) {
+    this.logger.verbose(
+      `${buildLogContext(message.value.context)} Consuming broadcast message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
+    );
+    this.webSocketGateway.sendMessageByContext(message.value, broadcastWebSocketContext);
+  }
+
+  @EventPattern(KafkaTopic.QueryOutput)
+  forwardQueryExecution(message: IKafkaMessage) {
+    this.logger.verbose(
+      `${buildLogContext(message.value.context)} Consuming message ${message.offset} from topic ${
+        message.topic
+      } with timestamp ${message.timestamp}`
+    );
+    this.webSocketGateway.sendMessageByContext(message.value, broadcastWebSocketContext);
   }
 }

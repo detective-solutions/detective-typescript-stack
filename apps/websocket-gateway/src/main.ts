@@ -1,19 +1,21 @@
+import { KafkaOptions, MicroserviceOptions } from '@nestjs/microservices';
+
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
-import { MicroserviceOptions } from '@nestjs/microservices';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import { microserviceConfig } from './app/microservice-config';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, microserviceConfig);
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, microserviceConfig as KafkaOptions);
   app.useWebSocketAdapter(new WsAdapter(app));
-
   await app.listen();
-
-  const kafkaPort = app.get(ConfigService).get('KAFKA_PORT');
-  Logger.log(`🚀 Application is running on ports 7777 (WebSockets) and ${kafkaPort} (Kafka)`);
+  Logger.log(
+    `🚀 Application is running on port 7777 (WebSockets) and listening to port ${app
+      .get(ConfigService)
+      .get('KAFKA_PORT')} (Kafka)`
+  );
 }
 
 bootstrap();

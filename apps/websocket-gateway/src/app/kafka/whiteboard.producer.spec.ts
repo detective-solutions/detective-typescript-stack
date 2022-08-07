@@ -1,3 +1,5 @@
+import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+
 import { ClientKafka } from '@nestjs/microservices';
 import { Test } from '@nestjs/testing';
 import { WhiteboardProducer } from './whiteboard.producer';
@@ -40,10 +42,10 @@ describe('WhiteboardProducer', () => {
         context: {
           tenantId: uuidv4(),
           casefileId: uuidv4(),
-          eventType: 'testEvent',
+          eventType: MessageEventType.QueryTable,
           nodeId: uuidv4(),
           userId: uuidv4(),
-          userRole: 'admin',
+          userRole: UserRole.ADMIN,
           timestamp: 123,
         },
         body: { test: '123' },

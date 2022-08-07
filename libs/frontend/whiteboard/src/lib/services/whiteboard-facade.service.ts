@@ -13,7 +13,6 @@ import { WhiteboardNodeActions, selectAllWhiteboardNodes } from '../state';
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { dummyNodes } from './whiteboard-dummy-data';
 
 /* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
 
@@ -42,9 +41,9 @@ export class WhiteboardFacadeService {
     this.store.dispatch(WhiteboardNodeActions.loadWhiteboardData());
 
     // TODO: Remove these mocked data when action is triggered by backend response
-    setTimeout(() => {
-      this.store.dispatch(WhiteboardNodeActions.whiteboardDataLoaded({ nodes: dummyNodes }));
-    }, 500);
+    // setTimeout(() => {
+    //   this.store.dispatch(WhiteboardNodeActions.whiteboardDataLoaded({ nodes: dummyNodes }));
+    // }, 500);
   }
 
   getForceGraph(options: WhiteboardOptions): ForceDirectedGraph {

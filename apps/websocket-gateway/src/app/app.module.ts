@@ -1,13 +1,12 @@
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
+import { WhiteboardConsumer, WhiteboardProducer } from './kafka';
 
 import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { WhiteboardConsumer } from './kafka/whiteboard.consumer';
-import { WhiteboardProducer } from './kafka/whiteboard.producer';
-import { WhiteboardWebSocketGateway } from './websocket/whiteboard-websocket.gateway';
+import { WhiteboardWebSocketGateway } from './websocket';
 import { defaultEnvConfig } from './default-env.config';
-import { kafkaClientInjectionToken } from './utils';
+import { microserviceConfig } from './microservice-config';
 
 @Module({
   imports: [
@@ -16,23 +15,7 @@ import { kafkaClientInjectionToken } from './utils';
       cache: true,
       validationSchema: defaultEnvConfig,
     }),
-    ClientsModule.register([
-      {
-        name: kafkaClientInjectionToken,
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            brokers: [`${process.env.KAFKA_SERVICE_NAME}:${process.env.KAFKA_PORT}`],
-            retry: {
-              retries: 30,
-            },
-          },
-          consumer: {
-            groupId: 'websocket-gateway',
-          },
-        },
-      },
-    ]),
+    ClientsModule.register([microserviceConfig] as ClientsModuleOptions),
     AuthModule,
   ],
   controllers: [WhiteboardConsumer],

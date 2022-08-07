@@ -1,5 +1,5 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, IMessage, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 
@@ -33,6 +33,21 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
       verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
         this.handleNewClientConnection(server, info, cb),
     };
+  }
+
+  @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
+  onLoadWhiteboardDataEvent(@MessageBody() message: IMessage<any>) {
+    message.context = this.mergeEventTypeIntoMessageContext(
+      EventTypeTopicMapping.loadWhiteboardData.eventType,
+      message.context
+    );
+    this.logger.verbose(
+      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
+        EventTypeTopicMapping.loadWhiteboardData.targetTopic
+      }`
+    );
+    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
+    // TODO: Return acknowledgement to sending client for robust collaboration
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
@@ -153,7 +168,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     return contextKeysToCheck.every((contextKey) => messageContext[contextKey] === webSocketClientContext[contextKey]);
   }
 
-  private mergeEventTypeIntoMessageContext(eventType: string, messageContext: IMessageContext): IMessageContext {
+  private mergeEventTypeIntoMessageContext(
+    eventType: MessageEventType,
+    messageContext: IMessageContext
+  ): IMessageContext {
     return { eventType, ...messageContext };
   }
 }
