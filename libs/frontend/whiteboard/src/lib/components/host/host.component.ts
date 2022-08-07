@@ -1,4 +1,4 @@
-import { AbstractNode, ForceDirectedGraph, NodeType, WhiteboardOptions } from '../../models';
+import { AbstractNode, ForceDirectedGraph, INode, NodeType, WhiteboardOptions } from '../../models';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -10,8 +10,10 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Subscription, delayWhen, distinctUntilChanged, filter, tap } from 'rxjs';
+import { Subscription, delayWhen, distinctUntilChanged, filter, pluck, switchMap, take, tap } from 'rxjs';
 
+import { Casefile } from '@detective.solutions/frontend/shared/data-access';
+import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
 import { WhiteboardNodeActions } from '../../state';
@@ -73,6 +75,28 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // Listen to LOAD_WHITEBOARD_DATA websocket message event
+    this.whiteboardFacade.getWebSocketSubjectAsync$
+      .pipe(
+        switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
+        pluck('body'),
+        take(1)
+      )
+      .subscribe((messageData: Casefile) => {
+        // TODO: Unify casefile/node data handling in DET-915!
+        messageData.tableObjects.map((tableObject: INode) => {
+          tableObject.id = (tableObject as any).xid;
+          tableObject.title = (tableObject as any).name;
+          tableObject.type = 'table';
+        });
+        console.log('MESSAGE DATA:', messageData);
+        this.store.dispatch(
+          WhiteboardNodeActions.whiteboardDataLoaded({
+            nodes: messageData.tableObjects,
+          })
+        );
+      });
+
     // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
 
