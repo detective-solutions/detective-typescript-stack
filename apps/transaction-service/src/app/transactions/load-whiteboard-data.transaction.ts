@@ -20,8 +20,7 @@ export class LoadWhiteboardDataTransaction extends WhiteboardTransaction {
         `Could not fetch data for casefile ${this.messagePayload.context.casefileId}`
       );
     }
-    this.logger.log(`${buildLogContext(this.messagePayload.context)} received casefile data`);
-    this.logger.debug(`[DEBUG] Received casefile data: ${casefileData}`);
+    this.logger.log(`${buildLogContext(this.messagePayload.context)} Received casefile data`);
 
     this.messagePayload.body = casefileData; // Fill empty message payload body with casefile data
     this.transactionProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, this.messagePayload);
