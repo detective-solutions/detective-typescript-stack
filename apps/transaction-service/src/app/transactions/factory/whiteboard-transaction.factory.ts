@@ -24,14 +24,12 @@ export class WhiteboardTransactionFactory {
   ) {}
 
   // Dynamically instantiate transaction classes based on the incoming event type
-  createTransaction<K extends TransactionKeys>(
-    eventType: SingleTransactionKey<K>,
-    messagePayload: IMessage<any>
-  ): void {
+  createTransaction<K extends TransactionKeys>(eventType: SingleTransactionKey<K>, messagePayload: IMessage<any>) {
     try {
       const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
       this.logger.log(`Created transaction for event type ${eventType as string}`);
       transaction.execute();
+      return transaction; // Return transaction to allow testing this method
     } catch (e) {
       this.logger.error(e);
       throw new InternalServerErrorException(
