@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 import { ICasefile } from '@detective.solutions/shared/data-access';
 
@@ -13,5 +13,6 @@ export class Casefile implements ICasefile {
   @IsString()
   title: string;
 
-  tableObjects: any; // TODO: Define backend node types
+  @IsOptional()
+  tables?: any; // TODO: Define backend node types
 }

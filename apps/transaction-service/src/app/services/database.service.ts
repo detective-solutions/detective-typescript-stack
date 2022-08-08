@@ -24,10 +24,11 @@ export class DatabaseService {
     const query = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
-          xid: Casefile.xid
+          id: Casefile.xid
           title: Casefile.title
           tables: Casefile.tables @normalize
             {
+              id: TableOccurrence.xid
               title: TableOccurrence.title
               x: TableOccurrence.x
               y: TableOccurrence.y
@@ -40,6 +41,7 @@ export class DatabaseService {
             }
           queries: Casefile.queries @normalize
             {
+              id: UserQueryOccurrence.xid
               name: UserQueryOccurrence.name
               x: UserQueryOccurrence.x
               y: UserQueryOccurrence.y

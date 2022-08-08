@@ -33,16 +33,17 @@ describe('DatabaseService', () => {
     const testCasefileData = {
       id: uuidv4(),
       title: 'testCasefile',
-      tableObjects: [],
+      tables: [],
     };
 
     const getCasefileByIdQuery = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
-          xid: Casefile.xid
+          id: Casefile.xid
           title: Casefile.title
           tables: Casefile.tables @normalize
             {
+              id: TableOccurrence.xid
               title: TableOccurrence.title
               x: TableOccurrence.x
               y: TableOccurrence.y
@@ -55,6 +56,7 @@ describe('DatabaseService', () => {
             }
           queries: Casefile.queries @normalize
             {
+              id: UserQueryOccurrence.xid
               name: UserQueryOccurrence.name
               x: UserQueryOccurrence.x
               y: UserQueryOccurrence.y
@@ -96,9 +98,9 @@ describe('DatabaseService', () => {
         .spyOn(DatabaseService.prototype as any, 'sendQuery')
         .mockResolvedValue({ testCasefileData });
 
-      const getCasefileByIdPromise = databaseService.getCasefileById(testCasefileData.id);
+      const getCasefileBIdPromise = databaseService.getCasefileById(testCasefileData.id);
 
-      await expect(getCasefileByIdPromise).rejects.toThrow(InternalServerErrorException);
+      await expect(getCasefileBIdPromise).rejects.toThrow(InternalServerErrorException);
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
