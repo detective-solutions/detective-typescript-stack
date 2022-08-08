@@ -14,7 +14,7 @@ export class Casefile implements ICasefile {
     public views = 0,
     public editors = [{ email: '' }] as IUser[],
     public lastUpdated: Date | null = null,
-    public tableObjects = [] as any[] // TODO: Add correct tableNode type here
+    public tables = [] as any[] // TODO: Add correct tableNode type here
   ) {}
 
   static Build(casefileInput: ICasefile) {
@@ -31,7 +31,7 @@ export class Casefile implements ICasefile {
       casefileInput.views,
       casefileInput.editors as IUser[],
       casefileInput.lastUpdated as Date,
-      casefileInput.tableObjects
+      casefileInput.tables
     );
   }
 

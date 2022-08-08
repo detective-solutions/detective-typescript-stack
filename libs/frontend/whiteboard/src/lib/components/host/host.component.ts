@@ -84,7 +84,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe((messageData: Casefile) => {
         // TODO: Unify casefile/node data handling in DET-915!
-        messageData.tableObjects.map((tableObject: INode) => {
+        messageData.tables.map((tableObject: INode) => {
           tableObject.id = (tableObject as any).xid;
           tableObject.title = (tableObject as any).name;
           tableObject.type = 'table';
@@ -92,7 +92,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('MESSAGE DATA:', messageData);
         this.store.dispatch(
           WhiteboardNodeActions.whiteboardDataLoaded({
-            nodes: messageData.tableObjects,
+            nodes: messageData.tables,
           })
         );
       });
