@@ -24,17 +24,29 @@ export class DatabaseService {
     const query = `
       query casefileData($id: string) {
         casefileData(func: eq(Casefile.xid, $id)) {
-          id: Casefile.xid
+          xid: Casefile.xid
           title: Casefile.title
-          tableObjects: Casefile.tableObjects
+          tables: Casefile.tables @normalize
             {
-              xid: TableObject.xid
-              name: TableObject.name
-              layout: TableObject.layout {
-                x: TableNodeLayout.x
-                y: TableNodeLayout.y
-                width: TableNodeLayout.width
-                height: TableNodeLayout.height
+              title: TableOccurrence.title
+              x: TableOccurrence.x
+              y: TableOccurrence.y
+              width: TableOccurrence.width
+              height: TableOccurrence.height
+              TableOccurrence.entity {
+                name: Table.name
+                description: Table.description
+              }
+            }
+          queries: Casefile.queries @normalize
+            {
+              name: UserQueryOccurrence.name
+              x: UserQueryOccurrence.x
+              y: UserQueryOccurrence.y
+              width: UserQueryOccurrence.width
+              height: UserQueryOccurrence.height
+              UserQueryOccurrence.entity {
+                code: UserQuery.code
               }
             }
         }
