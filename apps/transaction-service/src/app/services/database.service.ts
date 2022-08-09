@@ -26,6 +26,7 @@ export class DatabaseService {
         casefileData(func: eq(Casefile.xid, $id)) {
           id: Casefile.xid
           title: Casefile.title
+          description: Casefile.description
           tables: Casefile.tables @normalize
             {
               id: TableOccurrence.xid
