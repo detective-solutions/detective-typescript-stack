@@ -1,11 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 import { ICasefile } from '@detective.solutions/shared/data-access';
 
 export class Casefile implements ICasefile {
-  @MaxLength(254)
+  @IsUUID()
   @IsNotEmpty()
-  @IsString()
   id: string;
 
   @MaxLength(254)
