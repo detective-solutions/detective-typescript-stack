@@ -81,6 +81,7 @@ export class DatabaseService {
 
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response.casefileData[0];
+    console.log(casefileData);
     await validateDto(Casefile, casefileData, this.logger);
 
     return casefileData;
