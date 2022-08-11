@@ -33,28 +33,24 @@ export class SourceConnection implements ISourceConnection {
   static readonly defaultThumbnail = SourceConnection.iconBasePath + 'default.svg';
 
   constructor(
-    public xid = '',
-    public name = '',
-    public connectorName = '',
-    public description = '',
-    public iconSrc = '',
-    public lastUpdated: Date | null = null,
-    public status = SourceConnectionStatus.PENDING
+    public id: string,
+    public name: string,
+    public connectorName: string,
+    public description: string,
+    public iconSrc: string,
+    public status: SourceConnectionStatus,
+    public lastUpdated: Date
   ) {}
 
   static Build(sourceConnectionInput: ISourceConnection) {
-    if (!sourceConnectionInput) {
-      return new SourceConnection();
-    }
-
     return new SourceConnection(
-      sourceConnectionInput.xid,
+      sourceConnectionInput.id,
       sourceConnectionInput.name,
       sourceConnectionInput.connectorName,
-      sourceConnectionInput.description,
+      sourceConnectionInput.description ?? '',
       sourceConnectionInput.iconSrc ?? SourceConnection.getIconSrc(sourceConnectionInput.connectorName),
-      (sourceConnectionInput.lastUpdated as Date) ?? new Date(),
-      sourceConnectionInput.status
+      sourceConnectionInput.status,
+      sourceConnectionInput.lastUpdated
     );
   }
 
@@ -87,11 +83,5 @@ export class SourceConnection implements ISourceConnection {
       default:
         return SourceConnection.defaultThumbnail;
     }
-  }
-
-  toJSON(): object {
-    const serialized = Object.assign(this);
-    delete serialized.id;
-    return serialized;
   }
 }

@@ -5,9 +5,9 @@ import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../..
 import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
-import { NodeType } from '../../../../../models';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../../../services';
+import { WhiteboardNodeType } from '../../../../../models';
 
 @Injectable()
 export class TableNodeEffects {
@@ -15,7 +15,7 @@ export class TableNodeEffects {
     () => {
       return this.actions$.pipe(
         ofType(WhiteboardNodeActions.WhiteboardNodeAdded),
-        filter((action) => action.addedNode.type === NodeType.TABLE),
+        filter((action) => action.addedNode.type === WhiteboardNodeType.TABLE),
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
@@ -24,8 +24,9 @@ export class TableNodeEffects {
             event: MessageEventType.QueryTable,
             data: {
               context: {
-                nodeId: action.addedNode.id,
                 ...context,
+                eventType: MessageEventType.QueryTable,
+                nodeId: action.addedNode.id,
               } as IMessageContext,
               body: {
                 queryType: QueryType.SqlQuery,

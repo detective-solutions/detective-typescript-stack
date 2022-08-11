@@ -1,6 +1,6 @@
+import { AnyWhiteboardNode, ForceDirectedGraph, WhiteboardOptions } from '../../models';
 import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
-import { ForceDirectedGraph, INode, WhiteboardOptions } from '../../models';
 
 import { BufferService } from './buffer.service';
 import { DragService } from './drag.service';
@@ -57,7 +57,7 @@ export class D3AdapterService {
     return pass;
   }
 
-  applyDragBehavior(elementToDrag: Element, nodeToUpdate: INode) {
+  applyDragBehavior(elementToDrag: Element, nodeToUpdate: AnyWhiteboardNode) {
     const d3element = d3Select(elementToDrag);
     const dragServiceRef = this.dragService;
     const bufferServiceRef = this.bufferService;

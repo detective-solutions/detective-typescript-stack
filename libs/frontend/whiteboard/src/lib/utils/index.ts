@@ -1,1 +1,1 @@
-export * from './serialize-node-for-whiteboard';
+export * from './serialize-whiteboard-nodes';

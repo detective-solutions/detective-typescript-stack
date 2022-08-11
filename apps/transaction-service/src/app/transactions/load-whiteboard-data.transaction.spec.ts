@@ -67,6 +67,8 @@ describe('LoadWhiteboardDataTransaction', () => {
       id: uuidv4(),
       title: 'testCasefile',
       tables: [],
+      queries: [],
+      embeddings: [],
     };
 
     it('should correctly execute transaction', async () => {

@@ -7,6 +7,8 @@ import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../../kafka';
 import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 describe('TransactionCoordinationService', () => {
   let whiteboardTransactionFactory: WhiteboardTransactionFactory;
 

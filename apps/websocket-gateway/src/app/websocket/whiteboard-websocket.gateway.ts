@@ -1,21 +1,22 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IJwtTokenPayload, IMessage, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
+import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { AuthEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { MessageContext } from '@detective.solutions/backend/shared/data-access';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardProducer } from '../kafka/whiteboard.producer';
-import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit {
-  private readonly logger = new Logger(WhiteboardWebSocketGateway.name);
+  readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
   server: Server<IWebSocketClient>;
@@ -36,33 +37,25 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
-  onLoadWhiteboardDataEvent(@MessageBody() message: IMessage<any>) {
-    message.context = this.mergeEventTypeIntoMessageContext(
-      EventTypeTopicMapping.loadWhiteboardData.eventType,
-      message.context
-    );
+  async onLoadWhiteboardDataEvent(@MessageBody() message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
     this.logger.verbose(
       `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
         EventTypeTopicMapping.loadWhiteboardData.targetTopic
       }`
     );
     this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
-    // TODO: Return acknowledgement to sending client for robust collaboration
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
-  onQueryTableEvent(@MessageBody() message: IMessage<any>) {
-    message.context = this.mergeEventTypeIntoMessageContext(
-      EventTypeTopicMapping.queryTable.eventType,
-      message.context
-    );
+  async onQueryTableEvent(@MessageBody() message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
     this.logger.verbose(
       `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
         EventTypeTopicMapping.queryTable.targetTopic
       }`
     );
     this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
-    // TODO: Return acknowledgement to sending client for robust collaboration
   }
 
   sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
@@ -94,9 +87,9 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
       cb(false, 401, 'Unauthorized');
     }
 
-    const decodedAccessToken = await this.verifyAndExtractAccessToken(accessToken);
+    const decodedAccessToken = await this.verifyAndExtractAccessToken(accessToken, requestUrl);
     if (decodedAccessToken) {
-      const clientContext = await this.buildClientContext(requestUrl, decodedAccessToken);
+      const clientContext = await this.buildClientContext(decodedAccessToken, requestUrl);
       if (!clientContext) {
         this.logger.warn(`Denied invalid connection. Cannot build client context from url ${requestUrl}`);
         cb(false, 401, 'Unauthorized');
@@ -114,11 +107,23 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     }
   }
 
-  private async verifyAndExtractAccessToken(accessToken: string): Promise<IJwtTokenPayload> | null {
+  private async verifyAndExtractAccessToken(accessToken: string, url: string): Promise<IJwtTokenPayload> | null {
     try {
-      return this.jwtService.verifyAsync(accessToken, {
+      // Verify if token is valid (algorithm & expiry)
+      const tokenPayload = await this.jwtService.verifyAsync(accessToken, {
         secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
       });
+      // Verify if token is valid for the requested tenantId
+      const urlTenantId = this.extractUrlPathParameter(url, 'tenant');
+      if (!urlTenantId) {
+        this.logger.warn('Denied invalid connection. Could not extract tenant id from request url');
+        throw new UnauthorizedException();
+      }
+      if (tokenPayload.tenantId !== urlTenantId) {
+        this.logger.warn(`Denied invalid connection. Given token is not valid for requested tenant ${urlTenantId}`);
+        throw new UnauthorizedException();
+      }
+      return tokenPayload;
     } catch (e) {
       this.logger.warn(`An error occurred while verifying access token ${accessToken}`);
       this.logger.warn(e);
@@ -127,8 +132,8 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
   }
 
   private async buildClientContext(
-    url: string,
-    tokenPayload: IJwtTokenPayload
+    tokenPayload: IJwtTokenPayload,
+    url: string
   ): Promise<WebSocketClientContext | null> {
     return new Promise((resolve, reject) => {
       const tenantId = this.extractUrlPathParameter(url, 'tenant');
@@ -160,18 +165,18 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     return parameterTitleIndex ? splittedUrl[parameterTitleIndex + 1] : null;
   }
 
+  private async validateMessageContext(context: IMessageContext): Promise<void> {
+    if (!context) {
+      throw new InternalServerErrorException('The incoming websocket message is missing mandatory context information');
+    }
+    await validateDto(MessageContext, context, this.logger);
+  }
+
   private isContextMatch(
     messageContext: IMessageContext,
     webSocketClientContext: WebSocketClientContext,
     contextKeysToCheck: string[]
   ): boolean {
     return contextKeysToCheck.every((contextKey) => messageContext[contextKey] === webSocketClientContext[contextKey]);
-  }
-
-  private mergeEventTypeIntoMessageContext(
-    eventType: MessageEventType,
-    messageContext: IMessageContext
-  ): IMessageContext {
-    return { eventType, ...messageContext };
   }
 }

@@ -1,6 +1,6 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
+import { IMessageContext, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { ConfigService } from '@nestjs/config';
@@ -24,34 +24,6 @@ describe('WhiteboardWebsocketGateway', () => {
   const testEventType = MessageEventType.QueryTable;
   const testMessageBody = { test: 'test' };
 
-  const context1 = {
-    tenantId: uuidv4(),
-    casefileId: uuidv4(),
-    nodeId: uuidv4(),
-    userId: uuidv4(),
-    userRole: UserRole.BASIC,
-    eventType: testEventType,
-    timestamp: 123,
-  };
-  const context2 = {
-    tenantId: uuidv4(),
-    casefileId: uuidv4(),
-    nodeId: uuidv4(),
-    userId: uuidv4(),
-    userRole: UserRole.BASIC,
-    eventType: testEventType,
-    timestamp: 123,
-  };
-  const context3 = {
-    tenantId: uuidv4(),
-    casefileId: uuidv4(),
-    nodeId: uuidv4(),
-    userId: uuidv4(),
-    userRole: UserRole.BASIC,
-    eventType: testEventType,
-    timestamp: 123,
-  };
-
   let webSocketGateway: WhiteboardWebSocketGateway;
 
   beforeEach(async () => {
@@ -67,6 +39,9 @@ describe('WhiteboardWebsocketGateway', () => {
     webSocketGateway = moduleRef.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
     webSocketGateway.server = new WS(webSocketUrl) as any;
     webSocketGateway.server.clients = new Set();
+
+    // Disable logger for test runs
+    webSocketGateway.logger.localInstance.setLogLevels([]);
   });
 
   afterEach(() => {
@@ -79,33 +54,56 @@ describe('WhiteboardWebsocketGateway', () => {
   });
 
   describe('OnQueryTableEvent', () => {
-    it('should forward QUERY_TABLE events to the correct target topic', () => {
+    it('should forward QUERY_TABLE events to the correct target topic', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
-      const testMessage = { context: context1, body: { test: 'test' } };
+      const testMessage = { context: _createContext(MessageEventType.QueryTable), body: testMessageBody };
 
-      webSocketGateway.onQueryTableEvent(testMessage);
+      await webSocketGateway.onQueryTableEvent(testMessage);
 
       expect(producerMock).toBeCalledTimes(1);
       expect(producerMock).toBeCalledWith(EventTypeTopicMapping.queryTable.targetTopic, testMessage);
     });
 
-    it('should merge the eventType into the message context', () => {
+    it('should throw an InternalServerErrorException if the message context validation fails', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
-      const context = context1;
-      delete context['eventType'];
+      const context = _createContext(MessageEventType.QueryTable);
+      delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
-      expect(context).not.toHaveProperty('eventType');
+      expect(webSocketGateway.onQueryTableEvent({ context: context, body: {} })).rejects.toThrow(
+        InternalServerErrorException
+      );
+      expect(producerMock).toBeCalledTimes(0);
+    });
+  });
 
-      webSocketGateway.onQueryTableEvent({ context: context, body: {} });
+  describe('onLoadWhiteboardDataEvent', () => {
+    it('should forward LOAD_WHITEBOARD_DATA events to the correct target topic', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const testMessage = { context: _createContext(MessageEventType.LoadWhiteboardData), body: testMessageBody };
 
-      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.queryTable.targetTopic, {
-        context: { eventType: EventTypeTopicMapping.queryTable.eventType, ...context },
-        body: {},
-      });
+      await webSocketGateway.onLoadWhiteboardDataEvent(testMessage);
+
+      expect(producerMock).toBeCalledTimes(1);
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.loadWhiteboardData.targetTopic, testMessage);
+    });
+
+    it('should throw an InternalServerErrorException if the message context validation fails', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const context = _createContext(MessageEventType.LoadWhiteboardData);
+      delete context['tenantId']; // tenantId is required in the MessageContextDTO
+
+      expect(webSocketGateway.onLoadWhiteboardDataEvent({ context: context, body: {} })).rejects.toThrow(
+        InternalServerErrorException
+      );
+      expect(producerMock).toBeCalledTimes(0);
     });
   });
 
   describe('sendMessageByContext', () => {
+    const context1 = _createContext(MessageEventType.QueryTable);
+    const context2 = _createContext(MessageEventType.QueryTable);
+    const context3 = _createContext(MessageEventType.QueryTable);
+
     it('should only broadcast messages to clients with matching context', async () => {
       const client1 = await _createWebSocketClient(context1);
       const client1Spy = jest.spyOn(client1, 'send').mockImplementation();
@@ -205,5 +203,17 @@ describe('WhiteboardWebsocketGateway', () => {
     webSocketGateway.server.clients.add(client);
     await (webSocketGateway.server as any).connected;
     return client;
+  }
+
+  function _createContext(eventType: MessageEventType): IMessageContext {
+    return {
+      tenantId: uuidv4(),
+      casefileId: uuidv4(),
+      nodeId: uuidv4(),
+      userId: uuidv4(),
+      userRole: UserRole.BASIC,
+      eventType: eventType,
+      timestamp: 123,
+    };
   }
 });

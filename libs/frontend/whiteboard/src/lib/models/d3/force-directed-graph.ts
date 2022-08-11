@@ -1,8 +1,8 @@
 import { Simulation, forceSimulation as d3ForceSimulation } from 'd3-force';
 
-import { AbstractNode } from '../abstract-node.type';
+import { AnyWhiteboardNode } from '../nodes';
 import { EventEmitter } from '@angular/core';
-import { INode } from '../node.interface';
+import { IForceDirectedNode } from './force-directed-node.interface';
 import { Link } from '../link';
 import { WhiteboardOptions } from '../whiteboard-options.type';
 import { quadtree as d3Quadtree } from 'd3-quadtree';
@@ -12,12 +12,12 @@ import { quadtree as d3Quadtree } from 'd3-quadtree';
 export class ForceDirectedGraph {
   private static readonly forceCollisionPadding = 85;
 
-  private nodes: AbstractNode[] = [];
+  private nodes: AnyWhiteboardNode[] = [];
   private options: { width: number; height: number };
   // private readonly linkForceStrength = 1 / 80;
 
-  readonly ticker$: EventEmitter<Simulation<INode, Link>> = new EventEmitter();
-  readonly nodePositionUpdatedByForce$: EventEmitter<AbstractNode> = new EventEmitter();
+  readonly ticker$: EventEmitter<Simulation<IForceDirectedNode, Link>> = new EventEmitter();
+  readonly nodePositionUpdatedByForce$: EventEmitter<AnyWhiteboardNode> = new EventEmitter();
 
   simulation!: Simulation<any, any>;
 
@@ -29,7 +29,7 @@ export class ForceDirectedGraph {
 
     this.simulation = d3ForceSimulation().force(
       'collision',
-      this.rectCollide((nodeWithUpdatedPosition: AbstractNode) =>
+      this.rectCollide((nodeWithUpdatedPosition: AnyWhiteboardNode) =>
         this.nodePositionUpdatedByForce$.emit(nodeWithUpdatedPosition)
       )
     );
@@ -42,7 +42,7 @@ export class ForceDirectedGraph {
     });
   }
 
-  updateNodes(nodes: AbstractNode[]) {
+  updateNodes(nodes: AnyWhiteboardNode[]) {
     if (!this.simulation) {
       throw new Error('Simulation was not initialized yet');
     }
@@ -88,8 +88,8 @@ export class ForceDirectedGraph {
   //   this.simulation.force('centers', null);
   // }
 
-  private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: AbstractNode) => void) {
-    let nodes: AbstractNode[];
+  private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: AnyWhiteboardNode) => void) {
+    let nodes: AnyWhiteboardNode[];
 
     function force() {
       const quadTree = d3Quadtree(
@@ -138,7 +138,7 @@ export class ForceDirectedGraph {
         });
       }
     }
-    force.initialize = (_nodes: AbstractNode[]) => (nodes = _nodes);
+    force.initialize = (_nodes: AnyWhiteboardNode[]) => (nodes = _nodes);
     return force;
   }
 }

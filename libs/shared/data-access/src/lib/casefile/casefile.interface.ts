@@ -1,13 +1,20 @@
-import { IUser } from '../user/user.interface';
+import { IEmbedding } from '../embedding';
+import { ITableOccurrence } from '../table';
+import { IUser } from '../user';
+import { IUserQueryOccurrence } from '../user-query';
 
 export interface ICasefile {
   id: string;
   title: string;
   description?: string;
-  thumbnailSrc?: string;
-  author?: IUser;
-  views?: number;
-  editors?: IUser[];
-  lastUpdated?: Date | null | string;
-  tables?: any[]; // TODO: Specify TableNodes type
+  thumbnail?: string;
+  tables: ITableOccurrence[];
+  queries: IUserQueryOccurrence[];
+  embeddings: IEmbedding[];
+  views: number;
+  author: IUser;
+  editors: IUser[];
+  lastUpdatedBy: IUser;
+  lastUpdated: Date;
+  created: Date;
 }

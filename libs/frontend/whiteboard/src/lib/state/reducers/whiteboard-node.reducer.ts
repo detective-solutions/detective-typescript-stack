@@ -1,22 +1,23 @@
+import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
-import { AbstractNodeInput } from '../../models';
+import { AnyWhiteboardNode } from '../../models';
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components/node-components/table/state';
-import { WhiteboardNodeActions } from '../actions';
 import { createEntityAdapter } from '@ngrx/entity';
+import { serializeWhiteboardNodes } from '../../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const whiteboardNodeEntityAdapter = createEntityAdapter<AbstractNodeInput>();
+export const whiteboardNodeEntityAdapter = createEntityAdapter<AnyWhiteboardNode>();
 
 export const whiteboardNodeReducer = createReducer(
   whiteboardNodeEntityAdapter.getInitialState(),
-  on(WhiteboardNodeActions.resetWhiteboardData, (state: IWhiteboardNodeState) =>
+  on(WhiteboardGeneralActions.resetWhiteboardData, (state: IWhiteboardNodeState) =>
     whiteboardNodeEntityAdapter.removeAll(state)
   ),
-  on(WhiteboardNodeActions.whiteboardDataLoaded, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.setAll(action.nodes, state)
+  on(WhiteboardGeneralActions.whiteboardDataLoaded, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.setAll(serializeWhiteboardNodes(action.casefile), state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeAdded, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.addOne(action.addedNode, state)

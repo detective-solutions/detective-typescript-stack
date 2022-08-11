@@ -1,6 +1,18 @@
+import {
+  getJwtUserInfoByEmailQuery,
+  getJwtUserInfoByEmailQueryName,
+  getJwtUserInfoByIdQuery,
+  getJwtUserInfoByIdQueryName,
+  getUserUidQuery,
+  getUserUidQueryName,
+  passwordCheckQuery,
+  passwordCheckQueryName,
+  passwordCheckResponseProperty,
+} from './queries';
+
 import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { InternalServerErrorException } from '@nestjs/common';
-import { JwtUserInfo } from './dto/user.dto';
+import { JwtUserInfo } from './models';
 import { Test } from '@nestjs/testing';
 import { UserRole } from '@detective.solutions/shared/data-access';
 import { UserService } from './user.service';
@@ -39,17 +51,9 @@ describe('UserService', () => {
   });
 
   describe('checkPassword', () => {
-    const passwordCheckQuery = `
-      query passwordCheck($email: string, $password: string) {
-        passwordCheck(func: eq(User.email, $email)) @normalize {
-          isValid: checkpwd(User.password, $password)
-        }
-      }
-    `;
-
     it('should return true if the database password check returns true', async () => {
       const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({
-        passwordCheck: [{ isValid: true }],
+        passwordCheck: [{ [passwordCheckResponseProperty]: true }],
       });
 
       const res = await userService.checkPassword(testUserCredentials.email, testUserCredentials.password);
@@ -71,9 +75,9 @@ describe('UserService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
-    it('should throw an InternalServerErrorException if the database response misses the "passwordCheck" property', async () => {
+    it(`should throw an InternalServerErrorException if the database response misses the ${passwordCheckQueryName} property`, async () => {
       const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({
-        isValid: true,
+        [passwordCheckResponseProperty]: true,
       });
 
       const checkPasswordPromise = userService.checkPassword(testUserCredentials.email, testUserCredentials.password);
@@ -84,7 +88,7 @@ describe('UserService', () => {
 
     it('should throw an InternalServerErrorException if more than one user is returned from the database password check.', async () => {
       const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({
-        passwordCheck: [{ isValid: true }, { isValid: true }],
+        passwordCheck: [{ [passwordCheckResponseProperty]: true }, { [passwordCheckResponseProperty]: true }],
       });
 
       const checkPasswordPromise = userService.checkPassword(testUserCredentials.email, testUserCredentials.password);
@@ -93,7 +97,7 @@ describe('UserService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
-    it('should throw an InternalServerErrorException if the incoming password check object misses the "isValid" property', async () => {
+    it(`should throw an InternalServerErrorException if the incoming password check object misses the ${passwordCheckResponseProperty} property`, async () => {
       const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({
         passwordCheck: [{ isCorrect: true }],
       });
@@ -106,36 +110,23 @@ describe('UserService', () => {
   });
 
   describe('getJwtUserInfoByEmail', () => {
-    const testJwtUserInfo = {
+    const testResponse: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
-    } as JwtUserInfo;
-
-    const userInfoByEmailQuery = `
-      query jwtUserInfo($email: string) {
-        jwtUserInfo(func: eq(User.email, $email)) @normalize {
-          id: User.xid
-          User.tenants
-            {
-              tenantId: Tenant.xid
-            }
-          role: User.role
-        }
-      }
-    `;
+    };
 
     it('should return JwtUserInfo object with all mandatory properties', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [testJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByEmailQueryName]: [testResponse] });
 
       const res = await userService.getJwtUserInfoByEmail(testUserCredentials.email);
 
-      expect(res).toBe(testJwtUserInfo);
+      expect(res).toBe(testResponse);
       expect(sendQuerySpy).toBeCalledTimes(1);
-      expect(sendQuerySpy).toBeCalledWith(userInfoByEmailQuery, {
+      expect(sendQuerySpy).toBeCalledWith(getJwtUserInfoByEmailQuery, {
         $email: testUserCredentials.email,
       });
     });
@@ -149,8 +140,10 @@ describe('UserService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
-    it('should throw an InternalServerErrorException if the database response misses the "jwtUserInfo" property', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ testJwtUserInfo });
+    it(`should throw an InternalServerErrorException if the database response misses the ${getJwtUserInfoByEmailQueryName} property`, async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ testJwtUserInfo: testResponse });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoByEmail(testUserCredentials.email);
 
@@ -161,7 +154,7 @@ describe('UserService', () => {
     it('should throw an InternalServerErrorException if more than one user is returned for the given email address', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [testJwtUserInfo, testJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByEmailQueryName]: [testResponse, testResponse] });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoByEmail(testUserCredentials.email);
 
@@ -170,7 +163,9 @@ describe('UserService', () => {
     });
 
     it('should return null if no user is returned for the given email address', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ jwtUserInfo: [] });
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getJwtUserInfoByEmailQueryName]: [] });
 
       const res = await userService.getJwtUserInfoByEmail(testUserCredentials.email);
 
@@ -179,13 +174,13 @@ describe('UserService', () => {
     });
 
     it('should throw an InternalServerErrorException if the validation for the incoming JwtUserInfo object fails', async () => {
-      const modifiedJwtUserInfo = testJwtUserInfo;
+      const modifiedJwtUserInfo = testResponse;
       modifiedJwtUserInfo.id = ''; // id should not be empty
       modifiedJwtUserInfo.tenantId = ''; // tenantId should not be empty
 
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [modifiedJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByEmailQueryName]: [modifiedJwtUserInfo] });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoByEmail(testUserCredentials.email);
 
@@ -195,37 +190,23 @@ describe('UserService', () => {
   });
 
   describe('getJwtUserInfoById', () => {
-    const testJwtUserInfo = {
+    const testResponse: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
-    } as JwtUserInfo;
-
-    const userInfoByIdQuery = `
-      query jwtUserInfo($id: string) {
-        jwtUserInfo(func: eq(User.xid, $id)) @normalize {
-          id: User.xid
-          User.tenants
-            {
-              tenantId: Tenant.xid
-            }
-          role: User.role
-          refreshTokenId: User.refreshTokenId
-        }
-      }
-    `;
+    };
 
     it('should return JwtUserInfo object with all mandatory properties', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [testJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByIdQueryName]: [testResponse] });
 
       const res = await userService.getJwtUserInfoById(testUserCredentials.id);
 
-      expect(res).toBe(testJwtUserInfo);
+      expect(res).toBe(testResponse);
       expect(sendQuerySpy).toBeCalledTimes(1);
-      expect(sendQuerySpy).toBeCalledWith(userInfoByIdQuery, {
+      expect(sendQuerySpy).toBeCalledWith(getJwtUserInfoByIdQuery, {
         $id: testUserCredentials.id,
       });
     });
@@ -239,8 +220,10 @@ describe('UserService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
-    it('should throw an InternalServerErrorException if the database response misses the "jwtUserInfo" property', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ testJwtUserInfo });
+    it(`should throw an InternalServerErrorException if the database response misses the ${getJwtUserInfoByIdQueryName} property`, async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ testJwtUserInfo: testResponse });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoById(testUserCredentials.id);
 
@@ -251,7 +234,7 @@ describe('UserService', () => {
     it('should throw an InternalServerErrorException if more than one user is returned for the given id', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [testJwtUserInfo, testJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByIdQueryName]: [testResponse, testResponse] });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoById(testUserCredentials.id);
 
@@ -260,7 +243,9 @@ describe('UserService', () => {
     });
 
     it('should return null if no user is returned for the given id', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ jwtUserInfo: [] });
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getJwtUserInfoByIdQueryName]: [] });
 
       const res = await userService.getJwtUserInfoById(testUserCredentials.id);
 
@@ -269,13 +254,13 @@ describe('UserService', () => {
     });
 
     it('should throw an InternalServerErrorException if the validation for the incoming JwtUserInfo object fails', async () => {
-      const modifiedJwtUserInfo = testJwtUserInfo;
+      const modifiedJwtUserInfo = testResponse;
       modifiedJwtUserInfo.id = ''; // id should not be empty
       modifiedJwtUserInfo.refreshTokenId = '123'; // refreshTokenId should be an UUID
 
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ jwtUserInfo: [modifiedJwtUserInfo] });
+        .mockResolvedValue({ [getJwtUserInfoByIdQueryName]: [modifiedJwtUserInfo] });
 
       const getJwtUserInfoPromise = userService.getJwtUserInfoById(testUserCredentials.id);
 
@@ -343,19 +328,18 @@ describe('UserService', () => {
   });
 
   describe('getUserUid', () => {
-    const testUserUid = {
+    const testResponse = {
       uid: '123',
     };
-    const getUserUidQuery = 'query getUserUid($id: string) { getUserUid(func: eq(User.xid, $id)) { uid }}';
 
     it('should return a valid user uid', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ getUserUid: [testUserUid] });
+        .mockResolvedValue({ [getUserUidQueryName]: [testResponse] });
 
       const res = await userService.getUserUid(testUserCredentials.id);
 
-      expect(res).toBe(testUserUid.uid);
+      expect(res).toBe(testResponse.uid);
       expect(sendQuerySpy).toBeCalledTimes(1);
       expect(sendQuerySpy).toBeCalledWith(getUserUidQuery, {
         $id: testUserCredentials.id,
@@ -371,8 +355,10 @@ describe('UserService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
 
-    it('should throw an InternalServerErrorException if the database response misses the "getUserUid" property', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ testUserUid });
+    it(`should throw an InternalServerErrorException if the database response misses the ${getUserUidQueryName} property`, async () => {
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ testUserUid: testResponse });
 
       const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
 
@@ -383,7 +369,7 @@ describe('UserService', () => {
     it('should throw an InternalServerErrorException if more than one user uid is returned for the given id', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ getUserUid: [testUserUid, testUserUid] });
+        .mockResolvedValue({ [getUserUidQueryName]: [testResponse, testResponse] });
 
       const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
 
@@ -392,7 +378,9 @@ describe('UserService', () => {
     });
 
     it('should return null if no user uid is returned for the given id', async () => {
-      const sendQuerySpy = jest.spyOn(UserService.prototype as any, 'sendQuery').mockResolvedValue({ getUserUid: [] });
+      const sendQuerySpy = jest
+        .spyOn(UserService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getUserUidQueryName]: [] });
 
       const res = await userService.getUserUid(testUserCredentials.id);
 
@@ -403,7 +391,7 @@ describe('UserService', () => {
     it('should throw an InternalServerErrorException if the returned object is missing a uid key', async () => {
       const sendQuerySpy = jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ getUserUid: [{}] });
+        .mockResolvedValue({ [getUserUidQueryName]: [{}] });
 
       const getUserUidPromise = userService.getUserUid(testUserCredentials.id);
 

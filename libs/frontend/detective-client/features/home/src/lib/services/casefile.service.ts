@@ -6,7 +6,6 @@ import {
 } from '../graphql';
 import { Observable, catchError, map } from 'rxjs';
 
-import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { IGetAllCasefilesResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
@@ -34,7 +33,7 @@ export class CasefileService {
       map((response: any) => response.data),
       map((response: IGetAllCasefilesGQLResponse) => {
         return {
-          casefiles: response.queryCasefile.map(Casefile.Build),
+          casefiles: response.queryCasefile,
           totalElementsCount: response.aggregateCasefile.count,
         };
       }),
@@ -65,7 +64,7 @@ export class CasefileService {
       map((response: any) => response.data),
       map((response: IGetCasefilesByAuthorGQLResponse) => {
         return {
-          casefiles: response.queryCasefile.map(Casefile.Build),
+          casefiles: response.queryCasefile,
           totalElementsCount: response.aggregateCasefile.count,
         };
       }),

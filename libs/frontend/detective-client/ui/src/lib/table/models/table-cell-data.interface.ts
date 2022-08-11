@@ -55,7 +55,7 @@ export interface IIconButtonTableCell extends IBaseTableCell {
 
 export interface IMultiTableCell extends IBaseTableCell {
   type: TableCellTypes.MULTI_TABLE_CELL;
-  thumbnailSrc: string;
+  thumbnail: string;
   name: string;
   description: string;
 }

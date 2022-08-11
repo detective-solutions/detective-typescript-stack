@@ -1,4 +1,10 @@
-import { ICasefile, IUser } from '@detective.solutions/shared/data-access';
+import {
+  ICasefile,
+  IEmbedding,
+  ITableOccurrence,
+  IUser,
+  IUserQueryOccurrence,
+} from '@detective.solutions/shared/data-access';
 
 import { User } from './user.dto';
 
@@ -6,38 +12,36 @@ export class Casefile implements ICasefile {
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
-    public id = '',
-    public title = '',
-    public description = '',
-    public thumbnailSrc = '',
-    public author = new User(),
-    public views = 0,
-    public editors = [{ email: '' }] as IUser[],
-    public lastUpdated: Date | null = null,
-    public tables = [] as any[] // TODO: Add correct tableNode type here
+    public id: string,
+    public title: string,
+    public description: string,
+    public thumbnail: string,
+    public views: number,
+    public author: User,
+    public editors: IUser[],
+    public lastUpdatedBy: IUser,
+    public lastUpdated: Date,
+    public created: Date,
+    public tables: ITableOccurrence[],
+    public queries: IUserQueryOccurrence[],
+    public embeddings: IEmbedding[]
   ) {}
 
   static Build(casefileInput: ICasefile) {
-    if (!casefileInput) {
-      return new Casefile();
-    }
-
     return new Casefile(
       casefileInput.id,
       casefileInput.title,
       casefileInput.description ?? '',
-      casefileInput.thumbnailSrc ?? Casefile.thumbnailPlaceholder,
-      User.Build(casefileInput.author as IUser),
+      casefileInput.thumbnail ?? Casefile.thumbnailPlaceholder,
       casefileInput.views,
+      User.Build(casefileInput.author as IUser),
       casefileInput.editors as IUser[],
-      casefileInput.lastUpdated as Date,
-      casefileInput.tables
+      casefileInput.lastUpdatedBy,
+      casefileInput.lastUpdated,
+      casefileInput.created,
+      casefileInput.tables,
+      casefileInput.queries,
+      casefileInput.embeddings
     );
-  }
-
-  toJSON(): object {
-    const serialized = Object.assign(this);
-    delete serialized.id;
-    return serialized;
   }
 }

@@ -1,6 +1,6 @@
 // TODO: Remove this file if data is correctly provided by the backend
 
-import { AbstractNodeInput, NodeType } from '../models';
+import { AnyWhiteboardNode, WhiteboardNodeType } from '../models';
 
 const randomDummyTitles = [
   'Clue 1',
@@ -12,24 +12,30 @@ const randomDummyTitles = [
   '',
 ];
 
-export const dummyNodes: AbstractNodeInput[] = [
+export const dummyNodes: AnyWhiteboardNode[] = [
   {
     id: '1',
-    type: NodeType.TABLE,
+    type: WhiteboardNodeType.TABLE,
     title: randomDummyTitles[Math.floor(Math.random() * randomDummyTitles.length)],
-    layout: { x: 10, y: 100, width: 900, height: 500 },
+    x: 10,
+    y: 100,
+    width: 900,
+    height: 500,
   },
   {
     id: '2',
-    type: NodeType.TABLE,
+    type: WhiteboardNodeType.TABLE,
     title: randomDummyTitles[Math.floor(Math.random() * randomDummyTitles.length)],
-    layout: { x: 1300, y: 800, width: 900, height: 500 },
+    x: 1300,
+    y: 800,
+    width: 900,
+    height: 500,
   },
   // {
   //   id: '3',
   //   type: NodeType.EMBEDDING,
   //   title: randomDummyTitles[Math.floor(Math.random() * randomDummyTitles.length)],
-  //   layout: { x: 500, y: 400, width: 900, height: 500 },
+  //   x: 500, y: 400, width: 900, height: 500 ,
   //   href: 'http://detective.solutions',
   // },
 ];

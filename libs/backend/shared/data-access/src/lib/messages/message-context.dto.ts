@@ -4,34 +4,34 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Validate
 export class MessageContext implements IMessageContext {
   @IsEnum(MessageEventType)
   @IsNotEmpty()
-  eventType: MessageEventType;
+  eventType!: MessageEventType;
 
   @MaxLength(254)
   @IsNotEmpty()
   @IsString()
-  tenantId: string;
+  tenantId!: string;
 
   @MaxLength(254)
   @IsNotEmpty()
   @IsString()
-  casefileId: string;
+  casefileId!: string;
 
   @MaxLength(254)
   @IsNotEmpty()
   @IsString()
-  userId: string;
+  userId!: string;
 
   @IsEnum(UserRole)
   @IsNotEmpty()
-  userRole: UserRole;
+  userRole!: UserRole;
 
   @MaxLength(254)
   @ValidateIf((nodeId) => nodeId !== '')
   @IsString()
   @IsOptional()
-  nodeId: string;
+  nodeId!: string;
 
   @IsNumber()
   @IsNotEmpty()
-  timestamp: number;
+  timestamp!: number;
 }
