@@ -1,1 +1,1 @@
-export * from './casefile-for-whiteboard.dto';
+export * from './casefile.dto';

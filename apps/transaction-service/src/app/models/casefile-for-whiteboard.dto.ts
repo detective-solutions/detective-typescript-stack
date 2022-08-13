@@ -1,4 +1,4 @@
-import { Casefile } from './casefile.dto';
+import { Casefile } from '@detective.solutions/backend/shared/data-access';
 import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { OmitType } from '@nestjs/mapped-types';
 

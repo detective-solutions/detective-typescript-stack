@@ -1,7 +1,7 @@
 import { IGetCasefileById, getCasefileByIdQuery, getCasefileByIdQueryName } from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
-import { CasefileForWhiteboard } from '@detective.solutions/backend/shared/data-access';
+import { CasefileForWhiteboard } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { TxnOptions } from 'dgraph-js';
