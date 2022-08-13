@@ -25,5 +25,4 @@ async function bootstrap() {
   Logger.log(`🚀 Application is running on port ${port}`);
 }
 
-console.log(); // TODO: Remove me!
 bootstrap();
