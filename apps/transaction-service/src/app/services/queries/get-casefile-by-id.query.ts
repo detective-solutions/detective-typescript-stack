@@ -21,6 +21,9 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
+        lastUpdatedBy: TableOccurrence.lastUpdatedBy
+        lastUpdated: TableOccurrence.lastUpdated
+        created: TableOccurrence.created
         TableOccurrence.entity {
           name: Table.name
           description: Table.description
@@ -34,6 +37,9 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
+        lastUpdatedBy: TableOccurrence.lastUpdatedBy
+        lastUpdated: TableOccurrence.lastUpdated
+        created: TableOccurrence.created
         UserQueryOccurrence.entity {
           code: UserQuery.code
         }
@@ -47,6 +53,9 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
+        lastUpdatedBy: TableOccurrence.lastUpdatedBy
+        lastUpdated: TableOccurrence.lastUpdated
+        created: TableOccurrence.created
       }
     }
   }
