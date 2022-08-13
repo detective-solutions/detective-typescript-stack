@@ -42,6 +42,7 @@ export class DatabaseService {
 
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response[getCasefileByIdQueryName][0];
+    console.log(casefileData); // TODO: Remove me!
     await validateDto(CasefileForWhiteboard, casefileData, this.logger);
 
     return casefileData;
