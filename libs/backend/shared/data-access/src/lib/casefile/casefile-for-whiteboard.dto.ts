@@ -2,7 +2,7 @@ import { Casefile } from './casefile.dto';
 import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { OmitType } from '@nestjs/mapped-types';
 
-export class CasefileForWhiteboardDTO
+export class CasefileForWhiteboard
   extends OmitType(Casefile, [
     'thumbnail',
     'views',

@@ -1,7 +1,7 @@
 import { IGetCasefileById, getCasefileByIdQuery, getCasefileByIdQueryName } from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
-import { CasefileForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
+import { CasefileForWhiteboard } from '@detective.solutions/backend/shared/data-access';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { TxnOptions } from 'dgraph-js';
@@ -42,7 +42,7 @@ export class DatabaseService {
 
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response[getCasefileByIdQueryName][0];
-    await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
+    await validateDto(CasefileForWhiteboard, casefileData, this.logger);
 
     return casefileData;
   }
