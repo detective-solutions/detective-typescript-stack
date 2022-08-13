@@ -1,7 +1,7 @@
+import { ITable, IUser } from '@detective.solutions/shared/data-access';
 import { ITableNode, ITableNodeTemporaryData } from './table-node.interface';
 
 import { ITableWhiteboardNode } from './table-whiteboard-node.interface';
-import { IUser } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeType } from '../whiteboard-node-types.enum';
 
 export class TableWhiteboardNode implements ITableWhiteboardNode {
@@ -9,9 +9,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
 
   constructor(
     public id: string,
-    public name: string,
     public title: string,
-    public description: string,
     public x: number,
     public y: number,
     public width: number,
@@ -20,6 +18,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     public lastUpdatedBy: IUser,
     public lastUpdated: string,
     public created: string,
+    public entity: ITable,
     public temporary: ITableNodeTemporaryData | undefined
   ) {}
 
@@ -27,9 +26,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     try {
       return new TableWhiteboardNode(
         nodeInput.id,
-        nodeInput.name,
-        nodeInput?.title ?? nodeInput.name,
-        nodeInput?.description ?? '',
+        nodeInput?.title ?? nodeInput.entity.name,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,
@@ -38,6 +35,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
         nodeInput.lastUpdatedBy,
         nodeInput.lastUpdated,
         nodeInput.created,
+        nodeInput.entity,
         nodeInput?.temporary
       );
     } catch (e) {
