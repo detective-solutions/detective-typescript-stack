@@ -1,4 +1,4 @@
-import { ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
+import { ITable, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class TableOccurrence implements ITableOccurrence {
@@ -8,18 +8,8 @@ export class TableOccurrence implements ITableOccurrence {
 
   @MaxLength(254)
   @IsString()
-  @IsNotEmpty()
-  name!: string;
-
-  @MaxLength(254)
-  @IsString()
   @IsOptional()
   title!: string;
-
-  @MaxLength(254)
-  @IsString()
-  @IsOptional()
-  description!: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -51,4 +41,7 @@ export class TableOccurrence implements ITableOccurrence {
   @IsString()
   @IsNotEmpty()
   created!: string;
+
+  @IsNotEmpty()
+  entity!: ITable;
 }

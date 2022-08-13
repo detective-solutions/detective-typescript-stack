@@ -1,24 +1,15 @@
-import { IUser, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UserQueryOccurrence implements IUserQueryOccurrence {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  code!: string;
-
   @MaxLength(254)
   @IsString()
   @IsNotEmpty()
   title!: string;
-
-  @MaxLength(254)
-  @IsString()
-  @IsOptional()
-  utterance!: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -56,4 +47,7 @@ export class UserQueryOccurrence implements IUserQueryOccurrence {
   @IsString()
   @IsNotEmpty()
   created!: string;
+
+  @IsNotEmpty()
+  entity!: IUserQuery;
 }

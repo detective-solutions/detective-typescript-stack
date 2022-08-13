@@ -1,10 +1,9 @@
 import { IUser } from '../user';
+import { IUserQuery } from './user-query.interface';
 
 export interface IUserQueryOccurrence {
   id: string;
-  code: string;
   title: string;
-  utterance: string;
   x: number;
   y: number;
   width: number;
@@ -15,4 +14,5 @@ export interface IUserQueryOccurrence {
   lastUpdatedBy: IUser;
   lastUpdated: string;
   created: string;
+  entity: IUserQuery;
 }

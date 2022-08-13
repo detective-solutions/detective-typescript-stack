@@ -1,10 +1,9 @@
+import { ITable } from './table.interface';
 import { IUser } from '../user';
 
 export interface ITableOccurrence {
   id: string;
-  name: string;
   title: string;
-  description?: string;
   x: number;
   y: number;
   width: number;
@@ -13,4 +12,5 @@ export interface ITableOccurrence {
   lastUpdatedBy: IUser;
   lastUpdated: string;
   created: string;
+  entity: ITable;
 }
