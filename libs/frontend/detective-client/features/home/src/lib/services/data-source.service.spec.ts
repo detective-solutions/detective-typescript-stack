@@ -121,7 +121,7 @@ describe('DataSourceService', () => {
       description: '',
       iconSrc: '',
       status: SourceConnectionStatus.AVAILABLE,
-      lastUpdated: new Date(),
+      lastUpdated: Date.now().toString(),
     });
   }
 });
