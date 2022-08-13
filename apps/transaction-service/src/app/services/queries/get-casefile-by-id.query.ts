@@ -13,7 +13,7 @@ export const getCasefileByIdQuery = `
       id: Casefile.xid
       title: Casefile.title
       description: Casefile.description
-      tables: Casefile.tables @normalize {
+      tables: Casefile.tables {
         id: TableOccurrence.xid
         title: TableOccurrence.title
         x: TableOccurrence.x
@@ -21,7 +21,7 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        TableOccurrence.lastUpdatedBy {
+        lastUpdatedBy: TableOccurrence.lastUpdatedBy {
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
@@ -29,12 +29,12 @@ export const getCasefileByIdQuery = `
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
-        TableOccurrence.entity {
+        entity: TableOccurrence.entity {
           name: Table.name
           description: Table.description
         }
       }
-      queries: Casefile.queries @normalize {
+      queries: Casefile.queries {
         id: UserQueryOccurrence.xid
         name: UserQueryOccurrence.name
         x: UserQueryOccurrence.x
@@ -42,7 +42,7 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
-        UserQueryOccurrence.lastUpdatedBy {
+        lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy {
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
@@ -50,11 +50,11 @@ export const getCasefileByIdQuery = `
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
-        UserQueryOccurrence.entity {
+        entity: UserQueryOccurrence.entity {
           code: UserQuery.code
         }
       }
-      embeddings: Casefile.embeddings @normalize {
+      embeddings: Casefile.embeddings {
         id: Embedding.xid
         title: Embedding.title
         href: Embedding.href
@@ -63,7 +63,7 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        Embedding.lastUpdatedBy {
+        lastUpdatedBy: Embedding.lastUpdatedBy {
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
