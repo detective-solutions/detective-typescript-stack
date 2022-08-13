@@ -1,12 +1,12 @@
+import { AnyWhiteboardNode, ITableNodeTemporaryData } from '../../../models';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
-import { IQueryResponse as IQueryResponseBody, ITableNodeTemporaryData } from './models';
 import { filter, map, pluck, switchMap } from 'rxjs';
 
-import { AbstractNode } from '../../../models';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
+import { IQueryResponse as IQueryResponseBody } from './models';
 import { TableNodeActions } from './state';
 import { selectWhiteboardNodeById } from '../../../state';
 
@@ -37,12 +37,15 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
   ngOnInit() {
     // Node update subscription needs to be defined here, otherwise this.id would be undefined
     this.subscriptions.add(
-      this.store.select(selectWhiteboardNodeById(this.node.id)).subscribe((updatedNode: AbstractNode) => {
-        // WARNING: It is not possible to simply reassign this.node reference when updating the node values
-        // Currently the rendering will break due to some conflicts between HTML and SVG handling
-        this.updateExistingNodeObject(updatedNode);
-        this.nodeUpdates$.next(updatedNode);
-      })
+      this.store
+        .select(selectWhiteboardNodeById(this.node.id))
+        .pipe(filter(Boolean))
+        .subscribe((updatedNode: AnyWhiteboardNode) => {
+          // WARNING: It is not possible to simply reassign this.node reference when updating the node values
+          // Currently the rendering will break due to some conflicts between HTML and SVG handling
+          this.updateExistingNodeObject(updatedNode);
+          this.nodeUpdates$.next(updatedNode);
+        })
     );
 
     // Listen to QUERY_TABLE websocket message events

@@ -1,7 +1,7 @@
-import { AbstractNode, INode } from '../../../models';
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription, filter, map, pluck } from 'rxjs';
 
+import { AnyWhiteboardNode } from '../../../models';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
@@ -14,16 +14,16 @@ import { WhiteboardNodeActions } from '../../../state';
   styleUrls: ['./base-node.component.scss'],
 })
 export class BaseNodeComponent implements AfterViewInit, OnDestroy {
-  @Input() node!: AbstractNode;
+  @Input() node!: AnyWhiteboardNode;
 
   readonly isDragging$ = this.whiteboardFacade.isDragging$;
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
 
-  protected readonly nodeUpdates$ = new BehaviorSubject<AbstractNode>(this.node);
+  protected readonly nodeUpdates$ = new BehaviorSubject<AnyWhiteboardNode>(this.node);
   protected readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
-    filter((node: AbstractNode) => !!node?.temporary),
+    filter((node: AnyWhiteboardNode) => !!node?.temporary),
     pluck('temporary'),
     filter(Boolean)
   );
@@ -73,7 +73,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  protected updateExistingNodeObject(updatedNode: INode) {
+  protected updateExistingNodeObject(updatedNode: AnyWhiteboardNode) {
     Object.keys(updatedNode).forEach((key: string) => {
       (this.node as Record<string, any>)[key] = (updatedNode as Record<string, any>)[key];
     });

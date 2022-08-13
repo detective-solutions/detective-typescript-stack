@@ -66,7 +66,9 @@ describe('LoadWhiteboardDataTransaction', () => {
     const getCasefileByIdResponse = {
       id: uuidv4(),
       title: 'testCasefile',
-      tableObjects: [],
+      tables: [],
+      queries: [],
+      embeddings: [],
     };
 
     it('should correctly execute transaction', async () => {

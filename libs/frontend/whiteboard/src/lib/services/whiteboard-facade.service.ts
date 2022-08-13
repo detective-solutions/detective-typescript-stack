@@ -1,5 +1,5 @@
-import { AbstractNode, ForceDirectedGraph, Link, NodeComponent, WhiteboardOptions } from '../models';
 import { Actions, ofType } from '@ngrx/effects';
+import { AnyWhiteboardNode, ForceDirectedGraph, Link, NodeComponent, WhiteboardOptions } from '../models';
 import {
   BufferService,
   D3AdapterService,
@@ -8,21 +8,19 @@ import {
   WhiteboardSelectionService,
 } from './internal-services';
 import { Observable, combineLatest, map, of } from 'rxjs';
-import { WhiteboardNodeActions, selectAllWhiteboardNodes } from '../state';
+import { WhiteboardGeneralActions, selectAllWhiteboardNodes } from '../state';
 
 import { EventBasedWebSocketMessage } from '@detective.solutions/rx-websocket-wrapper';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-/* eslint-disable ngrx/avoid-dispatching-multiple-actions-sequentially */ // TODO: Remove this when data is loaded from backend
-
 @Injectable()
 export class WhiteboardFacadeService {
-  readonly whiteboardNodes$: Observable<AbstractNode[]> = this.store.select(selectAllWhiteboardNodes);
+  readonly whiteboardNodes$: Observable<AnyWhiteboardNode[]> = this.store.select(selectAllWhiteboardNodes);
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
-    this.actions$.pipe(ofType(WhiteboardNodeActions.whiteboardDataLoaded)),
+    this.actions$.pipe(ofType(WhiteboardGeneralActions.whiteboardDataLoaded)),
     this.webSocketService.isConnectedToWebSocketServer$,
   ]).pipe(
     map(
@@ -31,14 +29,21 @@ export class WhiteboardFacadeService {
   );
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
   readonly isDragging$ = this.dragService.isDragging$;
+
+  // TODO: Test if delayWhen operator works as expected when additional actions are implemented
+  // readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$.pipe(
+  //   // Delay subscribing to web socket until whiteboard data is loaded (incoming messages will be buffered)
+  //   delayWhen(() => this.isWhiteboardInitialized$.pipe(filter((isInitialized: boolean) => !isInitialized)))
+  // );
   readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$;
+
   readonly isConnectedToWebSocketServer$ = this.webSocketService.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
 
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
-    this.store.dispatch(WhiteboardNodeActions.loadWhiteboardData());
+    this.store.dispatch(WhiteboardGeneralActions.loadWhiteboardData());
 
     // TODO: Remove these mocked data when action is triggered by backend response
     // setTimeout(() => {
@@ -52,7 +57,7 @@ export class WhiteboardFacadeService {
 
   resetWhiteboard() {
     this.webSocketService.resetWebsocketConnection();
-    this.store.dispatch(WhiteboardNodeActions.resetWhiteboardData());
+    this.store.dispatch(WhiteboardGeneralActions.resetWhiteboardData());
   }
 
   addSelectedElement(selectedElementComponent: NodeComponent) {
@@ -79,7 +84,7 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addToNodeLayoutUpdateBuffer(node: AbstractNode) {
+  addToNodeLayoutUpdateBuffer(node: AnyWhiteboardNode) {
     this.bufferService.addToNodeLayoutUpdateBuffer(node);
   }
 

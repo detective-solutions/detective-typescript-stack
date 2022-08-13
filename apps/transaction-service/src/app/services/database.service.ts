@@ -1,8 +1,9 @@
+import { IGetCasefileById, getCasefileByIdQuery, getCasefileByIdQueryName } from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
-import { Casefile } from '@detective.solutions/backend/shared/data-access';
+import { CasefileForWhiteboard } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
-import { ICasefile } from '@detective.solutions/shared/data-access';
+import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { TxnOptions } from 'dgraph-js';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
@@ -15,58 +16,33 @@ export class DatabaseService {
 
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
 
-  async getCasefileById(id: string): Promise<Casefile> | null {
-    interface ICasefileDataApiResponse {
-      casefileData: ICasefile[];
-    }
-
-    // Make sure the query matches Casefile DTO properties
-    const query = `
-      query casefileData($id: string) {
-        casefileData(func: eq(Casefile.xid, $id)) {
-          id: Casefile.xid
-          title: Casefile.title
-          tableObjects: Casefile.tableObjects
-            {
-              xid: TableObject.xid
-              name: TableObject.name
-              layout: TableObject.layout {
-                x: TableNodeLayout.x
-                y: TableNodeLayout.y
-                width: TableNodeLayout.width
-                height: TableNodeLayout.height
-              }
-            }
-        }
-      }
-    `;
-
+  async getCasefileById(id: string): Promise<ICasefileForWhiteboard> | null {
     this.logger.verbose(`Requesting data for casefile ${id}`);
 
     const queryVariables = { $id: id };
-    const response = (await this.sendQuery(query, queryVariables)) as ICasefileDataApiResponse;
+    const response = (await this.sendQuery(getCasefileByIdQuery, queryVariables)) as IGetCasefileById;
     if (!response) {
       return null;
     }
 
-    if (!response.casefileData) {
+    if (!response[getCasefileByIdQueryName]) {
       this.logger.error('Incoming database response object is missing "jwtUserInfo" property');
       throw new InternalServerErrorException();
     }
 
-    if (response.casefileData.length > 1) {
+    if (response[getCasefileByIdQueryName].length > 1) {
       this.logger.error(`Found more than one casefile with id ${id}`);
       throw new InternalServerErrorException();
     }
 
-    if (response.casefileData.length === 0) {
+    if (response[getCasefileByIdQueryName].length === 0) {
       this.logger.warn(`No casefile found for the given id ${id}`);
       return null;
     }
 
     this.logger.verbose(`Received data for casefile ${id}`);
-    const casefileData = response.casefileData[0];
-    await validateDto(Casefile, casefileData, this.logger);
+    const casefileData = response[getCasefileByIdQueryName][0];
+    await validateDto(CasefileForWhiteboard, casefileData, this.logger);
 
     return casefileData;
   }

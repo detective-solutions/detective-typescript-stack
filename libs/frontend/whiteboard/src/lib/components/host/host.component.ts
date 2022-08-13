@@ -1,4 +1,3 @@
-import { AbstractNode, ForceDirectedGraph, NodeType, WhiteboardOptions } from '../../models';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -10,23 +9,20 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Subscription, delayWhen, distinctUntilChanged, filter, tap } from 'rxjs';
+import {
+  AnyWhiteboardNode,
+  ForceDirectedGraph,
+  TableWhiteboardNode,
+  WhiteboardNodeType,
+  WhiteboardOptions,
+} from '../../models';
+import { ICasefile, IUser, MessageEventType } from '@detective.solutions/shared/data-access';
+import { Subscription, delayWhen, distinctUntilChanged, filter, pluck, switchMap, tap } from 'rxjs';
+import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../../state';
 
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
-import { WhiteboardNodeActions } from '../../state';
 import { v4 as uuidv4 } from 'uuid';
-
-// TODO: Remove these when actual node data is loaded
-const randomTitles = [
-  'Clue 1',
-  'I am a randomly chosen title',
-  'Clue 2',
-  'Find suspicious content',
-  'Clue 3',
-  'Suspicious data',
-  '',
-];
 
 @Component({
   selector: 'whiteboard-host',
@@ -47,7 +43,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
     // Update underlying graph nodes
-    tap((nodes: AbstractNode[]) => this.forceGraph.updateNodes(nodes)),
+    tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes)),
     // Update layouts for nodes moved by graph force
     tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
   );
@@ -56,7 +52,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
 
   readonly forceGraph: ForceDirectedGraph = this.whiteboardFacade.getForceGraph(HostComponent.options);
-  readonly nodeType = NodeType;
+  readonly nodeType = WhiteboardNodeType;
   readonly whiteboardHtmlId = 'whiteboard';
 
   private readonly subscriptions = new Subscription();
@@ -71,8 +67,23 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly store: Store
   ) {}
-
   ngOnInit() {
+    // Listen to LOAD_WHITEBOARD_DATA websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
+          pluck('body')
+        )
+        .subscribe((messageData: ICasefile) => {
+          this.store.dispatch(
+            WhiteboardGeneralActions.whiteboardDataLoaded({
+              casefile: messageData,
+            })
+          );
+        })
+    );
+
     // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
 
@@ -80,7 +91,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$
         .pipe(distinctUntilChanged())
-        .subscribe((node: AbstractNode) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
+        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
     );
   }
 
@@ -104,20 +115,42 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onElementDrop(event: DragEvent) {
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+
+    // TODO: Remove these when actual node data is loaded
+    const randomTitles = [
+      'Clue 1',
+      'I am a randomly chosen title',
+      'Clue 2',
+      'Find suspicious content',
+      'Clue 3',
+      'Suspicious data',
+      '',
+    ];
+
     // TODO: Use data from added element instead of hard-coded data
+    const tableNode = TableWhiteboardNode.Build({
+      id: uuidv4(),
+      title: '',
+      x: convertedDOMPoint.x,
+      y: convertedDOMPoint.y,
+      width: 900,
+      height: 500,
+      locked: false,
+      lastUpdatedBy: {} as IUser,
+      lastUpdated: Date.now().toString(),
+      created: Date.now().toString(),
+      entity: {
+        id: uuidv4(),
+        name: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+        description: '',
+        lastUpdatedBy: {} as IUser,
+        lastUpdated: Date.now().toString(),
+        created: Date.now().toString(),
+      },
+    });
     this.store.dispatch(
       WhiteboardNodeActions.WhiteboardNodeAdded({
-        addedNode: {
-          id: uuidv4(),
-          type: NodeType.TABLE,
-          title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-          layout: {
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: 900,
-            height: 500,
-          },
-        },
+        addedNode: TableWhiteboardNode.Build(tableNode),
         addedManually: true,
       })
     );

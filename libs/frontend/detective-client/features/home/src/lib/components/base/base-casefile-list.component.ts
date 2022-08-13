@@ -80,7 +80,7 @@ export class BaseCasefileListComponent implements OnDestroy {
           title: casefile.title,
           targetUrl: this.buildCasefileUrl(authStatus.tenantId, casefile.id),
           description: casefile.description,
-          thumbnailSrc: casefile.thumbnailSrc,
+          thumbnail: casefile.thumbnail || 'assets/images/detective-logo.svg',
         });
       });
     });
@@ -103,7 +103,7 @@ export class BaseCasefileListComponent implements OnDestroy {
               cellData: {
                 id: casefile.id,
                 type: TableCellTypes.MULTI_TABLE_CELL,
-                thumbnailSrc: casefile.thumbnailSrc,
+                thumbnail: casefile.thumbnail || 'assets/images/detective-logo.svg',
                 name: casefile.title,
                 description: casefile.description,
               },

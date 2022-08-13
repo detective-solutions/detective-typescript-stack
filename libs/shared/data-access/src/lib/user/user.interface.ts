@@ -1,5 +1,6 @@
-import { ITenant } from './tenant.interface';
-import { IUserGroup } from './user-group.interface';
+import { ITenant } from '../tenant';
+import { IUserGroup } from '../user-group';
+import { UserRole } from './user-role.enum';
 
 export interface IUser {
   id: string;
@@ -12,10 +13,7 @@ export interface IUser {
   avatarUrl?: string;
   userGroups?: IUserGroup[];
   refreshTokenId?: string;
-}
-
-export enum UserRole {
-  NONE = 'none',
-  BASIC = 'basic',
-  ADMIN = 'admin',
+  lastUpdatedBy?: IUser;
+  lastUpdated?: string;
+  created?: string;
 }

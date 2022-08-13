@@ -8,5 +8,5 @@ export interface ITile {
   title: string;
   targetUrl: string;
   description?: string;
-  thumbnailSrc?: string;
+  thumbnail?: string;
 }

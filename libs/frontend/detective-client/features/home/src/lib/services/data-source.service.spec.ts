@@ -6,7 +6,9 @@ import { Apollo } from 'apollo-angular';
 import { DataSourceService } from './data-source.service';
 import { GetAllDataSourcesGQL } from '../graphql';
 import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
+import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -50,10 +52,7 @@ describe('DataSourceService', () => {
 
   describe('getAllDataSources', () => {
     it('should correctly map the server response to the IGetAllDataSourcesResponse interface', fakeAsync(() => {
-      const dataSources = [
-        SourceConnection.Build(new SourceConnection()),
-        SourceConnection.Build(new SourceConnection()),
-      ];
+      const dataSources = [_createSourceConnection(), _createSourceConnection()];
       const mockResponse = { querySourceConnection: dataSources, aggregateSourceConnection: { count: 2 } };
       const watchQuerySpy = jest
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
@@ -68,7 +67,7 @@ describe('DataSourceService', () => {
     }));
 
     it('should invoke internal error handling if the response does not comply with the IGetAllDataSourcesResponse interface', fakeAsync(() => {
-      const dataSources = [SourceConnection.Build(new SourceConnection())];
+      const dataSources = [_createSourceConnection()];
       const mockResponse = { wrongKey: dataSources, aggregateSourceConnection: { count: 1 } };
       jest
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
@@ -113,4 +112,16 @@ describe('DataSourceService', () => {
       tick();
     }));
   });
+
+  function _createSourceConnection(): SourceConnection {
+    return SourceConnection.Build({
+      id: uuidv4(),
+      name: 'Test Connection',
+      connectorName: 'connector',
+      description: '',
+      iconSrc: '',
+      status: SourceConnectionStatus.AVAILABLE,
+      lastUpdated: Date.now().toString(),
+    });
+  }
 });

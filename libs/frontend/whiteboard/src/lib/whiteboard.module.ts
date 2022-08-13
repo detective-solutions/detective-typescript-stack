@@ -15,7 +15,12 @@ import {
   TestLinkComponent,
 } from './components';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
-import { WHITEBOARD_STORE_NAME, WhiteboardMetadataEffects, WhiteboardNodeEffects } from './state';
+import {
+  WHITEBOARD_STORE_NAME,
+  WhiteboardGeneralEffects,
+  WhiteboardMetadataEffects,
+  WhiteboardNodeEffects,
+} from './state';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
@@ -40,7 +45,12 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardRoutingModule,
     TranslocoModule,
     StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
-    EffectsModule.forFeature([WhiteboardMetadataEffects, WhiteboardNodeEffects, TableNodeEffects]),
+    EffectsModule.forFeature([
+      WhiteboardGeneralEffects,
+      WhiteboardMetadataEffects,
+      WhiteboardNodeEffects,
+      TableNodeEffects,
+    ]),
     WhiteboardMaterialModule,
   ],
   declarations: [

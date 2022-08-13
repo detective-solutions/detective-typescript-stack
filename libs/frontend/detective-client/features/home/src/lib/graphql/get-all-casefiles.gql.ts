@@ -15,7 +15,7 @@ export class GetAllCasefilesGQL extends Query<Response> {
         id: xid
         title
         description
-        thumbnailSrc
+        thumbnail
         author {
           firstname
           lastname

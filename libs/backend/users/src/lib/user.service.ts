@@ -1,7 +1,22 @@
+import {
+  IGetJwtUserInfoByEmail,
+  IGetJwtUserInfoById,
+  IGetUserUid,
+  IPasswordCheck,
+  getJwtUserInfoByEmailQuery,
+  getJwtUserInfoByEmailQueryName,
+  getJwtUserInfoByIdQuery,
+  getJwtUserInfoByIdQueryName,
+  getUserUidQuery,
+  getUserUidQueryName,
+  passwordCheckQuery,
+  passwordCheckQueryName,
+  passwordCheckResponseProperty,
+} from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
-import { JwtUserInfo } from './dto/user.dto';
+import { JwtUserInfo } from './models';
 import { TxnOptions } from 'dgraph-js';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
@@ -15,140 +30,91 @@ export class UserService {
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
 
   async checkPassword(email: string, password: string): Promise<boolean | null> {
-    interface PasswordCheckApiResponse {
-      passwordCheck: { isValid: boolean }[];
-    }
-
-    const query = `
-      query passwordCheck($email: string, $password: string) {
-        passwordCheck(func: eq(User.email, $email)) @normalize {
-          isValid: checkpwd(User.password, $password)
-        }
-      }
-    `;
-
     this.logger.log('Requesting credential check from the database');
 
     const queryVariables = { $email: email, $password: password };
-    const response = (await this.sendQuery(query, queryVariables)) as PasswordCheckApiResponse;
+    const response = (await this.sendQuery(passwordCheckQuery, queryVariables)) as IPasswordCheck;
     if (!response) {
       return null;
     }
 
-    if (!response.passwordCheck) {
-      this.logger.error('Incoming password check object is missing "passwordCheck" property');
+    if (!response[passwordCheckQueryName]) {
+      this.logger.error(`Incoming password check object is missing ${passwordCheckQueryName} property`);
       throw new InternalServerErrorException();
     }
 
-    if (response.passwordCheck.length > 1) {
+    if (response[passwordCheckQueryName].length > 1) {
       this.logger.error(`Found more than one user with email address ${email} during password check`);
       throw new InternalServerErrorException();
     }
 
-    const passwordCheck = response.passwordCheck[0];
+    const passwordCheck = response[passwordCheckQueryName][0];
 
-    if (!('isValid' in passwordCheck)) {
-      this.logger.error('Incoming password check object is missing "isValid" property');
+    if (!(passwordCheckResponseProperty in passwordCheck)) {
+      this.logger.error(`Incoming password check object is missing ${passwordCheckResponseProperty} property`);
       throw new InternalServerErrorException();
     }
 
-    return passwordCheck.isValid;
+    return passwordCheck[passwordCheckResponseProperty];
   }
 
   async getJwtUserInfoByEmail(email: string): Promise<JwtUserInfo | null> {
-    interface IApiResponse {
-      jwtUserInfo: JwtUserInfo[];
-    }
-
-    // Make sure the query matches JWTUserInfo DTO properties
-    const query = `
-      query jwtUserInfo($email: string) {
-        jwtUserInfo(func: eq(User.email, $email)) @normalize {
-          id: User.xid
-          User.tenants
-            {
-              tenantId: Tenant.xid
-            }
-          role: User.role
-        }
-      }
-    `;
-
-    this.logger.log('Requesting user information for token creation');
+    this.logger.log('Requesting JwtUserInfo object from database');
 
     const queryVariables = { $email: email };
-    const response = (await this.sendQuery(query, queryVariables)) as IApiResponse;
+    const response = (await this.sendQuery(getJwtUserInfoByEmailQuery, queryVariables)) as IGetJwtUserInfoByEmail;
     if (!response) {
       return null;
     }
 
-    if (!response.jwtUserInfo) {
-      this.logger.error('Incoming database response object is missing "jwtUserInfo" property');
+    if (!response[getJwtUserInfoByEmailQueryName]) {
+      this.logger.error(`Incoming database response object is missing ${getJwtUserInfoByEmailQueryName} property`);
       throw new InternalServerErrorException();
     }
 
-    if (response.jwtUserInfo.length > 1) {
+    if (response[getJwtUserInfoByEmailQueryName].length > 1) {
       this.logger.error(`Found more than one user with email address ${email}`);
       throw new InternalServerErrorException();
     }
 
-    if (response.jwtUserInfo.length === 0) {
+    if (response[getJwtUserInfoByEmailQueryName].length === 0) {
       this.logger.warn(`No user found for the given email address ${email}`);
       return null;
     }
 
     this.logger.log('Validating incoming user information');
-    const jwtUserInfo = response.jwtUserInfo[0];
+    const jwtUserInfo = response[getJwtUserInfoByEmailQueryName][0];
     await validateDto(JwtUserInfo, jwtUserInfo, this.logger);
 
     return jwtUserInfo;
   }
 
   async getJwtUserInfoById(id: string): Promise<JwtUserInfo | null> {
-    interface IApiResponse {
-      jwtUserInfo: JwtUserInfo[];
-    }
-
-    // Make sure the query matches JWTUserInfo DTO properties
-    const query = `
-      query jwtUserInfo($id: string) {
-        jwtUserInfo(func: eq(User.xid, $id)) @normalize {
-          id: User.xid
-          User.tenants
-            {
-              tenantId: Tenant.xid
-            }
-          role: User.role
-          refreshTokenId: User.refreshTokenId
-        }
-      }
-    `;
-
     this.logger.log('Requesting JwtUserInfo object from database');
 
     const queryVariables = { $id: id };
-    const response = (await this.sendQuery(query, queryVariables)) as IApiResponse;
+    const response = (await this.sendQuery(getJwtUserInfoByIdQuery, queryVariables)) as IGetJwtUserInfoById;
     if (!response) {
       return null;
     }
 
-    if (!response.jwtUserInfo) {
-      this.logger.error('Incoming database response object is missing "jwtUserInfo" property');
+    if (!response[getJwtUserInfoByIdQueryName]) {
+      this.logger.error(`Incoming database response object is missing ${getJwtUserInfoByIdQueryName} property`);
       throw new InternalServerErrorException();
     }
 
-    if (response.jwtUserInfo.length > 1) {
+    if (response[getJwtUserInfoByIdQueryName].length > 1) {
       this.logger.error(`Found more than one user with id ${id}`);
       throw new InternalServerErrorException();
     }
 
-    if (response.jwtUserInfo.length === 0) {
+    if (response[getJwtUserInfoByIdQueryName].length === 0) {
       this.logger.warn(`No user found for the given id ${id}`);
       return null;
     }
 
     this.logger.log('Validating incoming JwtUserInfo object');
-    const jwtUserInfo = response.jwtUserInfo[0];
+    const jwtUserInfo = response[getJwtUserInfoByIdQueryName][0];
     await validateDto(JwtUserInfo, jwtUserInfo, this.logger);
 
     return jwtUserInfo;
@@ -178,36 +144,32 @@ export class UserService {
   }
 
   async getUserUid(id: string): Promise<string> {
-    interface IApiResponse {
-      getUserUid: { uid: string }[];
-    }
+    this.logger.log('Requesting user uid from database');
 
-    const query = 'query getUserUid($id: string) { getUserUid(func: eq(User.xid, $id)) { uid }}';
     const queryVariables = { $id: id };
-
-    const queryResponse = (await this.sendQuery(query, queryVariables)) as IApiResponse;
+    const queryResponse = (await this.sendQuery(getUserUidQuery, queryVariables)) as IGetUserUid;
     if (!queryResponse) {
       return null;
     }
 
-    if (!queryResponse.getUserUid) {
-      this.logger.error('Incoming database response object is missing "getUserUid" property');
+    if (!queryResponse[getUserUidQueryName]) {
+      this.logger.error(`Incoming database response object is missing ${getUserUidQueryName} property`);
       throw new InternalServerErrorException();
     }
 
-    if (queryResponse.getUserUid.length > 1) {
+    if (queryResponse[getUserUidQueryName].length > 1) {
       this.logger.error(`Found more than one user with id ${id} while fetching uid`);
       throw new InternalServerErrorException();
     }
 
-    if (queryResponse.getUserUid.length === 0) {
+    if (queryResponse[getUserUidQueryName].length === 0) {
       this.logger.error(`No user found for the given id ${id}`);
       return null;
     }
 
-    const userUid = queryResponse.getUserUid[0]?.uid;
+    const userUid = queryResponse[getUserUidQueryName][0]?.uid;
     if (!userUid) {
-      this.logger.error('"getUserUid" is missing "uid" property');
+      this.logger.error(`${getJwtUserInfoByEmailQueryName} is missing "uid" property`);
       throw new InternalServerErrorException();
     }
 
