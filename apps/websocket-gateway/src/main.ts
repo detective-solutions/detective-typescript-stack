@@ -18,4 +18,5 @@ async function bootstrap() {
   );
 }
 
+console.log(); // TODO: Remove me!
 bootstrap();
