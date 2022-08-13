@@ -2,7 +2,7 @@ export const passwordCheckQueryName = 'passwordCheck';
 export const passwordCheckResponseProperty = 'isValid';
 
 export interface IPasswordCheck {
-  [passwordCheckQueryName]: { isValid: boolean }[];
+  [passwordCheckQueryName]: { [passwordCheckResponseProperty]: boolean }[];
 }
 
 // Make sure the query matches the API response interface above

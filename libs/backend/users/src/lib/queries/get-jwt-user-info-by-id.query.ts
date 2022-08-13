@@ -3,7 +3,7 @@ import { JwtUserInfo } from '../models';
 export const getJwtUserInfoByIdQueryName = 'getJwtUserInfoById';
 
 export interface IGetJwtUserInfoById {
-  jwtUserInfo: JwtUserInfo[];
+  [getJwtUserInfoByIdQueryName]: JwtUserInfo[];
 }
 
 export const getJwtUserInfoByIdQuery = `
