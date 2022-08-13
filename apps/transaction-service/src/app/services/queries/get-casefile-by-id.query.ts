@@ -25,7 +25,9 @@ export const getCasefileByIdQuery = `
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
+          title: User.title
           role: User.role
+          avatarUrl: User.avatarUrl
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
@@ -46,7 +48,9 @@ export const getCasefileByIdQuery = `
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
+          title: User.title
           role: User.role
+          avatarUrl: User.avatarUrl
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
@@ -67,7 +71,9 @@ export const getCasefileByIdQuery = `
           id: User.xid
           firstname: User.firstname
           lastname: User.lastname
+          title: User.title
           role: User.role
+          avatarUrl: User.avatarUrl
         }
         lastUpdated: Embedding.lastUpdated
         created: Embedding.created

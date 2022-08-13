@@ -42,21 +42,26 @@ export class User implements IUser {
 
   @MaxLength(64)
   @IsString()
+  @IsOptional()
   firstname!: string;
 
   @MaxLength(64)
   @IsString()
+  @IsOptional()
   lastname!: string;
 
   @MaxLength(64)
   @IsString()
+  @IsOptional()
   title!: string;
 
   @IsUrl()
+  @IsOptional()
   avatarUrl!: string;
 
   @ValidateNested({ each: true })
   @Type(() => UserGroup)
+  @IsOptional()
   userGroups!: UserGroup[];
 
   @ValidateIf((refreshTokenId) => refreshTokenId !== '')

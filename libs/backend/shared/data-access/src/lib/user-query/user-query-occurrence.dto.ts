@@ -1,5 +1,8 @@
 import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+
+import { Type } from 'class-transformer';
+import { UserForWhiteboard } from '../user';
 
 export class UserQueryOccurrence implements IUserQueryOccurrence {
   @IsUUID()
@@ -37,6 +40,8 @@ export class UserQueryOccurrence implements IUserQueryOccurrence {
   @IsNotEmpty()
   editors!: IUser[];
 
+  @ValidateNested({ each: true })
+  @Type(() => UserForWhiteboard)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

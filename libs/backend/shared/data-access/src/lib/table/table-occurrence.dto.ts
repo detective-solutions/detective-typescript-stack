@@ -1,5 +1,17 @@
 import { ITable, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
+
+import { Type } from 'class-transformer';
+import { UserForWhiteboard } from '../user';
 
 export class TableOccurrence implements ITableOccurrence {
   @IsUUID()
@@ -31,6 +43,8 @@ export class TableOccurrence implements ITableOccurrence {
   @IsNotEmpty()
   locked!: boolean;
 
+  @ValidateNested({ each: true })
+  @Type(() => UserForWhiteboard)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

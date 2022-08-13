@@ -1,5 +1,18 @@
 import { IEmbedding, IUser } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsUrl,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
+
+import { Type } from 'class-transformer';
+import { UserForWhiteboard } from '../user';
 
 export class Embedding implements IEmbedding {
   @IsUUID()
@@ -42,6 +55,8 @@ export class Embedding implements IEmbedding {
   @IsNotEmpty()
   editors!: IUser[];
 
+  @ValidateNested({ each: true })
+  @Type(() => UserForWhiteboard)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
