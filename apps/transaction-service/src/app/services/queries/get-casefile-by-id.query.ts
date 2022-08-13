@@ -8,7 +8,7 @@ export interface IGetCasefileById {
 
 // Make sure the query matches the API response interface above
 export const getCasefileByIdQuery = `
-  ${getCasefileByIdQueryName}($id: string) {
+  query ${getCasefileByIdQueryName}($id: string) {
     ${getCasefileByIdQueryName}(func: eq(Casefile.xid, $id)) {
       id: Casefile.xid
       title: Casefile.title
