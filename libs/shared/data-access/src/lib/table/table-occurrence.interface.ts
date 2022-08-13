@@ -11,6 +11,6 @@ export interface ITableOccurrence {
   height: number;
   locked: boolean;
   lastUpdatedBy: IUser;
-  lastUpdated: Date;
-  created: Date;
+  lastUpdated: string;
+  created: string;
 }

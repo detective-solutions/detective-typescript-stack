@@ -18,8 +18,8 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     public height: number,
     public locked: boolean,
     public lastUpdatedBy: IUser,
-    public lastUpdated: Date,
-    public created: Date,
+    public lastUpdated: string,
+    public created: string,
     public temporary: ITableNodeTemporaryData | undefined
   ) {}
 

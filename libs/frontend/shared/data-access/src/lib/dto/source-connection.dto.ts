@@ -39,7 +39,7 @@ export class SourceConnection implements ISourceConnection {
     public description: string,
     public iconSrc: string,
     public status: SourceConnectionStatus,
-    public lastUpdated: Date
+    public lastUpdated: string
   ) {}
 
   static Build(sourceConnectionInput: ISourceConnection) {

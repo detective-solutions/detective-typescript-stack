@@ -13,7 +13,7 @@ export interface ISourceConnection {
   databaseSchema?: string;
   connectorName: string;
   connectedTables?: ITableOccurrence[];
-  lastUpdated: Date;
+  lastUpdated: string;
   status: SourceConnectionStatus;
   iconSrc?: string;
 }

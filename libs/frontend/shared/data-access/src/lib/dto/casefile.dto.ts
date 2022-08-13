@@ -20,8 +20,8 @@ export class Casefile implements ICasefile {
     public author: User,
     public editors: IUser[],
     public lastUpdatedBy: IUser,
-    public lastUpdated: Date,
-    public created: Date,
+    public lastUpdated: string,
+    public created: string,
     public tables: ITableOccurrence[],
     public queries: IUserQueryOccurrence[],
     public embeddings: IEmbedding[]

@@ -19,8 +19,8 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
     public author: IUser,
     public editors: IUser[],
     public lastUpdatedBy: IUser,
-    public lastUpdated: Date,
-    public created: Date,
+    public lastUpdated: string,
+    public created: string,
     public temporary: IEmbeddingNodeTemporaryData | undefined
   ) {}
 

@@ -4,6 +4,7 @@ import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, 
 import { Embedding } from '../embedding';
 import { TableOccurrence } from '../table';
 import { Type } from 'class-transformer';
+import { User } from '../user';
 import { UserQueryOccurrence } from '../user-query';
 
 export class Casefile implements ICasefile {
@@ -45,21 +46,26 @@ export class Casefile implements ICasefile {
   @IsNotEmpty()
   views!: number;
 
+  @ValidateNested({ each: true })
+  @Type(() => User)
   @IsNotEmpty()
   author!: IUser;
 
+  @ValidateNested({ each: true })
+  @Type(() => User)
   @IsNotEmpty()
   editors!: IUser[];
 
-  @IsDate()
+  @ValidateNested({ each: true })
+  @Type(() => User)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  lastUpdated!: Date;
+  lastUpdated!: string;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  created!: Date;
+  created!: string;
 }

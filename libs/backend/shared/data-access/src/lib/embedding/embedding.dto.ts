@@ -1,7 +1,6 @@
 import { IEmbedding, IUser } from '@detective.solutions/shared/data-access';
 import {
   IsBoolean,
-  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,7 +8,11 @@ import {
   IsUUID,
   IsUrl,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
+
+import { Type } from 'class-transformer';
+import { User } from '../user';
 
 export class Embedding implements IEmbedding {
   @IsUUID()
@@ -52,15 +55,16 @@ export class Embedding implements IEmbedding {
   @IsNotEmpty()
   editors!: IUser[];
 
-  @IsDate()
+  @ValidateNested({ each: true })
+  @Type(() => User)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  lastUpdated!: Date;
+  lastUpdated!: string;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  created!: Date;
+  created!: string;
 }

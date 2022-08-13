@@ -5,6 +5,6 @@ export interface ITable {
   name: string;
   description?: string;
   lastUpdatedBy: IUser;
-  lastUpdated: Date;
-  created: Date;
+  lastUpdated: string;
+  created: string;
 }

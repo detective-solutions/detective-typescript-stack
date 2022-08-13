@@ -138,8 +138,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       height: 500,
       locked: false,
       lastUpdatedBy: {} as IUser,
-      lastUpdated: new Date(),
-      created: new Date(),
+      lastUpdated: Date.now().toString(),
+      created: Date.now().toString(),
     });
     this.store.dispatch(
       WhiteboardNodeActions.WhiteboardNodeAdded({

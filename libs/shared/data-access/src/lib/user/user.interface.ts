@@ -14,6 +14,6 @@ export interface IUser {
   userGroups?: IUserGroup[];
   refreshTokenId?: string;
   lastUpdatedBy?: IUser;
-  lastUpdated?: Date;
-  created?: Date;
+  lastUpdated?: string;
+  created?: string;
 }

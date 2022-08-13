@@ -15,6 +15,6 @@ export interface ICasefile {
   author: IUser;
   editors: IUser[];
   lastUpdatedBy: IUser;
-  lastUpdated: Date;
-  created: Date;
+  lastUpdated: string;
+  created: string;
 }
