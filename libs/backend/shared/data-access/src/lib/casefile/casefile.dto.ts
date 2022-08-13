@@ -1,10 +1,9 @@
 import { ICasefile, IEmbedding, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 
 import { Embedding } from '../embedding';
 import { TableOccurrence } from '../table';
 import { Type } from 'class-transformer';
-import { User } from '../user';
 import { UserQueryOccurrence } from '../user-query';
 
 export class Casefile implements ICasefile {
@@ -46,18 +45,12 @@ export class Casefile implements ICasefile {
   @IsNotEmpty()
   views!: number;
 
-  @ValidateNested({ each: true })
-  @Type(() => User)
   @IsNotEmpty()
   author!: IUser;
 
-  @ValidateNested({ each: true })
-  @Type(() => User)
   @IsNotEmpty()
   editors!: IUser[];
 
-  @ValidateNested({ each: true })
-  @Type(() => User)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
