@@ -13,7 +13,7 @@ RUN apk add && \
 COPY ./dist/apps/transaction-service/package.json package-lock.json ./
 
 # TODO: Remove explicit installation of mapped-types when NX generates package json correct again
-RUN npm ci --no-audit --no-fund && run npm i @nestjs/mapped-types
+RUN npm ci --no-audit --no-fund && npm i @nestjs/mapped-types
 
 # Copy built code
 COPY ./dist/apps/transaction-service ./
