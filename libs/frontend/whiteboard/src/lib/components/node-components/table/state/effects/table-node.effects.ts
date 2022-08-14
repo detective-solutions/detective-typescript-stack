@@ -36,6 +36,19 @@ export class TableNodeEffects {
               } as IQueryMessagePayload,
             },
           })
+        ),
+        tap(([context, action]) =>
+          this.whiteboardFacade.sendWebsocketMessage({
+            event: MessageEventType.WhiteboardNodeAdded,
+            data: {
+              context: {
+                ...context,
+                eventType: MessageEventType.WhiteboardNodeAdded,
+                nodeId: action.addedNode.id,
+              } as IMessageContext,
+              body: action.addedNode,
+            },
+          })
         )
       );
     },
