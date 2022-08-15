@@ -54,22 +54,22 @@ export class DatabaseService {
     return casefileData;
   }
 
-  // TODO: Add correct parameter type
-  async addWhiteboardNode(casefileId: string, addedNode: ITableOccurrence) {
+  async addTableOccurrenceToCasefile(casefileId: string, addedTableOccurrence: ITableOccurrence) {
     const mutationJson = {
-      'TableOccurrence.title': addedNode.title,
-      'TableOccurrence.x': addedNode.x,
-      'TableOccurrence.y': addedNode.y,
-      'TableOccurrence.width': addedNode.width,
-      'TableOccurrence.height': addedNode.height,
-      'TableOccurrence.locked': String(addedNode.locked),
+      'TableOccurrence.xid': addedTableOccurrence.id,
+      'TableOccurrence.title': addedTableOccurrence.title,
+      'TableOccurrence.x': addedTableOccurrence.x,
+      'TableOccurrence.y': addedTableOccurrence.y,
+      'TableOccurrence.width': addedTableOccurrence.width,
+      'TableOccurrence.height': addedTableOccurrence.height,
+      'TableOccurrence.locked': addedTableOccurrence.locked,
       'TableOccurrence.lastUpdatedBy': {
-        uid: await this.getUidByType(addedNode.lastUpdatedBy.id, 'User'),
+        uid: await this.getUidByType(addedTableOccurrence.lastUpdatedBy.id, 'User'),
       },
-      'TableOccurrence.lastUpdated': addedNode.lastUpdated,
-      'TableOccurrence.created': addedNode.created,
+      'TableOccurrence.lastUpdated': addedTableOccurrence.lastUpdated,
+      'TableOccurrence.created': addedTableOccurrence.created,
       'TableOccurrence.entity': {
-        uid: await this.getUidByType(addedNode.entity.id, 'Table'),
+        uid: await this.getUidByType(addedTableOccurrence.entity.id, 'Table'),
       },
       'TableOccurrence.casefile': {
         uid: await this.getUidByType(casefileId, 'Casefile'),

@@ -23,8 +23,9 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
       }`
     );
 
+    // TODO: Determine node type and corresponding database service method
     this.logger.verbose(`${buildLogContext(this.messagePayload.context)} Adding node to casefile data`);
-    const response = await this.databaseService.addWhiteboardNode(
+    const response = await this.databaseService.addTableOccurrenceToCasefile(
       this.messagePayload.context.casefileId,
       this.messagePayload.body
     );
