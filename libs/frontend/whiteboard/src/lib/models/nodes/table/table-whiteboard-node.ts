@@ -18,7 +18,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     public lastUpdatedBy: IUser,
     public lastUpdated: string,
     public created: string,
-    public entity: ITable,
+    public entity: Partial<ITable>,
     public temporary: ITableNodeTemporaryData | undefined
   ) {}
 

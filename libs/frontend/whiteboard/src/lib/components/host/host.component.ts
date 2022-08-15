@@ -163,7 +163,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // TODO: Use data from added element instead of hard-coded data
     const tableNode = TableWhiteboardNode.Build({
       id: uuidv4(),
-      title: '',
+      title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
       x: convertedDOMPoint.x,
       y: convertedDOMPoint.y,
       width: 900,
@@ -174,11 +174,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       created: Date.now().toString(),
       entity: {
         id: uuidv4(),
-        name: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-        description: '',
-        lastUpdatedBy: {} as IUser,
-        lastUpdated: Date.now().toString(),
-        created: Date.now().toString(),
       },
     });
     this.store.dispatch(

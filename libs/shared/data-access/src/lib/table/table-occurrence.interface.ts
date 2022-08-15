@@ -12,5 +12,5 @@ export interface ITableOccurrence {
   lastUpdatedBy: IUser;
   lastUpdated: string;
   created: string;
-  entity: ITable;
+  entity: Partial<ITable>;
 }
