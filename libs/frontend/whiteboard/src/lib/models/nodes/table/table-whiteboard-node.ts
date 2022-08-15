@@ -15,7 +15,7 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     public width: number,
     public height: number,
     public locked: boolean,
-    public lastUpdatedBy: IUser,
+    public lastUpdatedBy: Partial<IUser>,
     public lastUpdated: string,
     public created: string,
     public entity: Partial<ITable>,
