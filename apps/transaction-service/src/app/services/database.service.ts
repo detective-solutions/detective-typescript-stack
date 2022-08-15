@@ -74,7 +74,9 @@ export class DatabaseService {
       },
       'TableOccurrence.casefile': {
         uid: await this.getUidByType(casefileId, 'Casefile'),
-        'Casefile.tables': '_:new_table_occurrence',
+        'Casefile.tables': {
+          uid: '_:new_table_occurrence',
+        },
       },
       'dgraph.type': 'TableOccurrence',
     };
