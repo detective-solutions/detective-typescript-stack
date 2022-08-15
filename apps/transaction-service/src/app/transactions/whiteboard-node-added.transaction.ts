@@ -16,8 +16,6 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
   }
 
   async execute(): Promise<void> {
-    console.log('MESSAGE PAYLOAD', this.messagePayload);
-
     this.transactionProducer.sendKafkaMessage(KafkaTopic.TransactionOutputBroadcast, this.messagePayload);
     this.logger.log(
       `${buildLogContext(this.messagePayload.context)} Forwarded node information to topic ${
