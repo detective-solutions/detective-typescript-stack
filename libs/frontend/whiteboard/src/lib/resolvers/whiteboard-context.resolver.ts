@@ -13,7 +13,7 @@ export class WhiteboardContextResolver implements Resolve<void> {
   resolve(route: ActivatedRouteSnapshot) {
     this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
       this.store.dispatch(
-        WhiteboardContextActions.initializeWhiteboardContext({
+        WhiteboardContextActions.InitializeWhiteboardContext({
           context: {
             tenantId: route.params['tenantId'],
             casefileId: route.params['casefileId'],

@@ -6,28 +6,24 @@ import { WhiteboardNodeActions } from '../../state';
 
 @Injectable()
 export class BufferService {
-  private readonly nodeLayoutUpdateBuffer: Set<AnyWhiteboardNode> = new Set();
+  private readonly nodeUpdateBuffer: Set<AnyWhiteboardNode> = new Set();
 
   constructor(private readonly store: Store) {}
 
-  addToNodeLayoutUpdateBuffer(node: AnyWhiteboardNode) {
-    this.nodeLayoutUpdateBuffer.add(node);
+  addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
+    this.nodeUpdateBuffer.add(node);
   }
 
-  updateNodeLayoutsFromBuffer() {
+  updateNodesFromBuffer() {
     const updates: Update<AnyWhiteboardNode>[] = [];
-    this.nodeLayoutUpdateBuffer.forEach((node: AnyWhiteboardNode) =>
+    this.nodeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
+      const { id, ...updatedProperties } = node;
       updates.push({
-        id: node.id,
-        changes: {
-          x: node.x,
-          y: node.y,
-          width: node.width,
-          height: node.height,
-        },
-      })
-    );
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeLayoutUpdate({ updates: updates }));
-    this.nodeLayoutUpdateBuffer.clear();
+        id: id,
+        changes: updatedProperties,
+      });
+    });
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeBatchUpdate({ updates: updates }));
+    this.nodeUpdateBuffer.clear();
   }
 }

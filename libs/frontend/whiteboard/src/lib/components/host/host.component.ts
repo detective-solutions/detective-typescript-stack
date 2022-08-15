@@ -17,8 +17,18 @@ import {
   WhiteboardOptions,
 } from '../../models';
 import { ICasefile, IUser, MessageEventType } from '@detective.solutions/shared/data-access';
-import { Subscription, delayWhen, distinctUntilChanged, filter, pluck, switchMap, tap } from 'rxjs';
-import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../../state';
+import {
+  Subscription,
+  combineLatest,
+  delayWhen,
+  distinctUntilChanged,
+  filter,
+  pluck,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { WhiteboardGeneralActions, selectWhiteboardContextState } from '../../state';
 
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
@@ -45,7 +55,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Update underlying graph nodes
     tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes)),
     // Update layouts for nodes moved by graph force
-    tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
+    tap(() => this.whiteboardFacade.updateNodesFromBuffer())
   );
   readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
   readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
@@ -68,6 +78,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly store: Store
   ) {}
   ngOnInit() {
+    // Bind Angular change detection to each graph tick for render sync
+    this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
+
     // Listen to LOAD_WHITEBOARD_DATA websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
@@ -77,21 +90,40 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         )
         .subscribe((messageData: ICasefile) => {
           this.store.dispatch(
-            WhiteboardGeneralActions.whiteboardDataLoaded({
+            WhiteboardGeneralActions.WhiteboardDataLoaded({
               casefile: messageData,
             })
           );
         })
     );
 
-    // Bind Angular change detection to each graph tick for render sync
-    this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
+    // Listen to WHITEBOARD_NODE_ADDED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeAdded),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        .subscribe(([messageData, _context]) => {
+          this.store.dispatch(
+            WhiteboardGeneralActions.WhiteboardNodeAdded({
+              addedNode: messageData.body,
+              addedManually: false,
+            })
+          );
+        })
+    );
 
     // Handle position updates caused by the graph force
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$
         .pipe(distinctUntilChanged())
-        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
+        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeUpdateBuffer(node))
     );
   }
 
@@ -149,7 +181,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     });
     this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodeAdded({
+      WhiteboardGeneralActions.WhiteboardNodeAdded({
         addedNode: TableWhiteboardNode.Build(tableNode),
         addedManually: true,
       })

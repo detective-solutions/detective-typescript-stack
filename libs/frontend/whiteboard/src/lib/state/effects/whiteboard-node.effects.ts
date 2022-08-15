@@ -3,7 +3,7 @@ import { filter, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { WhiteboardFacadeService } from '../../services';
-import { WhiteboardNodeActions } from '../actions';
+import { WhiteboardGeneralActions } from '../actions';
 
 @Injectable()
 export class WhiteboardNodeEffects {
@@ -11,7 +11,7 @@ export class WhiteboardNodeEffects {
   readonly selectedManuallyAddedNodes$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeAdded),
+        ofType(WhiteboardGeneralActions.WhiteboardNodeAdded),
         filter((action) => action.addedManually),
         tap((action) => this.whiteboardFacade.whiteboardSelection$.next(action.addedNode.id))
       );

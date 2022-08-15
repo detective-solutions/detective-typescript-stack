@@ -20,7 +20,7 @@ export class WhiteboardFacadeService {
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
 
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
-    this.actions$.pipe(ofType(WhiteboardGeneralActions.whiteboardDataLoaded)),
+    this.actions$.pipe(ofType(WhiteboardGeneralActions.WhiteboardDataLoaded)),
     this.webSocketService.isConnectedToWebSocketServer$,
   ]).pipe(
     map(
@@ -43,7 +43,7 @@ export class WhiteboardFacadeService {
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
-    this.store.dispatch(WhiteboardGeneralActions.loadWhiteboardData());
+    this.store.dispatch(WhiteboardGeneralActions.LoadWhiteboardData());
 
     // TODO: Remove these mocked data when action is triggered by backend response
     // setTimeout(() => {
@@ -57,7 +57,7 @@ export class WhiteboardFacadeService {
 
   resetWhiteboard() {
     this.webSocketService.resetWebsocketConnection();
-    this.store.dispatch(WhiteboardGeneralActions.resetWhiteboardData());
+    this.store.dispatch(WhiteboardGeneralActions.ResetWhiteboardData());
   }
 
   addSelectedElement(selectedElementComponent: NodeComponent) {
@@ -84,12 +84,12 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addToNodeLayoutUpdateBuffer(node: AnyWhiteboardNode) {
-    this.bufferService.addToNodeLayoutUpdateBuffer(node);
+  addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
+    this.bufferService.addToNodeUpdateBuffer(node);
   }
 
-  updateNodeLayoutsFromBuffer() {
-    this.bufferService.updateNodeLayoutsFromBuffer();
+  updateNodesFromBuffer() {
+    this.bufferService.updateNodesFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

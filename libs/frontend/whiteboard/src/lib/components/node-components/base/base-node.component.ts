@@ -49,6 +49,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.whiteboardFacade.applyDragBehaviorToComponent(this);
+    this.customAfterViewInit();
   }
 
   ngOnDestroy() {
@@ -72,6 +73,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
       })
     );
   }
+
+  // Can be used by child classes to add custom logic to the ngAfterViewInit hook
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customAfterViewInit() {}
 
   protected updateExistingNodeObject(updatedNode: AnyWhiteboardNode) {
     Object.keys(updatedNode).forEach((key: string) => {
