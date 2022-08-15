@@ -1,3 +1,4 @@
+import { ICasefileForWhiteboard, ITableOccurrence } from '@detective.solutions/shared/data-access';
 import {
   IGetCasefileById,
   IGetUid,
@@ -10,7 +11,6 @@ import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableExc
 
 import { CasefileForWhiteboard } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
-import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { TxnOptions } from 'dgraph-js';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
@@ -55,8 +55,7 @@ export class DatabaseService {
   }
 
   // TODO: Add correct parameter type
-  async addWhiteboardNode(casefileId: string, addedNode: any) {
-    console.log(addedNode);
+  async addWhiteboardNode(casefileId: string, addedNode: ITableOccurrence) {
     const mutationJson = {
       'TableOccurrence.title': addedNode.title,
       'TableOccurrence.x': addedNode.x,

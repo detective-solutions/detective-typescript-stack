@@ -28,7 +28,7 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
     this.logger.verbose(`${buildLogContext(this.messagePayload.context)} Adding node to casefile data`);
     const response = await this.databaseService.addWhiteboardNode(
       this.messagePayload.context.casefileId,
-      this.messagePayload
+      this.messagePayload.body
     );
     if (!response) {
       throw new InternalServerErrorException(
