@@ -1,4 +1,4 @@
-import { AnyWhiteboardNode, ITableNodeTemporaryData } from '../../../models';
+import { AnyWhiteboardNode, ITableNode, ITableNodeTemporaryData, ITableWhiteboardNode } from '../../../models';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 import { filter, map, pluck, switchMap } from 'rxjs';
@@ -58,7 +58,7 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
         )
         .subscribe((messageData: IQueryResponseBody) => {
           this.store.dispatch(
-            TableNodeActions.tableDataReceived({
+            TableNodeActions.TableDataReceived({
               update: {
                 id: this.node.id,
                 changes: { temporary: { colDefs: messageData.tableSchema, rowData: messageData.tableData } },
@@ -67,5 +67,13 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
           );
         })
     );
+
+    const isTemporaryTableDataAvailable =
+      !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
+    if (isTemporaryTableDataAvailable) {
+      // It is mandatory to create a deep copy of the node object, because it will be set to read-only
+      // when it is handled by the state mechanism
+      this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
+    }
   }
 }
