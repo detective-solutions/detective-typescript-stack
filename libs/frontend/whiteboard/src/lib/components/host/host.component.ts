@@ -109,6 +109,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           ),
           filter(([messageData, context]) => messageData.context.userId !== context.userId)
         )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .subscribe(([messageData, _context]) => {
           this.store.dispatch(
             WhiteboardGeneralActions.WhiteboardNodeAdded({
