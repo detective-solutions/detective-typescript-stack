@@ -26,7 +26,7 @@ export class DatabaseService {
     }
 
     if (!response[getCasefileByIdQueryName]) {
-      this.logger.error('Incoming database response object is missing "jwtUserInfo" property');
+      this.logger.error(`Incoming database response object is missing ${getCasefileByIdQueryName} property`);
       throw new InternalServerErrorException();
     }
 
