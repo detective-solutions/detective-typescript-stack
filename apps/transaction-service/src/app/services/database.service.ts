@@ -56,6 +56,7 @@ export class DatabaseService {
 
   async addTableOccurrenceToCasefile(casefileId: string, addedTableOccurrence: ITableOccurrence) {
     const mutationJson = {
+      uid: '_:new_table_occurrence',
       'TableOccurrence.xid': addedTableOccurrence.id,
       'TableOccurrence.title': addedTableOccurrence.title,
       'TableOccurrence.x': addedTableOccurrence.x,
@@ -73,6 +74,7 @@ export class DatabaseService {
       },
       'TableOccurrence.casefile': {
         uid: await this.getUidByType(casefileId, 'Casefile'),
+        'Casefile.tables': '_:new_table_occurrence',
       },
       'dgraph.type': 'TableOccurrence',
     };
