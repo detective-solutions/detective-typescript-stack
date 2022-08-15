@@ -62,8 +62,8 @@ export class DatabaseService {
       'TableOccurrence.y': addedNode.y,
       'TableOccurrence.width': addedNode.width,
       'TableOccurrence.height': addedNode.height,
-      'TableOccurrence.locked': addedNode.locked,
-      'TableOccurrence.lastUpdatedBy': addedNode.lastUpdatedBy,
+      'TableOccurrence.locked': String(addedNode.locked),
+      'TableOccurrence.lastUpdatedBy': await this.getUidByType(addedNode.lastUpdatedBy.id, 'User'),
       'TableOccurrence.lastUpdated': addedNode.lastUpdated,
       'TableOccurrence.created': addedNode.created,
       'TableOccurrence.entity': {
