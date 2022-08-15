@@ -56,6 +56,7 @@ export class DatabaseService {
 
   // TODO: Add correct parameter type
   async addWhiteboardNode(casefileId: string, addedNode: any) {
+    console.log(addedNode);
     const mutationJson = {
       'TableOccurrence.title': addedNode.title,
       'TableOccurrence.x': addedNode.x,
@@ -74,6 +75,8 @@ export class DatabaseService {
       },
       'dgraph.type': 'TableOccurrence',
     };
+
+    console.log(mutationJson);
 
     return this.sendMutation(mutationJson).catch(() => {
       this.logger.error(`There was a problem while trying to add a node to casefile ${casefileId}`);
