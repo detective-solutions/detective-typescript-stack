@@ -11,6 +11,6 @@ export const WhiteboardNodeUpdate = createAction(
 );
 
 export const WhiteboardNodeBatchUpdate = createAction(
-  `${actionPrefix} Updating node layout`,
+  `${actionPrefix} Updating multiple nodes`,
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );
