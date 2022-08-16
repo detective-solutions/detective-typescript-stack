@@ -32,6 +32,7 @@ import { WhiteboardGeneralActions, selectWhiteboardContextState } from '../../st
 
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
+import { formatDate } from '@detective.solutions/frontend/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -161,6 +162,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     // TODO: Use data from added element instead of hard-coded data
+    const now = formatDate(new Date());
     const tableNode = TableWhiteboardNode.Build({
       id: uuidv4(),
       title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
@@ -169,11 +171,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       width: 900,
       height: 500,
       locked: false,
-      lastUpdatedBy: {} as IUser,
-      lastUpdated: Date.now().toString(),
-      created: Date.now().toString(),
+      lastUpdatedBy: {
+        id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+      },
+      lastUpdated: now,
+      created: now,
       entity: {
-        id: uuidv4(),
+        id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
       },
     });
     this.store.dispatch(
