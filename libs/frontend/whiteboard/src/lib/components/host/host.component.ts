@@ -32,7 +32,7 @@ import { WhiteboardGeneralActions, selectWhiteboardContextState } from '../../st
 
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
-import { formatDate } from '@detective.solutions/frontend/shared/utils';
+import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
