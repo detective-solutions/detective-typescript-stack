@@ -79,7 +79,7 @@ describe('LoadWhiteboardDataTransaction', () => {
 
       await loadWhiteboardDataTransaction.execute();
 
-      const modifiedPayload = Object.assign({}, testMessagePayload);
+      const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
 
       expect(getCasfileByIdSpy).toBeCalledTimes(1);
