@@ -1,4 +1,10 @@
-import { ICasefileForWhiteboard, ITableOccurrence } from '@detective.solutions/shared/data-access';
+import {
+  AnyWhiteboardNode,
+  ICasefileForWhiteboard,
+  IEmbeddingWhiteboardNode,
+  ITableWhiteboardNode,
+  IUserQueryWhiteboardNode,
+} from '@detective.solutions/shared/data-access';
 import {
   IGetCasefileById,
   IGetUid,
@@ -9,7 +15,7 @@ import {
 } from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
-import { CasefileForWhiteboard } from '../models';
+import { CasefileForWhiteboardDTO } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
@@ -19,6 +25,8 @@ import { validateDto } from '@detective.solutions/backend/shared/utils';
 @Injectable()
 export class DatabaseService {
   private static readonly readTxnOptions: TxnOptions = { readOnly: true, bestEffort: true };
+  private static readonly mutationNodeReference = '_:new_node';
+
   readonly logger = new Logger(DatabaseService.name);
 
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
@@ -49,40 +57,83 @@ export class DatabaseService {
 
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response[getCasefileByIdQueryName][0];
-    await validateDto(CasefileForWhiteboard, casefileData, this.logger);
+    await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
     return casefileData;
   }
 
-  async addTableOccurrenceToCasefile(casefileId: string, addedTableOccurrence: ITableOccurrence) {
+  async addTableOccurrenceToCasefile(
+    casefileId: string,
+    tableWhiteboardNode: ITableWhiteboardNode
+  ): Promise<Record<string, any> | null> {
     const mutationJson = {
-      uid: '_:new_table_occurrence',
-      'TableOccurrence.xid': addedTableOccurrence.id,
-      'TableOccurrence.title': addedTableOccurrence.title,
-      'TableOccurrence.x': addedTableOccurrence.x,
-      'TableOccurrence.y': addedTableOccurrence.y,
-      'TableOccurrence.width': addedTableOccurrence.width,
-      'TableOccurrence.height': addedTableOccurrence.height,
-      'TableOccurrence.locked': addedTableOccurrence.locked,
-      'TableOccurrence.lastUpdatedBy': {
-        uid: await this.getUidByType(addedTableOccurrence.lastUpdatedBy.id, 'User'),
+      uid: DatabaseService.mutationNodeReference,
+      ...this.createBasicNodeMutation(tableWhiteboardNode),
+      [`${tableWhiteboardNode.type}.entity`]: {
+        uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
       },
-      'TableOccurrence.lastUpdated': addedTableOccurrence.lastUpdated,
-      'TableOccurrence.created': addedTableOccurrence.created,
-      'TableOccurrence.entity': {
-        uid: await this.getUidByType(addedTableOccurrence.entity.id, 'Table'),
-      },
-      'TableOccurrence.casefile': {
+      [`${tableWhiteboardNode}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
-        'Casefile.tables': {
-          uid: '_:new_table_occurrence',
-        },
+        'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
-      'dgraph.type': 'TableOccurrence',
     };
 
     return this.sendMutation(mutationJson).catch(() => {
-      this.logger.error(`There was a problem while trying to add a node to casefile ${casefileId}`);
+      this.logger.error(
+        `There was a problem while trying to add a ${tableWhiteboardNode.type} node to casefile ${casefileId}`
+      );
+      return null;
+    });
+  }
+
+  async addUserQueryToCasefile(
+    casefileId: string,
+    userQueryWhiteboardNode: IUserQueryWhiteboardNode
+  ): Promise<Record<string, any> | null> {
+    const mutationJson = {
+      uid: DatabaseService.mutationNodeReference,
+      ...this.createBasicNodeMutation(userQueryWhiteboardNode),
+      [`${userQueryWhiteboardNode.type}.author`]: {
+        uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
+      },
+      [`${userQueryWhiteboardNode.type}.entity`]: {
+        uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
+      },
+      [`${userQueryWhiteboardNode}.casefile`]: {
+        uid: await this.getUidByType(casefileId, 'Casefile'),
+        'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
+      },
+    };
+
+    return this.sendMutation(mutationJson).catch(() => {
+      this.logger.error(
+        `There was a problem while trying to add a ${userQueryWhiteboardNode.type} node to casefile ${casefileId}`
+      );
+      return null;
+    });
+  }
+
+  async addEmbeddingToCasefile(
+    casefileId: string,
+    embeddingWhiteboardNode: IEmbeddingWhiteboardNode
+  ): Promise<Record<string, any> | null> {
+    const mutationJson = {
+      uid: DatabaseService.mutationNodeReference,
+      ...this.createBasicNodeMutation(embeddingWhiteboardNode),
+      [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
+      [`${embeddingWhiteboardNode.type}.author`]: {
+        uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
+      },
+      [`${embeddingWhiteboardNode.type}.casefile`]: {
+        uid: await this.getUidByType(casefileId, 'Casefile'),
+        'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
+      },
+    };
+
+    return this.sendMutation(mutationJson).catch(() => {
+      this.logger.error(
+        `There was a problem while trying to add a ${embeddingWhiteboardNode} node to casefile ${casefileId}`
+      );
       return null;
     });
   }
@@ -118,6 +169,24 @@ export class DatabaseService {
     }
 
     return uid;
+  }
+
+  private async createBasicNodeMutation(addedWhiteboardNode: AnyWhiteboardNode) {
+    return {
+      [`${addedWhiteboardNode.type}.xid`]: addedWhiteboardNode.id,
+      [`${addedWhiteboardNode.type}.title`]: addedWhiteboardNode.title,
+      [`${addedWhiteboardNode.type}.x`]: addedWhiteboardNode.x,
+      [`${addedWhiteboardNode.type}.y`]: addedWhiteboardNode.y,
+      [`${addedWhiteboardNode.type}.width`]: addedWhiteboardNode.width,
+      [`${addedWhiteboardNode.type}.height`]: addedWhiteboardNode.height,
+      [`${addedWhiteboardNode.type}.locked`]: addedWhiteboardNode.locked,
+      [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
+        uid: await this.getUidByType(addedWhiteboardNode.lastUpdatedBy.id, 'User'),
+      },
+      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated,
+      [`${addedWhiteboardNode.type}.created`]: addedWhiteboardNode.created,
+      'dgraph.type': addedWhiteboardNode.type,
+    };
   }
 
   /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)
