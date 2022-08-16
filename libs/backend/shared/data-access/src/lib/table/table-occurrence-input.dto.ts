@@ -1,19 +1,7 @@
 import { ITable, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
-import { Type } from 'class-transformer';
-import { UserForWhiteboardDTO } from '../user';
-
-export class TableOccurrenceDTO implements ITableOccurrence {
+export class TableOccurrenceInputDTO implements ITableOccurrence {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -43,8 +31,6 @@ export class TableOccurrenceDTO implements ITableOccurrence {
   @IsNotEmpty()
   locked!: boolean;
 
-  @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboardDTO)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

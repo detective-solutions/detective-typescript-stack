@@ -2,7 +2,7 @@ import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-valid
 
 import { ITenant } from '@detective.solutions/shared/data-access';
 
-export class Tenant implements ITenant {
+export class TenantDTO implements ITenant {
   @IsNotEmpty()
   @IsUUID()
   id!: string;

@@ -1,6 +1,6 @@
-import { Casefile } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetAllCasefilesResponse {
-  casefiles: Casefile[];
+  casefiles: CasefileDTO[];
   totalElementsCount: number;
 }

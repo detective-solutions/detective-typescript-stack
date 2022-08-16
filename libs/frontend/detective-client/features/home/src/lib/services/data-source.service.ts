@@ -4,7 +4,7 @@ import { Observable, catchError, map } from 'rxjs';
 import { IGetAllDataSourcesResponse } from '../interfaces';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
-import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
@@ -27,7 +27,7 @@ export class DataSourceService {
       map((response: any) => response.data),
       map((response: IGetAllDataSourcesGQLResponse) => {
         return {
-          dataSources: response.querySourceConnection.map(SourceConnection.Build),
+          dataSources: response.querySourceConnection.map(SourceConnectionDTO.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
         };
       }),

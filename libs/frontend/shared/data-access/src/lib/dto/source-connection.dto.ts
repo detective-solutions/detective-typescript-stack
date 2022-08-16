@@ -15,22 +15,22 @@ export enum SourceConnectorName {
   AWS_DYNAMODB = 'aws-dynamo',
 }
 
-export class SourceConnection implements ISourceConnection {
+export class SourceConnectionDTO implements ISourceConnection {
   static readonly iconBasePath = 'assets/icons/source-connections/';
 
-  static readonly excelThumbnail = SourceConnection.iconBasePath + 'excel.svg';
-  static readonly pdfThumbnail = SourceConnection.iconBasePath + 'pdf.svg';
-  static readonly mongoDbThumbnail = SourceConnection.iconBasePath + 'mongo-db.svg';
-  static readonly mySqlThumbnail = SourceConnection.iconBasePath + 'my-sql.svg';
-  static readonly mariaDbThumbnail = SourceConnection.iconBasePath + 'maria-db.svg';
-  static readonly postgresThumbnail = SourceConnection.iconBasePath + 'postgres.svg';
-  static readonly oracleDbThumbnail = SourceConnection.iconBasePath + 'oracle-db.svg';
-  static readonly microsoftSqlThumbnail = SourceConnection.iconBasePath + 'ms-sql.svg';
-  static readonly azureSqlThumbnail = SourceConnection.iconBasePath + 'azure-sql.svg';
-  static readonly azureBlobThumbnail = SourceConnection.iconBasePath + 'azure-blob.svg';
-  static readonly awsBlobThumbnail = SourceConnection.iconBasePath + 'aws-blob.svg';
-  static readonly awsDynamoDbThumbnail = SourceConnection.iconBasePath + 'aws-dynamodb.svg';
-  static readonly defaultThumbnail = SourceConnection.iconBasePath + 'default.svg';
+  static readonly excelThumbnail = SourceConnectionDTO.iconBasePath + 'excel.svg';
+  static readonly pdfThumbnail = SourceConnectionDTO.iconBasePath + 'pdf.svg';
+  static readonly mongoDbThumbnail = SourceConnectionDTO.iconBasePath + 'mongo-db.svg';
+  static readonly mySqlThumbnail = SourceConnectionDTO.iconBasePath + 'my-sql.svg';
+  static readonly mariaDbThumbnail = SourceConnectionDTO.iconBasePath + 'maria-db.svg';
+  static readonly postgresThumbnail = SourceConnectionDTO.iconBasePath + 'postgres.svg';
+  static readonly oracleDbThumbnail = SourceConnectionDTO.iconBasePath + 'oracle-db.svg';
+  static readonly microsoftSqlThumbnail = SourceConnectionDTO.iconBasePath + 'ms-sql.svg';
+  static readonly azureSqlThumbnail = SourceConnectionDTO.iconBasePath + 'azure-sql.svg';
+  static readonly azureBlobThumbnail = SourceConnectionDTO.iconBasePath + 'azure-blob.svg';
+  static readonly awsBlobThumbnail = SourceConnectionDTO.iconBasePath + 'aws-blob.svg';
+  static readonly awsDynamoDbThumbnail = SourceConnectionDTO.iconBasePath + 'aws-dynamodb.svg';
+  static readonly defaultThumbnail = SourceConnectionDTO.iconBasePath + 'default.svg';
 
   constructor(
     public id: string,
@@ -43,12 +43,12 @@ export class SourceConnection implements ISourceConnection {
   ) {}
 
   static Build(sourceConnectionInput: ISourceConnection) {
-    return new SourceConnection(
+    return new SourceConnectionDTO(
       sourceConnectionInput.id,
       sourceConnectionInput.name,
       sourceConnectionInput.connectorName,
       sourceConnectionInput.description ?? '',
-      sourceConnectionInput.iconSrc ?? SourceConnection.getIconSrc(sourceConnectionInput.connectorName),
+      sourceConnectionInput.iconSrc ?? SourceConnectionDTO.getIconSrc(sourceConnectionInput.connectorName),
       sourceConnectionInput.status,
       sourceConnectionInput.lastUpdated
     );
@@ -57,31 +57,31 @@ export class SourceConnection implements ISourceConnection {
   private static getIconSrc(sourceConnectionType: string): string {
     switch (sourceConnectionType) {
       case SourceConnectorName.EXCEL:
-        return SourceConnection.excelThumbnail;
+        return SourceConnectionDTO.excelThumbnail;
       case SourceConnectorName.PDF:
-        return SourceConnection.pdfThumbnail;
+        return SourceConnectionDTO.pdfThumbnail;
       case SourceConnectorName.MONGO_DB:
-        return SourceConnection.mongoDbThumbnail;
+        return SourceConnectionDTO.mongoDbThumbnail;
       case SourceConnectorName.MY_SQL:
-        return SourceConnection.mySqlThumbnail;
+        return SourceConnectionDTO.mySqlThumbnail;
       case SourceConnectorName.MARIA_DB:
-        return SourceConnection.mariaDbThumbnail;
+        return SourceConnectionDTO.mariaDbThumbnail;
       case SourceConnectorName.POSTGRES:
-        return SourceConnection.postgresThumbnail;
+        return SourceConnectionDTO.postgresThumbnail;
       case SourceConnectorName.ORACLE_DB:
-        return SourceConnection.oracleDbThumbnail;
+        return SourceConnectionDTO.oracleDbThumbnail;
       case SourceConnectorName.MICROSOFT_SQL:
-        return SourceConnection.microsoftSqlThumbnail;
+        return SourceConnectionDTO.microsoftSqlThumbnail;
       case SourceConnectorName.AZURE_SQL:
-        return SourceConnection.azureSqlThumbnail;
+        return SourceConnectionDTO.azureSqlThumbnail;
       case SourceConnectorName.AZURE_BLOB:
-        return SourceConnection.azureBlobThumbnail;
+        return SourceConnectionDTO.azureBlobThumbnail;
       case SourceConnectorName.AWS_BLOB:
-        return SourceConnection.awsBlobThumbnail;
+        return SourceConnectionDTO.awsBlobThumbnail;
       case SourceConnectorName.AWS_DYNAMODB:
-        return SourceConnection.awsDynamoDbThumbnail;
+        return SourceConnectionDTO.awsDynamoDbThumbnail;
       default:
-        return SourceConnection.defaultThumbnail;
+        return SourceConnectionDTO.defaultThumbnail;
     }
   }
 }

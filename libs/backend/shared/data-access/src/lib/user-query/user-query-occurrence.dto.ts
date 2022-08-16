@@ -2,9 +2,9 @@ import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/sh
 import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 
 import { Type } from 'class-transformer';
-import { UserForWhiteboard } from '../user';
+import { UserForWhiteboardDTO } from '../user';
 
-export class UserQueryOccurrence implements IUserQueryOccurrence {
+export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -41,7 +41,7 @@ export class UserQueryOccurrence implements IUserQueryOccurrence {
   editors!: IUser[];
 
   @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboard)
+  @Type(() => UserForWhiteboardDTO)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

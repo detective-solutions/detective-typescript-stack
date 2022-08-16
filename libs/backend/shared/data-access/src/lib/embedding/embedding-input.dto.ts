@@ -1,19 +1,7 @@
-import { ITable, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
+import { IEmbedding, IUser } from '@detective.solutions/shared/data-access';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, IsUrl, MaxLength } from 'class-validator';
 
-import { Type } from 'class-transformer';
-import { UserForWhiteboardDTO } from '../user';
-
-export class TableOccurrenceDTO implements ITableOccurrence {
+export class EmbeddingInputDTO implements IEmbedding {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -22,6 +10,11 @@ export class TableOccurrenceDTO implements ITableOccurrence {
   @IsString()
   @IsOptional()
   title!: string;
+
+  @IsUrl()
+  @IsString()
+  @IsNotEmpty()
+  href!: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -43,8 +36,12 @@ export class TableOccurrenceDTO implements ITableOccurrence {
   @IsNotEmpty()
   locked!: boolean;
 
-  @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboardDTO)
+  @IsNotEmpty()
+  author!: IUser;
+
+  @IsNotEmpty()
+  editors!: IUser[];
+
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
@@ -55,7 +52,4 @@ export class TableOccurrenceDTO implements ITableOccurrence {
   @IsString()
   @IsNotEmpty()
   created!: string;
-
-  @IsNotEmpty()
-  entity!: ITable;
 }

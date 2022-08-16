@@ -5,7 +5,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Apollo } from 'apollo-angular';
 import { DataSourceService } from './data-source.service';
 import { GetAllDataSourcesGQL } from '../graphql';
-import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { v4 as uuidv4 } from 'uuid';
@@ -113,8 +113,8 @@ describe('DataSourceService', () => {
     }));
   });
 
-  function _createSourceConnection(): SourceConnection {
-    return SourceConnection.Build({
+  function _createSourceConnection(): SourceConnectionDTO {
+    return SourceConnectionDTO.Build({
       id: uuidv4(),
       name: 'Test Connection',
       connectorName: 'connector',

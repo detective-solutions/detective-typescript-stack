@@ -7,7 +7,7 @@ import { buildLogContext, validateDto } from '@detective.solutions/backend/share
 import { AuthEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { MessageContext } from '@detective.solutions/backend/shared/data-access';
+import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardProducer } from '../kafka/whiteboard.producer';
@@ -180,7 +180,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
     if (!context) {
       throw new InternalServerErrorException('The incoming websocket message is missing mandatory context information');
     }
-    await validateDto(MessageContext, context, this.logger);
+    await validateDto(MessageContextDTO, context, this.logger);
   }
 
   private isContextMatch(
