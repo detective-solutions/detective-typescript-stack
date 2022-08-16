@@ -11,12 +11,12 @@ import {
 } from '@angular/core';
 import {
   AnyWhiteboardNode,
-  ForceDirectedGraph,
-  TableWhiteboardNode,
+  ICasefile,
+  MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
-} from '../../models';
-import { ICasefile, IUser, MessageEventType } from '@detective.solutions/shared/data-access';
+} from '@detective.solutions/shared/data-access';
+import { ForceDirectedGraph, TableWhiteboardNode } from '../../models';
 import {
   Subscription,
   combineLatest,

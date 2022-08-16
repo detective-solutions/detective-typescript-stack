@@ -1,4 +1,4 @@
-import { AnyWhiteboardNode } from '../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';

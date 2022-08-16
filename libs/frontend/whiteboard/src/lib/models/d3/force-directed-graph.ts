@@ -1,10 +1,8 @@
+import { AnyWhiteboardNode, IForceDirectedNode, WhiteboardOptions } from '@detective.solutions/shared/data-access';
 import { Simulation, forceSimulation as d3ForceSimulation } from 'd3-force';
 
-import { AnyWhiteboardNode } from '../nodes';
 import { EventEmitter } from '@angular/core';
-import { IForceDirectedNode } from './force-directed-node.interface';
-import { Link } from '../link';
-import { WhiteboardOptions } from '../whiteboard-options.type';
+import { Link } from './link';
 import { quadtree as d3Quadtree } from 'd3-quadtree';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

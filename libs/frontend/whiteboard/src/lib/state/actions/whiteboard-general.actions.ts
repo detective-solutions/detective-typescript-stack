@@ -1,7 +1,5 @@
+import { AnyWhiteboardNode, ICasefile } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
-
-import { AnyWhiteboardNode } from '../../models';
-import { ICasefile } from '@detective.solutions/shared/data-access';
 
 const actionPrefix = '[Whiteboard]';
 

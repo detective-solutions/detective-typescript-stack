@@ -1,2 +1,2 @@
 export * from './force-directed-graph';
-export * from './force-directed-node.interface';
+export * from './link';

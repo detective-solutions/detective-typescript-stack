@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-import { AnyWhiteboardNode } from '../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Whiteboard Node]';

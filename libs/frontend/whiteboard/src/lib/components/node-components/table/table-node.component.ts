@@ -1,6 +1,12 @@
-import { AnyWhiteboardNode, ITableNode, ITableNodeTemporaryData, ITableWhiteboardNode } from '../../../models';
+import {
+  AnyWhiteboardNode,
+  IMessage,
+  ITableNode,
+  ITableNodeTemporaryData,
+  ITableWhiteboardNode,
+  MessageEventType,
+} from '@detective.solutions/shared/data-access';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 import { filter, map, pluck, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';

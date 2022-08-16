@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription, filter, map, pluck } from 'rxjs';
 
-import { AnyWhiteboardNode } from '../../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';

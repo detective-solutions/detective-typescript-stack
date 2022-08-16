@@ -1,5 +1,5 @@
 import { Actions, ofType } from '@ngrx/effects';
-import { AnyWhiteboardNode, ForceDirectedGraph, Link, NodeComponent, WhiteboardOptions } from '../models';
+import { AnyWhiteboardNode, WhiteboardOptions } from '@detective.solutions/shared/data-access';
 import {
   BufferService,
   D3AdapterService,
@@ -7,6 +7,7 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
+import { ForceDirectedGraph, Link, NodeComponent } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 import { WhiteboardGeneralActions, selectAllWhiteboardNodes } from '../state';
 

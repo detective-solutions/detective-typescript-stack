@@ -1,7 +1,7 @@
 import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
-import { AnyWhiteboardNode } from '../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components/node-components/table/state';
 import { createEntityAdapter } from '@ngrx/entity';

@@ -1,4 +1,4 @@
-import { IEmbedding } from '@detective.solutions/shared/data-access';
+import { IEmbedding } from '../../embedding';
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
 

@@ -1,8 +1,11 @@
-import { ITable, IUser } from '@detective.solutions/shared/data-access';
-import { ITableNode, ITableNodeTemporaryData } from './table-node.interface';
-
-import { ITableWhiteboardNode } from './table-whiteboard-node.interface';
-import { WhiteboardNodeType } from '../whiteboard-node-types.enum';
+import {
+  ITable,
+  ITableNode,
+  ITableNodeTemporaryData,
+  ITableWhiteboardNode,
+  IUser,
+  WhiteboardNodeType,
+} from '@detective.solutions/shared/data-access';
 
 export class TableWhiteboardNode implements ITableWhiteboardNode {
   type = WhiteboardNodeType.TABLE;

@@ -1,6 +1,6 @@
 import { ColDef, ColGroupDef } from 'ag-grid-community';
 
-import { ITableOccurrence } from '@detective.solutions/shared/data-access';
+import { ITableOccurrence } from '../../table';
 
 export interface ITableNode extends ITableOccurrence {
   title: string;
