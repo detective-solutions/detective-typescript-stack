@@ -6,20 +6,22 @@ import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
 import { v4 as uuidv4 } from 'uuid';
 
+const getCasefileByIdMethodName = 'getCasefileById';
 const databaseServiceMock = {
-  getCasefileById: jest.fn(),
+  [getCasefileByIdMethodName]: jest.fn(),
 };
 
+const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionProducerMock = {
-  sendKafkaMessage: jest.fn(),
+  [sendKafkaMessageMethodName]: jest.fn(),
 };
 
 const testMessagePayload = {
   context: {
     eventType: MessageEventType.LoadWhiteboardData,
-    tenantId: 'tenantId',
-    casefileId: 'casefileId',
-    userId: 'userId',
+    tenantId: uuidv4(),
+    casefileId: uuidv4(),
+    userId: uuidv4(),
     userRole: UserRole.BASIC,
     nodeId: 'nodeId',
     timestamp: 123456,
@@ -73,9 +75,9 @@ describe('LoadWhiteboardDataTransaction', () => {
 
     it('should correctly execute transaction', async () => {
       const getCasfileByIdSpy = jest
-        .spyOn(databaseService, 'getCasefileById')
+        .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, 'sendKafkaMessage');
+      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
       await loadWhiteboardDataTransaction.execute();
 
