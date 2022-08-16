@@ -41,7 +41,7 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
 
     switch (addedWhiteboardNode.type) {
       case WhiteboardNodeType.TABLE: {
-        validateDto(TableWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+        await validateDto(TableWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
         response = await this.databaseService.addTableOccurrenceToCasefile(
           casefileId,
           addedWhiteboardNode as ITableWhiteboardNode
@@ -49,7 +49,7 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
         break;
       }
       case WhiteboardNodeType.USER_QUERY: {
-        validateDto(UserQueryWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+        await validateDto(UserQueryWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
         response = await this.databaseService.addUserQueryOccurrenceToCasefile(
           casefileId,
           addedWhiteboardNode as IUserQueryWhiteboardNode
@@ -57,7 +57,7 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
         break;
       }
       case WhiteboardNodeType.EMBEDDING: {
-        validateDto(EmbeddingWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+        await validateDto(EmbeddingWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
         response = await this.databaseService.addEmbeddingToCasefile(
           casefileId,
           addedWhiteboardNode as IEmbeddingWhiteboardNode
