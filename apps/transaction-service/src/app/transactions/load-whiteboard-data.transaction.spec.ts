@@ -1,4 +1,4 @@
-import { KafkaTopic, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { DatabaseService } from '../services';
 import { LoadWhiteboardDataTransaction } from './load-whiteboard-data.transaction';
@@ -85,7 +85,7 @@ describe('LoadWhiteboardDataTransaction', () => {
       expect(getCasfileByIdSpy).toBeCalledTimes(1);
       expect(getCasfileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, modifiedPayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
     });
   });
 });

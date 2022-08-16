@@ -1,16 +1,40 @@
-import { IMessage } from '@detective.solutions/shared/data-access';
+import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
+
+import { DatabaseService } from '../../services';
 import { Logger } from '@nestjs/common';
+import { TransactionProducer } from '../../kafka';
+import { TransactionServiceRefs } from '../factory';
+import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export abstract class Transaction {
-  readonly logger: Logger;
+  abstract readonly logger: Logger;
+  abstract readonly targetTopic: KafkaTopic;
 
-  messagePayload: IMessage<any>;
+  readonly transactionProducer: TransactionProducer;
+  readonly databaseService: DatabaseService;
 
-  constructor(messagePayload: IMessage<any>) {
-    this.messagePayload = messagePayload;
+  message: IMessage<any>;
+  messageContext: IMessageContext;
+  messageBody: any;
+  logContext: string;
+
+  constructor(serviceRefs: TransactionServiceRefs, message: IMessage<any>) {
+    this.transactionProducer = serviceRefs.transactionProducer;
+    this.databaseService = serviceRefs.databaseService;
+    this.message = message;
+    this.messageContext = message.context;
+    this.messageBody = message.body;
+    this.logContext = buildLogContext(this.messageContext);
   }
 
   abstract execute(): Promise<void>;
+
+  protected forwardMessageToOtherClients() {
+    this.transactionProducer.sendKafkaMessage(this.targetTopic, this.message);
+    this.logger.verbose(
+      `${this.logContext} Forwarded transaction information to topic ${KafkaTopic.TransactionOutputUnicast}`
+    );
+  }
 }
