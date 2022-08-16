@@ -86,7 +86,7 @@ export class DatabaseService {
     });
   }
 
-  async addUserQueryToCasefile(
+  async addUserQueryOccurrenceToCasefile(
     casefileId: string,
     userQueryWhiteboardNode: IUserQueryWhiteboardNode
   ): Promise<Record<string, any> | null> {

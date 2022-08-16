@@ -50,7 +50,7 @@ export class WhiteboardNodeAddedTransaction extends WhiteboardTransaction {
       }
       case WhiteboardNodeType.USER_QUERY: {
         validateDto(UserQueryWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
-        response = await this.databaseService.addUserQueryToCasefile(
+        response = await this.databaseService.addUserQueryOccurrenceToCasefile(
           casefileId,
           addedWhiteboardNode as IUserQueryWhiteboardNode
         );
