@@ -66,9 +66,10 @@ export class DatabaseService {
     casefileId: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const mutationJson = {
+    const basicMutationJson = await this.createBasicNodeMutation(tableWhiteboardNode);
+    const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...this.createBasicNodeMutation(tableWhiteboardNode),
+      ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
       },
@@ -77,10 +78,10 @@ export class DatabaseService {
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
     };
-    console.log(this.createBasicNodeMutation(tableWhiteboardNode));
-    console.log(mutationJson);
 
-    return this.sendMutation(mutationJson).catch(() => {
+    console.log(finalMutationJson);
+
+    return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
         `There was a problem while trying to add a ${tableWhiteboardNode.type} node to casefile ${casefileId}`
       );
@@ -92,9 +93,10 @@ export class DatabaseService {
     casefileId: string,
     userQueryWhiteboardNode: IUserQueryWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const mutationJson = {
+    const basicMutationJson = await this.createBasicNodeMutation(userQueryWhiteboardNode);
+    const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...this.createBasicNodeMutation(userQueryWhiteboardNode),
+      ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
       },
@@ -107,7 +109,7 @@ export class DatabaseService {
       },
     };
 
-    return this.sendMutation(mutationJson).catch(() => {
+    return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
         `There was a problem while trying to add a ${userQueryWhiteboardNode.type} node to casefile ${casefileId}`
       );
@@ -119,9 +121,10 @@ export class DatabaseService {
     casefileId: string,
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const mutationJson = {
+    const basicMutationJson = await this.createBasicNodeMutation(embeddingWhiteboardNode);
+    const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...this.createBasicNodeMutation(embeddingWhiteboardNode),
+      ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
@@ -132,7 +135,7 @@ export class DatabaseService {
       },
     };
 
-    return this.sendMutation(mutationJson).catch(() => {
+    return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
         `There was a problem while trying to add a ${embeddingWhiteboardNode} node to casefile ${casefileId}`
       );
