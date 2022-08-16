@@ -27,6 +27,7 @@
     "shared-assets": "libs/shared/assets",
     "shared-data-access": "libs/shared/data-access",
     "shared-i18n": "libs/shared/i18n",
+    "shared-utils": "libs/shared/i18n",
     "transaction-service": "apps/transaction-service",
     "websocket-gateway": "apps/websocket-gateway"
   }
