@@ -77,6 +77,8 @@ export class DatabaseService {
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
     };
+    console.log(this.createBasicNodeMutation(tableWhiteboardNode));
+    console.log(mutationJson);
 
     return this.sendMutation(mutationJson).catch(() => {
       this.logger.error(
