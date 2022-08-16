@@ -72,7 +72,7 @@ export class DatabaseService {
       [`${tableWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
       },
-      [`${tableWhiteboardNode}.casefile`]: {
+      [`${tableWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
@@ -99,7 +99,7 @@ export class DatabaseService {
       [`${userQueryWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
       },
-      [`${userQueryWhiteboardNode}.casefile`]: {
+      [`${userQueryWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
       },
