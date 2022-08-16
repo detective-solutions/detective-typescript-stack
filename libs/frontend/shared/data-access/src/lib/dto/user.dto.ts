@@ -33,10 +33,4 @@ export class UserDTO implements IUser {
   public get fullName(): string {
     return this.firstname && this.lastname ? `${this.firstname} ${this.lastname}` : '';
   }
-
-  toJSON(): object {
-    const serialized = Object.assign(this);
-    delete serialized.fullName;
-    return serialized;
-  }
 }
