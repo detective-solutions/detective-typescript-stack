@@ -45,11 +45,6 @@ export class WhiteboardFacadeService {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
     this.store.dispatch(WhiteboardGeneralActions.LoadWhiteboardData());
-
-    // TODO: Remove these mocked data when action is triggered by backend response
-    // setTimeout(() => {
-    //   this.store.dispatch(WhiteboardNodeActions.whiteboardDataLoaded({ nodes: dummyNodes }));
-    // }, 500);
   }
 
   getForceGraph(options: WhiteboardOptions): ForceDirectedGraph {
