@@ -1,33 +1,40 @@
-import { IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { ICasefileForWhiteboard, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { Logger } from '@nestjs/common';
+import { Transaction } from './abstract';
 
-import { TransactionServiceRefs } from './factory';
-import { WhiteboardTransaction } from './abstract';
-import { buildLogContext } from '@detective.solutions/backend/shared/utils';
-
-export class LoadWhiteboardDataTransaction extends WhiteboardTransaction {
+export class LoadWhiteboardDataTransaction extends Transaction {
   readonly logger = new Logger(LoadWhiteboardDataTransaction.name);
+  readonly targetTopic = KafkaTopic.TransactionOutputUnicast;
+  readonly maxRetries = 1;
 
-  constructor(serviceRefs: TransactionServiceRefs, messagePayload: IMessage<void>) {
-    super(serviceRefs, messagePayload);
-  }
+  override message: IMessage<ICasefileForWhiteboard>; // Define message body type
+
+  private retryCount = 0;
 
   async execute(): Promise<void> {
-    this.logger.verbose(`${buildLogContext(this.messagePayload.context)} Requesting casefile data `);
-    const casefileData = await this.databaseService.getCasefileById(this.messagePayload.context.casefileId);
-    if (!casefileData) {
-      throw new InternalServerErrorException(
-        `Could not fetch data for casefile ${this.messagePayload.context.casefileId}`
-      );
-    }
-    this.logger.log(`${buildLogContext(this.messagePayload.context)} Received casefile data`);
+    this.logger.log(`${this.logContext} Executing transaction`);
 
-    this.messagePayload.body = casefileData; // Fill empty message payload body with casefile data
-    this.transactionProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, this.messagePayload);
-    this.logger.log(
-      `${buildLogContext(this.messagePayload.context)} Forwarded casefile data to topic ${
-        KafkaTopic.TransactionOutputUnicast
-      }`
-    );
+    try {
+      const casefileId = this.messageContext.casefileId;
+      const casefileData = await this.databaseService.getCasefileById(casefileId);
+      if (!casefileData) {
+        throw new Error(`Could not fetch data for casefile ${casefileId}`);
+      }
+
+      this.message.body = casefileData; // Fill empty message payload body with casefile data
+      this.forwardMessageToOtherClients();
+    } catch (error) {
+      this.handleError(error);
+    }
+
+    this.logger.log(`${this.logContext} Transaction successful`);
+  }
+
+  private handleError(error) {
+    this.logger.error(error);
+    if (this.retryCount < this.maxRetries) {
+      this.retryCount++;
+      this.execute();
+    }
   }
 }

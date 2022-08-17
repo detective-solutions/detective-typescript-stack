@@ -1,7 +1,7 @@
 import { IMessageContext, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, ValidateIf } from 'class-validator';
 
-export class MessageContext implements IMessageContext {
+export class MessageContextDTO implements IMessageContext {
   @IsEnum(MessageEventType)
   @IsNotEmpty()
   eventType!: MessageEventType;

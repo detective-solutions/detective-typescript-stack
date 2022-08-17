@@ -1,21 +1,20 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
 import { IQueryMessagePayload, QueryType } from '../../models';
-import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../../../state';
-import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
+import { combineLatest, of, switchMap, take, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { TableNodeActions } from '../actions';
 import { WhiteboardFacadeService } from '../../../../../services';
-import { WhiteboardNodeType } from '../../../../../models';
+import { selectWhiteboardContextState } from '../../../../../state';
 
 @Injectable()
 export class TableNodeEffects {
   readonly loadTableData$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeAdded),
-        filter((action) => action.addedNode.type === WhiteboardNodeType.TABLE),
+        ofType(TableNodeActions.LoadTableData),
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
@@ -26,7 +25,7 @@ export class TableNodeEffects {
               context: {
                 ...context,
                 eventType: MessageEventType.QueryTable,
-                nodeId: action.addedNode.id,
+                nodeId: action.node.id,
               } as IMessageContext,
               body: {
                 queryType: QueryType.SqlQuery,

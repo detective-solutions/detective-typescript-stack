@@ -1,6 +1,6 @@
 import { IWhiteboardNodeState, IWhiteboardState } from '../interfaces';
 
-import { AnyWhiteboardNode } from '../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Dictionary } from '@ngrx/entity';
 import { createSelector } from '@ngrx/store';
 import { selectWhiteboardState } from './whiteboard-selector';

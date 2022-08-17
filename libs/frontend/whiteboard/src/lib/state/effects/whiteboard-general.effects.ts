@@ -1,6 +1,6 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
-import { combineLatest, of, switchMap, take, tap } from 'rxjs';
+import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -13,7 +13,7 @@ export class WhiteboardGeneralEffects {
   readonly loadWhiteboardData$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(WhiteboardGeneralActions.loadWhiteboardData),
+        ofType(WhiteboardGeneralActions.LoadWhiteboardData),
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
@@ -21,13 +21,39 @@ export class WhiteboardGeneralEffects {
         tap(([context, _action]) => {
           this.whiteboardFacade.sendWebsocketMessage({
             event: MessageEventType.LoadWhiteboardData,
-            // TODO: Investigate how to handle empty node ids
             data: {
-              context: { ...context, eventType: MessageEventType.LoadWhiteboardData, nodeId: '' } as IMessageContext,
+              context: { ...context, eventType: MessageEventType.LoadWhiteboardData } as IMessageContext,
               body: {},
             },
           });
         })
+      );
+    },
+    { dispatch: false }
+  );
+
+  readonly whiteboardNodeAdded$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(WhiteboardGeneralActions.WhiteboardNodeAdded),
+        filter((action) => action?.addedManually), // Only handle manually added nodes to prevent infinite loop
+        switchMap((action) =>
+          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
+        ),
+        tap(([context, action]) =>
+          this.whiteboardFacade.sendWebsocketMessage({
+            event: MessageEventType.WhiteboardNodeAdded,
+            data: {
+              context: {
+                ...context,
+                eventType: MessageEventType.WhiteboardNodeAdded,
+                userId: context.userId,
+                nodeId: action.addedNode.id,
+              } as IMessageContext,
+              body: action.addedNode,
+            },
+          })
+        )
       );
     },
     { dispatch: false }

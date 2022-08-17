@@ -1,7 +1,7 @@
 import { PickType } from '@nestjs/mapped-types';
-import { User } from './user.dto';
+import { UserDTO } from './user.dto';
 
-export class UserForWhiteboard extends PickType(User, [
+export class UserForWhiteboardDTO extends PickType(UserDTO, [
   'id',
   'firstname',
   'lastname',

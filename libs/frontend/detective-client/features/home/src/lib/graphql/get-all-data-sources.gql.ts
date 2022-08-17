@@ -1,9 +1,9 @@
 import { Query, gql } from 'apollo-angular';
 import { Injectable } from '@angular/core';
-import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetAllDataSourcesGQLResponse {
-  querySourceConnection: SourceConnection[];
+  querySourceConnection: SourceConnectionDTO[];
   aggregateSourceConnection: { count: number };
 }
 

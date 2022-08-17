@@ -9,8 +9,8 @@ export interface ITableOccurrence {
   width: number;
   height: number;
   locked: boolean;
-  lastUpdatedBy: IUser;
+  lastUpdatedBy: Partial<IUser>;
   lastUpdated: string;
   created: string;
-  entity: ITable;
+  entity: Partial<ITable>;
 }

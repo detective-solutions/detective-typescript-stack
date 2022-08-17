@@ -11,17 +11,28 @@ import {
 } from '@angular/core';
 import {
   AnyWhiteboardNode,
-  ForceDirectedGraph,
-  TableWhiteboardNode,
+  ICasefile,
+  MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
-} from '../../models';
-import { ICasefile, IUser, MessageEventType } from '@detective.solutions/shared/data-access';
-import { Subscription, delayWhen, distinctUntilChanged, filter, pluck, switchMap, tap } from 'rxjs';
-import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../../state';
+} from '@detective.solutions/shared/data-access';
+import { ForceDirectedGraph, TableWhiteboardNode } from '../../models';
+import {
+  Subscription,
+  combineLatest,
+  delayWhen,
+  distinctUntilChanged,
+  filter,
+  pluck,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { WhiteboardGeneralActions, selectWhiteboardContextState } from '../../state';
 
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../services';
+import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -45,7 +56,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Update underlying graph nodes
     tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes)),
     // Update layouts for nodes moved by graph force
-    tap(() => this.whiteboardFacade.updateNodeLayoutsFromBuffer())
+    tap(() => this.whiteboardFacade.updateNodesFromBuffer())
   );
   readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
   readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
@@ -68,6 +79,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly store: Store
   ) {}
   ngOnInit() {
+    // Bind Angular change detection to each graph tick for render sync
+    this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
+
     // Listen to LOAD_WHITEBOARD_DATA websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
@@ -77,21 +91,41 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         )
         .subscribe((messageData: ICasefile) => {
           this.store.dispatch(
-            WhiteboardGeneralActions.whiteboardDataLoaded({
+            WhiteboardGeneralActions.WhiteboardDataLoaded({
               casefile: messageData,
             })
           );
         })
     );
 
-    // Bind Angular change detection to each graph tick for render sync
-    this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
+    // Listen to WHITEBOARD_NODE_ADDED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeAdded),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .subscribe(([messageData, _context]) => {
+          this.store.dispatch(
+            WhiteboardGeneralActions.WhiteboardNodeAdded({
+              addedNode: messageData.body,
+              addedManually: false,
+            })
+          );
+        })
+    );
 
     // Handle position updates caused by the graph force
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$
         .pipe(distinctUntilChanged())
-        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeLayoutUpdateBuffer(node))
+        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeUpdateBuffer(node))
     );
   }
 
@@ -128,28 +162,26 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     // TODO: Use data from added element instead of hard-coded data
+    const now = formatDate(new Date());
     const tableNode = TableWhiteboardNode.Build({
       id: uuidv4(),
-      title: '',
+      title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
       x: convertedDOMPoint.x,
       y: convertedDOMPoint.y,
       width: 900,
       height: 500,
       locked: false,
-      lastUpdatedBy: {} as IUser,
-      lastUpdated: Date.now().toString(),
-      created: Date.now().toString(),
+      lastUpdatedBy: {
+        id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+      },
+      lastUpdated: now,
+      created: now,
       entity: {
-        id: uuidv4(),
-        name: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-        description: '',
-        lastUpdatedBy: {} as IUser,
-        lastUpdated: Date.now().toString(),
-        created: Date.now().toString(),
+        id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
       },
     });
     this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodeAdded({
+      WhiteboardGeneralActions.WhiteboardNodeAdded({
         addedNode: TableWhiteboardNode.Build(tableNode),
         addedManually: true,
       })

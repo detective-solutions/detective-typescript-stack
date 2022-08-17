@@ -1,8 +1,11 @@
-import { ITable, IUser } from '@detective.solutions/shared/data-access';
-import { ITableNode, ITableNodeTemporaryData } from './table-node.interface';
-
-import { ITableWhiteboardNode } from './table-whiteboard-node.interface';
-import { WhiteboardNodeType } from '../whiteboard-node-types.enum';
+import {
+  ITable,
+  ITableNode,
+  ITableNodeTemporaryData,
+  ITableWhiteboardNode,
+  IUser,
+  WhiteboardNodeType,
+} from '@detective.solutions/shared/data-access';
 
 export class TableWhiteboardNode implements ITableWhiteboardNode {
   type = WhiteboardNodeType.TABLE;
@@ -15,10 +18,10 @@ export class TableWhiteboardNode implements ITableWhiteboardNode {
     public width: number,
     public height: number,
     public locked: boolean,
-    public lastUpdatedBy: IUser,
+    public lastUpdatedBy: Partial<IUser>,
     public lastUpdated: string,
     public created: string,
-    public entity: ITable,
+    public entity: Partial<ITable>,
     public temporary: ITableNodeTemporaryData | undefined
   ) {}
 

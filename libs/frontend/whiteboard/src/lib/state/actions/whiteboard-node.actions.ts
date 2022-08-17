@@ -1,19 +1,16 @@
 import { createAction, props } from '@ngrx/store';
 
-import { AnyWhiteboardNode } from '../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Update } from '@ngrx/entity';
 
-const actionPrefix = '[Whiteboard Nodes]';
+const actionPrefix = '[Whiteboard Node]';
 
-export const WhiteboardNodeAdded = createAction(
-  `${actionPrefix} Node added`,
-  props<{ addedNode: AnyWhiteboardNode; addedManually: boolean }>()
-);
 export const WhiteboardNodeUpdate = createAction(
   `${actionPrefix} Updating node`,
   props<{ update: Update<AnyWhiteboardNode> }>()
 );
-export const WhiteboardNodeLayoutUpdate = createAction(
-  `${actionPrefix} Updating node layout`,
+
+export const WhiteboardNodeBatchUpdate = createAction(
+  `${actionPrefix} Updating multiple nodes`,
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );

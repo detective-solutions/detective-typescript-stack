@@ -15,7 +15,7 @@ export const initialWhiteboardContextState: IWhiteboardContextState = {
 export const whiteboardContextReducer = createReducer(
   initialWhiteboardContextState,
   on(
-    WhiteboardContextActions.initializeWhiteboardContext,
+    WhiteboardContextActions.InitializeWhiteboardContext,
     (_state: IWhiteboardContextState, action: any): IWhiteboardContextState => {
       {
         return { ...action.context };

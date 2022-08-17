@@ -1,12 +1,12 @@
 import { ICasefile, IEmbedding, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 
-import { Embedding } from '../embedding';
-import { TableOccurrence } from '../table';
+import { EmbeddingDTO } from '../embedding';
+import { TableOccurrenceDTO } from '../table';
 import { Type } from 'class-transformer';
-import { UserQueryOccurrence } from '../user-query';
+import { UserQueryOccurrenceDTO } from '../user-query';
 
-export class Casefile implements ICasefile {
+export class CasefileDTO implements ICasefile {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -27,17 +27,17 @@ export class Casefile implements ICasefile {
   thumbnail!: string;
 
   @ValidateNested({ each: true })
-  @Type(() => TableOccurrence)
+  @Type(() => TableOccurrenceDTO)
   @IsOptional()
   tables!: ITableOccurrence[];
 
   @ValidateNested({ each: true })
-  @Type(() => UserQueryOccurrence)
+  @Type(() => UserQueryOccurrenceDTO)
   @IsOptional()
   queries!: any;
 
   @ValidateNested({ each: true })
-  @Type(() => Embedding)
+  @Type(() => EmbeddingDTO)
   @IsOptional()
   embeddings!: IEmbedding[];
 

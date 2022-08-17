@@ -3,9 +3,9 @@ import { SingleTransactionKey, TransactionKeys, transactionMap } from './transac
 
 import { DatabaseService } from '../../services';
 import { IMessage } from '@detective.solutions/shared/data-access';
+import { Transaction } from '../abstract';
 import { TransactionProducer } from '../../kafka';
 import { TransactionServiceRefs } from './transaction-service-refs.type';
-import { WhiteboardTransaction } from '../abstract';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -26,7 +26,7 @@ export class WhiteboardTransactionFactory {
   // Dynamically instantiate transaction classes based on the incoming event type
   createTransaction<K extends TransactionKeys>(eventType: SingleTransactionKey<K>, messagePayload: IMessage<any>) {
     try {
-      const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as WhiteboardTransaction;
+      const transaction = new transactionMap[eventType](this.serviceRefs, messagePayload) as Transaction;
       this.logger.log(`Created transaction for event type ${eventType as string}`);
       transaction.execute();
       return transaction; // Return transaction to allow testing this method

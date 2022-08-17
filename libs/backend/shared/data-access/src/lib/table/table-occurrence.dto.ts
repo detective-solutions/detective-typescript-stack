@@ -11,9 +11,9 @@ import {
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
-import { UserForWhiteboard } from '../user';
+import { UserForWhiteboardDTO } from '../user';
 
-export class TableOccurrence implements ITableOccurrence {
+export class TableOccurrenceDTO implements ITableOccurrence {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -44,7 +44,7 @@ export class TableOccurrence implements ITableOccurrence {
   locked!: boolean;
 
   @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboard)
+  @Type(() => UserForWhiteboardDTO)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

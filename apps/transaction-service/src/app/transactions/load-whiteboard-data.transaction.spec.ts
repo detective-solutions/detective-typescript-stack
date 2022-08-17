@@ -1,4 +1,4 @@
-import { KafkaTopic, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { DatabaseService } from '../services';
 import { LoadWhiteboardDataTransaction } from './load-whiteboard-data.transaction';
@@ -6,20 +6,22 @@ import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
 import { v4 as uuidv4 } from 'uuid';
 
+const getCasefileByIdMethodName = 'getCasefileById';
 const databaseServiceMock = {
-  getCasefileById: jest.fn(),
+  [getCasefileByIdMethodName]: jest.fn(),
 };
 
+const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionProducerMock = {
-  sendKafkaMessage: jest.fn(),
+  [sendKafkaMessageMethodName]: jest.fn(),
 };
 
 const testMessagePayload = {
   context: {
     eventType: MessageEventType.LoadWhiteboardData,
-    tenantId: 'tenantId',
-    casefileId: 'casefileId',
-    userId: 'userId',
+    tenantId: uuidv4(),
+    casefileId: uuidv4(),
+    userId: uuidv4(),
     userRole: UserRole.BASIC,
     nodeId: 'nodeId',
     timestamp: 123456,
@@ -73,19 +75,29 @@ describe('LoadWhiteboardDataTransaction', () => {
 
     it('should correctly execute transaction', async () => {
       const getCasfileByIdSpy = jest
-        .spyOn(databaseService, 'getCasefileById')
+        .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, 'sendKafkaMessage');
+      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
       await loadWhiteboardDataTransaction.execute();
 
-      const modifiedPayload = Object.assign({}, testMessagePayload);
+      const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
 
       expect(getCasfileByIdSpy).toBeCalledTimes(1);
       expect(getCasfileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, modifiedPayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
+    });
+
+    it('should retry query after a failed request', async () => {
+      const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName).mockResolvedValue(null);
+      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+
+      await loadWhiteboardDataTransaction.execute();
+
+      expect(getCasfileByIdSpy).toBeCalledTimes(loadWhiteboardDataTransaction.maxRetries + 1);
+      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
     });
   });
 });

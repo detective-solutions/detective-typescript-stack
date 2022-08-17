@@ -13,8 +13,8 @@ import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
-import { Casefile } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileCreateDialogComponent } from './dialog';
+import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from '../../services';
 import { ComponentType } from '@angular/cdk/portal';
 import { ICasefileTableDef } from '../../interfaces';
@@ -70,11 +70,11 @@ export class BaseCasefileListComponent implements OnDestroy {
     });
   }
 
-  protected transformToTileStructure(originalCasefiles: Casefile[]): ITile[] {
+  protected transformToTileStructure(originalCasefiles: CasefileDTO[]): ITile[] {
     const tempTileItems = [] as ITile[];
 
     this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
-      originalCasefiles.forEach((casefile: Casefile) => {
+      originalCasefiles.forEach((casefile: CasefileDTO) => {
         tempTileItems.push({
           id: casefile.id,
           title: casefile.title,
@@ -87,7 +87,7 @@ export class BaseCasefileListComponent implements OnDestroy {
     return tempTileItems;
   }
 
-  protected transformToTableStructure(originalCasefiles: Casefile[]): ICasefileTableDef[] {
+  protected transformToTableStructure(originalCasefiles: CasefileDTO[]): ICasefileTableDef[] {
     const tempTableItems = [] as ICasefileTableDef[];
 
     combineLatest([
@@ -96,7 +96,7 @@ export class BaseCasefileListComponent implements OnDestroy {
     ])
       .pipe(take(1))
       .subscribe(([translation, authStatus]) => {
-        originalCasefiles.forEach((casefile: Casefile) => {
+        originalCasefiles.forEach((casefile: CasefileDTO) => {
           tempTableItems.push({
             casefileInfo: {
               columnName: '',

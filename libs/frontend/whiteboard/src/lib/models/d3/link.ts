@@ -1,5 +1,4 @@
-import { AnyWhiteboardNode } from './nodes';
-import { IForceDirectedLink } from './d3/force-directed-link.interface';
+import { AnyWhiteboardNode, IForceDirectedLink } from '@detective.solutions/shared/data-access';
 
 export class Link implements IForceDirectedLink {
   // optional - defining optional implementation properties - required for relevant typing assistance

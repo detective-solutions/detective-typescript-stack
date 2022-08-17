@@ -299,7 +299,7 @@ describe('UserService', () => {
   });
 
   describe('updateRefreshTokenId', () => {
-    it('should return a valid object reference if the database mutation was successful ', async () => {
+    it('should return a valid object reference if the database mutation was successful', async () => {
       const userUid = '123';
       jest.spyOn(userService, 'getUserUid').mockResolvedValue(userUid);
 

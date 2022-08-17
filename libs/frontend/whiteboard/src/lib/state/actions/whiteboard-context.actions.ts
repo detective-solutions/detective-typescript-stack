@@ -4,7 +4,7 @@ import { IWhiteboardContextState } from '../interfaces';
 
 const actionPrefix = '[Whiteboard Context]';
 
-export const initializeWhiteboardContext = createAction(
-  `${actionPrefix} Initialize context`,
+export const InitializeWhiteboardContext = createAction(
+  `${actionPrefix} Initialize whiteboard context`,
   props<{ context: IWhiteboardContextState }>()
 );

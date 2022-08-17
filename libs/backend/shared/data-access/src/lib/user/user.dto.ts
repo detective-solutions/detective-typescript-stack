@@ -12,11 +12,11 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { Tenant } from '../tenant';
+import { TenantDTO } from '../tenant';
 import { Type } from 'class-transformer';
-import { UserGroup } from '../user-group';
+import { UserGroupDTO } from '../user-group';
 
-export class User implements IUser {
+export class UserDTO implements IUser {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -33,9 +33,9 @@ export class User implements IUser {
   password!: string;
 
   @ValidateNested({ each: true })
-  @Type(() => Tenant)
+  @Type(() => TenantDTO)
   @IsNotEmpty()
-  tenantIds!: Tenant[];
+  tenantIds!: TenantDTO[];
 
   @IsNotEmpty()
   role!: UserRole;
@@ -60,9 +60,9 @@ export class User implements IUser {
   avatarUrl!: string;
 
   @ValidateNested({ each: true })
-  @Type(() => UserGroup)
+  @Type(() => UserGroupDTO)
   @IsOptional()
-  userGroups!: UserGroup[];
+  userGroups!: UserGroupDTO[];
 
   @ValidateIf((refreshTokenId) => refreshTokenId !== '')
   @IsString()

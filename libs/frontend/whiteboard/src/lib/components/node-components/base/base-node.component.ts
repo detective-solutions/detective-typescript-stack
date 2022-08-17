@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription, filter, map, pluck } from 'rxjs';
 
-import { AnyWhiteboardNode } from '../../../models';
+import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
@@ -49,6 +49,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.whiteboardFacade.applyDragBehaviorToComponent(this);
+    this.customAfterViewInit();
   }
 
   ngOnDestroy() {
@@ -72,6 +73,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
       })
     );
   }
+
+  // Can be used by child classes to add custom logic to the ngAfterViewInit hook
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customAfterViewInit() {}
 
   protected updateExistingNodeObject(updatedNode: AnyWhiteboardNode) {
     Object.keys(updatedNode).forEach((key: string) => {

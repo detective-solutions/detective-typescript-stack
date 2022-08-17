@@ -1,6 +1,6 @@
 import { ITenant, IUser, IUserGroup, UserRole } from '@detective.solutions/shared/data-access';
 
-export class User implements IUser {
+export class UserDTO implements IUser {
   constructor(
     public id = '',
     public email = '',
@@ -15,9 +15,9 @@ export class User implements IUser {
 
   static Build(userInput: IUser) {
     if (!userInput) {
-      return new User();
+      return new UserDTO();
     }
-    return new User(
+    return new UserDTO(
       userInput.id,
       userInput.email,
       userInput.tenantIds as ITenant[],
@@ -32,11 +32,5 @@ export class User implements IUser {
 
   public get fullName(): string {
     return this.firstname && this.lastname ? `${this.firstname} ${this.lastname}` : '';
-  }
-
-  toJSON(): object {
-    const serialized = Object.assign(this);
-    delete serialized.fullName;
-    return serialized;
   }
 }

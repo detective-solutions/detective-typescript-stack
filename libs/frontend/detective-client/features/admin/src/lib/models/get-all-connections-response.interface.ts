@@ -1,6 +1,6 @@
-import { SourceConnection } from '@detective.solutions/frontend/shared/data-access';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetAllConnectionsResponse {
-  connections: SourceConnection[];
+  connections: SourceConnectionDTO[];
   totalElementsCount: number;
 }

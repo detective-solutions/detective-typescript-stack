@@ -3,7 +3,7 @@ import { IKafkaMessage, KafkaTopic } from '@detective.solutions/shared/data-acce
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { EventPattern } from '@nestjs/microservices';
-import { MessageContext } from '@detective.solutions/backend/shared/data-access';
+import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
 import { TransactionCoordinationService } from '../services';
 import { coordinationServiceInjectionToken } from '../utils';
 
@@ -33,6 +33,6 @@ export class TransactionConsumer {
     if (!context) {
       throw new InternalServerErrorException('The consumed message is missing mandatory context information');
     }
-    await validateDto(MessageContext, context, this.logger);
+    await validateDto(MessageContextDTO, context, this.logger);
   }
 }

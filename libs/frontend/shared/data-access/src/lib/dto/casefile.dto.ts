@@ -6,9 +6,9 @@ import {
   IUserQueryOccurrence,
 } from '@detective.solutions/shared/data-access';
 
-import { User } from './user.dto';
+import { UserDTO } from './user.dto';
 
-export class Casefile implements ICasefile {
+export class CasefileDTO implements ICasefile {
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
@@ -17,7 +17,7 @@ export class Casefile implements ICasefile {
     public description: string,
     public thumbnail: string,
     public views: number,
-    public author: User,
+    public author: UserDTO,
     public editors: IUser[],
     public lastUpdatedBy: IUser,
     public lastUpdated: string,
@@ -28,13 +28,13 @@ export class Casefile implements ICasefile {
   ) {}
 
   static Build(casefileInput: ICasefile) {
-    return new Casefile(
+    return new CasefileDTO(
       casefileInput.id,
       casefileInput.title,
       casefileInput.description ?? '',
-      casefileInput.thumbnail ?? Casefile.thumbnailPlaceholder,
+      casefileInput.thumbnail ?? CasefileDTO.thumbnailPlaceholder,
       casefileInput.views,
-      User.Build(casefileInput.author as IUser),
+      UserDTO.Build(casefileInput.author as IUser),
       casefileInput.editors as IUser[],
       casefileInput.lastUpdatedBy,
       casefileInput.lastUpdated,

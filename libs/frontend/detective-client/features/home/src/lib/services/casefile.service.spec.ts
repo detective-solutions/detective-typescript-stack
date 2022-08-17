@@ -4,7 +4,7 @@ import { MockProvider, ngMocks } from 'ng-mocks';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { Apollo } from 'apollo-angular';
-import { Casefile } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from './casefile.service';
 import { IUser } from '@detective.solutions/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
@@ -181,8 +181,8 @@ describe('CasefileService', () => {
     }));
   });
 
-  function _createCasefile(): Casefile {
-    return Casefile.Build({
+  function _createCasefile(): CasefileDTO {
+    return CasefileDTO.Build({
       id: uuidv4(),
       title: 'Test Casefile',
       description: '',

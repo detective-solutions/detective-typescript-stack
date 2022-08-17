@@ -1,8 +1,10 @@
-import { IEmbeddingNode, IEmbeddingNodeTemporaryData } from './embedding-node.interface';
-
-import { IEmbeddingWhiteboardNode } from './embedding-whiteboard-node.interface';
-import { IUser } from '@detective.solutions/shared/data-access';
-import { WhiteboardNodeType } from '../whiteboard-node-types.enum';
+import {
+  IEmbeddingNode,
+  IEmbeddingNodeTemporaryData,
+  IEmbeddingWhiteboardNode,
+  IUser,
+  WhiteboardNodeType,
+} from '@detective.solutions/shared/data-access';
 
 export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
   type = WhiteboardNodeType.EMBEDDING;

@@ -1,4 +1,5 @@
 export * from './d3';
-export * from './nodes';
-export * from './link';
-export * from './whiteboard-options.type';
+export * from './embedding';
+export * from './table';
+
+export * from './whiteboard-node-component.type';

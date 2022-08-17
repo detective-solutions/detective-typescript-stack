@@ -12,9 +12,9 @@ import {
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
-import { UserForWhiteboard } from '../user';
+import { UserForWhiteboardDTO } from '../user';
 
-export class Embedding implements IEmbedding {
+export class EmbeddingDTO implements IEmbedding {
   @IsUUID()
   @IsNotEmpty()
   id!: string;
@@ -56,7 +56,7 @@ export class Embedding implements IEmbedding {
   editors!: IUser[];
 
   @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboard)
+  @Type(() => UserForWhiteboardDTO)
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 

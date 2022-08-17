@@ -1,9 +1,9 @@
 import { Query, gql } from 'apollo-angular';
-import { Casefile } from '@detective.solutions/frontend/shared/data-access';
+import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 import { Injectable } from '@angular/core';
 
 export interface IGetAllCasefilesGQLResponse {
-  queryCasefile: Casefile[];
+  queryCasefile: CasefileDTO[];
   aggregateCasefile: { count: number };
 }
 

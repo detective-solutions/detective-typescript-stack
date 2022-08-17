@@ -1,9 +1,10 @@
-import { AnyWhiteboardNode, ForceDirectedGraph, WhiteboardOptions } from '../../models';
+import { AnyWhiteboardNode, WhiteboardOptions } from '@detective.solutions/shared/data-access';
 import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
 
 import { BufferService } from './buffer.service';
 import { DragService } from './drag.service';
+import { ForceDirectedGraph } from '../../models';
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
 import { select as d3Select } from 'd3-selection';
@@ -79,7 +80,7 @@ export class D3AdapterService {
         deltaY = nodeToUpdate.y - dragStartEvent.y;
       }
 
-      bufferServiceRef.addToNodeLayoutUpdateBuffer(nodeToUpdate);
+      bufferServiceRef.addToNodeUpdateBuffer(nodeToUpdate);
       dragStartEvent.on('drag', OnDrag).on('end', OnDragEnd);
 
       function OnDrag(dragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
@@ -98,7 +99,7 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          bufferServiceRef.updateNodeLayoutsFromBuffer();
+          bufferServiceRef.updateNodesFromBuffer();
         }
       }
     }

@@ -14,7 +14,7 @@ export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
 export const whiteboardMetadataReducer = createReducer(
   initialWhiteboardMetadataState,
   on(
-    WhiteboardGeneralActions.whiteboardDataLoaded,
+    WhiteboardGeneralActions.WhiteboardDataLoaded,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
       return { ...state, id: action.id, title: action.title, description: action.description };
     }
