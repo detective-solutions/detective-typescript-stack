@@ -20,13 +20,13 @@ import { WhiteboardNodeAddedTransaction } from './whiteboard-node-added.transact
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const addTableOccurrenceMethodName = 'addTableOccurrenceToCasefile';
-const addUserQueryOccurrenceMethodName = 'addUserQueryOccurrenceToCasefile';
-const addEmbeddingMethodName = 'addEmbeddingToCasefile';
+const insertTableOccurrenceMethodName = 'insertTableOccurrenceToCasefile';
+const insertUserQueryOccurrenceMethodName = 'insertUserQueryOccurrenceToCasefile';
+const insertEmbeddingMethodName = 'insertEmbeddingToCasefile';
 const databaseServiceMock = {
-  [addTableOccurrenceMethodName]: jest.fn(),
-  [addUserQueryOccurrenceMethodName]: jest.fn(),
-  [addEmbeddingMethodName]: jest.fn(),
+  [insertTableOccurrenceMethodName]: jest.fn(),
+  [insertUserQueryOccurrenceMethodName]: jest.fn(),
+  [insertEmbeddingMethodName]: jest.fn(),
 };
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
@@ -92,14 +92,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
         transaction.logger.localInstance.setLogLevels([]);
@@ -122,14 +122,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
           context: testMessageContext,
@@ -149,7 +149,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
@@ -194,14 +194,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
         transaction.logger.localInstance.setLogLevels([]);
@@ -224,14 +224,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
           context: testMessageContext,
@@ -251,7 +251,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
@@ -295,14 +295,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
       it('should correctly execute transaction for embedding node type', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
@@ -325,14 +325,14 @@ describe('WhiteboardNodeAddedTransaction', () => {
       it('should throw an InternalServerErrorException if the given message body does not pass the embedding node DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue({});
+        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addTableOccurrenceMethodName)
+          .spyOn(databaseService, insertTableOccurrenceMethodName)
           .mockResolvedValue({});
 
         const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, addUserQueryOccurrenceMethodName)
+          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
           .mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
@@ -352,7 +352,9 @@ describe('WhiteboardNodeAddedTransaction', () => {
       it('should throw an InternalServerErrorException if the database response is invalid', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, addEmbeddingMethodName).mockResolvedValue(null);
+        const addEmbeddingToCasefileSpy = jest
+          .spyOn(databaseService, insertEmbeddingMethodName)
+          .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
         transaction.logger.localInstance.setLogLevels([]);

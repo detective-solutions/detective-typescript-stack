@@ -62,11 +62,11 @@ export class DatabaseService {
     return casefileData;
   }
 
-  async addTableOccurrenceToCasefile(
+  async insertTableOccurrenceToCasefile(
     casefileId: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(tableWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
       [`${tableWhiteboardNode.type}.entity`]: {
@@ -87,11 +87,11 @@ export class DatabaseService {
     });
   }
 
-  async addUserQueryOccurrenceToCasefile(
+  async insertUserQueryOccurrenceToCasefile(
     casefileId: string,
     userQueryWhiteboardNode: IUserQueryWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(userQueryWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
       [`${userQueryWhiteboardNode.type}.author`]: {
@@ -115,11 +115,11 @@ export class DatabaseService {
     });
   }
 
-  async addEmbeddingToCasefile(
+  async insertEmbeddingToCasefile(
     casefileId: string,
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(embeddingWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
@@ -174,7 +174,7 @@ export class DatabaseService {
     return uid;
   }
 
-  private async createBasicNodeMutation(addedWhiteboardNode: AnyWhiteboardNode) {
+  private async createBasicNodeInsertMutation(addedWhiteboardNode: AnyWhiteboardNode) {
     return {
       [`${addedWhiteboardNode.type}.xid`]: addedWhiteboardNode.id,
       [`${addedWhiteboardNode.type}.title`]: addedWhiteboardNode.title,

@@ -176,7 +176,7 @@ describe('DatabaseService', () => {
         'dgraph.type': WhiteboardNodeType.TABLE,
       };
 
-      const res = await databaseService.addTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
+      const res = await databaseService.insertTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
 
       expect(res).toBeTruthy();
       expect(getUidByTypeSpy).toBeCalledTimes(3);
@@ -188,7 +188,7 @@ describe('DatabaseService', () => {
       const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
       const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
 
-      const res = await databaseService.addTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
+      const res = await databaseService.insertTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
 
       expect(res).toBe(null);
       expect(getUidByTypeSpy).toBeCalledTimes(3);
@@ -245,7 +245,7 @@ describe('DatabaseService', () => {
         'dgraph.type': WhiteboardNodeType.USER_QUERY,
       };
 
-      const res = await databaseService.addUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
+      const res = await databaseService.insertUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
 
       expect(res).toBeTruthy();
       expect(getUidByTypeSpy).toBeCalledTimes(4);
@@ -257,7 +257,7 @@ describe('DatabaseService', () => {
       const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
       const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
 
-      const res = await databaseService.addUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
+      const res = await databaseService.insertUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
 
       expect(res).toBe(null);
       expect(getUidByTypeSpy).toBeCalledTimes(4);
@@ -312,7 +312,7 @@ describe('DatabaseService', () => {
         'dgraph.type': WhiteboardNodeType.EMBEDDING,
       };
 
-      const res = await databaseService.addEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
+      const res = await databaseService.insertEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
 
       expect(res).toBeTruthy();
       expect(getUidByTypeSpy).toBeCalledTimes(3);
@@ -324,7 +324,7 @@ describe('DatabaseService', () => {
       const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
       const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
 
-      const res = await databaseService.addEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
+      const res = await databaseService.insertEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
 
       expect(res).toBe(null);
       expect(getUidByTypeSpy).toBeCalledTimes(3);
