@@ -69,7 +69,6 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeMutation(tableWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
       },
@@ -77,6 +76,7 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -94,7 +94,6 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeMutation(userQueryWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
       },
@@ -105,6 +104,7 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -122,7 +122,6 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeMutation(embeddingWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
@@ -131,6 +130,7 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
