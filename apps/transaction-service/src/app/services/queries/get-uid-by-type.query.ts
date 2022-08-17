@@ -1,13 +1,13 @@
-export const getUidQueryName = 'getUid';
+export const getUidByTypeQueryName = 'getUid';
 
 export interface IGetUid {
-  [getUidQueryName]: { uid: string }[];
+  [getUidByTypeQueryName]: { uid: string }[];
 }
 
-export function createGetUidQueryByType(databaseType: string) {
+export function createGetUidByTypeQuery(databaseType: string) {
   return `
-      query ${getUidQueryName}($id: string) {
-        ${getUidQueryName}(func: eq(${databaseType}.xid, $id)) {
+      query ${getUidByTypeQueryName}($id: string) {
+        ${getUidByTypeQueryName}(func: eq(${databaseType}.xid, $id)) {
           uid
         }
       }

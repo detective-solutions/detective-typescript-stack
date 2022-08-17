@@ -8,10 +8,10 @@ import {
 import {
   IGetCasefileById,
   IGetUid,
-  createGetUidQueryByType,
+  createGetUidByTypeQuery,
   getCasefileByIdQuery,
   getCasefileByIdQueryName,
-  getUidQueryName,
+  getUidByTypeQueryName,
 } from './queries';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
@@ -147,29 +147,29 @@ export class DatabaseService {
     this.logger.log(`Requesting uid for type ${type} from database`);
 
     const queryVariables = { $id: id };
-    const queryResponse = (await this.sendQuery(createGetUidQueryByType(type), queryVariables)) as IGetUid;
+    const queryResponse = (await this.sendQuery(createGetUidByTypeQuery(type), queryVariables)) as IGetUid;
     if (!queryResponse) {
       return null;
     }
 
-    if (!queryResponse[getUidQueryName]) {
-      this.logger.error(`Incoming database response object is missing ${getUidQueryName} property`);
+    if (!queryResponse[getUidByTypeQueryName]) {
+      this.logger.error(`Incoming database response object is missing ${getUidByTypeQueryName} property`);
       throw new InternalServerErrorException();
     }
 
-    if (queryResponse[getUidQueryName].length > 1) {
+    if (queryResponse[getUidByTypeQueryName].length > 1) {
       this.logger.error(`Found more than one objects with id ${id} while fetching uid`);
       throw new InternalServerErrorException();
     }
 
-    if (queryResponse[getUidQueryName].length === 0) {
+    if (queryResponse[getUidByTypeQueryName].length === 0) {
       this.logger.error(`No object found for the given id ${id}`);
       return null;
     }
 
-    const uid = queryResponse[getUidQueryName][0]?.uid;
+    const uid = queryResponse[getUidByTypeQueryName][0]?.uid;
     if (!uid) {
-      this.logger.error(`${getUidQueryName} is missing "uid" property`);
+      this.logger.error(`${getUidByTypeQueryName} is missing "uid" property`);
       throw new InternalServerErrorException();
     }
 
