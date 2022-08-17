@@ -5,11 +5,10 @@ import { Transaction } from './abstract';
 export class LoadWhiteboardDataTransaction extends Transaction {
   readonly logger = new Logger(LoadWhiteboardDataTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputUnicast;
+  readonly maxRetries = 1;
 
   override message: IMessage<ICasefileForWhiteboard>; // Define message body type
 
-  private readonly retryInterval = 1000;
-  private readonly maxRetries = 3;
   private retryCount = 0;
 
   async execute(): Promise<void> {
@@ -33,11 +32,9 @@ export class LoadWhiteboardDataTransaction extends Transaction {
 
   private handleError(error) {
     this.logger.error(error);
-    if (this.retryCount <= this.maxRetries) {
-      setTimeout(() => {
-        this.retryCount++;
-        this.execute();
-      }, this.retryInterval);
+    if (this.retryCount < this.maxRetries) {
+      this.retryCount++;
+      this.execute();
     }
   }
 }

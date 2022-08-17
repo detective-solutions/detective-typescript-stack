@@ -89,5 +89,15 @@ describe('LoadWhiteboardDataTransaction', () => {
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
     });
+
+    it('should retry query after a failed request', async () => {
+      const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName).mockResolvedValue(null);
+      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+
+      await loadWhiteboardDataTransaction.execute();
+
+      expect(getCasfileByIdSpy).toBeCalledTimes(loadWhiteboardDataTransaction.maxRetries + 1);
+      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+    });
   });
 });
