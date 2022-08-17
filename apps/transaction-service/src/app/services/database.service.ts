@@ -24,8 +24,8 @@ import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 @Injectable()
 export class DatabaseService {
-  private static readonly readTxnOptions: TxnOptions = { readOnly: true, bestEffort: true };
-  private static readonly mutationNodeReference = '_:new_node';
+  static readonly readTxnOptions: TxnOptions = { readOnly: true, bestEffort: true };
+  static readonly mutationNodeReference = '_:new_node';
 
   readonly logger = new Logger(DatabaseService.name);
 
