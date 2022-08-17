@@ -28,6 +28,7 @@ const databaseServiceMock = {
   [addUserQueryOccurrenceMethodName]: jest.fn(),
   [addEmbeddingMethodName]: jest.fn(),
 };
+
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
