@@ -15,6 +15,17 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
       throw new InternalServerErrorException('Transaction cannot be executed due to missing message body information');
     }
 
-    this.forwardMessageToOtherClients();
+    try {
+      this.forwardMessageToOtherClients();
+      this.databaseService.updateNodePositionInCasefile(this.messageContext.casefileId, this.messageBody);
+      this.logger.log(`${this.logContext} Transaction successful`);
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  private handleError(error) {
+    // TODO: Improve error handling with caching of transaction data & re-running mutations
+    this.logger.error(error);
   }
 }
