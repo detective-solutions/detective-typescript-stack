@@ -79,8 +79,6 @@ export class DatabaseService {
       },
     };
 
-    console.log(finalMutationJson);
-
     return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
         `There was a problem while trying to add a ${tableWhiteboardNode.type} node to casefile ${casefileId}`
