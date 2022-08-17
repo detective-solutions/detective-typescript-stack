@@ -15,8 +15,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const mockWhiteboardProducer = {
-  sendKafkaMessage: jest.fn(),
+  [sendKafkaMessageMethodName]: jest.fn(),
 };
 
 describe('WhiteboardWebsocketGateway', () => {
@@ -55,7 +56,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
   describe('OnQueryTableEvent', () => {
     it('should forward QUERY_TABLE events to the correct target topic', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const testMessage = { context: _createContext(MessageEventType.QueryTable), body: testMessageBody };
 
       await webSocketGateway.onQueryTableEvent(testMessage);
@@ -65,7 +66,7 @@ describe('WhiteboardWebsocketGateway', () => {
     });
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const context = _createContext(MessageEventType.QueryTable);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
@@ -78,7 +79,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
   describe('onLoadWhiteboardDataEvent', () => {
     it('should forward LOAD_WHITEBOARD_DATA events to the correct target topic', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const testMessage = { context: _createContext(MessageEventType.LoadWhiteboardData), body: testMessageBody };
 
       await webSocketGateway.onLoadWhiteboardDataEvent(testMessage);
@@ -88,7 +89,7 @@ describe('WhiteboardWebsocketGateway', () => {
     });
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const context = _createContext(MessageEventType.LoadWhiteboardData);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
@@ -101,7 +102,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
   describe('onWhiteboardNodeAddedEvent', () => {
     it('should forward WHITEBOARD_NODE_ADDED events to the correct target topic', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const testMessage = { context: _createContext(MessageEventType.WhiteboardNodeAdded), body: testMessageBody };
 
       await webSocketGateway.onWhiteboardNodeAddedEvent(testMessage);
@@ -111,7 +112,7 @@ describe('WhiteboardWebsocketGateway', () => {
     });
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const context = _createContext(MessageEventType.WhiteboardNodeAdded);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
@@ -124,7 +125,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
   describe('onWhiteboardNodeMovedEvent', () => {
     it('should forward WHITEBOARD_NODE_MOVED events to the correct target topic', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const testMessage = { context: _createContext(MessageEventType.WhiteboardNodeMoved), body: testMessageBody };
 
       await webSocketGateway.onWhiteboardNodeMoved(testMessage);
@@ -134,7 +135,7 @@ describe('WhiteboardWebsocketGateway', () => {
     });
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
-      const producerMock = jest.spyOn(mockWhiteboardProducer, 'sendKafkaMessage');
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const context = _createContext(MessageEventType.WhiteboardNodeMoved);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
