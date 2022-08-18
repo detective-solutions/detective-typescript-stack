@@ -143,17 +143,17 @@ export class DatabaseService {
 
   async updateNodePositionInCasefile(
     casefileId: string,
-    updateNode: AnyWhiteboardNode
+    updatedNode: AnyWhiteboardNode
   ): Promise<Record<string, any> | null> {
     const mutationJson = {
-      uid: await this.getUidByType(updateNode.id, updateNode.type),
-      [`${updateNode.type}.x`]: updateNode.x,
-      [`${updateNode.type}.y`]: updateNode.y,
+      uid: await this.getUidByType(updatedNode.id, updatedNode.type),
+      [`${updatedNode.type}.x`]: updatedNode.x,
+      [`${updatedNode.type}.y`]: updatedNode.y,
     };
 
     return this.sendMutation(mutationJson).catch(() => {
       this.logger.error(
-        `There was a problem while trying to update the position of a ${updateNode.type} node (${updateNode.id}) in casefile ${casefileId}`
+        `There was a problem while trying to update the position of a ${updatedNode.type} node (${updatedNode.id}) in casefile ${casefileId}`
       );
       return null;
     });
