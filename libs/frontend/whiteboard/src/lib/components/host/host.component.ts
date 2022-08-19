@@ -167,6 +167,12 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onElementDrop(event: DragEvent) {
+    // TODO: Add interface for drag data transfer object
+    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
+    if (!dragDataTransfer) {
+      console.error('Could not extract drag data for adding whiteboard node');
+    }
+
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
 
     // TODO: Remove these when actual node data is loaded
@@ -180,31 +186,64 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       '',
     ];
 
-    // TODO: Use data from added element instead of hard-coded data
     const now = formatDate(new Date());
-    const tableNode = TableWhiteboardNode.Build({
-      id: uuidv4(),
-      title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-      x: convertedDOMPoint.x,
-      y: convertedDOMPoint.y,
-      width: 900,
-      height: 500,
-      locked: false,
-      lastUpdatedBy: {
-        id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-      },
-      lastUpdated: now,
-      created: now,
-      entity: {
-        id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
-      },
-    });
-    this.store.dispatch(
-      WhiteboardGeneralActions.WhiteboardNodeAdded({
-        addedNode: TableWhiteboardNode.Build(tableNode),
-        addedManually: true,
-      })
-    );
+
+    if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
+      // TODO: Remove when data from dragged element is used
+      const tableNode = TableWhiteboardNode.Build({
+        id: uuidv4(),
+        title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+        x: convertedDOMPoint.x,
+        y: convertedDOMPoint.y,
+        width: 900,
+        height: 500,
+        locked: false,
+        lastUpdatedBy: {
+          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+        },
+        lastUpdated: now,
+        created: now,
+        entity: {
+          id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
+        },
+      });
+
+      this.store.dispatch(
+        WhiteboardGeneralActions.WhiteboardNodeAdded({
+          addedNode: tableNode,
+          addedManually: true,
+        })
+      );
+    }
+
+    if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
+      // TODO: Remove when data from dragged element is used
+      const href = 'detective.solutions';
+      const embeddingNode = EmbeddingWhiteboardNode.Build({
+        id: uuidv4(),
+        title: href,
+        href: href,
+        x: convertedDOMPoint.x,
+        y: convertedDOMPoint.y,
+        width: 900,
+        height: 500,
+        locked: false,
+        author: { id: '78b4daab-dfe4-4bad-855f-ac575cc59730' },
+        editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+        lastUpdatedBy: {
+          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+        },
+        lastUpdated: now,
+        created: now,
+      });
+
+      this.store.dispatch(
+        WhiteboardGeneralActions.WhiteboardNodeAdded({
+          addedNode: embeddingNode,
+          addedManually: true,
+        })
+      );
+    }
   }
 
   private convertDOMToSVGCoordinates(x: number, y: number): DOMPoint {

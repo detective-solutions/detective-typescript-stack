@@ -1,10 +1,14 @@
 <div id="sidebar-wrapper">
   <div class="sidebar-button-wrapper" fxFlex fxLayout="column">
-    <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">storage</mat-icon>
+    <mat-icon #tableOccurrence fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
+      >storage</mat-icon
+    >
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">rectangle</mat-icon>
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">turn_sharp_left</mat-icon>
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">edit</mat-icon>
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">title</mat-icon>
-    <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">language</mat-icon>
+    <mat-icon #embedding fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
+      >language</mat-icon
+    >
   </div>
 </div>
