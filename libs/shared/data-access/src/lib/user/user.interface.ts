@@ -4,7 +4,7 @@ import { UserRole } from './user-role.enum';
 
 export interface IUser {
   id: string;
-  email: string;
+  email?: string;
   tenantIds?: ITenant[];
   role?: UserRole;
   firstname?: string;
