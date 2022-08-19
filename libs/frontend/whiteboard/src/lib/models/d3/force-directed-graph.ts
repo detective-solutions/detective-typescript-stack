@@ -125,12 +125,19 @@ export class ForceDirectedGraph {
               } else {
                 ly = 0;
               }
+              const prevX = node.x;
+              const prevY = node.y;
 
-              node.x -= x *= lx / 2;
-              node.y -= y *= ly / 2;
+              // Round node position to reduce data
+              node.x -= Math.round((x *= lx / 2));
+              node.y -= Math.round((y *= ly / 2));
 
-              nodePositionCallback(node);
-              updated = true;
+              // Only update node if position differs
+              // Otherwise updates will be send on every tick
+              if (prevX !== node.x || prevY !== node.y) {
+                updated = true;
+                nodePositionCallback(node);
+              }
             }
           }
           return updated;
