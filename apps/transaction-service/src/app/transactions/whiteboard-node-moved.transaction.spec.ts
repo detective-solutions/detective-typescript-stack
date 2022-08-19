@@ -9,7 +9,6 @@ import {
 } from '@detective.solutions/shared/data-access';
 
 import { DatabaseService } from '../services';
-import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
 import { TransactionServiceRefs } from './factory';
@@ -17,13 +16,9 @@ import { WhiteboardNodeMovedTransaction } from './whiteboard-node-moved.transact
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const addTableOccurrenceMethodName = 'addTableOccurrenceToCasefile';
-const addUserQueryOccurrenceMethodName = 'addUserQueryOccurrenceToCasefile';
-const addEmbeddingMethodName = 'addEmbeddingToCasefile';
+const updateNodePositionMethodName = 'updateNodePositionInCasefile';
 const databaseServiceMock = {
-  [addTableOccurrenceMethodName]: jest.fn(),
-  [addUserQueryOccurrenceMethodName]: jest.fn(),
-  [addEmbeddingMethodName]: jest.fn(),
+  [updateNodePositionMethodName]: jest.fn(),
 };
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
