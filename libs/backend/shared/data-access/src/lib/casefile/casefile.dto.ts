@@ -48,7 +48,7 @@ export class CasefileDTO implements ICasefile {
   @IsNotEmpty()
   author!: IUser;
 
-  @IsNotEmpty()
+  // TODO: Add validation
   editors!: IUser[];
 
   @IsNotEmpty()
