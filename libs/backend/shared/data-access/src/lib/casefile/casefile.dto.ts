@@ -16,7 +16,6 @@ export class CasefileDTO implements ICasefile {
   @IsNotEmpty()
   title!: string;
 
-  @MaxLength(254)
   @IsString()
   @IsOptional()
   description!: string;
