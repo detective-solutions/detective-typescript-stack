@@ -146,13 +146,13 @@ export class DatabaseService {
     updatedNodes: AnyWhiteboardNode[]
   ): Promise<Record<string, any> | null> {
     const mutations = [];
-    updatedNodes.forEach(async (node: AnyWhiteboardNode) => {
+    for (const node of updatedNodes) {
       mutations.push({
         uid: await this.getUidByType(node.id, node.type),
         [`${node.type}.x`]: node.x,
         [`${node.type}.y`]: node.y,
       });
-    });
+    }
 
     return this.sendMutation(mutations).catch(() => {
       this.logger.error(`There was a problem updating node positions in casefile ${casefileId}`);
