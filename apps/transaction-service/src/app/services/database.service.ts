@@ -141,20 +141,21 @@ export class DatabaseService {
     });
   }
 
-  async updateNodePositionInCasefile(
+  async updateNodePositionsInCasefile(
     casefileId: string,
-    updatedNode: AnyWhiteboardNode
+    updatedNodes: AnyWhiteboardNode[]
   ): Promise<Record<string, any> | null> {
-    const mutationJson = {
-      uid: await this.getUidByType(updatedNode.id, updatedNode.type),
-      [`${updatedNode.type}.x`]: updatedNode.x,
-      [`${updatedNode.type}.y`]: updatedNode.y,
-    };
+    const mutations = [];
+    updatedNodes.forEach(async (node: AnyWhiteboardNode) => {
+      mutations.push({
+        uid: await this.getUidByType(node.id, node.type),
+        [`${node.type}.x`]: node.x,
+        [`${node.type}.y`]: node.y,
+      });
+    });
 
-    return this.sendMutation(mutationJson).catch(() => {
-      this.logger.error(
-        `There was a problem while trying to update the position of a ${updatedNode.type} node (${updatedNode.id}) in casefile ${casefileId}`
-      );
+    return this.sendMutation(mutations).catch(() => {
+      this.logger.error(`There was a problem updating node positions in casefile ${casefileId}`);
       return null;
     });
   }

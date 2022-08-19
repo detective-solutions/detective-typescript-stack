@@ -6,7 +6,7 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeMovedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<AnyWhiteboardNode>; // Define message body type
+  override message: IMessage<AnyWhiteboardNode[]>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
@@ -17,7 +17,7 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
 
     try {
       this.forwardMessageToOtherClients();
-      this.databaseService.updateNodePositionInCasefile(this.messageContext.casefileId, this.messageBody);
+      this.databaseService.updateNodePositionsInCasefile(this.messageContext.casefileId, this.messageBody);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.handleError(error);
