@@ -52,7 +52,7 @@ export class EmbeddingDTO implements IEmbedding {
   @IsNotEmpty()
   author!: IUser;
 
-  @IsNotEmpty()
+  // TODO: Add validation
   editors!: IUser[];
 
   @ValidateNested({ each: true })
