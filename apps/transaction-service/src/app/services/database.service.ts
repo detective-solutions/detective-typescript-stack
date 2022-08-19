@@ -4,6 +4,7 @@ import {
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
   IUserQueryWhiteboardNode,
+  IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import {
   IGetCasefileById,
@@ -143,7 +144,7 @@ export class DatabaseService {
 
   async updateNodePositionsInCasefile(
     casefileId: string,
-    updatedNodes: AnyWhiteboardNode[]
+    updatedNodes: IWhiteboardNodePositionUpdate[]
   ): Promise<Record<string, any> | null> {
     const mutations = [];
     for (const node of updatedNodes) {

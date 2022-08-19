@@ -26,7 +26,7 @@ const transactionProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const testMessagePayload: IMessage<ITableWhiteboardNode> = {
+const testMessagePayload: IMessage<ITableWhiteboardNode[]> = {
   context: {
     eventType: MessageEventType.WhiteboardNodeAdded,
     tenantId: uuidv4(),
@@ -36,20 +36,36 @@ const testMessagePayload: IMessage<ITableWhiteboardNode> = {
     nodeId: uuidv4(),
     timestamp: 123456,
   },
-  body: {
-    id: uuidv4(),
-    title: 'test',
-    x: 1,
-    y: 1,
-    width: 1,
-    height: 1,
-    locked: false,
-    lastUpdatedBy: { id: uuidv4() } as IUser,
-    lastUpdated: formatDate(new Date()),
-    created: formatDate(new Date()),
-    entity: { id: uuidv4() } as ITable,
-    type: WhiteboardNodeType.TABLE,
-  },
+  body: [
+    {
+      id: uuidv4(),
+      title: 'test',
+      x: 1,
+      y: 1,
+      width: 1,
+      height: 1,
+      locked: false,
+      lastUpdatedBy: { id: uuidv4() } as IUser,
+      lastUpdated: formatDate(new Date()),
+      created: formatDate(new Date()),
+      entity: { id: uuidv4() } as ITable,
+      type: WhiteboardNodeType.TABLE,
+    },
+    {
+      id: uuidv4(),
+      title: 'test',
+      x: 1,
+      y: 1,
+      width: 1,
+      height: 1,
+      locked: false,
+      lastUpdatedBy: { id: uuidv4() } as IUser,
+      lastUpdated: formatDate(new Date()),
+      created: formatDate(new Date()),
+      entity: { id: uuidv4() } as ITable,
+      type: WhiteboardNodeType.TABLE,
+    },
+  ],
 };
 
 describe('WhiteboardNodeMovedTransaction', () => {
