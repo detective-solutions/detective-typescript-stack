@@ -68,7 +68,7 @@ export const getCasefileByIdQuery = `
         height: Embedding.height
         locked: Embedding.locked
         author: Embedding.author {
-          id: User.id
+          id: User.xid
         }
         lastUpdatedBy: Embedding.lastUpdatedBy {
           id: User.xid
