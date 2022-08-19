@@ -12,25 +12,17 @@ import {
 import {
   AnyWhiteboardNode,
   ICasefile,
+  IWhiteboardNodePositionUpdate,
   MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
 } from '@detective.solutions/shared/data-access';
-import { ForceDirectedGraph, TableWhiteboardNode } from '../../models';
-import {
-  Subscription,
-  combineLatest,
-  delayWhen,
-  distinctUntilChanged,
-  filter,
-  pluck,
-  switchMap,
-  take,
-  tap,
-} from 'rxjs';
-import { WhiteboardGeneralActions, selectWhiteboardContextState } from '../../state';
+import { EmbeddingWhiteboardNode, ForceDirectedGraph, TableWhiteboardNode } from '../../models';
+import { Subscription, combineLatest, delayWhen, filter, pluck, switchMap, take, tap } from 'rxjs';
+import { WhiteboardGeneralActions, WhiteboardNodeActions, selectWhiteboardContextState } from '../../state';
 
 import { Store } from '@ngrx/store';
+import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -54,10 +46,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
     // Update underlying graph nodes
-    tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes)),
-    // Update layouts for nodes moved by graph force
-    tap(() => this.whiteboardFacade.updateNodesFromBuffer())
+    tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes))
   );
+
   readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
   readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
@@ -92,7 +83,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe((messageData: ICasefile) => {
           this.store.dispatch(
             WhiteboardGeneralActions.WhiteboardDataLoaded({
-              casefile: messageData,
+              casefile: messageData as ICasefile,
             })
           );
         })
@@ -114,8 +105,36 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe(([messageData, _context]) => {
           this.store.dispatch(
             WhiteboardGeneralActions.WhiteboardNodeAdded({
-              addedNode: messageData.body,
+              addedNode: messageData.body as AnyWhiteboardNode,
               addedManually: false,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_MOVED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeMoved),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .subscribe(([messageData, _context]) => {
+          // Convert incoming message to ngRx Update type
+          const updates = (messageData.body as IWhiteboardNodePositionUpdate[]).map(
+            (positionUpdate: IWhiteboardNodePositionUpdate) => {
+              return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
+            }
+          );
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodesMovedRemotely({
+              updates: updates as Update<AnyWhiteboardNode>[],
             })
           );
         })
@@ -123,9 +142,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Handle position updates caused by the graph force
     this.subscriptions.add(
-      this.forceGraph.nodePositionUpdatedByForce$
-        .pipe(distinctUntilChanged())
-        .subscribe((node: AnyWhiteboardNode) => this.whiteboardFacade.addToNodeUpdateBuffer(node))
+      this.forceGraph.nodePositionUpdatedByForce$.subscribe((node: AnyWhiteboardNode) =>
+        this.whiteboardFacade.addToNodeUpdateBuffer(node)
+      )
     );
   }
 

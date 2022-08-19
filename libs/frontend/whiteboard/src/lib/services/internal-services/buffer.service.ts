@@ -17,13 +17,13 @@ export class BufferService {
   updateNodesFromBuffer() {
     const updates: Update<AnyWhiteboardNode>[] = [];
     this.nodeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
-      const { id, ...updatedProperties } = node;
       updates.push({
-        id: id,
-        changes: updatedProperties,
+        id: node.id,
+        // Round node position to reduce data
+        changes: { x: Math.round(node.x), y: Math.round(node.y), type: node.type },
       });
     });
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeBatchUpdate({ updates: updates }));
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesMoved({ updates: updates }));
     this.nodeUpdateBuffer.clear();
   }
 }
