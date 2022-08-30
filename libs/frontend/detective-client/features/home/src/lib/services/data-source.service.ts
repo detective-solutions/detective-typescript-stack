@@ -10,6 +10,8 @@ import { transformError } from '@detective.solutions/frontend/shared/error-handl
 
 @Injectable()
 export class DataSourceService {
+  private readonly missingResponseKeyErrorText = 'Database response is missing required key';
+
   private getAllDataSourcesWatchQuery!: QueryRef<Response>;
 
   constructor(
@@ -26,6 +28,9 @@ export class DataSourceService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       map((response: any) => response.data),
       map((response: IGetAllDataSourcesGQLResponse) => {
+        if (!response.querySourceConnection || !response.aggregateSourceConnection) {
+          this.handleError(this.missingResponseKeyErrorText);
+        }
         return {
           dataSources: response.querySourceConnection.map(SourceConnectionDTO.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
