@@ -16,7 +16,6 @@ export class CasefileDTO implements ICasefile {
   @IsNotEmpty()
   title!: string;
 
-  @MaxLength(254)
   @IsString()
   @IsOptional()
   description!: string;
@@ -48,7 +47,7 @@ export class CasefileDTO implements ICasefile {
   @IsNotEmpty()
   author!: IUser;
 
-  @IsNotEmpty()
+  // TODO: Add validation
   editors!: IUser[];
 
   @IsNotEmpty()

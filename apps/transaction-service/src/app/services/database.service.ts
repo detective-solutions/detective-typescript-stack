@@ -4,6 +4,7 @@ import {
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
   IUserQueryWhiteboardNode,
+  IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import {
   IGetCasefileById,
@@ -62,14 +63,13 @@ export class DatabaseService {
     return casefileData;
   }
 
-  async addTableOccurrenceToCasefile(
+  async insertTableOccurrenceToCasefile(
     casefileId: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(tableWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
       },
@@ -77,9 +77,8 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
-
-    console.log(finalMutationJson);
 
     return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
@@ -89,14 +88,13 @@ export class DatabaseService {
     });
   }
 
-  async addUserQueryOccurrenceToCasefile(
+  async insertUserQueryOccurrenceToCasefile(
     casefileId: string,
     userQueryWhiteboardNode: IUserQueryWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(userQueryWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
       },
@@ -107,6 +105,7 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -117,14 +116,13 @@ export class DatabaseService {
     });
   }
 
-  async addEmbeddingToCasefile(
+  async insertEmbeddingToCasefile(
     casefileId: string,
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeMutation(embeddingWhiteboardNode);
+    const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
         uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
@@ -133,12 +131,32 @@ export class DatabaseService {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
       },
+      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
       this.logger.error(
         `There was a problem while trying to add a ${embeddingWhiteboardNode} node to casefile ${casefileId}`
       );
+      return null;
+    });
+  }
+
+  async updateNodePositionsInCasefile(
+    casefileId: string,
+    updatedNodes: IWhiteboardNodePositionUpdate[]
+  ): Promise<Record<string, any> | null> {
+    const mutations = [];
+    for (const node of updatedNodes) {
+      mutations.push({
+        uid: await this.getUidByType(node.id, node.type),
+        [`${node.type}.x`]: node.x,
+        [`${node.type}.y`]: node.y,
+      });
+    }
+
+    return this.sendMutation(mutations).catch(() => {
+      this.logger.error(`There was a problem updating node positions in casefile ${casefileId}`);
       return null;
     });
   }
@@ -176,7 +194,7 @@ export class DatabaseService {
     return uid;
   }
 
-  private async createBasicNodeMutation(addedWhiteboardNode: AnyWhiteboardNode) {
+  private async createBasicNodeInsertMutation(addedWhiteboardNode: AnyWhiteboardNode) {
     return {
       [`${addedWhiteboardNode.type}.xid`]: addedWhiteboardNode.id,
       [`${addedWhiteboardNode.type}.title`]: addedWhiteboardNode.title,

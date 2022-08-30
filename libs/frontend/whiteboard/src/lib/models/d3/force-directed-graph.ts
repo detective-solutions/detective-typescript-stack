@@ -1,5 +1,5 @@
 import { AnyWhiteboardNode, IForceDirectedNode, WhiteboardOptions } from '@detective.solutions/shared/data-access';
-import { Simulation, forceSimulation as d3ForceSimulation } from 'd3-force';
+import { Simulation, forceCenter as d3ForceCenter, forceSimulation as d3ForceSimulation } from 'd3-force';
 
 import { EventEmitter } from '@angular/core';
 import { Link } from './link';
@@ -38,6 +38,8 @@ export class ForceDirectedGraph {
     this.simulation.on('tick', function () {
       ticker.emit(this);
     });
+
+    // this.addCenterForce();
   }
 
   updateNodes(nodes: AnyWhiteboardNode[]) {
@@ -75,16 +77,15 @@ export class ForceDirectedGraph {
   // }
 
   // TODO: Allow elements to be dropped at the rights coordinates when center force is activated
-  // TODO: Reactivate when done
-  // private addCenterForce() {
-  //   // Adjust center of the viewport while dragging elements
-  //   this.simulation.force('centers', d3ForceCenter(this.options.width, this.options.height));
-  //   this.simulation.restart();
-  // }
+  private addCenterForce() {
+    // Adjust center of the viewport while dragging elements
+    this.simulation.force('centers', d3ForceCenter(this.options.width, this.options.height));
+    this.simulation.restart();
+  }
 
-  // private removeCenterForce() {
-  //   this.simulation.force('centers', null);
-  // }
+  private removeCenterForce() {
+    this.simulation.force('centers', null);
+  }
 
   private rectCollide(nodePositionCallback: (nodeWithUpdatedPosition: AnyWhiteboardNode) => void) {
     let nodes: AnyWhiteboardNode[];
@@ -124,12 +125,19 @@ export class ForceDirectedGraph {
               } else {
                 ly = 0;
               }
+              const prevX = node.x;
+              const prevY = node.y;
 
-              node.x -= x *= lx / 2;
-              node.y -= y *= ly / 2;
+              // Round node position to reduce data
+              node.x -= Math.round((x *= lx / 2));
+              node.y -= Math.round((y *= ly / 2));
 
-              nodePositionCallback(node);
-              updated = true;
+              // Only update node if position differs
+              // Otherwise updates will be send on every tick
+              if (prevX !== node.x || prevY !== node.y) {
+                updated = true;
+                nodePositionCallback(node);
+              }
             }
           }
           return updated;

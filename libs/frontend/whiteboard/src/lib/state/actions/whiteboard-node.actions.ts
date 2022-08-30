@@ -14,3 +14,13 @@ export const WhiteboardNodeBatchUpdate = createAction(
   `${actionPrefix} Updating multiple nodes`,
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );
+
+export const WhiteboardNodesMoved = createAction(
+  `${actionPrefix} Updating node positions`,
+  props<{ updates: Update<AnyWhiteboardNode>[] }>()
+);
+
+export const WhiteboardNodesMovedRemotely = createAction(
+  `${actionPrefix} Updating remote node positions`,
+  props<{ updates: Update<AnyWhiteboardNode>[] }>()
+);

@@ -67,6 +67,9 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
+        author: Embedding.author {
+          id: User.xid
+        }
         lastUpdatedBy: Embedding.lastUpdatedBy {
           id: User.xid
           firstname: User.firstname

@@ -1,4 +1,4 @@
-import { AnyWhiteboardNode } from '../any-node.type';
+import { AnyWhiteboardNode } from '../any-whiteboard-node.type';
 import { SimulationLinkDatum } from 'd3-force';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

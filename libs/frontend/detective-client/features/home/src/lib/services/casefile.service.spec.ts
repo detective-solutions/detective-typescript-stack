@@ -67,8 +67,7 @@ describe('CasefileService', () => {
       tick();
     }));
 
-    // TODO: Fix me
-    xit('should invoke internal error handling if the response does not comply with the IGetAllCasefilesResponse interface', fakeAsync(() => {
+    it('should invoke internal error handling if the response does not comply with the IGetAllCasefilesResponse interface', fakeAsync(() => {
       const casefiles = [_createCasefile()];
       const mockResponse = { wrongKey: casefiles, aggregateCasefile: { count: 1 } };
       jest
@@ -76,7 +75,7 @@ describe('CasefileService', () => {
         .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
       const handleErrorSpy = jest.spyOn(CasefileService.prototype as any, 'handleError').mockReturnValue(EMPTY);
 
-      casefileService.getAllCasefiles(0, 10).subscribe(() => {
+      casefileService.getAllCasefiles(0, 10).subscribe((res) => {
         expect(handleErrorSpy).toBeCalledTimes(1);
       });
       tick();
@@ -99,8 +98,7 @@ describe('CasefileService', () => {
       tick();
     }));
 
-    // TODO: Fix me
-    xit('should invoke internal error handling if an error occurs during the execution of the fetchMore function', fakeAsync(() => {
+    it('should invoke internal error handling if an error occurs during the execution of the fetchMore function', fakeAsync(() => {
       const mockResponse = { queryCasefile: [], aggregateCasefile: { count: 2 } };
       const queryRefMock = mockUtils.createQueryRefMock(mockResponse);
       const fetchMorePromise = queryRefMock.fetchMore;
@@ -132,8 +130,7 @@ describe('CasefileService', () => {
       tick();
     }));
 
-    // TODO: Fix me
-    xit('should invoke internal error handling if the response does not comply with the IGetAllCasefilesResponse interface', fakeAsync(() => {
+    it('should invoke internal error handling if the response does not comply with the IGetAllCasefilesResponse interface', fakeAsync(() => {
       const casefiles = [_createCasefile()];
       const mockResponse = { wrongKey: casefiles, aggregateCasefile: { count: 1 } };
       jest
@@ -164,8 +161,7 @@ describe('CasefileService', () => {
       tick();
     }));
 
-    // TODO: Fix me
-    xit('should invoke internal error handling if an error occurs during the execution of the fetchMore function', fakeAsync(() => {
+    it('should invoke internal error handling if an error occurs during the execution of the fetchMore function', fakeAsync(() => {
       const mockResponse = { queryCasefile: [], aggregateCasefile: { count: 2 } };
       const queryRefMock = mockUtils.createQueryRefMock(mockResponse);
       const fetchMorePromise = queryRefMock.fetchMore;
