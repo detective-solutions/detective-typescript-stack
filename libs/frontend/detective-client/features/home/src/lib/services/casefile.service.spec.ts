@@ -6,6 +6,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Apollo } from 'apollo-angular';
 import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 import { CasefileService } from './casefile.service';
+import { IGetAllCasefilesResponse } from '../interfaces';
 import { IUser } from '@detective.solutions/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { v4 as uuidv4 } from 'uuid';
@@ -59,7 +60,7 @@ describe('CasefileService', () => {
         .spyOn(GetAllCasefilesGQL.prototype as any, 'watch')
         .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
 
-      casefileService.getAllCasefiles(0, 10).subscribe((response: any) => {
+      casefileService.getAllCasefiles(0, 10).subscribe((response: IGetAllCasefilesResponse) => {
         expect(watchQuerySpy).toBeCalledTimes(1);
         expect(watchQuerySpy).toBeCalledWith({ paginationOffset: 0, pageSize: 10 });
         expect(response).toMatchObject({ casefiles: casefiles, totalElementsCount: 2 });

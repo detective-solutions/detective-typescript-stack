@@ -5,6 +5,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Apollo } from 'apollo-angular';
 import { DataSourceService } from './data-source.service';
 import { GetAllDataSourcesGQL } from '../graphql';
+import { IGetAllDataSourcesResponse } from '../interfaces';
 import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
@@ -58,7 +59,7 @@ describe('DataSourceService', () => {
         .spyOn(GetAllDataSourcesGQL.prototype as any, 'watch')
         .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
 
-      dataSourceService.getAllDataSources(0, 10).subscribe((response: any) => {
+      dataSourceService.getAllDataSources(0, 10).subscribe((response: IGetAllDataSourcesResponse) => {
         expect(watchQuerySpy).toBeCalledTimes(1);
         expect(watchQuerySpy).toBeCalledWith({ paginationOffset: 0, pageSize: 10 });
         expect(response).toMatchObject({ dataSources: dataSources, totalElementsCount: 2 });
