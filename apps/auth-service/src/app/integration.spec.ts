@@ -53,8 +53,7 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-// TODO: Fix me
-xdescribe('AppController Integration', () => {
+describe('AppController Integration', () => {
   describe('/POST login', () => {
     it('should return a valid access and refresh token', () => {
       const testJwtUserInfo = {
@@ -193,6 +192,7 @@ xdescribe('AppController Integration', () => {
   });
 
   describe('/POST logout', () => {
+    const testUserUid = '00x1';
     const testJwtUserInfo: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
@@ -207,6 +207,7 @@ xdescribe('AppController Integration', () => {
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -232,10 +233,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given access token has expired', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -267,10 +269,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given access token is malformed', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -298,10 +301,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given access token has been modified', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -331,6 +335,7 @@ xdescribe('AppController Integration', () => {
   });
 
   describe('/POST refresh', () => {
+    const testUserUid = '00x1';
     const testJwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
@@ -340,10 +345,11 @@ xdescribe('AppController Integration', () => {
     it('should return a valid access and refresh tokens', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -425,10 +431,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the token ip address property mismatches the requests ip address', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -449,7 +456,7 @@ xdescribe('AppController Integration', () => {
       clonedTestJwtUserInfo.refreshTokenId = decodedRefreshToken.jti;
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [clonedTestJwtUserInfo] });
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [clonedTestJwtUserInfo] });
 
       return app
         .inject({
@@ -466,10 +473,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the user has already been logged out', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -502,10 +510,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given refresh token has expired', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -527,7 +536,7 @@ xdescribe('AppController Integration', () => {
       clonedTestJwtUserInfo.refreshTokenId = decodedRefreshToken.jti;
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [clonedTestJwtUserInfo] });
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [clonedTestJwtUserInfo] });
 
       return app
         .inject({
@@ -544,10 +553,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given refresh token is malformed', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -583,10 +593,11 @@ xdescribe('AppController Integration', () => {
     it('should return Unauthorized (401) if the given refresh token has been modified', async () => {
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [testJwtUserInfo] })
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [testJwtUserInfo] })
         .mockResolvedValueOnce({
           [passwordCheckQueryName]: [{ [passwordCheckResponseProperty]: true }],
         });
+      jest.spyOn(UserService.prototype as any, 'getUserUid').mockResolvedValue(testUserUid);
       jest.spyOn(UserService.prototype as any, 'sendMutation').mockResolvedValue({});
 
       const loginResponse = await app.inject({
@@ -607,7 +618,7 @@ xdescribe('AppController Integration', () => {
       clonedTestJwtUserInfo.refreshTokenId = decodedRefreshToken.jti;
       jest
         .spyOn(UserService.prototype as any, 'sendQuery')
-        .mockResolvedValueOnce({ [getJwtUserInfoByIdQueryName]: [clonedTestJwtUserInfo] });
+        .mockResolvedValueOnce({ [getJwtUserInfoByEmailQueryName]: [clonedTestJwtUserInfo] });
 
       return app
         .inject({
