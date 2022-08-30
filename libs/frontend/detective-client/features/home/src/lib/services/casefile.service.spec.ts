@@ -75,7 +75,7 @@ describe('CasefileService', () => {
         .mockReturnValue(mockUtils.createQueryRefMock(mockResponse));
       const handleErrorSpy = jest.spyOn(CasefileService.prototype as any, 'handleError').mockReturnValue(EMPTY);
 
-      casefileService.getAllCasefiles(0, 10).subscribe((res) => {
+      casefileService.getAllCasefiles(0, 10).subscribe(() => {
         expect(handleErrorSpy).toBeCalledTimes(1);
       });
       tick();
