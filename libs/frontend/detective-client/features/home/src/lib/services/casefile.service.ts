@@ -14,6 +14,8 @@ import { transformError } from '@detective.solutions/frontend/shared/error-handl
 
 @Injectable()
 export class CasefileService {
+  private readonly missingResponseKeyErrorText = 'Database response is missing required key';
+
   private getAllCasefilesWatchQuery!: QueryRef<Response>;
   private getCasefilesByAuthorWatchQuery!: QueryRef<Response>;
 
@@ -32,6 +34,9 @@ export class CasefileService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       map((response: any) => response.data),
       map((response: IGetAllCasefilesGQLResponse) => {
+        if (!response.queryCasefile || !response.aggregateCasefile) {
+          this.handleError(this.missingResponseKeyErrorText);
+        }
         return {
           casefiles: response.queryCasefile,
           totalElementsCount: response.aggregateCasefile.count,
@@ -63,6 +68,9 @@ export class CasefileService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       map((response: any) => response.data),
       map((response: IGetCasefilesByAuthorGQLResponse) => {
+        if (!response.queryCasefile || !response.aggregateCasefile) {
+          this.handleError(this.missingResponseKeyErrorText);
+        }
         return {
           casefiles: response.queryCasefile,
           totalElementsCount: response.aggregateCasefile.count,
