@@ -12,6 +12,7 @@ import {
 import {
   AnyWhiteboardNode,
   ICasefile,
+  IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
   MessageEventType,
   WhiteboardNodeType,
@@ -107,6 +108,20 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             WhiteboardGeneralActions.WhiteboardNodeAdded({
               addedNode: messageData.body as AnyWhiteboardNode,
               addedManually: false,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked)))
+        .subscribe(([messageData, context]) => {
+          // Convert incoming message to ngRx Update type
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
+              update: { id: context.nodeId, changes: messageData.body } as Update<IWhiteboardNodeBlockUpdate>,
             })
           );
         })

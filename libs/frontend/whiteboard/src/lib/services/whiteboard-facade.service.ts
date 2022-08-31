@@ -29,6 +29,8 @@ export class WhiteboardFacadeService {
     )
   );
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
+  readonly whiteboardSelectionSubject$ = this.whiteboardSelectionService.whiteboardSelectionSubject$;
+
   readonly isDragging$ = this.dragService.isDragging$;
 
   // TODO: Test if delayWhen operator works as expected when additional actions are implemented
