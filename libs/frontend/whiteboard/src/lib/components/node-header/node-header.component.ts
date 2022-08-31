@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Observable, filter } from 'rxjs';
 
 import { WhiteboardFacadeService } from '../../services';
 
@@ -8,10 +9,17 @@ import { WhiteboardFacadeService } from '../../services';
   styleUrls: ['./node-header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NodeHeaderComponent {
+export class NodeHeaderComponent implements OnInit {
   @Input() title!: string;
+  @Input() isBlocked$!: Observable<string>;
+
+  blockInfo$!: Observable<string>;
 
   constructor(private readonly whiteboardFacade: WhiteboardFacadeService) {}
+
+  ngOnInit() {
+    this.blockInfo$ = this.isBlocked$.pipe(filter(Boolean));
+  }
 
   enableDragging() {
     this.whiteboardFacade.activateDragging();

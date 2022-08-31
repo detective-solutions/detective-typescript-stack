@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription, filter, map, pluck } from 'rxjs';
+import { AnyWhiteboardNode, IGeneralWhiteboardNodeTemporaryData } from '@detective.solutions/shared/data-access';
+import { BehaviorSubject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
+import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../state';
 
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
-import { WhiteboardNodeActions } from '../../../state';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -20,19 +20,31 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
     map((selectedId) => (selectedId === this.node.id ? selectedId : null))
   );
-
-  protected readonly nodeUpdates$ = new BehaviorSubject<AnyWhiteboardNode>(this.node);
-  protected readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
+  readonly nodeUpdates$ = new BehaviorSubject<AnyWhiteboardNode>(this.node);
+  readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
     filter((node: AnyWhiteboardNode) => !!node?.temporary),
     pluck('temporary'),
     filter(Boolean)
   );
+  readonly isBlocked$ = this.nodeTemporaryData$.pipe(
+    filter((temporaryData: IGeneralWhiteboardNodeTemporaryData) => !!temporaryData?.blockedBy),
+    pluck('blockedBy'),
+    filter(Boolean),
+    switchMap((blockedBy: string) =>
+      combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(blockedBy).pipe(take(1))])
+    ),
+    filter(([context, blockedBy]) => context.userId !== blockedBy),
+    map(([_context, blockedBy]) => blockedBy)
+  );
+
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
   private onPointerDown(event: PointerEvent) {
-    this.whiteboardFacade.addSelectedElement(this);
-    this.whiteboardFacade.addDelayedDragHandling(event);
+    if (!this.node.temporary?.blockedBy) {
+      this.whiteboardFacade.addSelectedElement(this);
+      this.whiteboardFacade.addDelayedDragHandling(event);
+    }
   }
 
   @HostListener('pointerup')

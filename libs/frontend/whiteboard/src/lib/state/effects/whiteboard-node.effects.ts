@@ -23,7 +23,7 @@ export class WhiteboardNodeEffects {
       return this.actions$.pipe(
         ofType(WhiteboardGeneralActions.WhiteboardNodeAdded),
         filter((action) => action.addedManually),
-        tap((action) => this.whiteboardFacade.whiteboardSelectionSubject$.next(action.addedNode.id))
+        tap((action) => this.whiteboardFacade.whiteboardSelection$.next(action.addedNode.id))
       );
     },
     { dispatch: false }

@@ -64,6 +64,10 @@ export class D3AdapterService {
     const bufferServiceRef = this.bufferService;
 
     function onDragStart(dragStartEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      // Continue dragging only if node is not blocked by another user
+      if (nodeToUpdate.temporary?.blockedBy) {
+        return;
+      }
       // Continue dragging only on allowed target elements
       if (!dragServiceRef.isDraggingAllowedOnTarget(dragStartEvent.sourceEvent.target as HTMLElement)) {
         return;

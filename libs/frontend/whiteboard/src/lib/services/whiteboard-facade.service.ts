@@ -29,7 +29,6 @@ export class WhiteboardFacadeService {
     )
   );
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
-  readonly whiteboardSelectionSubject$ = this.whiteboardSelectionService.whiteboardSelectionSubject$;
 
   readonly isDragging$ = this.dragService.isDragging$;
 

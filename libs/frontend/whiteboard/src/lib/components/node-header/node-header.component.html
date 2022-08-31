@@ -1,6 +1,15 @@
 <div class="element-header" fxFlex fxLayoutAlign="space-between center">
   <input placeholder="Insert title here" [value]="title" />
-  <mat-icon fxLayoutAlign="center center" class="drag-indicator" (pointerdown)="enableDragging()">
+  <mat-icon
+    *ngIf="(blockInfo$ | async) === null; else blockInfo"
+    fxLayoutAlign="center center"
+    class="drag-indicator"
+    (pointerdown)="enableDragging()"
+  >
     drag_indicator
   </mat-icon>
+  <ng-template #blockInfo>
+    <p>{{ blockInfo$ | async }}</p>
+    <mat-icon fxLayoutAlign="center center" class="drag-indicator"> account_circle </mat-icon>
+  </ng-template>
 </div>

@@ -29,8 +29,8 @@
     </div>
   </foreignObject>
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
-    <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
-    <node-header [title]="node.title"></node-header>
+    <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
+    <node-header [title]="node.title" [isBlocked$]="isBlocked$"></node-header>
     <ag-grid-angular
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"

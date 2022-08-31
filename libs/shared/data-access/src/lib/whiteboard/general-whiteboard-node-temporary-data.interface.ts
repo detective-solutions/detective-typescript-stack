@@ -1,3 +1,3 @@
 export interface IGeneralWhiteboardNodeTemporaryData {
-  isBlocked?: string | null;
+  blockedBy?: string | null;
 }
