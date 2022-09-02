@@ -58,14 +58,15 @@ export class D3AdapterService {
     return pass;
   }
 
-  applyDragBehavior(elementToDrag: Element, nodeToUpdate: AnyWhiteboardNode) {
+  applyDragBehavior(elementToDrag: Element, nodeToUpdate: AnyWhiteboardNode, currentUserId: string) {
     const d3element = d3Select(elementToDrag);
     const dragServiceRef = this.dragService;
     const bufferServiceRef = this.bufferService;
 
     function onDragStart(dragStartEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
       // Continue dragging only if node is not blocked by another user
-      if (nodeToUpdate.temporary?.blockedBy) {
+      const isBlockedBy = nodeToUpdate.temporary?.blockedBy;
+      if (isBlockedBy && isBlockedBy !== currentUserId) {
         return;
       }
       // Continue dragging only on allowed target elements

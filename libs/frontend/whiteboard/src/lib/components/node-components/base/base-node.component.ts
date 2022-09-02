@@ -60,7 +60,12 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit() {
-    this.whiteboardFacade.applyDragBehaviorToComponent(this);
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1), pluck('userId'))
+      .subscribe((userId: string) => {
+        this.whiteboardFacade.applyDragBehaviorToComponent(this, userId);
+      });
     this.customAfterViewInit();
   }
 

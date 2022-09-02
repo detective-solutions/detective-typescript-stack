@@ -65,8 +65,8 @@ export class WhiteboardFacadeService {
     this.whiteboardSelectionService.resetSelection();
   }
 
-  applyDragBehaviorToComponent(component: NodeComponent) {
-    this.d3AdapterService.applyDragBehavior(component.elementRef.nativeElement, component.node);
+  applyDragBehaviorToComponent(component: NodeComponent, currentUserId: string) {
+    this.d3AdapterService.applyDragBehavior(component.elementRef.nativeElement, component.node, currentUserId);
   }
 
   activateDragging() {
