@@ -35,7 +35,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
     private readonly config: ConfigService
   ) {}
 
-  // TODO: Evaluate if it is possible to log when clients disconnect
   afterInit(server: Server) {
     // Setting server options afterwards to be able to call internal methods
     server.options = {
@@ -46,13 +45,13 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
 
   handleConnection(client: any, ...args: any[]) {
     console.log('NEW CONNECTION');
-    console.log('CLIENT', client);
+    console.log('CLIENT', client.context);
     console.log('args', args);
   }
 
   handleDisconnect(client: any) {
     console.log('DISCONNECTED');
-    console.log('CLIENT', client);
+    console.log('CLIENT', client.context);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
