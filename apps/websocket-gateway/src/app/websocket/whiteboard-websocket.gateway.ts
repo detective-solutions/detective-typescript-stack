@@ -1,7 +1,15 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
 import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
-import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { AuthEnvironment } from '@detective.solutions/backend/auth';
@@ -15,7 +23,7 @@ import { WhiteboardProducer } from '../kafka/whiteboard.producer';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @WebSocketGateway(7777)
-export class WhiteboardWebSocketGateway implements OnGatewayInit {
+export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
@@ -34,6 +42,17 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit {
       verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
         this.handleNewClientConnection(server, info, cb),
     };
+  }
+
+  handleConnection(client: any, ...args: any[]) {
+    console.log('NEW CONNECTION');
+    console.log('CLIENT', client);
+    console.log('args', args);
+  }
+
+  handleDisconnect(client: any) {
+    console.log('DISCONNECTED');
+    console.log('CLIENT', client);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
