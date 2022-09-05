@@ -5,5 +5,9 @@
       "reconnectionSuccessful": "Verbindung wiederhergestellt",
       "noConnection": "Es konnte keine Verbindung zu den Servern aufgebaut werden. Bitte laden Sie die Casefile neu."
     }
+  },
+  "nodeHeader": {
+    "titleInputPlaceholder": "Titel einfügen",
+    "blockedInfoTitle": "blockiert von"
   }
 }

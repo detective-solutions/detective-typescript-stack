@@ -1,6 +1,7 @@
 $border-radius: 12px;
+$blocked-username-max-width: 300px;
 
-.element-header {
+.node-header {
   width: inherit;
   height: 50px;
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0, rgba(0, 0, 0, 0) 100%);
@@ -20,10 +21,39 @@ $border-radius: 12px;
     filter: initial !important;
   }
 
+  .blocked-info-wrapper {
+    text-align: right;
+
+    .blocked-info-title {
+      font-weight: bold;
+    }
+
+    .blocked-info-username {
+      font-weight: lighter;
+      width: $blocked-username-max-width;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .node-header-icon {
+    height: inherit;
+    font-size: 32px;
+  }
+
   .drag-indicator {
     cursor: grab;
     margin-right: 25px;
-    height: inherit;
-    font-size: 32px;
+  }
+
+  .blocked-info-avatar {
+    margin: 0 25px;
+  }
+
+  .blocked-info-avatar-custom {
+    border-radius: 100%;
+    width: 38px;
+    height: 38px;
   }
 }
