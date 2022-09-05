@@ -34,6 +34,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
       combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(blockedBy).pipe(take(1))])
     ),
     filter(([context, blockedBy]) => context.userId !== blockedBy),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     map(([_context, blockedBy]) => blockedBy)
   );
 

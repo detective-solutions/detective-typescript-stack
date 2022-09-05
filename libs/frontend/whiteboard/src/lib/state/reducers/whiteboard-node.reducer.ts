@@ -22,7 +22,13 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardGeneralActions.WhiteboardNodeAdded, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.addOne(action.addedNode, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeBlockedRemotely, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodeBlocked, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.updateOne(action.update, state)
+  ),
+  on(WhiteboardNodeActions.WhiteboardNodeUnblocked, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.updateOne(action.update, state)
+  ),
+  on(WhiteboardNodeActions.WhiteboardNodeRemoteBlockUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeUpdate, (state: IWhiteboardNodeState, action: any) =>

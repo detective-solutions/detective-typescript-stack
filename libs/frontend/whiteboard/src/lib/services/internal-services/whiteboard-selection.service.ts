@@ -12,15 +12,24 @@ export class WhiteboardSelectionService {
 
   constructor(private readonly store: Store) {}
 
-  addSelectedNode(selectedNode: NodeComponent) {
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeBlocked({ nodeId: selectedNode.node.id }));
+  addSelectedNode(selectedNode: NodeComponent, currentUserId: string) {
+    this.resetSelection(); // Remove this when implementing multi-selection
     this.selectedNodes.push(selectedNode.node);
     this.whiteboardSelection$.next(selectedNode.node.id);
+    this.store.dispatch(
+      WhiteboardNodeActions.WhiteboardNodeBlocked({
+        update: { id: selectedNode.node.id, changes: { temporary: { blockedBy: currentUserId } } },
+      })
+    );
   }
 
   resetSelection() {
     this.selectedNodes.forEach((deselectedNode: AnyWhiteboardNode) => {
-      this.store.dispatch(WhiteboardNodeActions.WhiteboardNodeUnblocked({ nodeId: deselectedNode.id }));
+      this.store.dispatch(
+        WhiteboardNodeActions.WhiteboardNodeUnblocked({
+          update: { id: deselectedNode.id, changes: { temporary: { blockedBy: null } } },
+        })
+      );
     });
     this.selectedNodes = [];
     this.whiteboardSelection$.next(null);

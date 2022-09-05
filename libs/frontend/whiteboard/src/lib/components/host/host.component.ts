@@ -117,12 +117,21 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked)))
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
         .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
-          console.log('INCOMING BLOCKED', messageData);
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
+            WhiteboardNodeActions.WhiteboardNodeRemoteBlockUpdate({
               update: {
                 id: messageData.context.nodeId,
                 changes: messageData.body,

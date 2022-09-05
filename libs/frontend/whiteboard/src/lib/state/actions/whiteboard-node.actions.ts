@@ -19,11 +19,17 @@ export const WhiteboardNodeBatchUpdate = createAction(
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );
 
-export const WhiteboardNodeBlocked = createAction(`${actionPrefix} Blocking node`, props<{ nodeId: string }>());
-export const WhiteboardNodeUnblocked = createAction(`${actionPrefix} Unblocking node`, props<{ nodeId: string }>());
+export const WhiteboardNodeBlocked = createAction(
+  `${actionPrefix} Blocking node`,
+  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
+export const WhiteboardNodeUnblocked = createAction(
+  `${actionPrefix} Unblocking node`,
+  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
 
-export const WhiteboardNodeBlockedRemotely = createAction(
-  `${actionPrefix} Node blocked node remotely`,
+export const WhiteboardNodeRemoteBlockUpdate = createAction(
+  `${actionPrefix} Received remote node blocking information`,
   props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
 );
 

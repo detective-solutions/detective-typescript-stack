@@ -43,11 +43,11 @@ export class WhiteboardNodeEffects {
               context: {
                 ...context,
                 eventType: MessageEventType.WhiteboardNodeBlocked,
-                nodeId: action.nodeId,
+                nodeId: action.update.id,
                 userId: context.userId,
               } as IMessageContext,
               body: {
-                temporary: { blockedBy: context.userId },
+                temporary: { blockedBy: action.update.changes.temporary?.blockedBy },
               } as IWhiteboardNodeBlockUpdate,
             },
           });
@@ -72,7 +72,7 @@ export class WhiteboardNodeEffects {
               context: {
                 ...context,
                 eventType: MessageEventType.WhiteboardNodeBlocked,
-                nodeId: action.nodeId,
+                nodeId: action.update.id,
                 userId: context.userId,
               } as IMessageContext,
               body: {
