@@ -8,26 +8,26 @@ import { WhiteboardNodeActions } from '../../state';
 @Injectable()
 export class WhiteboardSelectionService {
   readonly whiteboardSelection$: ReplaySubject<string | null> = new ReplaySubject();
-  private selectedNodes: AnyWhiteboardNode[] = [];
+  private selectedNodes: string[] = [];
 
   constructor(private readonly store: Store) {}
 
-  addSelectedNode(selectedNode: NodeComponent, currentUserId: string) {
+  addSelectedNode(selectedNodeId: string, currentUserId: string) {
     this.resetSelection(); // Remove this when implementing multi-selection
-    this.selectedNodes.push(selectedNode.node);
-    this.whiteboardSelection$.next(selectedNode.node.id);
+    this.selectedNodes.push(selectedNodeId);
+    this.whiteboardSelection$.next(selectedNodeId);
     this.store.dispatch(
       WhiteboardNodeActions.WhiteboardNodeBlocked({
-        update: { id: selectedNode.node.id, changes: { temporary: { blockedBy: currentUserId } } },
+        update: { id: selectedNodeId, changes: { temporary: { blockedBy: currentUserId } } },
       })
     );
   }
 
   resetSelection() {
-    this.selectedNodes.forEach((deselectedNode: AnyWhiteboardNode) => {
+    this.selectedNodes.forEach((deselectedNodeId: string) => {
       this.store.dispatch(
         WhiteboardNodeActions.WhiteboardNodeUnblocked({
-          update: { id: deselectedNode.id, changes: { temporary: { blockedBy: null } } },
+          update: { id: deselectedNodeId, changes: { temporary: { blockedBy: null } } },
         })
       );
     });

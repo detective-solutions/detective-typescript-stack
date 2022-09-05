@@ -46,7 +46,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     // Check if node is blocked by other user
     const isBlockedByUserId = this.node.temporary?.blockedBy;
     if (!isBlockedByUserId || this.currentUserId === isBlockedByUserId) {
-      this.whiteboardFacade.addSelectedNode(this, this.currentUserId);
+      this.whiteboardFacade.addSelectedNode(this.node.id, this.currentUserId);
       this.whiteboardFacade.addDelayedDragHandling(event);
     }
   }
