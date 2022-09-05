@@ -6,6 +6,7 @@ import {
   DragService,
   WebSocketService,
   WhiteboardSelectionService,
+  WhiteboardUserService,
 } from './internal-services';
 import { ForceDirectedGraph, Link, NodeComponent } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
@@ -93,6 +94,10 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
+  getWhiteboardUserById(id: string) {
+    return this.whiteboardUserService.getWhiteboardUserById(id);
+  }
+
   constructor(
     private readonly store: Store,
     private readonly actions$: Actions,
@@ -100,6 +105,7 @@ export class WhiteboardFacadeService {
     private readonly d3AdapterService: D3AdapterService,
     private readonly dragService: DragService,
     private readonly webSocketService: WebSocketService,
-    private readonly whiteboardSelectionService: WhiteboardSelectionService
+    private readonly whiteboardSelectionService: WhiteboardSelectionService,
+    private readonly whiteboardUserService: WhiteboardUserService
   ) {}
 }
