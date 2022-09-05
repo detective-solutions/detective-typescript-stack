@@ -97,7 +97,8 @@ export class ForceDirectedGraph {
         (d: any) => d.y
       );
       for (const node of nodes) {
-        if (node.locked) {
+        // Check if node is permanently locked or blocked by another user
+        if (node.locked || node.temporary?.blockedBy) {
           continue;
         }
 

@@ -37,12 +37,15 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     map(([_context, blockedBy]) => blockedBy)
   );
 
+  protected currentUserId!: string;
   protected readonly subscriptions = new Subscription();
 
   @HostListener('pointerdown', ['$event'])
   private onPointerDown(event: PointerEvent) {
-    if (!this.node.temporary?.blockedBy) {
-      this.whiteboardFacade.addSelectedElement(this);
+    // Check if node is blocked by other user
+    const isBlockedByUserId = this.node.temporary?.blockedBy;
+    if (!isBlockedByUserId || this.currentUserId === isBlockedByUserId) {
+      this.whiteboardFacade.addSelectedNode(this, this.currentUserId);
       this.whiteboardFacade.addDelayedDragHandling(event);
     }
   }
@@ -64,9 +67,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
       .select(selectWhiteboardContextState)
       .pipe(take(1), pluck('userId'))
       .subscribe((userId: string) => {
-        this.whiteboardFacade.applyDragBehaviorToComponent(this, userId);
+        this.currentUserId = userId;
+        this.whiteboardFacade.applyDragBehaviorToComponent(this, this.currentUserId);
+        this.customAfterViewInit();
       });
-    this.customAfterViewInit();
   }
 
   ngOnDestroy() {

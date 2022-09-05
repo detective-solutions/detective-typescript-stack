@@ -57,8 +57,8 @@ export class WhiteboardFacadeService {
     this.store.dispatch(WhiteboardGeneralActions.ResetWhiteboardData());
   }
 
-  addSelectedElement(selectedElementComponent: NodeComponent) {
-    this.whiteboardSelectionService.addSelectedNode(selectedElementComponent);
+  addSelectedNode(selectedElementComponent: NodeComponent, currentUserId: string) {
+    this.whiteboardSelectionService.addSelectedNode(selectedElementComponent, currentUserId);
   }
 
   resetSelection() {
