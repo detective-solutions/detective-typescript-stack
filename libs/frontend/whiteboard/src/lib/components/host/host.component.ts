@@ -20,7 +20,7 @@ import {
   WhiteboardOptions,
 } from '@detective.solutions/shared/data-access';
 import { EmbeddingWhiteboardNode, ForceDirectedGraph, TableWhiteboardNode } from '../../models';
-import { Subscription, combineLatest, delayWhen, filter, pluck, switchMap, take, tap } from 'rxjs';
+import { Subscription, combineLatest, delayWhen, filter, map, pluck, switchMap, take, tap } from 'rxjs';
 import { WhiteboardGeneralActions, WhiteboardNodeActions, selectWhiteboardContextState } from '../../state';
 
 import { Store } from '@ngrx/store';
@@ -151,16 +151,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
             ])
           ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
         )
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) => {
+        .subscribe((messageData: IMessage<IWhiteboardNodePositionUpdate[]>) => {
           // Convert incoming message to ngRx Update type
-          const updates = (messageData.body as IWhiteboardNodePositionUpdate[]).map(
-            (positionUpdate: IWhiteboardNodePositionUpdate) => {
-              return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
-            }
-          );
+          const updates = messageData.body.map((positionUpdate: IWhiteboardNodePositionUpdate) => {
+            return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
+          });
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodesMovedRemotely({
               updates: updates as Update<AnyWhiteboardNode>[],
