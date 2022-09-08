@@ -20,7 +20,6 @@ import { Store } from '@ngrx/store';
 export class WhiteboardFacadeService {
   readonly whiteboardNodes$: Observable<AnyWhiteboardNode[]> = this.store.select(selectAllWhiteboardNodes);
   readonly whiteboardLinks$: Observable<Link[]> = of([]);
-
   readonly isWhiteboardInitialized$: Observable<boolean> = combineLatest([
     this.actions$.pipe(ofType(WhiteboardGeneralActions.WhiteboardDataLoaded)),
     this.webSocketService.isConnectedToWebSocketServer$,
@@ -29,19 +28,11 @@ export class WhiteboardFacadeService {
       ([isWhiteboardDataLoaded, isConnectedToWebSocketServer]) => isWhiteboardDataLoaded && isConnectedToWebSocketServer
     )
   );
-  readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
-
-  readonly isDragging$ = this.dragService.isDragging$;
-
-  // TODO: Test if delayWhen operator works as expected when additional actions are implemented
-  // readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$.pipe(
-  //   // Delay subscribing to web socket until whiteboard data is loaded (incoming messages will be buffered)
-  //   delayWhen(() => this.isWhiteboardInitialized$.pipe(filter((isInitialized: boolean) => !isInitialized)))
-  // );
-  readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$;
-
   readonly isConnectedToWebSocketServer$ = this.webSocketService.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.webSocketService.webSocketConnectionFailedEventually$;
+  readonly getWebSocketSubjectAsync$ = this.webSocketService.getWebSocketSubjectAsync$;
+  readonly isDragging$ = this.dragService.isDragging$;
+  readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
 
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
