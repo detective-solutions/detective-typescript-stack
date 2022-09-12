@@ -19,8 +19,11 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardGeneralActions.WhiteboardDataLoaded, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.setAll(serializeWhiteboardNodes(action.casefile), state)
   ),
-  on(WhiteboardGeneralActions.WhiteboardNodeAdded, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodeAdded, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.addOne(action.addedNode, state)
+  ),
+  on(WhiteboardNodeActions.WhiteboardNodeDeleted, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.removeOne(action.deletedNode, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeBlocked, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)

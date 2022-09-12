@@ -9,6 +9,16 @@ import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Whiteboard Node]';
 
+export const WhiteboardNodeAdded = createAction(
+  `${actionPrefix} Node added`,
+  props<{ addedNode: AnyWhiteboardNode; addedManually: boolean }>()
+);
+
+export const WhiteboardNodeDeleted = createAction(
+  `${actionPrefix} Node deleted`,
+  props<{ deletedNode: AnyWhiteboardNode }>()
+);
+
 export const WhiteboardNodeUpdate = createAction(
   `${actionPrefix} Updating node`,
   props<{ update: Update<AnyWhiteboardNode> }>()

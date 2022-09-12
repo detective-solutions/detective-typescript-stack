@@ -106,7 +106,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .subscribe(([messageData, _context]) => {
           this.store.dispatch(
-            WhiteboardGeneralActions.WhiteboardNodeAdded({
+            WhiteboardNodeActions.WhiteboardNodeAdded({
               addedNode: messageData.body as AnyWhiteboardNode,
               addedManually: false,
             })
@@ -237,7 +237,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        WhiteboardGeneralActions.WhiteboardNodeAdded({
+        WhiteboardNodeActions.WhiteboardNodeAdded({
           addedNode: tableNode,
           addedManually: true,
         })
@@ -266,7 +266,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        WhiteboardGeneralActions.WhiteboardNodeAdded({
+        WhiteboardNodeActions.WhiteboardNodeAdded({
           addedNode: embeddingNode,
           addedManually: true,
         })
