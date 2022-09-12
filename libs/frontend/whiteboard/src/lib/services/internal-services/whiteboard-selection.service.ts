@@ -1,37 +1,58 @@
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
-import { NodeComponent } from '../../models';
+import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { ReplaySubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { WhiteboardNodeActions } from '../../state';
+import { nodeDragTimeout } from '../../utils';
 
 @Injectable()
 export class WhiteboardSelectionService {
-  readonly whiteboardSelection$: ReplaySubject<string | null> = new ReplaySubject();
-  private selectedNodes: string[] = [];
+  readonly whiteboardSelection$ = new ReplaySubject<string[]>();
 
-  constructor(private readonly store: Store) {}
+  private selectedNodeIds: string[] = [];
+  private actionTimeout = nodeDragTimeout + 50;
+
+  constructor(private readonly keyboardService: KeyboardService, private readonly store: Store) {}
 
   addSelectedNode(selectedNodeId: string, currentUserId: string) {
-    this.resetSelection(); // Remove this when implementing multi-selection
-    this.selectedNodes.push(selectedNodeId);
-    this.whiteboardSelection$.next(selectedNodeId);
-    this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodeBlocked({
-        update: { id: selectedNodeId, changes: { temporary: { blockedBy: currentUserId } } },
-      })
-    );
+    if (!this.selectedNodeIds.includes(selectedNodeId)) {
+      // Reset selection if multi-selection is not activated
+      if (!this.keyboardService.isControlPressed) {
+        this.resetSelection();
+      }
+
+      this.selectedNodeIds.push(selectedNodeId);
+      this.whiteboardSelection$.next(this.selectedNodeIds);
+
+      // IMPORTANT: Timeout is needed to allow delayed dragging of nodes
+      // (Otherwise the dispatch will break the delayed dragging mechanism when switching selected nodes)
+      setTimeout(
+        () =>
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeBlocked({
+              update: { id: selectedNodeId, changes: { temporary: { blockedBy: currentUserId } } },
+            })
+          ),
+        this.actionTimeout
+      );
+    }
   }
 
   resetSelection() {
-    this.selectedNodes.forEach((deselectedNodeId: string) => {
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeUnblocked({
-          update: { id: deselectedNodeId, changes: { temporary: { blockedBy: null } } },
-        })
+    this.selectedNodeIds.forEach((deselectedNodeId: string) => {
+      // IMPORTANT: Timeout is needed to allow delayed dragging of nodes
+      // (Otherwise the dispatch will break the delayed dragging mechanism when switching selected nodes)
+      setTimeout(
+        () =>
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeUnblocked({
+              update: { id: deselectedNodeId, changes: { temporary: { blockedBy: null } } },
+            })
+          ),
+        this.actionTimeout
       );
     });
-    this.selectedNodes = [];
-    this.whiteboardSelection$.next(null);
+    this.selectedNodeIds = [];
+    this.whiteboardSelection$.next([]);
   }
 }

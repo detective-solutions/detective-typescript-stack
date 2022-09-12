@@ -18,7 +18,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
 
   readonly isDragging$ = this.whiteboardFacade.isDragging$;
   readonly selected$ = this.whiteboardFacade.whiteboardSelection$.pipe(
-    map((selectedId) => (selectedId === this.node.id ? selectedId : null))
+    map((selectedIds: string[]) => selectedIds.includes(this.node.id))
   );
   readonly nodeUpdates$ = new BehaviorSubject<AnyWhiteboardNode>(this.node);
   readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
