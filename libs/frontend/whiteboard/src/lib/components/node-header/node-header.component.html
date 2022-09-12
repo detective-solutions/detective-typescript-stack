@@ -1,6 +1,25 @@
-<div class="element-header" fxFlex fxLayoutAlign="space-between center">
-  <input placeholder="Insert title here" [value]="title" />
-  <mat-icon fxLayoutAlign="center center" class="drag-indicator" (pointerdown)="enableDragging()">
+<div class="node-header" fxFlex fxLayoutAlign="space-between center" *transloco="let t; read: 'whiteboard.nodeHeader'">
+  <input placeholder="{{ t('titleInputPlaceholder') }}" [value]="title" />
+  <mat-icon
+    *ngIf="(blockInfo$ | async) === null; else blockedInfo"
+    fxLayoutAlign="center center"
+    class="node-header-icon drag-indicator"
+    (pointerdown)="enableDragging()"
+  >
     drag_indicator
   </mat-icon>
+  <ng-template #blockedInfo>
+    <div fxLayout>
+      <div class="blocked-info-wrapper">
+        <div class="blocked-info-title">{{ t('blockedInfoTitle') }}</div>
+        <div class="blocked-info-username">{{ userName$ | async }}</div>
+      </div>
+      <ng-container *ngIf="(blockInfo$ | async)?.avatarUrl as avatarUrl; else noAvatar">
+        <img class="blocked-info-avatar blocked-info-avatar-custom" src="{{ avatarUrl }}" />
+      </ng-container>
+      <ng-template #noAvatar>
+        <mat-icon fxLayoutAlign="center center" class="node-header-icon blocked-info-avatar"> account_circle </mat-icon>
+      </ng-template>
+    </div>
+  </ng-template>
 </div>

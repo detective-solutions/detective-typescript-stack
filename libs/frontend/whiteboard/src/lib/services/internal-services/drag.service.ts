@@ -1,12 +1,12 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
+import { nodeDragTimeout } from '../../utils';
 
 declare let window: WindowGlobals;
 
 @Injectable()
 export class DragService {
-  private static readonly defaultDraggingDelay = 250;
   private dragHoldTimeout!: ReturnType<typeof setTimeout>;
 
   isMouseDown = false;
@@ -21,7 +21,7 @@ export class DragService {
           this.activateDragging();
         }
       }
-    }, DragService.defaultDraggingDelay);
+    }, nodeDragTimeout);
   }
 
   removeDelayedDragHandling() {

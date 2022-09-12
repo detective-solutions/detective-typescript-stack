@@ -1,6 +1,10 @@
+import {
+  AnyWhiteboardNode,
+  IWhiteboardNodeBlockUpdate,
+  IWhiteboardNodePositionUpdate,
+} from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
 
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Whiteboard Node]';
@@ -15,9 +19,23 @@ export const WhiteboardNodeBatchUpdate = createAction(
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );
 
+export const WhiteboardNodeBlocked = createAction(
+  `${actionPrefix} Blocking node`,
+  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
+export const WhiteboardNodeUnblocked = createAction(
+  `${actionPrefix} Unblocking node`,
+  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
+
+export const WhiteboardNodeRemoteBlockUpdate = createAction(
+  `${actionPrefix} Received remote node blocking information`,
+  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
+
 export const WhiteboardNodesMoved = createAction(
   `${actionPrefix} Updating node positions`,
-  props<{ updates: Update<AnyWhiteboardNode>[] }>()
+  props<{ updates: Update<IWhiteboardNodePositionUpdate>[] }>()
 );
 
 export const WhiteboardNodesMovedRemotely = createAction(

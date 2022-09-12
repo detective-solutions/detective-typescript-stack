@@ -5,5 +5,9 @@
       "reconnectionSuccessful": "Reconnection successful",
       "noConnection": "It was not possible to reconnect to the server. Please reload to try again."
     }
+  },
+  "nodeHeader": {
+    "titleInputPlaceholder": "Insert title here",
+    "blockedInfoTitle": "blocked by"
   }
 }

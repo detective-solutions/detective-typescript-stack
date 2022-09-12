@@ -1,5 +1,11 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { AnyWhiteboardNode, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
+import {
+  AnyWhiteboardNode,
+  IMessageContext,
+  IWhiteboardNodeBlockUpdate,
+  IWhiteboardNodePositionUpdate,
+  MessageEventType,
+} from '@detective.solutions/shared/data-access';
 import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 
@@ -17,7 +23,67 @@ export class WhiteboardNodeEffects {
       return this.actions$.pipe(
         ofType(WhiteboardGeneralActions.WhiteboardNodeAdded),
         filter((action) => action.addedManually),
-        tap((action) => this.whiteboardFacade.whiteboardSelection$.next(action.addedNode.id))
+        switchMap((action) =>
+          combineLatest([of(action).pipe(take(1)), this.store.select(selectWhiteboardContextState).pipe(take(1))])
+        ),
+        tap(([action, context]) => this.whiteboardFacade.addSelectedNode(action.addedNode.id, context.userId))
+      );
+    },
+    { dispatch: false }
+  );
+
+  readonly whiteboardNodeBlocked$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(WhiteboardNodeActions.WhiteboardNodeBlocked),
+        switchMap((action) =>
+          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
+        ),
+        tap(([context, action]) => {
+          this.whiteboardFacade.sendWebsocketMessage({
+            event: MessageEventType.WhiteboardNodeBlocked,
+            data: {
+              context: {
+                ...context,
+                eventType: MessageEventType.WhiteboardNodeBlocked,
+                nodeId: action.update.id,
+                userId: context.userId,
+              } as IMessageContext,
+              body: {
+                temporary: { blockedBy: action.update.changes.temporary?.blockedBy },
+              } as IWhiteboardNodeBlockUpdate,
+            },
+          });
+        })
+      );
+    },
+    { dispatch: false }
+  );
+
+  readonly whiteboardNodeUnBlocked$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(WhiteboardNodeActions.WhiteboardNodeUnblocked),
+        switchMap((action) =>
+          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
+        ),
+        tap(([context, action]) => {
+          // Use WHITEBOARD_NODE_BLOCKED event type with null value to be handled by the backend
+          this.whiteboardFacade.sendWebsocketMessage({
+            event: MessageEventType.WhiteboardNodeBlocked,
+            data: {
+              context: {
+                ...context,
+                eventType: MessageEventType.WhiteboardNodeBlocked,
+                nodeId: action.update.id,
+                userId: context.userId,
+              } as IMessageContext,
+              body: {
+                temporary: { blockedBy: null },
+              } as IWhiteboardNodeBlockUpdate,
+            },
+          });
+        })
       );
     },
     { dispatch: false }
@@ -41,7 +107,12 @@ export class WhiteboardNodeEffects {
               } as IMessageContext,
               // Convert ngRx Update type to plain node list for backend
               body: action.updates.map((update: Update<AnyWhiteboardNode>) => {
-                return { id: update.id, x: update.changes.x, y: update.changes.y, type: update.changes.type };
+                return {
+                  id: update.id,
+                  x: update.changes.x,
+                  y: update.changes.y,
+                  type: update.changes.type,
+                } as IWhiteboardNodePositionUpdate;
               }),
             },
           });

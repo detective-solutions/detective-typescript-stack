@@ -45,8 +45,6 @@ export class WebSocketService implements OnDestroy {
   ) {}
 
   establishWebsocketConnection() {
-    console.log(this.authService.getRefreshToken()); // TODO: Remove me
-
     // Need to create a new instance after calling unsubscribe() when resetting connection
     this.subscriptions = new Subscription();
 
@@ -54,6 +52,11 @@ export class WebSocketService implements OnDestroy {
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((whiteboardContext: IWhiteboardContextState) => {
+        // Log out user if no access or refresh token can be found
+        if (!this.authService.getAccessToken() || !this.authService.getRefreshToken()) {
+          this.authService.logout(true);
+        }
+
         this.logger.debug(
           `${WebSocketService.loggingPrefix} Establishing connection to ${this.buildWebSocketUrl(whiteboardContext)}`
         );
@@ -96,7 +99,10 @@ export class WebSocketService implements OnDestroy {
         // Given that a connection has been authenticated once
         this.subscriptions.add(
           this.authService.authStatus$
-            .pipe(filter((authStatus: IAuthStatus) => authStatus.isAuthenticated))
+            .pipe(
+              filter((authStatus: IAuthStatus) => authStatus.isAuthenticated),
+              filter(() => !!this.authService.getRefreshToken())
+            )
             .subscribe(() => this.startRefreshTokenTimer())
         );
         this.subscriptions.add(
