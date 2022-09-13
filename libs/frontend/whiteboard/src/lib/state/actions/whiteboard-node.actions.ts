@@ -1,6 +1,7 @@
 import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
+  IWhiteboardNodeDeletedUpdate,
   IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
@@ -16,7 +17,7 @@ export const WhiteboardNodeAdded = createAction(
 
 export const WhiteboardNodeDeleted = createAction(
   `${actionPrefix} Node deleted`,
-  props<{ deletedNode: AnyWhiteboardNode }>()
+  props<{ deletedNode: IWhiteboardNodeDeletedUpdate }>()
 );
 
 export const WhiteboardNodeUpdate = createAction(

@@ -23,7 +23,7 @@ export const whiteboardNodeReducer = createReducer(
     whiteboardNodeEntityAdapter.addOne(action.addedNode, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeDeleted, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.removeOne(action.deletedNode, state)
+    whiteboardNodeEntityAdapter.removeOne(action.deletedNode.id, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeBlocked, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
