@@ -10,7 +10,6 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
   override message: IMessage<AnyWhiteboardNode>; // Define message body type
 
   async execute(): Promise<void> {
-    console.log();
     this.logger.log(`${this.logContext} Executing transaction`);
 
     if (!this.messageBody) {

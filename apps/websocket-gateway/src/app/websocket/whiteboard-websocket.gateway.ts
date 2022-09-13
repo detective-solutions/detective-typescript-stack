@@ -49,7 +49,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
   }
 
   handleDisconnect(client: any) {
-    console.log();
     console.log('DISCONNECTED');
     console.log('CLIENT', client.context);
   }
