@@ -22,7 +22,7 @@
           <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
           <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
         </button>
-        <button mat-icon-button>
+        <button mat-icon-button (click)="delete()">
           <mat-icon fxFlex>delete</mat-icon>
         </button>
       </div>

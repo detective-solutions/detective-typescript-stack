@@ -96,6 +96,14 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     );
   }
 
+  delete() {
+    this.store.dispatch(
+      WhiteboardNodeActions.WhiteboardNodeDeleted({
+        deletedNode: { id: this.node.id, type: this.node.type },
+      })
+    );
+  }
+
   // Can be used by child classes to add custom logic to the ngAfterViewInit hook
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected customAfterViewInit() {}
