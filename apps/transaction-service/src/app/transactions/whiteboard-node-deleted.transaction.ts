@@ -1,12 +1,14 @@
 import {
   AnyWhiteboardNode,
   IMessage,
-  IWhiteboardNodeDeletedUpdate,
+  IWhiteboardNodeDeleteUpdate,
   KafkaTopic,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
+import { WhiteboardNodeDeleteUpdateDTO } from '../models';
+import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 export class WhiteboardNodeDeletedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeDeletedTransaction.name);
@@ -20,19 +22,26 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
     if (!this.messageBody) {
       throw new InternalServerErrorException('Transaction cannot be executed due to missing message body information');
     }
-    const deletedNode = this.messageBody as IWhiteboardNodeDeletedUpdate;
+
+    const deletedNode = this.messageBody as IWhiteboardNodeDeleteUpdate;
     const casefileId = this.messageContext.casefileId;
 
-    this.forwardMessageToOtherClients();
-    const response = this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
-    if (!response) {
+    try {
+      await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
+      this.forwardMessageToOtherClients();
+
+      const response = this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
+      if (!response) {
+        this.handleError(casefileId, deletedNode.type);
+      }
+
+      this.logger.log(`${this.logContext} Transaction successful`);
+      this.logger.verbose(
+        `${deletedNode.type} node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`
+      );
+    } catch (error) {
       this.handleError(casefileId, deletedNode.type);
     }
-
-    this.logger.log(`${this.logContext} Transaction successful`);
-    this.logger.verbose(
-      `${deletedNode.type} node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`
-    );
   }
 
   private handleError(casefileId: string, nodeType: string) {
