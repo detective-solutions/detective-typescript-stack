@@ -27,7 +27,7 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     if (!this.messageBody) {
-      throw new InternalServerErrorException('Transaction cannot be executed due to missing message body information');
+      throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
     const addedWhiteboardNode = this.messageBody as AnyWhiteboardNode;
     const casefileId = this.messageContext.casefileId;

@@ -20,6 +20,9 @@ export abstract class Transaction {
   messageBody: any;
   logContext: string;
 
+  protected readonly missingMessageBodyErrorText =
+    'Transaction cannot be executed due to missing message body information';
+
   constructor(serviceRefs: TransactionServiceRefs, message: IMessage<any>) {
     this.transactionProducer = serviceRefs.transactionProducer;
     this.databaseService = serviceRefs.databaseService;
