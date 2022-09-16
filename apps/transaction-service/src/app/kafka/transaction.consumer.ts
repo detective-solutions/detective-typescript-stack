@@ -24,11 +24,11 @@ export class TransactionConsumer {
       } (timestamp: ${message.timestamp})`
     );
 
-    await this.validateConsumedMessage(message);
+    await this.validateMessageContext(message);
     this.coordinationService.createTransactionByEventType(message.value.context.eventType, message.value);
   }
 
-  private async validateConsumedMessage(message: IKafkaMessage) {
+  private async validateMessageContext(message: IKafkaMessage) {
     const context = message?.value?.context;
     if (!context) {
       throw new InternalServerErrorException('The consumed message is missing mandatory context information');
