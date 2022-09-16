@@ -1,4 +1,5 @@
 import {
+  AnyWhiteboardNode,
   IEmbeddingWhiteboardNode,
   IMessage,
   ITable,
@@ -369,6 +370,40 @@ describe('WhiteboardNodeAddedTransaction', () => {
           testMessagePayload.body
         );
       });
+    });
+
+    it('should throw an InternalServerException if any error occurs during the transaction', async () => {
+      const testWhiteboardNode: AnyWhiteboardNode = {
+        id: uuidv4(),
+        title: 'test',
+        x: 1,
+        y: 1,
+        width: 1,
+        height: 1,
+        locked: false,
+        lastUpdatedBy: { id: uuidv4() } as IUser,
+        lastUpdated: formatDate(new Date()),
+        created: formatDate(new Date()),
+        entity: { id: uuidv4() } as ITable,
+        type: WhiteboardNodeType.TABLE,
+      };
+
+      const testMessagePayload: IMessage<ITableWhiteboardNode> = {
+        context: testMessageContext,
+        body: testWhiteboardNode,
+      };
+
+      jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+        throw new Error('');
+      });
+      jest.spyOn(databaseService, insertTableOccurrenceMethodName).mockResolvedValue({});
+      jest.spyOn(databaseService, insertUserQueryOccurrenceMethodName).mockResolvedValue({});
+      jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
+
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
   });
 });
