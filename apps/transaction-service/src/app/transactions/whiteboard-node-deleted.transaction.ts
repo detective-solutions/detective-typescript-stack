@@ -40,6 +40,7 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
         `${deletedNode.type} node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`
       );
     } catch (error) {
+      this.logger.error(error);
       this.handleError(casefileId, deletedNode.type);
     }
   }
