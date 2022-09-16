@@ -114,6 +114,28 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         })
     );
 
+    // Listen to WHITEBOARD_NODE_DELETED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeDeleted),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .subscribe(([messageData, _context]) => {
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
+              deletedNode: messageData.body as AnyWhiteboardNode,
+            })
+          );
+        })
+    );
+
     // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$

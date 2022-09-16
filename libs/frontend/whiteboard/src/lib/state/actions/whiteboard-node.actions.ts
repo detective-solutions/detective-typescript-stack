@@ -20,6 +20,11 @@ export const WhiteboardNodeDeleted = createAction(
   props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
 );
 
+export const WhiteboardNodeDeletedRemotely = createAction(
+  `${actionPrefix} Node deleted remotely`,
+  props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
+);
+
 export const WhiteboardNodeUpdate = createAction(
   `${actionPrefix} Updating node`,
   props<{ update: Update<AnyWhiteboardNode> }>()
