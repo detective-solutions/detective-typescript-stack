@@ -73,7 +73,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
       const deleteNodeInCasefileSpy = jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
-      transaction.logger.localInstance.setLogLevels([]);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
@@ -87,7 +87,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
       jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, { ...testMessagePayload, body: undefined });
-      transaction.logger.localInstance.setLogLevels([]);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
@@ -99,7 +99,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
       jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
-      transaction.logger.localInstance.setLogLevels([]);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
@@ -113,7 +113,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
         context: testMessageContext,
         body: { ...testWhiteboardNode, type: undefined },
       });
-      transaction.logger.localInstance.setLogLevels([]);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -129,7 +129,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
         .mockResolvedValue(null);
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
-      transaction.logger.localInstance.setLogLevels([]);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
