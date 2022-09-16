@@ -8,8 +8,17 @@ import {
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { IInvoiceTableDef, IInvoice, IInvoiceListResponse, SubscriptionClickEvent } from '../../models';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { ComponentType } from '@angular/cdk/portal';
+import {
+  IInvoiceTableDef,
+  IInvoice,
+  IInvoiceListResponse,
+  SubscriptionClickEvent,
+  SubscriptionDialogComponent,
+} from '../../models';
 import { SubscriptionService } from '../../services';
+import { SubscriptionCancelDialogComponent } from './dialog';
 
 @Component({
   selector: 'subscriptions',
@@ -28,9 +37,15 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
 
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
+
   constructor(
     private readonly SubscriptionService: SubscriptionService,
     private readonly translationService: TranslocoService,
+    private readonly matDialog: MatDialog,
     private readonly tableCellEventService: TableCellEventService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
@@ -54,6 +69,13 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
+  openCancelDialog(componentToOpen?: ComponentType<SubscriptionDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? SubscriptionCancelDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
+  }
+
   downloadInvoice(invoiceLink: string) {
     window.open(invoiceLink, '_blank');
   }
@@ -66,20 +88,20 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       .subscribe((translation: { [key: string]: string }) => {
         originalInvoiceData.forEach((invoice: IInvoice) => {
           tempTableItems.push({
-            invoice: {
-              columnName: translation['invoice'],
-              cellData: {
-                id: invoice.invoice,
-                type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(invoice.invoice),
-              },
-            },
             period: {
               columnName: translation['period'],
               cellData: {
                 id: invoice.invoice,
                 type: TableCellTypes.TEXT_TABLE_CELL,
                 text: String(invoice.period),
+              },
+            },
+            invoice: {
+              columnName: translation['invoice'],
+              cellData: {
+                id: invoice.invoice,
+                type: TableCellTypes.TEXT_TABLE_CELL,
+                text: SubscriptionService.invoiceId(String(invoice.invoice)),
               },
             },
             interval: {

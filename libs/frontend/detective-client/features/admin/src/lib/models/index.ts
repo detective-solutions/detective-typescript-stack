@@ -14,3 +14,4 @@ export * from './subscription-click-events.enum';
 export * from './subscription-invoice-response.interface';
 export * from './subscription-list-response.interface';
 export * from './subscription-table.interface';
+export * from './subscription-dialog-components.type';

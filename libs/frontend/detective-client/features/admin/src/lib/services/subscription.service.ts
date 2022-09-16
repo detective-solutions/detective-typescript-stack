@@ -27,19 +27,38 @@ export class SubscriptionService {
     return value;
   }
 
+  static invoiceId(invoiceId: string): string {
+    if (invoiceId === 'null') {
+      return 'Next';
+    } else {
+      return invoiceId;
+    }
+  }
+
+  getUserLimit() {
+    return 0.4;
+  }
+
   // 1. get tenant id for current user
   // 2. get invoice data
   getInvoices(): Observable<IInvoiceListResponse> {
     const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-
-    const payload = { uuid: '242b8c90-216a-11ed-9410-471c72d0bd79' };
     const headers = new HttpHeaders().set('Authentication', token);
     headers.set('Access-Control-Allow-Origin', '*');
 
-    return this.httpClient.post<IInvoiceListResponse>(
+    return this.httpClient.get<IInvoiceListResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningListInvoicesV1,
-      payload,
       { headers: headers }
     );
+  }
+
+  cancelSubscription() {
+    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
+    const headers = new HttpHeaders().set('Authentication', token);
+    headers.set('Access-Control-Allow-Origin', '*');
+
+    return this.httpClient.get<any>(SubscriptionService.provisioningBasePath + environment.provisioningListInvoicesV1, {
+      headers: headers,
+    });
   }
 }

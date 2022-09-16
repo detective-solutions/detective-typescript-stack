@@ -1,0 +1,14 @@
+<div class="cancel-dialog-wrapper" *transloco="let t; read: 'admin.subscriptions.cancelDialog'">
+  <h1 mat-dialog-title align="center">{{ t('cancelDialogHeader') }}</h1>
+  <div mat-dialog-content align="center">
+    {{ t('cancelDialogText') }}
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="cancelSubscription()">
+      {{ t('cancelButtonText') }}
+    </button>
+  </div>
+</div>
+<!--
+  <mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
+  -->
