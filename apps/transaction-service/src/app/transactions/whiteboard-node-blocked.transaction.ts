@@ -17,6 +17,8 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     if (!this.messageBody) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
+    const nodeId = this.messageContext?.nodeId;
+    const casefileId = this.messageContext.casefileId;
 
     try {
       await validateDto(WhiteboardNodeBlockUpdateDTO, this.messageBody as IWhiteboardNodeBlockUpdate, this.logger);
@@ -24,12 +26,13 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
       // TODO: Add temporary data to cache
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.handleError(error);
+      this.logger.error(error);
+      this.handleError(nodeId, casefileId);
     }
   }
 
-  private handleError(error) {
+  private handleError(nodeId: string, casefileId: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not block node ${nodeId} in casefile ${casefileId}`);
   }
 }
