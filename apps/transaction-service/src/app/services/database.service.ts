@@ -5,6 +5,7 @@ import {
   ITableWhiteboardNode,
   IUserQueryWhiteboardNode,
   IWhiteboardNodePositionUpdate,
+  WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 import {
   IGetCasefileById,
@@ -142,6 +143,16 @@ export class DatabaseService {
     });
   }
 
+  async deleteNodeInCasefile(nodeId: string, nodeType: WhiteboardNodeType) {
+    const mutationJson = {
+      uid: await this.getUidByType(nodeId, nodeType),
+    };
+    return this.sendDeleteMutation(mutationJson).catch(() => {
+      this.logger.error(`There was a problem while trying to delete node ${nodeId} of type ${nodeType}`);
+      return null;
+    });
+  }
+
   async updateNodePositionsInCasefile(
     casefileId: string,
     updatedNodes: IWhiteboardNodePositionUpdate[]
@@ -228,6 +239,19 @@ export class DatabaseService {
     const mutation = this.dGraphClient.createMutation();
     mutation.setCommitNow(true);
     mutation.setSetJson(mutationJson);
+
+    const txn = this.dGraphClient.client.newTxn();
+    return txn.mutate(mutation).catch((err) => {
+      this.logger.error('There was an error while sending a mutation to the database', err);
+      throw new ServiceUnavailableException();
+    });
+  }
+
+  /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)
+  private async sendDeleteMutation(mutationJson: object): Promise<Record<string, any>> {
+    const mutation = this.dGraphClient.createMutation();
+    mutation.setCommitNow(true);
+    mutation.setDeleteJson(mutationJson);
 
     const txn = this.dGraphClient.client.newTxn();
     return txn.mutate(mutation).catch((err) => {

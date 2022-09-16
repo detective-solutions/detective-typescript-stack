@@ -1,4 +1,5 @@
 import {
+  AnyWhiteboardNode,
   IEmbeddingWhiteboardNode,
   IMessage,
   ITable,
@@ -88,7 +89,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testTableWhiteboardNode,
       };
 
-      it('should correctly execute transaction for table node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
@@ -102,7 +103,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -118,7 +119,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the table node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
@@ -135,7 +136,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testTableWhiteboardNode, entity: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -153,7 +154,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -190,7 +191,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testUserQueryWhiteboardNode,
       };
 
-      it('should correctly execute transaction for user query node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
@@ -204,7 +205,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -220,7 +221,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the user query node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
@@ -237,7 +238,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testUserQueryWhiteboardNode, entity: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -255,7 +256,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -292,7 +293,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testEmbeddingWhiteboardNode,
       };
 
-      it('should correctly execute transaction for embedding node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
@@ -306,7 +307,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -322,7 +323,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the embedding node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
@@ -339,7 +340,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testEmbeddingWhiteboardNode, href: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -357,7 +358,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -369,6 +370,40 @@ describe('WhiteboardNodeAddedTransaction', () => {
           testMessagePayload.body
         );
       });
+    });
+
+    it('should throw an InternalServerException if any error occurs during the transaction', async () => {
+      const testWhiteboardNode: AnyWhiteboardNode = {
+        id: uuidv4(),
+        title: 'test',
+        x: 1,
+        y: 1,
+        width: 1,
+        height: 1,
+        locked: false,
+        lastUpdatedBy: { id: uuidv4() } as IUser,
+        lastUpdated: formatDate(new Date()),
+        created: formatDate(new Date()),
+        entity: { id: uuidv4() } as ITable,
+        type: WhiteboardNodeType.TABLE,
+      };
+
+      const testMessagePayload: IMessage<ITableWhiteboardNode> = {
+        context: testMessageContext,
+        body: testWhiteboardNode,
+      };
+
+      jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+        throw new Error('');
+      });
+      jest.spyOn(databaseService, insertTableOccurrenceMethodName).mockResolvedValue({});
+      jest.spyOn(databaseService, insertUserQueryOccurrenceMethodName).mockResolvedValue({});
+      jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
+
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
   });
 });

@@ -15,23 +15,30 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     if (!this.messageBody || !Array.isArray(this.messageBody)) {
-      throw new InternalServerErrorException('Transaction cannot be executed due to missing message body information');
+      throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
+    const casefileId = this.messageContext.casefileId;
 
     try {
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
       this.forwardMessageToOtherClients();
-      this.databaseService.updateNodePositionsInCasefile(this.messageContext.casefileId, this.messageBody);
+      const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
+      if (!response) {
+        this.handleError(casefileId);
+      }
+
       this.logger.log(`${this.logContext} Transaction successful`);
+      this.logger.verbose(`Node positions were successfully updated in casefile ${casefileId}`);
     } catch (error) {
-      this.handleError(error);
+      this.logger.error(error);
+      this.handleError(casefileId);
     }
   }
 
-  private handleError(error) {
+  private handleError(casefileId: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not update node positions in casefile ${casefileId}`);
   }
 }

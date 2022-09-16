@@ -1,8 +1,7 @@
-import { WhiteboardNodeType } from './whiteboard-node-types.enum';
+import { IGeneralWhiteboardNode } from './general-whiteboard-node.interface';
 
-export interface IWhiteboardNodePositionUpdate {
+export interface IWhiteboardNodePositionUpdate extends IGeneralWhiteboardNode {
   id: string;
   x: number;
   y: number;
-  type: WhiteboardNodeType;
 }

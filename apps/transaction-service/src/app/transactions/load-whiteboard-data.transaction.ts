@@ -15,6 +15,7 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     try {
+      // No message body check, because it is empty on purpose and will be filled by this transaction
       const casefileId = this.messageContext.casefileId;
       const casefileData = await this.databaseService.getCasefileById(casefileId);
       if (!casefileData) {

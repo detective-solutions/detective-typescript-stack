@@ -27,61 +27,70 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     if (!this.messageBody) {
-      throw new InternalServerErrorException('Transaction cannot be executed due to missing message body information');
+      throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
     const addedWhiteboardNode = this.messageBody as AnyWhiteboardNode;
     const casefileId = this.messageContext.casefileId;
 
-    switch (addedWhiteboardNode.type) {
-      case WhiteboardNodeType.TABLE: {
-        await validateDto(TableWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
-        this.forwardMessageToOtherClients();
-        const response = await this.databaseService.insertTableOccurrenceToCasefile(
-          casefileId,
-          addedWhiteboardNode as ITableWhiteboardNode
-        );
-        if (!response) {
-          this.handleError(casefileId, addedWhiteboardNode.type);
+    try {
+      switch (addedWhiteboardNode.type) {
+        case WhiteboardNodeType.TABLE: {
+          await validateDto(TableWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+          this.forwardMessageToOtherClients();
+          const response = await this.databaseService.insertTableOccurrenceToCasefile(
+            casefileId,
+            addedWhiteboardNode as ITableWhiteboardNode
+          );
+          if (!response) {
+            this.handleError(casefileId, addedWhiteboardNode.type);
+          }
+          break;
         }
-        break;
-      }
-      case WhiteboardNodeType.USER_QUERY: {
-        await validateDto(UserQueryWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
-        this.forwardMessageToOtherClients();
-        const response = await this.databaseService.insertUserQueryOccurrenceToCasefile(
-          casefileId,
-          addedWhiteboardNode as IUserQueryWhiteboardNode
-        );
-        if (!response) {
-          this.handleError(casefileId, addedWhiteboardNode.type);
+        case WhiteboardNodeType.USER_QUERY: {
+          await validateDto(UserQueryWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+          this.forwardMessageToOtherClients();
+          const response = await this.databaseService.insertUserQueryOccurrenceToCasefile(
+            casefileId,
+            addedWhiteboardNode as IUserQueryWhiteboardNode
+          );
+          if (!response) {
+            this.handleError(casefileId, addedWhiteboardNode.type);
+          }
+          break;
         }
-        break;
-      }
-      case WhiteboardNodeType.EMBEDDING: {
-        await validateDto(EmbeddingWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
-        this.forwardMessageToOtherClients();
-        const response = await this.databaseService.insertEmbeddingToCasefile(
-          casefileId,
-          addedWhiteboardNode as IEmbeddingWhiteboardNode
-        );
-        if (!response) {
-          this.handleError(casefileId, addedWhiteboardNode.type);
+        case WhiteboardNodeType.EMBEDDING: {
+          await validateDto(EmbeddingWhiteboardNodeInputDTO, addedWhiteboardNode, this.logger);
+          this.forwardMessageToOtherClients();
+          const response = await this.databaseService.insertEmbeddingToCasefile(
+            casefileId,
+            addedWhiteboardNode as IEmbeddingWhiteboardNode
+          );
+          if (!response) {
+            this.handleError(casefileId, addedWhiteboardNode.type);
+          }
+          break;
         }
-        break;
+        default: {
+          throw new InternalServerErrorException(
+            `Could not execute transaction for unknown type ${addedWhiteboardNode.type}`
+          );
+        }
       }
-      default: {
-        throw new InternalServerErrorException(
-          `Could not execute transaction for unknown type ${addedWhiteboardNode.type}`
-        );
-      }
-    }
 
-    this.logger.log(`${this.logContext} Transaction successful`);
-    this.logger.verbose(`${addedWhiteboardNode.type} node was successfully added to casefile ${casefileId}`);
+      this.logger.log(`${this.logContext} Transaction successful`);
+      this.logger.verbose(`${addedWhiteboardNode.type} node was successfully added to casefile ${casefileId}`);
+    } catch (error) {
+      this.logger.error(error);
+      this.handleError(casefileId);
+    }
   }
 
-  private handleError(casefileId: string, nodeType: string) {
+  private handleError(casefileId: string, nodeType?: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not add ${nodeType} node to casefile ${casefileId}`);
+    if (nodeType) {
+      throw new InternalServerErrorException(`Could not add ${nodeType} node to casefile ${casefileId}`);
+    } else {
+      throw new InternalServerErrorException(`There was an error while adding a node to casefile ${casefileId}`);
+    }
   }
 }

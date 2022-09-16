@@ -1,5 +1,6 @@
-import { AnyWhiteboardNode, ICasefile } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
+
+import { ICasefile } from '@detective.solutions/shared/data-access';
 
 const actionPrefix = '[Whiteboard]';
 
@@ -10,8 +11,3 @@ export const WhiteboardDataLoaded = createAction(
   props<{ casefile: ICasefile }>()
 );
 export const ResetWhiteboardData = createAction(`${actionPrefix} Resetting whiteboard data`);
-
-export const WhiteboardNodeAdded = createAction(
-  `${actionPrefix} Node added`,
-  props<{ addedNode: AnyWhiteboardNode; addedManually: boolean }>()
-);

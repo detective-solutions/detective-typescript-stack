@@ -75,105 +75,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
 
-    // Listen to LOAD_WHITEBOARD_DATA websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
-          pluck('body')
-        )
-        .subscribe((messageData: ICasefile) => {
-          this.store.dispatch(
-            WhiteboardGeneralActions.WhiteboardDataLoaded({
-              casefile: messageData as ICasefile,
-            })
-          );
-        })
-    );
-
-    // Listen to WHITEBOARD_NODE_ADDED websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) =>
-            combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeAdded),
-              this.store.select(selectWhiteboardContextState).pipe(take(1)),
-            ])
-          ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId)
-        )
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) => {
-          this.store.dispatch(
-            WhiteboardGeneralActions.WhiteboardNodeAdded({
-              addedNode: messageData.body as AnyWhiteboardNode,
-              addedManually: false,
-            })
-          );
-        })
-    );
-
-    // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) =>
-            combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked),
-              this.store.select(selectWhiteboardContextState).pipe(take(1)),
-            ])
-          ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
-        )
-        .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
-          // Convert incoming message to ngRx Update type
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeRemoteBlockUpdate({
-              update: {
-                id: messageData.context.nodeId,
-                changes: messageData.body,
-              } as Update<IWhiteboardNodeBlockUpdate>,
-            })
-          );
-        })
-    );
-
-    // Listen to WHITEBOARD_NODE_MOVED websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) =>
-            combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeMoved),
-              this.store.select(selectWhiteboardContextState).pipe(take(1)),
-            ])
-          ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
-        )
-        .subscribe((messageData: IMessage<IWhiteboardNodePositionUpdate[]>) => {
-          // Convert incoming message to ngRx Update type
-          const updates = messageData.body.map((positionUpdate: IWhiteboardNodePositionUpdate) => {
-            return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
-          });
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodesMovedRemotely({
-              updates: updates as Update<AnyWhiteboardNode>[],
-            })
-          );
-        })
-    );
-
     // Handle position updates caused by the graph force
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$.subscribe((node: AnyWhiteboardNode) =>
         this.whiteboardFacade.addToNodeUpdateBuffer(node)
       )
     );
+
+    this.initializeCollaborationSubscriptions();
   }
 
   ngAfterViewInit() {
@@ -237,7 +146,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        WhiteboardGeneralActions.WhiteboardNodeAdded({
+        WhiteboardNodeActions.WhiteboardNodeAdded({
           addedNode: tableNode,
           addedManually: true,
         })
@@ -266,12 +175,129 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        WhiteboardGeneralActions.WhiteboardNodeAdded({
+        WhiteboardNodeActions.WhiteboardNodeAdded({
           addedNode: embeddingNode,
           addedManually: true,
         })
       );
     }
+  }
+
+  private initializeCollaborationSubscriptions() {
+    // Listen to LOAD_WHITEBOARD_DATA websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
+          pluck('body')
+        )
+        .subscribe((messageData: ICasefile) => {
+          this.store.dispatch(
+            WhiteboardGeneralActions.WhiteboardDataLoaded({
+              casefile: messageData as ICasefile,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_ADDED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeAdded),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .subscribe(([messageData, _context]) => {
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeAdded({
+              addedNode: messageData.body as AnyWhiteboardNode,
+              addedManually: false,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_DELETED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeDeleted),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .subscribe(([messageData, _context]) => {
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
+              deletedNode: messageData.body as AnyWhiteboardNode,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
+          // Convert incoming message to ngRx Update type
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
+              update: {
+                id: messageData.context.nodeId,
+                changes: messageData.body,
+              } as Update<IWhiteboardNodeBlockUpdate>,
+            })
+          );
+        })
+    );
+
+    // Listen to WHITEBOARD_NODE_MOVED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeMoved),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IWhiteboardNodePositionUpdate[]>) => {
+          // Convert incoming message to ngRx Update type
+          const updates = messageData.body.map((positionUpdate: IWhiteboardNodePositionUpdate) => {
+            return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
+          });
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely({
+              updates: updates as Update<AnyWhiteboardNode>[],
+            })
+          );
+        })
+    );
   }
 
   private convertDOMToSVGCoordinates(x: number, y: number): DOMPoint {
