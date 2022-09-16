@@ -153,7 +153,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeRemoteBlockUpdate({
+            WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
               update: {
                 id: messageData.context.nodeId,
                 changes: messageData.body,
@@ -183,7 +183,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
           });
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodesMovedRemotely({
+            WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely({
               updates: updates as Update<AnyWhiteboardNode>[],
             })
           );

@@ -140,7 +140,7 @@ export class WhiteboardNodeEffects {
   readonly whiteboardNodesMoved$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodesMoved),
+        ofType(WhiteboardNodeActions.WhiteboardNodesPositionUpdated),
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),

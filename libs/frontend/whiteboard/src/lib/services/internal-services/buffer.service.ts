@@ -23,7 +23,7 @@ export class BufferService {
         changes: { x: Math.round(node.x), y: Math.round(node.y), type: node.type },
       });
     });
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesMoved({ updates: updates }));
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesPositionUpdated({ updates: updates }));
     this.nodeUpdateBuffer.clear();
   }
 }

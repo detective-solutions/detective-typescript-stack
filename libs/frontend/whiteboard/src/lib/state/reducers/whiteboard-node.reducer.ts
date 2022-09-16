@@ -34,16 +34,16 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeUnblocked, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeRemoteBlockUpdate, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodeBlockedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodesMoved, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdated, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodesMovedRemotely, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeBatchUpdate, (state: IWhiteboardNodeState, action: any) =>
