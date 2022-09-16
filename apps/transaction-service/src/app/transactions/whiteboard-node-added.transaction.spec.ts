@@ -102,7 +102,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -135,7 +135,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testTableWhiteboardNode, entity: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -153,7 +153,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -204,7 +204,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -237,7 +237,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testUserQueryWhiteboardNode, entity: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -255,7 +255,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -306,7 +306,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue({});
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await transaction.execute();
 
@@ -339,7 +339,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           context: testMessageContext,
           body: { ...testEmbeddingWhiteboardNode, href: undefined },
         });
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
@@ -357,7 +357,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
           .mockResolvedValue(null);
 
         const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]);
+        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
         await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
