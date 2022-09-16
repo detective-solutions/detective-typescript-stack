@@ -30,6 +30,12 @@ export class AdminContainerComponent {
       route: '/admin/masks',
       title: '',
     },
+    {
+      icon: 'card_membership',
+      translationKey: 'admin.navigation.sidenavItems.subscriptions',
+      route: '/admin/subscriptions',
+      title: '',
+    },
   ];
 
   sidenavBottomItem: ISidenavItem = {

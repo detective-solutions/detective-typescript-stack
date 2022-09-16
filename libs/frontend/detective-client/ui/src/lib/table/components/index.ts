@@ -5,4 +5,5 @@ export * from './icon-button-table-cell';
 export * from './multi-table-cell';
 export * from './status-table-cell';
 export * from './text-table-cell';
+export * from './link-table-cell';
 export * from './user-avatar-list-table-cell';

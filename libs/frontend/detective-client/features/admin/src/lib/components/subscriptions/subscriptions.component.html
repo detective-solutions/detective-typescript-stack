@@ -1,0 +1,35 @@
+<!-- subscription section -->
+<div class="subscriptions-wrapper">
+  <div class="top-row" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+    <div fxFlex="50" class="section" fxFlex.xs="55">
+      <p>
+        <small class="subscription-chip"> Advanced </small>
+        Plan
+      </p>
+      <p>10 von 12 Users</p>
+      <mat-progress-bar mode="determinate" value="80"></mat-progress-bar>
+    </div>
+    <div fxFlex="50" class="section" fxFlex.xs="55">
+      <p>
+        <b>10 €</b>
+        <small> /month </small>
+      </p>
+      <span fxLayoutAlign="left" fxHide.sm fxHide.xs>
+        <button mat-raised-button color="accent" class="invite-button">Upgrade</button>
+      </span>
+    </div>
+    <div fxFlex="50" class="section" fxFlex.xs="55">
+      <p><small>Card</small></p>
+      <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="add-connection-button-wrapper">
+        <button>change payment</button>
+      </span>
+    </div>
+    <div fxFlex="50" class="section" fxFlex.xs="55">
+      <p>**** 4242</p>
+      <a>cancel</a>
+    </div>
+  </div>
+  <div class="invoice-row">
+    <table-view [tableRows$]="tableItems$" [pageSize]="pageSize"></table-view>
+  </div>
+</div>

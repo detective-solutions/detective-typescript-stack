@@ -1,6 +1,7 @@
 export * from './lib/auth';
 export * from './lib/casefile';
 export * from './lib/embedding';
+export * from './lib/masking';
 export * from './lib/messages';
 export * from './lib/source-connection';
 export * from './lib/table';

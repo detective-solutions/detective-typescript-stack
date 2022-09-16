@@ -1,13 +1,19 @@
-import { AdminContainerComponent, ConnectionsComponent, GroupsComponent, MasksComponent } from './components';
+import {
+  AdminContainerComponent,
+  ConnectionsComponent,
+  GroupsComponent,
+  MasksComponent,
+  SubscriptionsComponent,
+} from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { GetAllConnectionsGQL, GetConnectionByIdGQL } from './graphql';
+import { ConnectionsService, MaskingsService, SubscriptionService } from './services';
+import { GetAllConnectionsGQL, GetAllMaskingsGQL, GetConnectionByIdGQL } from './graphql';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
-import { ConnectionsService } from './services';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -21,6 +27,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsDeleteDialogComponent,
     GroupsComponent,
     MasksComponent,
+    SubscriptionsComponent,
   ],
   imports: [
     CommonModule,
@@ -43,6 +50,9 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsService,
     GetConnectionByIdGQL,
     GetAllConnectionsGQL,
+    MaskingsService,
+    GetAllMaskingsGQL,
+    SubscriptionService,
   ],
 })
 export class AdminModule {}

@@ -6,6 +6,9 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class TableCellEventService {
   readonly tableCellEvents$ = new Subject<ITableCellEvent>();
+  readonly download$ = this.tableCellEvents$.pipe(
+    filter((tableEvent: ITableCellEvent) => tableEvent.type === TableCellEventType.DOWNLOAD)
+  );
   readonly iconButtonClicks$ = this.tableCellEvents$.pipe(
     filter((tableEvent: ITableCellEvent) => tableEvent.type === TableCellEventType.ICON_BUTTON_CLICK)
   );

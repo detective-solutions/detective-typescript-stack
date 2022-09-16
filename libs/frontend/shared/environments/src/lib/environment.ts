@@ -9,6 +9,7 @@ export const environment = {
   dbApiPath: '/v1/graphql',
   authApiPathV1: '/v1/auth',
   catalogApiPathV1: '/v1/catalog',
+  provisioningListInvoicesV1: 'v1/provisioning/list-invoices',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency

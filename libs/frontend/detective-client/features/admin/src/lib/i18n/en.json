@@ -1,6 +1,11 @@
 {
   "navigation": {
-    "sidenavItems": { "connections": "Connections", "groups": "Groups", "masks": "Masks" },
+    "sidenavItems": {
+      "connections": "Connections",
+      "groups": "Groups",
+      "masks": "Masks",
+      "subscriptions": "Subscription"
+    },
     "sidenavBottomItem": "Home"
   },
   "connections": {
@@ -26,6 +31,25 @@
       "actionFailed": "Action could not be performed",
       "formInitError": "Could not fetch connection data. Please contact support",
       "formSubmitError": "Could not submit connection data. Please contact support"
+    }
+  },
+  "masks": {
+    "addMaskingButtonText": "New Masking",
+    "columnNames": {
+      "lastUpdatedColumn": "Last Updated",
+      "table": "Masked Table"
+    }
+  },
+  "subscriptions": {
+    "columnNames": {
+      "invoice": "Invoice Nr.",
+      "period": "Period",
+      "interval": "Interval",
+      "amount": "Amount",
+      "currency": "Currency",
+      "status": "Status",
+      "invoice_pdf": "Invoice",
+      "download": "Download"
     }
   }
 }
