@@ -1,9 +1,7 @@
 import {
   AnyWhiteboardNode,
   IMessage,
-  ITableNode,
   ITableNodeTemporaryData,
-  ITableWhiteboardNode,
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
@@ -74,12 +72,12 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
         })
     );
 
-    const isTemporaryTableDataAvailable =
-      !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
-    if (isTemporaryTableDataAvailable) {
-      // It is mandatory to create a deep copy of the node object, because it will be set to read-only
-      // when it is handled by the state mechanism
-      this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
-    }
+    // const isTemporaryTableDataAvailable =
+    //   !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
+    // if (isTemporaryTableDataAvailable) {
+    //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
+    //   // when it is handled by the state mechanism
+    //   this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
+    // }
   }
 }
