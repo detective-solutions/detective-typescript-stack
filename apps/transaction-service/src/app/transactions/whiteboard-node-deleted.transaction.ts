@@ -30,7 +30,7 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
       await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
       this.forwardMessageToOtherClients();
 
-      const response = this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
+      const response = await this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
       if (!response) {
         this.handleError(casefileId, deletedNode.type);
       }
