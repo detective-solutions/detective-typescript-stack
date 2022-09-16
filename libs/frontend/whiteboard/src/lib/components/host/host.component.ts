@@ -75,6 +75,115 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
 
+    // Handle position updates caused by the graph force
+    this.subscriptions.add(
+      this.forceGraph.nodePositionUpdatedByForce$.subscribe((node: AnyWhiteboardNode) =>
+        this.whiteboardFacade.addToNodeUpdateBuffer(node)
+      )
+    );
+
+    this.initializeCollaborationSubscriptions();
+  }
+
+  ngAfterViewInit() {
+    this.whiteboardFacade.initializeWhiteboard(
+      this.whiteboardContainerElement.nativeElement,
+      this.zoomContainerElement.nativeElement
+    );
+  }
+
+  ngOnDestroy() {
+    this.forceGraph.simulation.stop();
+    this.subscriptions.unsubscribe();
+    // Make sure to reset websocket connection & whiteboard data
+    this.whiteboardFacade.resetWhiteboard();
+  }
+
+  onElementDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onElementDrop(event: DragEvent) {
+    // TODO: Add interface for drag data transfer object
+    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
+    if (!dragDataTransfer) {
+      console.error('Could not extract drag data for adding whiteboard node');
+    }
+
+    const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+
+    // TODO: Remove these when actual node data is loaded
+    const randomTitles = [
+      'Clue 1',
+      'I am a randomly chosen title',
+      'Clue 2',
+      'Find suspicious content',
+      'Clue 3',
+      'Suspicious data',
+      '',
+    ];
+
+    const now = formatDate(new Date());
+
+    if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
+      // TODO: Remove when data from dragged element is used
+      const tableNode = TableWhiteboardNode.Build({
+        id: uuidv4(),
+        title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+        x: convertedDOMPoint.x,
+        y: convertedDOMPoint.y,
+        width: 900,
+        height: 500,
+        locked: false,
+        lastUpdatedBy: {
+          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+        },
+        lastUpdated: now,
+        created: now,
+        entity: {
+          id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
+        },
+      });
+
+      this.store.dispatch(
+        WhiteboardNodeActions.WhiteboardNodeAdded({
+          addedNode: tableNode,
+          addedManually: true,
+        })
+      );
+    }
+
+    if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
+      // TODO: Remove when data from dragged element is used
+      const href = 'detective.solutions';
+      const embeddingNode = EmbeddingWhiteboardNode.Build({
+        id: uuidv4(),
+        title: href,
+        href: href,
+        x: convertedDOMPoint.x,
+        y: convertedDOMPoint.y,
+        width: 900,
+        height: 500,
+        locked: false,
+        author: { id: '78b4daab-dfe4-4bad-855f-ac575cc59730' },
+        editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+        lastUpdatedBy: {
+          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+        },
+        lastUpdated: now,
+        created: now,
+      });
+
+      this.store.dispatch(
+        WhiteboardNodeActions.WhiteboardNodeAdded({
+          addedNode: embeddingNode,
+          addedManually: true,
+        })
+      );
+    }
+  }
+
+  private initializeCollaborationSubscriptions() {
     // Listen to LOAD_WHITEBOARD_DATA websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
@@ -189,111 +298,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         })
     );
-
-    // Handle position updates caused by the graph force
-    this.subscriptions.add(
-      this.forceGraph.nodePositionUpdatedByForce$.subscribe((node: AnyWhiteboardNode) =>
-        this.whiteboardFacade.addToNodeUpdateBuffer(node)
-      )
-    );
-  }
-
-  ngAfterViewInit() {
-    this.whiteboardFacade.initializeWhiteboard(
-      this.whiteboardContainerElement.nativeElement,
-      this.zoomContainerElement.nativeElement
-    );
-  }
-
-  ngOnDestroy() {
-    this.forceGraph.simulation.stop();
-    this.subscriptions.unsubscribe();
-    // Make sure to reset websocket connection & whiteboard data
-    this.whiteboardFacade.resetWhiteboard();
-  }
-
-  onElementDragOver(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  onElementDrop(event: DragEvent) {
-    // TODO: Add interface for drag data transfer object
-    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
-    if (!dragDataTransfer) {
-      console.error('Could not extract drag data for adding whiteboard node');
-    }
-
-    const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
-
-    // TODO: Remove these when actual node data is loaded
-    const randomTitles = [
-      'Clue 1',
-      'I am a randomly chosen title',
-      'Clue 2',
-      'Find suspicious content',
-      'Clue 3',
-      'Suspicious data',
-      '',
-    ];
-
-    const now = formatDate(new Date());
-
-    if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
-      // TODO: Remove when data from dragged element is used
-      const tableNode = TableWhiteboardNode.Build({
-        id: uuidv4(),
-        title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-        x: convertedDOMPoint.x,
-        y: convertedDOMPoint.y,
-        width: 900,
-        height: 500,
-        locked: false,
-        lastUpdatedBy: {
-          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-        },
-        lastUpdated: now,
-        created: now,
-        entity: {
-          id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
-        },
-      });
-
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeAdded({
-          addedNode: tableNode,
-          addedManually: true,
-        })
-      );
-    }
-
-    if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
-      // TODO: Remove when data from dragged element is used
-      const href = 'detective.solutions';
-      const embeddingNode = EmbeddingWhiteboardNode.Build({
-        id: uuidv4(),
-        title: href,
-        href: href,
-        x: convertedDOMPoint.x,
-        y: convertedDOMPoint.y,
-        width: 900,
-        height: 500,
-        locked: false,
-        author: { id: '78b4daab-dfe4-4bad-855f-ac575cc59730' },
-        editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-        lastUpdatedBy: {
-          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-        },
-        lastUpdated: now,
-        created: now,
-      });
-
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeAdded({
-          addedNode: embeddingNode,
-          addedManually: true,
-        })
-      );
-    }
   }
 
   private convertDOMToSVGCoordinates(x: number, y: number): DOMPoint {
