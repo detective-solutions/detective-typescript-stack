@@ -60,8 +60,7 @@ export class WhiteboardNodeEffects {
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
-        tap(([context, action]) => {
-          console.log('SENDING');
+        tap(([context, action]) =>
           this.whiteboardFacade.sendWebsocketMessage({
             event: MessageEventType.WhiteboardNodeDeleted,
             data: {
@@ -73,8 +72,8 @@ export class WhiteboardNodeEffects {
               } as IMessageContext,
               body: { id: action.deletedNode.id, type: action.deletedNode.type },
             },
-          });
-        })
+          })
+        )
       );
     },
     { dispatch: false }
