@@ -1,11 +1,5 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import {
-  AnyWhiteboardNode,
-  IMessageContext,
-  IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodePositionUpdate,
-  MessageEventType,
-} from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
 import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
@@ -66,7 +60,8 @@ export class WhiteboardNodeEffects {
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
-        tap(([context, action]) =>
+        tap(([context, action]) => {
+          console.log('SENDING');
           this.whiteboardFacade.sendWebsocketMessage({
             event: MessageEventType.WhiteboardNodeDeleted,
             data: {
@@ -78,8 +73,8 @@ export class WhiteboardNodeEffects {
               } as IMessageContext,
               body: { id: action.deletedNode.id, type: action.deletedNode.type },
             },
-          })
-        )
+          });
+        })
       );
     },
     { dispatch: false }
@@ -99,12 +94,12 @@ export class WhiteboardNodeEffects {
               context: {
                 ...context,
                 eventType: MessageEventType.WhiteboardNodeBlocked,
-                nodeId: action.update.id,
                 userId: context.userId,
+                nodeId: action.update.id,
               } as IMessageContext,
               body: {
                 temporary: { blockedBy: action.update.changes.temporary?.blockedBy },
-              } as IWhiteboardNodeBlockUpdate,
+              },
             },
           });
         })
@@ -133,7 +128,7 @@ export class WhiteboardNodeEffects {
               } as IMessageContext,
               body: {
                 temporary: { blockedBy: null },
-              } as IWhiteboardNodeBlockUpdate,
+              },
             },
           });
         })
@@ -165,7 +160,7 @@ export class WhiteboardNodeEffects {
                   x: update.changes.x,
                   y: update.changes.y,
                   type: update.changes.type,
-                } as IWhiteboardNodePositionUpdate;
+                };
               }),
             },
           });
