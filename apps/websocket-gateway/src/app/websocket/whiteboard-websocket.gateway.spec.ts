@@ -123,6 +123,29 @@ describe('WhiteboardWebsocketGateway', () => {
     });
   });
 
+  describe('onWhiteboardNodeDeletedEvent', () => {
+    it('should forward WHITEBOARD_NODE_DELETED events to the correct target topic', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const testMessage = { context: _createContext(MessageEventType.WhiteboardNodeDeleted), body: testMessageBody };
+
+      await webSocketGateway.onWhiteboardNodeDeletedEvent(testMessage);
+
+      expect(producerMock).toBeCalledTimes(1);
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic, testMessage);
+    });
+
+    it('should throw an InternalServerErrorException if the message context validation fails', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const context = _createContext(MessageEventType.WhiteboardNodeDeleted);
+      delete context['tenantId']; // tenantId is required in the MessageContextDTO
+
+      expect(webSocketGateway.onWhiteboardNodeDeletedEvent({ context: context, body: {} })).rejects.toThrow(
+        InternalServerErrorException
+      );
+      expect(producerMock).toBeCalledTimes(0);
+    });
+  });
+
   describe('onWhiteboardNodeBlockedEvent', () => {
     it('should forward WHITEBOARD_NODE_BLOCKED events to the correct target topic', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
