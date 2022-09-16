@@ -88,7 +88,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testTableWhiteboardNode,
       };
 
-      it('should correctly execute transaction for table node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
@@ -118,7 +118,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the table node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
@@ -190,7 +190,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testUserQueryWhiteboardNode,
       };
 
-      it('should correctly execute transaction for user query node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
@@ -220,7 +220,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the user query node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
@@ -292,7 +292,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testEmbeddingWhiteboardNode,
       };
 
-      it('should correctly execute transaction for embedding node type', async () => {
+      it('should correctly execute transaction', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
@@ -322,7 +322,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
       });
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the embedding node DTO validation', async () => {
+      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
         const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
