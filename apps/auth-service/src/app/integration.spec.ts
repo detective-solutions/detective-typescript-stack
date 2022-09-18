@@ -13,6 +13,7 @@ import {
 } from '@detective.solutions/backend/users';
 
 import { AppController } from './app.controller';
+import { DGraphGrpcClientEnvironment } from '@detective.solutions/backend/dgraph-grpc-client';
 import { Test } from '@nestjs/testing';
 import { defaultEnvConfig } from './default-env.config';
 import jwtDecode from 'jwt-decode';
@@ -26,10 +27,10 @@ let jwtService: JwtService;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'production';
-  process.env.ACCESS_TOKEN_SECRET = 'accessTokenSecret';
-  process.env.REFRESH_TOKEN_SECRET = 'refreshTokenSecret';
-  process.env.DATABASE_GRPC_SERVICE_NAME = 'db-service-name';
-  process.env.DATABASE_GRPC_PORT = '8090';
+  process.env[AuthModuleEnvironment.ACCESS_TOKEN_SECRET] = 'accessTokenSecret';
+  process.env[AuthModuleEnvironment.REFRESH_TOKEN_SECRET] = 'refreshTokenSecret';
+  process.env[DGraphGrpcClientEnvironment.DATABASE_SERVICE_NAME] = 'db-service-name';
+  process.env[DGraphGrpcClientEnvironment.DATABASE_PORT] = '8090';
 
   const moduleRef = await Test.createTestingModule({
     imports: [

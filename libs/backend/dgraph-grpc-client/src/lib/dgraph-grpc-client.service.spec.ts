@@ -1,7 +1,7 @@
 import { DgraphClient, DgraphClientStub, Mutation } from 'dgraph-js';
 
-import { DGRAPH_MODULE_OPTIONS } from './dgraph-grpc-client.constants';
-import { DGraphGrpcClientModule } from '..';
+import { DGRAPH_MODULE_OPTIONS } from './models';
+import { DGraphGrpcClientModule } from './dgraph-grpc-client.module';
 import { DGraphGrpcClientService } from './dgraph-grpc-client.service';
 import { Test } from '@nestjs/testing';
 

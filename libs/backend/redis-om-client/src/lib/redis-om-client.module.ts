@@ -1,5 +1,5 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
-import { IRedisClientOptions, REDIS_CLIENT_MODULE_OPTIONS } from './models';
+import { IRedisOMClientOptions, REDIS_OM_CLIENT_MODULE_OPTIONS } from './models';
 
 import { ModuleRef } from '@nestjs/core';
 import { RedisOMClientService } from './redis-om-client.service';
@@ -12,10 +12,10 @@ import { RedisOMClientService } from './redis-om-client.service';
 export class RedisOMClientModule {
   constructor(private readonly moduleRef: ModuleRef) {}
 
-  static register(options: IRedisClientOptions): DynamicModule {
+  static register(moduleOptions: IRedisOMClientOptions): DynamicModule {
     return {
       module: RedisOMClientModule,
-      providers: [{ provide: REDIS_CLIENT_MODULE_OPTIONS, useValue: options }, RedisOMClientService],
+      providers: [{ provide: REDIS_OM_CLIENT_MODULE_OPTIONS, useValue: moduleOptions }, RedisOMClientService],
       exports: [RedisOMClientService],
     };
   }

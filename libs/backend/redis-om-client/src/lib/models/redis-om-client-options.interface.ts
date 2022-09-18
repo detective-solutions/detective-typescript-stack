@@ -1,3 +1,3 @@
-export interface IRedisClientOptions {
+export interface IRedisOMClientOptions {
   address: string;
 }

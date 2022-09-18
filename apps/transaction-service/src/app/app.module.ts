@@ -1,10 +1,10 @@
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
+import { DGraphGrpcClientEnvironment, DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { DatabaseService, TransactionCoordinationService } from './services';
 import { RedisOMClientEnvironment, RedisOMClientModule } from '@detective.solutions/backend/redis-om-client';
 import { TransactionConsumer, TransactionProducer } from './kafka';
 
 import { ConfigModule } from '@nestjs/config';
-import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { Module } from '@nestjs/common';
 import { WhiteboardTransactionFactory } from './transactions';
 import { coordinationServiceInjectionToken } from './utils';
@@ -26,7 +26,13 @@ import { kafkaConfig } from './kafka-config';
       }`,
     }),
     DGraphGrpcClientModule.register({
-      stubs: [{ address: `${process.env.DATABASE_GRPC_SERVICE_NAME}:${process.env.DATABASE_GRPC_PORT}` }],
+      stubs: [
+        {
+          address: `${process.env[DGraphGrpcClientEnvironment.DATABASE_SERVICE_NAME]}:${
+            process.env[DGraphGrpcClientEnvironment.DATABASE_PORT]
+          }`,
+        },
+      ],
       debug: !environment.production,
     }),
   ],
