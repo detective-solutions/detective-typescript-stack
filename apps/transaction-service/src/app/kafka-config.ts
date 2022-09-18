@@ -1,7 +1,7 @@
 import { Transport } from '@nestjs/microservices';
 import { kafkaClientInjectionToken } from './utils';
 
-export const microserviceConfig = {
+export const kafkaConfig = {
   name: kafkaClientInjectionToken,
   transport: Transport.KAFKA,
   options: {

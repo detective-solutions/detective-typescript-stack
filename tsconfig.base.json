@@ -19,6 +19,7 @@
     "paths": {
       "@detective.solutions/backend/auth": ["libs/backend/auth/src/index.ts"],
       "@detective.solutions/backend/dgraph-grpc-client": ["libs/backend/dgraph-grpc-client/src/index.ts"],
+      "@detective.solutions/backend/redis-om-client": ["libs/backend/redis-om-client/src/index.ts"],
       "@detective.solutions/backend/shared/data-access": ["libs/backend/shared/data-access/src/index.ts"],
       "@detective.solutions/backend/shared/environments": ["libs/backend/shared/environments/src/index.ts"],
       "@detective.solutions/backend/shared/utils": ["libs/backend/shared/utils/src/index.ts"],

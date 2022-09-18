@@ -1,5 +1,6 @@
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
 import { DatabaseService, TransactionCoordinationService } from './services';
+import { RedisOMClientEnvironment, RedisOMClientModule } from '@detective.solutions/backend/redis-om-client';
 import { TransactionConsumer, TransactionProducer } from './kafka';
 
 import { ConfigModule } from '@nestjs/config';
@@ -9,7 +10,7 @@ import { WhiteboardTransactionFactory } from './transactions';
 import { coordinationServiceInjectionToken } from './utils';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
-import { microserviceConfig } from './microservice-config';
+import { kafkaConfig } from './kafka-config';
 
 @Module({
   imports: [
@@ -18,7 +19,12 @@ import { microserviceConfig } from './microservice-config';
       cache: true,
       validationSchema: defaultEnvConfig,
     }),
-    ClientsModule.register([microserviceConfig] as ClientsModuleOptions),
+    ClientsModule.register([kafkaConfig] as ClientsModuleOptions),
+    RedisOMClientModule.register({
+      address: `${process.env[RedisOMClientEnvironment.REDIS_SERVICE_NAME]}:${
+        process.env[RedisOMClientEnvironment.REDIS_PORT]
+      }`,
+    }),
     DGraphGrpcClientModule.register({
       stubs: [{ address: `${process.env.DATABASE_GRPC_SERVICE_NAME}:${process.env.DATABASE_GRPC_PORT}` }],
       debug: !environment.production,

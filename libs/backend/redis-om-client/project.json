@@ -1,0 +1,23 @@
+{
+  "root": "libs/backend/redis-om-client",
+  "sourceRoot": "libs/backend/redis-om-client/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/backend/redis-om-client/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/backend/redis-om-client"],
+      "options": {
+        "jestConfig": "libs/backend/redis-om-client/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
