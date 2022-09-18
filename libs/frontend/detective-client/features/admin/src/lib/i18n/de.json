@@ -47,14 +47,19 @@
       "interval": "Interval",
       "amount": "Betrag",
       "currency": "Währung",
-      "status": "Status",
+      "status": "Bezahlt",
       "invoice_pdf": "Rechnung",
       "download": "Download"
     },
     "cancelDialog": {
       "cancelDialogHeader": "Account löschen",
       "cancelDialogText": "Sie sind dabei die Account zu löschen und den Zugriff auf ihre Diskussionen zu verlieren",
-      "cancelButtonText": "Ich möchte detective nicht mehr nutzen."
+      "cancelExecuteButtonText": "Abonement kündigen",
+      "cancelCancelButtonText": "Abbrechen"
+    },
+    "utils": {
+      "of": "von",
+      "users": "Nutzern"
     }
   }
 }

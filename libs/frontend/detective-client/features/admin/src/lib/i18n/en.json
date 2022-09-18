@@ -47,14 +47,19 @@
       "interval": "Interval",
       "amount": "Amount",
       "currency": "Currency",
-      "status": "Status",
+      "status": "Paid",
       "invoice_pdf": "Invoice",
       "download": "Download"
     },
     "cancelDialog": {
       "cancelDialogHeader": "Delete account",
       "cancelDialogText": "You are about to delete the account and lose access to your discussions",
-      "cancelButtonText": "I don't want to use detective anymore."
+      "cancelExecuteButtonText": "Unsubscribe",
+      "cancelCancelButtonText": "Keep on investigating"
+    },
+    "utils": {
+      "of": "of",
+      "users": "users"
     }
   }
 }

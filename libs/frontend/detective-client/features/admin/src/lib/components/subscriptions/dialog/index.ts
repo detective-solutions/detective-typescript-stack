@@ -1,1 +1,1 @@
-export * from './subscription-cancel-dialog.component';
+export * from './subscriptions-cancel-dialog.component';

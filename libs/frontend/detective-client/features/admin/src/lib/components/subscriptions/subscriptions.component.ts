@@ -1,6 +1,6 @@
 /* eslint-disable sort-imports */
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription, filter, map, take } from 'rxjs';
+import { Observable, Subscription, filter, map, take, combineLatest, shareReplay } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import {
   ITableCellEvent,
@@ -16,9 +16,12 @@ import {
   IInvoiceListResponse,
   SubscriptionClickEvent,
   SubscriptionDialogComponent,
+  IGetAllUsersResponse,
+  IGetProductResponse,
 } from '../../models';
 import { SubscriptionService } from '../../services';
 import { SubscriptionCancelDialogComponent } from './dialog';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'subscriptions',
@@ -27,8 +30,22 @@ import { SubscriptionCancelDialogComponent } from './dialog';
 })
 export class SubscriptionsComponent implements OnInit, OnDestroy {
   readonly pageSize = 10;
+
+  readonly activeUsers$: Observable<number> = this.SubscriptionService.getAllUsers().pipe(
+    map((response: IGetAllUsersResponse) => response.totalElementsCount)
+  );
+
+  readonly isMobile$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
+
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
+  productInfo$!: Observable<IGetProductResponse>;
+  userRatio$!: Observable<number>;
 
   private readonly subscriptions = new Subscription();
 
@@ -43,6 +60,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   };
 
   constructor(
+    private readonly breakpointObserver: BreakpointObserver,
     private readonly SubscriptionService: SubscriptionService,
     private readonly translationService: TranslocoService,
     private readonly matDialog: MatDialog,
@@ -51,6 +69,26 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.productInfo$ = this.SubscriptionService.getProductDescription().pipe(
+      map((product: IGetProductResponse) => {
+        return {
+          name: product.name || '',
+          price: product.price || 0,
+          currency: product.currency || '',
+          iteration: product.iteration || '',
+          userLimit: product.userLimit || 0,
+          priceTag: SubscriptionService.convertAmountToCurrencyString(product.price, product.currency) || '',
+        };
+      })
+    );
+
+    this.userRatio$ = combineLatest(
+      [this.activeUsers$, this.productInfo$],
+      (active: number, limit: IGetProductResponse) => {
+        return (active / limit.userLimit) * 100;
+      }
+    );
+
     this.tableItems$ = this.SubscriptionService.getInvoices().pipe(
       map((invoices: IInvoiceListResponse) => {
         return {

@@ -4,11 +4,12 @@
     {{ t('cancelDialogText') }}
   </div>
   <div mat-dialog-actions align="center">
-    <button mat-raised-button color="accent" (click)="cancelSubscription()">
-      {{ t('cancelButtonText') }}
+    <button mat-raised-button (click)="cancelSubscription()">
+      {{ t('cancelExecuteButtonText') }}
+    </button>
+    <button mat-raised-button color="accent" (click)="cancelModal()">
+      {{ t('cancelCancelButtonText') }}
     </button>
   </div>
 </div>
-<!--
-  <mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
-  -->
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

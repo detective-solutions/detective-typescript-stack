@@ -8,9 +8,9 @@ import { SubscriptionService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 
 @Component({
-  selector: 'subscription-cancel-dialog',
-  styleUrls: ['subscription-cancel-dialog.component.scss'],
-  templateUrl: 'subscription-cancel-dialog.component.html',
+  selector: 'subscriptions-cancel-dialog',
+  styleUrls: ['subscriptions-cancel-dialog.component.scss'],
+  templateUrl: 'subscriptions-cancel-dialog.component.html',
 })
 export class SubscriptionCancelDialogComponent {
   isSubmitting = false;
@@ -26,12 +26,18 @@ export class SubscriptionCancelDialogComponent {
 
   cancelSubscription() {
     this.isSubmitting = true;
-    this.subscriptionService.cancelSubscription();
+    this.subscriptionService
+      .cancelSubscription()
+      .pipe(take(1))
+      .subscribe((subscriptionState: any) => console.log(subscriptionState));
+    this.dialogRef.close();
+  }
+
+  cancelModal() {
     this.dialogRef.close();
   }
 
   private handleError(error: Error) {
-    this.isSubmitting = false;
     this.logger.error('Encountered an error while submitting connection deletion request');
     console.error(error);
     this.translationService
