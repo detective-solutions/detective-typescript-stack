@@ -1,11 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
 export class CacheService {
   constructor(private readonly redisService: RedisClientService) {}
+
+  async isCasefileCached(casefileId) {
+    return await this.redisService.client.exists(casefileId);
+  }
 
   async saveCasefile(casefile: any) {
     if (!casefile) {
@@ -15,6 +18,6 @@ export class CacheService {
   }
 
   async loadCasefile(casefileId: string) {
-    return JSON.parse(await this.redisService.client.get(casefileId)) as ICasefileForWhiteboard;
+    return await this.redisService.client.json.get(casefileId);
   }
 }

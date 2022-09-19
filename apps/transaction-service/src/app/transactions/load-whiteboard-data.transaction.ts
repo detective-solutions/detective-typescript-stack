@@ -17,18 +17,23 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     try {
       // No message body check, because it is empty on purpose and will be filled by this transaction
       const casefileId = this.messageContext.casefileId;
-      let casefileData = await this.cacheService.loadCasefile(casefileId);
+      const cacheExists = await this.cacheService.isCasefileCached(casefileId);
 
-      this.logger.verbose('CACHED DATA:');
-      this.logger.verbose(casefileData);
-
-      if (!casefileData) {
+      this.logger.verbose('CACHE EXISTS:');
+      this.logger.verbose(cacheExists);
+      let casefileData;
+      if (cacheExists) {
+        casefileData = await this.cacheService.loadCasefile(casefileId);
+      } else {
         casefileData = await this.databaseService.getCasefileById(casefileId);
         this.cacheService.saveCasefile(casefileData);
       }
       if (!casefileData) {
         throw new Error(`Could not fetch data for casefile ${casefileId}`);
       }
+
+      this.logger.verbose('CASEFILE DATA:');
+      this.logger.verbose(casefileData);
 
       this.message.body = casefileData; // Fill empty message payload body with casefile data
       this.forwardMessageToOtherClients();
