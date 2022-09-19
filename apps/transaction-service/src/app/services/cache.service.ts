@@ -21,10 +21,7 @@ export class CacheService {
     this.logger.log(`Saving casefile ${casefile?.id} to cache`);
     const response = await this.redisService.client.json.set(casefile.id, '$', casefile);
 
-    this.logger.debug('CASEFILE SAVE RESPONSE');
-    this.logger.debug(response);
-
-    if (!response) {
+    if (!response || response !== 'OK') {
       throw new InternalServerErrorException();
     }
     return response;
