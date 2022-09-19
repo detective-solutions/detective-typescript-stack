@@ -1,23 +1,37 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
+import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
 export class CacheService {
+  readonly logger = new Logger(CacheService.name);
+
   constructor(private readonly redisService: RedisClientService) {}
 
-  async isCasefileCached(casefileId) {
+  async isCasefileCached(casefileId: string): Promise<number> {
+    this.logger.verbose(`Checking if casefile ${casefileId} is cached already`);
     return await this.redisService.client.exists(casefileId);
   }
 
-  async saveCasefile(casefile: any) {
+  async saveCasefile(casefile: any): Promise<string> {
     if (!casefile) {
       throw new InternalServerErrorException();
     }
-    await this.redisService.client.json.set(casefile.id, '$', casefile);
+    this.logger.log(`Saving casefile ${casefile?.id} to cache`);
+    const response = await this.redisService.client.json.set(casefile.id, '$', casefile);
+
+    this.logger.debug('CASEFILE SAVE RESPONSE');
+    this.logger.debug(response);
+
+    if (!response) {
+      throw new InternalServerErrorException();
+    }
+    return response;
   }
 
-  async loadCasefile(casefileId: string) {
-    return await this.redisService.client.json.get(casefileId);
+  async getCasefileById(casefileId: string): Promise<ICasefileForWhiteboard> {
+    this.logger.log(`Requesting casefile ${casefileId} data from cache`);
+    return JSON.parse((await this.redisService.client.json.get(casefileId)) as string);
   }
 }
