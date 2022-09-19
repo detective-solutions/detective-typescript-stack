@@ -17,7 +17,15 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     try {
       // No message body check, because it is empty on purpose and will be filled by this transaction
       const casefileId = this.messageContext.casefileId;
-      const casefileData = await this.databaseService.getCasefileById(casefileId);
+      let casefileData = await this.cacheService.loadCasefile(casefileId);
+
+      this.logger.verbose('CACHED DATA:');
+      this.logger.verbose(casefileData);
+
+      if (!casefileData) {
+        casefileData = await this.databaseService.getCasefileById(casefileId);
+        this.cacheService.saveCasefile(casefileData);
+      }
       if (!casefileData) {
         throw new Error(`Could not fetch data for casefile ${casefileId}`);
       }

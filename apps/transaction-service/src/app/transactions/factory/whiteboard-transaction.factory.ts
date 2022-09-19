@@ -1,7 +1,7 @@
+import { CacheService, DatabaseService } from '../../services';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { SingleTransactionKey, TransactionKeys, transactionMap } from './transaction-map';
 
-import { DatabaseService } from '../../services';
 import { IMessage } from '@detective.solutions/shared/data-access';
 import { Transaction } from '../abstract';
 import { TransactionProducer } from '../../kafka';
@@ -15,11 +15,13 @@ export class WhiteboardTransactionFactory {
 
   serviceRefs: TransactionServiceRefs = {
     transactionProducer: this.transactionProducer,
+    cacheService: this.cacheService,
     databaseService: this.databaseService,
   };
 
   constructor(
     private readonly transactionProducer: TransactionProducer,
+    private readonly cacheService: CacheService,
     private readonly databaseService: DatabaseService
   ) {}
 

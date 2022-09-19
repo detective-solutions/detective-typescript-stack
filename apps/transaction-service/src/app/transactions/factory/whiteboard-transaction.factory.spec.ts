@@ -1,6 +1,6 @@
+import { CacheService, DatabaseService } from '../../services';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../../services';
 import { InternalServerErrorException } from '@nestjs/common';
 import { LoadWhiteboardDataTransaction } from '../load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
@@ -17,6 +17,7 @@ describe('TransactionCoordinationService', () => {
       providers: [
         WhiteboardTransactionFactory,
         { provide: TransactionProducer, useValue: jest.fn() },
+        { provide: CacheService, useValue: jest.fn() },
         { provide: DatabaseService, useValue: jest.fn() },
       ],
     }).compile();

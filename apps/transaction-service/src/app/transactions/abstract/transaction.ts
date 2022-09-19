@@ -1,6 +1,6 @@
+import { CacheService, DatabaseService } from '../../services';
 import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../../services';
 import { Logger } from '@nestjs/common';
 import { TransactionProducer } from '../../kafka';
 import { TransactionServiceRefs } from '../factory';
@@ -13,6 +13,7 @@ export abstract class Transaction {
   abstract readonly targetTopic: KafkaTopic;
 
   readonly transactionProducer: TransactionProducer;
+  readonly cacheService: CacheService;
   readonly databaseService: DatabaseService;
 
   message: IMessage<any>;
@@ -25,6 +26,7 @@ export abstract class Transaction {
 
   constructor(serviceRefs: TransactionServiceRefs, message: IMessage<any>) {
     this.transactionProducer = serviceRefs.transactionProducer;
+    this.cacheService = serviceRefs.cacheService;
     this.databaseService = serviceRefs.databaseService;
     this.message = message;
     this.messageContext = message.context;

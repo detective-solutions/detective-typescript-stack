@@ -1,3 +1,4 @@
+import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
   IWhiteboardNodeDeleteUpdate,
@@ -6,7 +7,6 @@ import {
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../services';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
@@ -14,14 +14,16 @@ import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeDeletedTransaction } from './whiteboard-node-deleted.transaction';
 import { v4 as uuidv4 } from 'uuid';
 
-const deleteNodeInCasefileMethodName = 'deleteNodeInCasefile';
-const databaseServiceMock = {
-  [deleteNodeInCasefileMethodName]: jest.fn(),
-};
-
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
+};
+
+const cacheServiceMock = {};
+
+const deleteNodeInCasefileMethodName = 'deleteNodeInCasefile';
+const databaseServiceMock = {
+  [deleteNodeInCasefileMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -45,21 +47,28 @@ const testMessagePayload: IMessage<IWhiteboardNodeDeleteUpdate> = {
 };
 
 describe('WhiteboardNodeDeletedTransaction', () => {
-  let databaseService: DatabaseService;
   let transactionProducer: TransactionProducer;
+  let cacheService: CacheService;
+  let databaseService: DatabaseService;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: DatabaseService, useValue: databaseServiceMock },
         { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: CacheService, useValue: cacheServiceMock },
+        { provide: DatabaseService, useValue: databaseServiceMock },
       ],
     }).compile();
 
-    databaseService = app.get<DatabaseService>(DatabaseService);
     transactionProducer = app.get<TransactionProducer>(TransactionProducer);
-    serviceRefs = { databaseService: databaseService, transactionProducer: transactionProducer };
+    cacheService = app.get<CacheService>(CacheService);
+    databaseService = app.get<DatabaseService>(DatabaseService);
+    serviceRefs = {
+      transactionProducer: transactionProducer,
+      cacheService: cacheService,
+      databaseService: databaseService,
+    };
   });
 
   afterEach(() => {

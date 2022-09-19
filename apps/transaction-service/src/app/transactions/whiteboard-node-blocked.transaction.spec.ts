@@ -1,3 +1,4 @@
+import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
   IWhiteboardNodeBlockUpdate,
@@ -5,7 +6,6 @@ import {
   UserRole,
 } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../services';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
@@ -17,6 +17,8 @@ const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
+
+const cacheServiceMock = {};
 
 const testMessageContext = {
   eventType: MessageEventType.WhiteboardNodeDeleted,
@@ -38,21 +40,28 @@ const testMessagePayload: IMessage<IWhiteboardNodeBlockUpdate> = {
 };
 
 describe('WhiteboardNodeBlockedTransaction', () => {
-  let databaseService: DatabaseService;
   let transactionProducer: TransactionProducer;
+  let cacheService: CacheService;
+  let databaseService: DatabaseService;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: CacheService, useValue: cacheServiceMock },
+        { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
-    databaseService = app.get<DatabaseService>(DatabaseService);
     transactionProducer = app.get<TransactionProducer>(TransactionProducer);
-    serviceRefs = { databaseService: databaseService, transactionProducer: transactionProducer };
+    cacheService = app.get<CacheService>(CacheService);
+    databaseService = app.get<DatabaseService>(DatabaseService);
+    serviceRefs = {
+      transactionProducer: transactionProducer,
+      cacheService: cacheService,
+      databaseService: databaseService,
+    };
   });
 
   afterEach(() => {

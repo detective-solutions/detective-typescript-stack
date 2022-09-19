@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'backend-redis-om-client',
+  displayName: 'backend-redis-client',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +11,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/backend/redis-om-client',
+  coverageDirectory: '../../../coverage/libs/backend/redis-client',
 };
