@@ -29,6 +29,6 @@ export class CacheService {
 
   async getCasefileById(casefileId: string): Promise<ICasefileForWhiteboard> {
     this.logger.log(`Requesting casefile ${casefileId} data from cache`);
-    return JSON.parse((await this.redisService.client.json.get(casefileId)) as string);
+    return this.redisService.client.json.get(casefileId) as any;
   }
 }
