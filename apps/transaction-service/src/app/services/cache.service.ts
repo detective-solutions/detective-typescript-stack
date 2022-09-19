@@ -7,11 +7,11 @@ import { RedisClientService } from '@detective.solutions/backend/redis-client';
 export class CacheService {
   constructor(private readonly redisService: RedisClientService) {}
 
-  async saveCasefile(casefile: ICasefileForWhiteboard) {
+  async saveCasefile(casefile: any) {
     if (!casefile) {
       throw new InternalServerErrorException();
     }
-    await this.redisService.client.json.set(casefile.id, '$', JSON.stringify(casefile));
+    await this.redisService.client.json.set(casefile.id, '$', casefile);
   }
 
   async loadCasefile(casefileId: string) {
