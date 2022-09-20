@@ -14,12 +14,14 @@ export class CacheService {
     return this.redisService.client.exists(casefileId);
   }
 
-  async saveCasefile(casefile: any): Promise<string> {
+  async saveCasefile(casefile: ICachedCasefileForWhiteboard): Promise<string> {
     if (!casefile) {
       throw new InternalServerErrorException();
     }
     this.logger.log(`Saving casefile ${casefile?.id} to cache`);
-    const response = await this.redisService.client.json.set(casefile.id, '$', casefile);
+    // Can't match expected Redis client type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await this.redisService.client.json.set(casefile.id, '$', casefile as any);
 
     if (!response || response !== 'OK') {
       throw new InternalServerErrorException();
