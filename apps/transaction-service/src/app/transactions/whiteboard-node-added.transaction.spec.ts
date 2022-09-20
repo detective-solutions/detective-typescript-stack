@@ -403,7 +403,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       };
 
       jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
-        throw new Error('');
+        throw new Error();
       });
       jest.spyOn(databaseService, insertTableOccurrenceMethodName).mockResolvedValue({});
       jest.spyOn(databaseService, insertUserQueryOccurrenceMethodName).mockResolvedValue({});

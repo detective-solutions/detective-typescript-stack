@@ -103,7 +103,7 @@ describe('WhiteboardNodeDeletedTransaction', () => {
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
       jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
-        throw new Error('');
+        throw new Error();
       });
       jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
 
