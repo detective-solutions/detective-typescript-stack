@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
-import { ICasefileForWhiteboard } from '@detective.solutions/shared/data-access';
+import { ICachedCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
@@ -27,8 +27,10 @@ export class CacheService {
     return response;
   }
 
-  async getCasefileById(casefileId: string): Promise<ICasefileForWhiteboard> {
+  async getCasefileById(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
     this.logger.log(`Requesting casefile ${casefileId} data from cache`);
+    // Can't match Redis client return types with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.redisService.client.json.get(casefileId) as any;
   }
 }

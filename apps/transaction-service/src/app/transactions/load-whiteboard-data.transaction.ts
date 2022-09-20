@@ -1,4 +1,4 @@
-import { ICasefileForWhiteboard, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { ICachedCasefileForWhiteboard, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { Logger } from '@nestjs/common';
 import { Transaction } from './abstract';
 
@@ -7,7 +7,7 @@ export class LoadWhiteboardDataTransaction extends Transaction {
   readonly targetTopic = KafkaTopic.TransactionOutputUnicast;
   readonly maxRetries = 1;
 
-  override message: IMessage<ICasefileForWhiteboard>; // Define message body type
+  override message: IMessage<ICachedCasefileForWhiteboard>; // Define message body type
 
   private retryCount = 0;
 
@@ -34,8 +34,8 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     this.logger.log(`${this.logContext} Transaction successful`);
   }
 
-  private async handleMissingCache(casefileId: string): Promise<ICasefileForWhiteboard> {
-    const casefileData = await this.databaseService.getCasefileById(casefileId);
+  private async handleMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
+    const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
     await this.cacheService.saveCasefile(casefileData);
     return casefileData;
   }
