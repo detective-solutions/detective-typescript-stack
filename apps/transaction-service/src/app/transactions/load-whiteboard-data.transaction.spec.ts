@@ -1,6 +1,7 @@
 import { CacheService, DatabaseService } from '../services';
-import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { ICachedCasefileForWhiteboard, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
+import { InternalServerErrorException } from '@nestjs/common';
 import { LoadWhiteboardDataTransaction } from './load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
 import { TransactionProducer } from '../kafka';
@@ -11,7 +12,14 @@ const transactionProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const cacheServiceMock = {};
+const isCasefileCachedMethodName = 'isCasefileCached';
+const getCachedCasefileByIdMethodName = 'getCasefileById';
+const saveCasefileToCacheMethodName = 'saveCasefile';
+const cacheServiceMock = {
+  [isCasefileCachedMethodName]: jest.fn(),
+  [getCachedCasefileByIdMethodName]: jest.fn(),
+  [saveCasefileToCacheMethodName]: jest.fn(),
+};
 
 const getCasefileByIdMethodName = 'getCasefileById';
 const databaseServiceMock = {
@@ -31,7 +39,7 @@ const testMessagePayload = {
   body: undefined,
 };
 
-xdescribe('LoadWhiteboardDataTransaction', () => {
+describe('LoadWhiteboardDataTransaction', () => {
   let loadWhiteboardDataTransaction: LoadWhiteboardDataTransaction;
   let transactionProducer: TransactionProducer;
   let cacheService: CacheService;
@@ -71,18 +79,21 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
   });
 
   describe('execute', () => {
-    const getCasefileByIdResponse = {
+    const getCasefileByIdResponse: ICachedCasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
       tables: [],
       queries: [],
       embeddings: [],
+      temporary: { activeUsers: [] },
     };
 
-    it('should correctly execute transaction', async () => {
+    it('should correctly load casefile data from database if no cache exists', async () => {
+      const isCasefileCachedSpy = jest.spyOn(cacheService, isCasefileCachedMethodName).mockResolvedValue(0);
       const getCasfileByIdSpy = jest
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
+      const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
       const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
 
       await loadWhiteboardDataTransaction.execute();
@@ -90,8 +101,33 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
       const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
 
+      expect(isCasefileCachedSpy).toBeCalledTimes(1);
       expect(getCasfileByIdSpy).toBeCalledTimes(1);
       expect(getCasfileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
+      expect(saveCasefileToCacheSpy).toHaveBeenCalledTimes(1);
+      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
+      expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
+    });
+
+    it('should correctly load casefile data from cache if it exists', async () => {
+      const isCasefileCachedSpy = jest.spyOn(cacheService, isCasefileCachedMethodName).mockResolvedValue(1);
+      const getCachedCasefileByIdSpy = jest
+        .spyOn(cacheService, getCachedCasefileByIdMethodName)
+        .mockResolvedValue(getCasefileByIdResponse);
+      const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName);
+      const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+
+      await loadWhiteboardDataTransaction.execute();
+
+      const modifiedPayload = { ...testMessagePayload };
+      modifiedPayload.body = getCasefileByIdResponse;
+
+      expect(isCasefileCachedSpy).toHaveBeenCalledTimes(1);
+      expect(getCachedCasefileByIdSpy).toHaveBeenCalledTimes(1);
+      expect(getCachedCasefileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
+      expect(getCasfileByIdSpy).toBeCalledTimes(0);
+      expect(saveCasefileToCacheSpy).toBeCalledTimes(0);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
     });
