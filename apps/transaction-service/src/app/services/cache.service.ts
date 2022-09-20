@@ -11,7 +11,7 @@ export class CacheService {
 
   async isCasefileCached(casefileId: string): Promise<number> {
     this.logger.verbose(`Checking if casefile ${casefileId} is cached already`);
-    return await this.redisService.client.exists(casefileId);
+    return this.redisService.client.exists(casefileId);
   }
 
   async saveCasefile(casefile: any): Promise<string> {
