@@ -2,6 +2,12 @@ import { KafkaTopic, MessageEventType } from '@detective.solutions/shared/data-a
 
 export const EventTypeTopicMapping = {
   loadWhiteboardData: { eventType: MessageEventType.LoadWhiteboardData, targetTopic: KafkaTopic.TransactionInput },
+  whiteboardUserConnected: {
+    targetTopic: KafkaTopic.TransactionInput,
+  },
+  whiteboardUserDisconnected: {
+    targetTopic: KafkaTopic.TransactionInput,
+  },
   whiteboardNodeAdded: { eventType: MessageEventType.WhiteboardNodeAdded, targetTopic: KafkaTopic.TransactionInput },
   whiteboardNodeDeleted: {
     eventType: MessageEventType.WhiteboardNodeDeleted,
