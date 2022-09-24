@@ -170,6 +170,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         },
         body: null,
       });
+      console.log();
 
       this.logger.verbose(
         `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
