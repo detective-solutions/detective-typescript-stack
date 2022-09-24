@@ -1,7 +1,7 @@
 import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { Test } from '@nestjs/testing';
-import { WhiteboardConsumer } from './whiteboard.consumer';
+import { WhiteboardEventConsumer } from './whiteboard-event.consumer';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
 import { broadcastWebSocketContext } from '../utils';
 
@@ -10,16 +10,16 @@ const mockWebSocketGateway = {
 };
 
 describe('WhiteboardConsumer', () => {
-  let whiteboardConsumer: WhiteboardConsumer;
+  let whiteboardEventConsumer: WhiteboardEventConsumer;
   let webSocketGateway: WhiteboardWebSocketGateway;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [WhiteboardConsumer],
+      controllers: [WhiteboardEventConsumer],
       providers: [{ provide: WhiteboardWebSocketGateway, useValue: mockWebSocketGateway }],
     }).compile();
 
-    whiteboardConsumer = moduleRef.get<WhiteboardConsumer>(WhiteboardConsumer);
+    whiteboardEventConsumer = moduleRef.get<WhiteboardEventConsumer>(WhiteboardEventConsumer);
     webSocketGateway = moduleRef.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
   });
 
@@ -28,7 +28,7 @@ describe('WhiteboardConsumer', () => {
   });
 
   it('should be defined', () => {
-    expect(whiteboardConsumer).toBeDefined();
+    expect(whiteboardEventConsumer).toBeDefined();
   });
 
   describe('forwardQueryExecution', () => {
@@ -54,7 +54,7 @@ describe('WhiteboardConsumer', () => {
       };
       const broadcastSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
 
-      whiteboardConsumer.forwardQueryExecution(testKafkaMessage);
+      whiteboardEventConsumer.forwardQueryExecution(testKafkaMessage);
 
       expect(broadcastSpy).toBeCalledTimes(1);
       expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value, broadcastWebSocketContext);

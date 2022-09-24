@@ -7,8 +7,8 @@ import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.ga
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 @Controller()
-export class WhiteboardConsumer {
-  private readonly logger = new Logger(WhiteboardConsumer.name);
+export class WhiteboardEventConsumer {
+  private readonly logger = new Logger(WhiteboardEventConsumer.name);
 
   constructor(private readonly webSocketGateway: WhiteboardWebSocketGateway) {}
 

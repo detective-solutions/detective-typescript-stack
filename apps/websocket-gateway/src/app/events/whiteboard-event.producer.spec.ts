@@ -2,18 +2,18 @@ import { MessageEventType, UserRole } from '@detective.solutions/shared/data-acc
 
 import { ClientKafka } from '@nestjs/microservices';
 import { Test } from '@nestjs/testing';
-import { WhiteboardProducer } from './whiteboard.producer';
+import { WhiteboardEventProducer } from './whiteboard-event.producer';
 import { kafkaClientInjectionToken } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('WhiteboardProducer', () => {
-  let whiteboardProducer: WhiteboardProducer;
+  let whiteboardProducer: WhiteboardEventProducer;
   let client: ClientKafka;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
-        WhiteboardProducer,
+        WhiteboardEventProducer,
         {
           provide: kafkaClientInjectionToken,
           useValue: {
@@ -23,7 +23,7 @@ describe('WhiteboardProducer', () => {
       ],
     }).compile();
 
-    whiteboardProducer = moduleRef.get<WhiteboardProducer>(WhiteboardProducer);
+    whiteboardProducer = moduleRef.get<WhiteboardEventProducer>(WhiteboardEventProducer);
     client = moduleRef.get<ClientKafka>(kafkaClientInjectionToken);
   });
 

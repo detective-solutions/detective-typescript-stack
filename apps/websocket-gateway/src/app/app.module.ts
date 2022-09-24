@@ -1,5 +1,5 @@
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
-import { WhiteboardConsumer, WhiteboardProducer } from './kafka';
+import { WhiteboardEventConsumer, WhiteboardEventProducer } from './events';
 
 import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
@@ -18,7 +18,7 @@ import { microserviceConfig } from './microservice-config';
     ClientsModule.register([microserviceConfig] as ClientsModuleOptions),
     AuthModule,
   ],
-  controllers: [WhiteboardConsumer],
-  providers: [WhiteboardProducer, WhiteboardWebSocketGateway],
+  controllers: [WhiteboardEventConsumer],
+  providers: [WhiteboardEventProducer, WhiteboardWebSocketGateway],
 })
 export class AppModule {}

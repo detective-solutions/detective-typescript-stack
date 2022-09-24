@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { WS } from 'jest-websocket-mock';
 import { WebSocket } from 'ws';
-import { WhiteboardProducer } from '../kafka/whiteboard.producer';
+import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
 import { WhiteboardWebSocketGateway } from './whiteboard-websocket.gateway';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -31,7 +31,7 @@ describe('WhiteboardWebsocketGateway', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         WhiteboardWebSocketGateway,
-        { provide: WhiteboardProducer, useValue: mockWhiteboardProducer },
+        { provide: WhiteboardEventProducer, useValue: mockWhiteboardProducer },
         { provide: JwtService, useValue: {} },
         ConfigService,
       ],
