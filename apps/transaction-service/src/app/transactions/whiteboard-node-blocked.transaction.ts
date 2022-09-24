@@ -21,6 +21,7 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
+      // TODO: Add check if node is already blocked!
       await validateDto(WhiteboardNodeBlockUpdateDTO, this.messageBody as IWhiteboardNodeBlockUpdate, this.logger);
       this.forwardMessageToOtherClients();
       // TODO: Add temporary data to cache

@@ -20,6 +20,7 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
+      // TODO: Add check if nodes are already blocked, if so abort position update
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
