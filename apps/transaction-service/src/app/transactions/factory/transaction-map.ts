@@ -4,13 +4,23 @@ import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transac
 import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
 import { WhiteboardNodeMovedTransaction } from '../whiteboard-node-moved.transaction';
+import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
+import { WhiteboardUserLeftTransaction } from '../whiteboard-user-left.transaction';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+// TODO: Split transaction map into persistent & temporary transactions for better performance
 
 const tempTransactionMap: any = {};
 Object.values(MessageEventType).forEach((eventType: string) => {
   if (eventType === MessageEventType.LoadWhiteboardData) {
     tempTransactionMap[eventType] = LoadWhiteboardDataTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardUserJoined) {
+    tempTransactionMap[eventType] = WhiteboardUserJoinedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardUserLeft) {
+    tempTransactionMap[eventType] = WhiteboardUserLeftTransaction;
   }
   if (eventType === MessageEventType.WhiteboardNodeAdded) {
     tempTransactionMap[eventType] = WhiteboardNodeAddedTransaction;

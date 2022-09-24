@@ -1,9 +1,14 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
+import {
+  IJwtTokenPayload,
+  IMessage,
+  IMessageContext,
+  MessageEventType,
+  UserRole,
+} from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import {
   MessageBody,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
@@ -23,7 +28,7 @@ import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @WebSocketGateway(7777)
-export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
@@ -43,17 +48,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
     };
   }
 
-  handleConnection(client: any) {
-    this.logger.debug('YO', client);
-    this.logger.log(`${buildLogContext(client.context)} New client has connected`);
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, {
-      context: client.context,
-      body: null,
-    });
-  }
-
   handleDisconnect(client: any) {
-    this.logger.debug('YO', client);
     this.logger.log(`${buildLogContext(client.context)} Client has disconnected`);
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
       context: client.context,
@@ -164,6 +159,17 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         cb(false, 401, 'Unauthorized');
       }
       (info.req as any).client.context = clientContext; // Assign context to client that requests to connect
+
+      // Notify backend to start a WHITEBOARD_USER_JOINED transaction
+      this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, {
+        context: {
+          ...clientContext,
+          timestamp: new Date().getTime(),
+          eventType: MessageEventType.WhiteboardUserJoined,
+          userRole: clientContext.userRole as UserRole,
+        },
+        body: null,
+      });
 
       this.logger.verbose(
         `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
