@@ -24,7 +24,7 @@ export class CacheService {
     const response = await this.clientService.client.json.set(casefile.id, '.', casefile as any);
 
     if (!response || response !== 'OK') {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(`Could not save casefile ${casefile.id} to cache`);
     }
     return response;
   }
@@ -36,17 +36,17 @@ export class CacheService {
     return this.clientService.client.json.get(casefileId) as any;
   }
 
-  async getActiveUsers(casefileId: string) {
+  async getActiveWhiteboardUsersByCasefile(casefileId: string) {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
     return this.clientService.client.json.get(`.${casefileId}.active-users`);
   }
 
-  async setActiveUser(userId: string, casefileId: string) {
+  async addActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
     const response = await this.clientService.client.json.set(casefileId, '.active-users', userId);
 
     if (!response || response !== 'OK') {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
     return response;
   }
