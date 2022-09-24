@@ -44,16 +44,18 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
   }
 
   handleConnection(client: any) {
+    this.logger.debug('YO', client);
     this.logger.log(`${buildLogContext(client.context)} New client has connected`);
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserConnected.targetTopic, {
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, {
       context: client.context,
       body: null,
     });
   }
 
   handleDisconnect(client: any) {
+    this.logger.debug('YO', client);
     this.logger.log(`${buildLogContext(client.context)} Client has disconnected`);
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserDisconnected.targetTopic, {
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
       context: client.context,
       body: null,
     });
