@@ -23,6 +23,11 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
+
+      // TODO: REMOVE ME
+      const test = await this.cacheService.getActiveWhiteboardUsersByCasefile(casefileId);
+      this.logger.debug('TEST ACTIVE USERS', test);
+
       this.forwardMessageToOtherClients();
       const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
       if (!response) {
