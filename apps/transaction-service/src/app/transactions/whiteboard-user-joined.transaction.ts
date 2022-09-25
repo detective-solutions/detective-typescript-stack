@@ -1,4 +1,9 @@
-import { ICachedCasefileForWhiteboard, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import {
+  ICachedCasefileForWhiteboard,
+  IMessage,
+  IUserForWhiteboard,
+  KafkaTopic,
+} from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
@@ -7,7 +12,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserJoinedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<null>; // Define message body type
+  override message: IMessage<IUserForWhiteboard>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
@@ -20,8 +25,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       if (!cacheExists) {
         await this.handleMissingCache(casefileId);
       }
+      const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
+      this.message.body = user;
       this.forwardMessageToOtherClients();
-      await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
