@@ -39,7 +39,7 @@ const testMessagePayload = {
   body: undefined,
 };
 
-xdescribe('LoadWhiteboardDataTransaction', () => {
+describe('LoadWhiteboardDataTransaction', () => {
   let loadWhiteboardDataTransaction: LoadWhiteboardDataTransaction;
   let transactionProducer: TransactionProducer;
   let cacheService: CacheService;
