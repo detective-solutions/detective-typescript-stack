@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
+import { DatabaseService } from './database.service';
 import { ICachedCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
@@ -7,7 +8,7 @@ import { RedisClientService } from '@detective.solutions/backend/redis-client';
 export class CacheService {
   readonly logger = new Logger(CacheService.name);
 
-  constructor(private readonly clientService: RedisClientService) {}
+  constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {}
 
   async isCasefileCached(casefileId: string): Promise<number> {
     this.logger.verbose(`Checking if casefile ${casefileId} is cached already`);
@@ -43,7 +44,9 @@ export class CacheService {
 
   async addActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
-    const response = await this.clientService.client.json.set(casefileId, '.active-users', userId);
+    const user = await this.databaseService.getUserById(userId);
+    this.logger.debug('USER INFO:', user);
+    const response = await this.clientService.client.json.set(casefileId, '.active-users', user);
 
     if (!response || response !== 'OK') {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);

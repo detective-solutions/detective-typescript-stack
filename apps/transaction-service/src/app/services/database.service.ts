@@ -3,6 +3,7 @@ import {
   ICasefileForWhiteboard,
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
+  IUserForWhiteboard,
   IUserQueryWhiteboardNode,
   IWhiteboardNodePositionUpdate,
   WhiteboardNodeType,
@@ -15,11 +16,13 @@ import {
   getCasefileByIdQueryName,
   getUidByTypeQueryName,
 } from './queries';
+import { IGetUserById, getUserByIdQuery, getUserByIdQueryName } from './queries/get-user-by-id.query';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
 import { CasefileForWhiteboardDTO } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
+import { UserForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -62,6 +65,37 @@ export class DatabaseService {
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
     return casefileData;
+  }
+
+  async getUserById(userId: string): Promise<IUserForWhiteboard> | null {
+    this.logger.log(`Requesting info for user ${userId} from database`);
+
+    const queryVariables = { $id: userId };
+    const response = (await this.sendQuery(getUserByIdQuery, queryVariables)) as IGetUserById;
+    if (!response) {
+      return null;
+    }
+
+    if (!response[getUserByIdQueryName]) {
+      this.logger.error(`Incoming database response object is missing ${getUserByIdQueryName} property`);
+      throw new InternalServerErrorException();
+    }
+
+    if (response[getUserByIdQueryName].length > 1) {
+      this.logger.error(`Found more than one user with id ${userId}`);
+      throw new InternalServerErrorException();
+    }
+
+    if (response[getUserByIdQueryName].length === 0) {
+      this.logger.warn(`No user found for the given id ${userId}`);
+      return null;
+    }
+
+    this.logger.verbose(`Received data for user ${userId}`);
+    const userData = response[getUidByTypeQueryName][0];
+    await validateDto(UserForWhiteboardDTO, userData, this.logger);
+
+    return userData;
   }
 
   async insertTableOccurrenceToCasefile(
