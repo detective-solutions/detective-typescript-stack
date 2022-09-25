@@ -13,7 +13,7 @@ export const kafkaConfig = {
       },
     },
     consumer: {
-      groupId: 'transaction-service-consumer',
+      groupId: 'transaction-service-consumer-group',
     },
   },
 };
