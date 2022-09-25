@@ -19,19 +19,21 @@
         <small> /{{ (productInfo$ | async)?.iteration }}</small>
       </p>
       <span fxLayoutAlign="left" fxHide.sm fxHide.xs>
-        <button mat-raised-button color="accent" class="invite-button">Upgrade</button>
+        <button mat-raised-button color="accent" class="invite-button" (click)="openUpgradeDialog()">Upgrade</button>
       </span>
     </div>
     <div fxFlex="50" class="section" fxFlex.xs="55">
-      <p><small>Card</small></p>
+      <p>
+        <img src="{{ (paymentMethod$ | async)?.cardType }}" alt="card-logo" class="card-logo" /><span>
+          **** {{ (paymentMethod$ | async)?.number }}</span
+        >
+      </p>
       <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="add-connection-button-wrapper">
-        <button>change payment</button>
+        <button mat-stroked-button (click)="changePayment()">change payment</button>
+        <button mat-stroked-button (click)="openCancelDialog()">cancel</button>
       </span>
     </div>
-    <div fxFlex="50" class="section" fxFlex.xs="55">
-      <p>**** 4242</p>
-      <a (click)="openCancelDialog()">cancel</a>
-    </div>
+    <div fxFlex="50" class="section" fxFlex.xs="55"></div>
   </div>
   <div class="invoice-row">
     <table-view [tableRows$]="tableItems$" [pageSize]="pageSize"></table-view>

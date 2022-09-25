@@ -1,0 +1,37 @@
+<div class="upgrade-dialog-wrapper" *transloco="let t; read: 'admin.subscriptions.upgradeDialog'">
+  <h1 mat-dialog-title align="center">{{ t('upgradeDialogHeader') }}</h1>
+  <div mat-dialog-content align="center">
+    {{ t('upgradeDialogText') }}
+  </div>
+  <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+    <mat-card
+      class="upgrade-card"
+      id="{{ plan.id }}"
+      fxFlex="50"
+      class="section"
+      fxFlex.xs="55"
+      (click)="lockUpgrade(plan.id)"
+      *ngFor="let plan of (availablePlans$ | async)?.prices; let i = index"
+    >
+      <mat-card-subtitle>{{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}</mat-card-subtitle>
+      <mat-card-title>{{ plan.nickname }}</mat-card-title>
+      <mat-card-content height="20px">
+        <p>{{ plan.metadata.description }}</p>
+      </mat-card-content>
+      <mat-card-footer>
+        <ul>
+          <li><mat-icon color="accent">done</mat-icon>{{ plan.metadata.user_limit }} {{ t('userLimit') }}</li>
+        </ul>
+      </mat-card-footer>
+    </mat-card>
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button (click)="closeModal()">
+      {{ t('cancelUpgradeButtonText') }}
+    </button>
+    <button mat-raised-button color="accent" (click)="pushUpgrade()">
+      {{ t('upgradeNowButtonText') }}
+    </button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

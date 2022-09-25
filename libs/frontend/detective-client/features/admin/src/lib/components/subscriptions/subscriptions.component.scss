@@ -18,5 +18,18 @@
       font-weight: bold;
       color: white;
     }
+
+    .add-connection-button-wrapper {
+      button {
+        margin-right: 15px;
+      }
+    }
   }
+}
+
+.card-logo {
+  display: inline-block;
+  height: 100%;
+  width: 40px;
+  vertical-align: middle;
 }

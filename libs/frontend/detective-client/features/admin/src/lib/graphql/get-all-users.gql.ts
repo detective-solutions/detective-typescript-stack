@@ -13,12 +13,12 @@ export interface IGetUsersGQLResponse {
 export class GetAllUsersGQL extends Query<Response> {
   override document = gql`
     query User {
-      queryUser {
+      queryUser @cascade {
         email
         role
         firstname
         lastname
-        tenantIds: tenants {
+        tenantIds: tenants(filter: { xid: { eq: "4091e594-3cb5-11ed-95e8-ebca79b0263f" } }) {
           xid
         }
       }

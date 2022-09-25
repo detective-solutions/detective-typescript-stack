@@ -57,6 +57,13 @@
       "cancelExecuteButtonText": "Unsubscribe",
       "cancelCancelButtonText": "Keep on investigating"
     },
+    "upgradeDialog": {
+      "upgradeDialogHeader": "Choose your upgrade",
+      "upgradeDialogText": "You can modify your subscriptions any time. This way you have the full flexbility",
+      "cancelUpgradeButtonText": "Cancel",
+      "upgradeNowButtonText": "Upgrade",
+      "userLimit": "User"
+    },
     "utils": {
       "of": "of",
       "users": "users"

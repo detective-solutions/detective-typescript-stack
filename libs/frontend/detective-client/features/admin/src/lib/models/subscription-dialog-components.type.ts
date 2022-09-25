@@ -1,3 +1,6 @@
-import { SubscriptionCancelDialogComponent } from '../components/subscriptions/dialog';
+import {
+  SubscriptionCancelDialogComponent,
+  SubscriptionUpgradeDialogComponent,
+} from '../components/subscriptions/dialog';
 
-export type SubscriptionDialogComponent = SubscriptionCancelDialogComponent;
+export type SubscriptionDialogComponent = SubscriptionCancelDialogComponent | SubscriptionUpgradeDialogComponent;

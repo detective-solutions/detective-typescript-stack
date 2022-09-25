@@ -57,6 +57,13 @@
       "cancelExecuteButtonText": "Abonement kündigen",
       "cancelCancelButtonText": "Abbrechen"
     },
+    "upgradeDialog": {
+      "upgradeDialogHeader": "Wähle dein Upgrade",
+      "upgradeDialogText": "Du kannst dein Abonement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
+      "cancelUpgradeButtonText": "Abbrechen",
+      "upgradeNowButtonText": "Ausführen",
+      "userLimit": "Nuzter"
+    },
     "utils": {
       "of": "von",
       "users": "Nutzern"

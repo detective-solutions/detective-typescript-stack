@@ -18,9 +18,11 @@ import {
   SubscriptionDialogComponent,
   IGetAllUsersResponse,
   IGetProductResponse,
+  IGetSubscriptionPaymentResponse,
+  IGetChangePaymentResponse,
 } from '../../models';
 import { SubscriptionService } from '../../services';
-import { SubscriptionCancelDialogComponent } from './dialog';
+import { SubscriptionCancelDialogComponent, SubscriptionUpgradeDialogComponent } from './dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
@@ -44,6 +46,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
 
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
+  paymentMethod$!: Observable<IGetSubscriptionPaymentResponse>;
   productInfo$!: Observable<IGetProductResponse>;
   userRatio$!: Observable<number>;
 
@@ -98,6 +101,16 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       })
     );
 
+    this.paymentMethod$ = this.SubscriptionService.getSubscriptionPaymentMethod().pipe(
+      map((payment: IGetSubscriptionPaymentResponse) => {
+        return {
+          id: payment.id || '',
+          cardType: this.selectCardImage(payment.cardType),
+          number: payment.number || '',
+        };
+      })
+    );
+
     this.subscriptions.add(
       this.downloadButtonClick$.subscribe((invoiceLink: string) => this.downloadInvoice(invoiceLink))
     );
@@ -107,6 +120,44 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
+  selectCardImage(card: string): string {
+    const base = 'assets/images/payment';
+    let path = base + '/visa.png';
+    switch (card) {
+      case 'amex':
+        path = base + '/amex.png';
+        break;
+      case 'visa':
+        path = base + '/visa.png';
+        break;
+      case 'discover':
+        path = base + '/discover.png';
+        break;
+      case 'jcb':
+        path = base + '/jcb.png';
+        break;
+      case 'maestro':
+        path = base + '/maestro.png';
+        break;
+      case 'master':
+        path = base + '/mastercard.png';
+        break;
+      case 'sage':
+        path = base + '/sage.png';
+        break;
+      case 'dinersclub':
+        path = base + '/dinersclub.png';
+        break;
+      case 'western':
+        path = base + '/westernunion.png';
+        break;
+      case 'paypal':
+        path = base + '/paypal.png';
+        break;
+    }
+    return path;
+  }
+
   openCancelDialog(componentToOpen?: ComponentType<SubscriptionDialogComponent>, config?: MatDialogConfig) {
     this.matDialog.open(componentToOpen ?? SubscriptionCancelDialogComponent, {
       ...this.dialogDefaultConfig,
@@ -114,8 +165,26 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  openUpgradeDialog(componentToOpen?: ComponentType<SubscriptionDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? SubscriptionUpgradeDialogComponent, {
+      ...{
+        width: '850px',
+        minWidth: '600px',
+      },
+      ...config,
+    });
+  }
+
   downloadInvoice(invoiceLink: string) {
     window.open(invoiceLink, '_blank');
+  }
+
+  changePayment() {
+    this.SubscriptionService.getChangePaymentPortal()
+      .pipe(take(1))
+      .subscribe((response: IGetChangePaymentResponse) => {
+        window.open(response.url, '_blank');
+      });
   }
 
   private transformToTableStructure(originalInvoiceData: IInvoice[]): IInvoiceTableDef[] {

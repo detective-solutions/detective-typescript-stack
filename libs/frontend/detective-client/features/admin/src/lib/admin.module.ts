@@ -9,6 +9,10 @@ import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } f
 import { ConnectionsService, MaskingsService, SubscriptionService } from './services';
 import { GetAllConnectionsGQL, GetAllMaskingsGQL, GetAllUsersGQL, GetConnectionByIdGQL } from './graphql';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
+import {
+  SubscriptionCancelDialogComponent,
+  SubscriptionUpgradeDialogComponent,
+} from './components/subscriptions/dialog';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
 import { AdminMaterialModule } from './admin.material.module';
@@ -17,7 +21,6 @@ import { CommonModule } from '@angular/common';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SubscriptionCancelDialogComponent } from './components/subscriptions/dialog';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
@@ -27,6 +30,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsAddEditDialogComponent,
     ConnectionsDeleteDialogComponent,
     SubscriptionCancelDialogComponent,
+    SubscriptionUpgradeDialogComponent,
     GroupsComponent,
     MasksComponent,
     SubscriptionsComponent,

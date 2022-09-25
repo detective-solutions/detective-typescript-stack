@@ -11,7 +11,11 @@ export const environment = {
   catalogApiPathV1: '/v1/catalog',
   provisioningListInvoicesV1: 'v1/provisioning/invoices/list',
   provisioningCancelSubV1: 'v1/provisioning/subscription/cancel',
-  productSubV1: 'v1/product/info',
+  provisioningUpdateSubV1: 'v1/provisioning/subscription/update',
+  provisioningPaymentSubV1: 'v1/provisioning/subscription/payment',
+  provisioningProductV1: 'v1/product/info',
+  provisioningAllProductListV1: 'v1/provisioning/config',
+  provisioningChangePaymentV1: 'v1/provisioning/payment/change',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
