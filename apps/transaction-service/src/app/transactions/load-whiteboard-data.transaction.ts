@@ -1,5 +1,5 @@
 import { ICachedCasefileForWhiteboard, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
-import { Logger } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { Transaction } from './abstract';
 
 export class LoadWhiteboardDataTransaction extends Transaction {
@@ -45,6 +45,8 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++;
       this.execute();
+    } else {
+      throw new InternalServerErrorException();
     }
   }
 }
