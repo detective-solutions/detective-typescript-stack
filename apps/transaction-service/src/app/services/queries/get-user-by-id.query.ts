@@ -12,8 +12,8 @@ export const getUserByIdQuery = `
     ${getUserByIdQueryName}(func: eq(User.xid, $id)) {
       id: User.xid
       email: User.email
-      firstname: User.description
-      lastname: User.tables {
+      firstname: User.firstname
+      lastname: User.lastname
       title: User.title
       role: User.role
       avatarUrl: User.avatarUrl
