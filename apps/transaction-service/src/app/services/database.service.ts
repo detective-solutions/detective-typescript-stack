@@ -92,7 +92,7 @@ export class DatabaseService {
     }
 
     this.logger.verbose(`Received data for user ${userId}`);
-    const userData = response[getUidByTypeQueryName][0];
+    const userData = response[getUserByIdQueryName][0];
     await validateDto(UserForWhiteboardDTO, userData, this.logger);
 
     return userData;
