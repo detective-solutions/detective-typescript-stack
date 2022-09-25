@@ -4,11 +4,11 @@ import { ICachedCasefileForWhiteboard, MessageEventType, UserRole } from '@detec
 import { InternalServerErrorException } from '@nestjs/common';
 import { LoadWhiteboardDataTransaction } from './load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../kafka';
+import { TransactionEventProducer } from '../events';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionProducerMock = {
+const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
@@ -41,25 +41,25 @@ const testMessagePayload = {
 
 describe('LoadWhiteboardDataTransaction', () => {
   let loadWhiteboardDataTransaction: LoadWhiteboardDataTransaction;
-  let transactionProducer: TransactionProducer;
+  let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
       ],
     }).compile();
 
-    transactionProducer = app.get<TransactionProducer>(TransactionProducer);
+    transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
     loadWhiteboardDataTransaction = new LoadWhiteboardDataTransaction(
       {
-        transactionProducer: transactionProducer,
+        transactionEventProducer: transactionEventProducer,
         cacheService: cacheService,
         databaseService: databaseService,
       },
@@ -94,7 +94,7 @@ describe('LoadWhiteboardDataTransaction', () => {
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await loadWhiteboardDataTransaction.execute();
 
@@ -116,7 +116,7 @@ describe('LoadWhiteboardDataTransaction', () => {
         .mockResolvedValue(getCasefileByIdResponse);
       const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName);
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await loadWhiteboardDataTransaction.execute();
 
@@ -142,7 +142,7 @@ describe('LoadWhiteboardDataTransaction', () => {
 
     xit('should retry query after a failed request and eventually throw an InternalServerErrorException', async () => {
       const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName).mockResolvedValue(null);
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       // await loadWhiteboardDataTransaction.execute();
       await expect(loadWhiteboardDataTransaction.execute()).rejects.toThrow(InternalServerErrorException);

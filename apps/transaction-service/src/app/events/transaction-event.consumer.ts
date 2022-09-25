@@ -8,8 +8,8 @@ import { TransactionCoordinationService } from '../services';
 import { coordinationServiceInjectionToken } from '../utils';
 
 @Controller()
-export class TransactionConsumer {
-  readonly logger = new Logger(TransactionConsumer.name);
+export class TransactionEventConsumer {
+  readonly logger = new Logger(TransactionEventConsumer.name);
 
   constructor(
     @Inject(coordinationServiceInjectionToken)

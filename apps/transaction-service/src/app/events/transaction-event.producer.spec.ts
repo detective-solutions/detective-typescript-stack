@@ -2,18 +2,18 @@ import { MessageEventType, UserRole } from '@detective.solutions/shared/data-acc
 
 import { ClientKafka } from '@nestjs/microservices';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from './transaction.producer';
+import { TransactionEventProducer } from './transaction-event.producer';
 import { kafkaClientInjectionToken } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
-describe('TransactionProducer', () => {
-  let transactionProducer: TransactionProducer;
+describe('TransactionEventProducer', () => {
+  let transactionEventProducer: TransactionEventProducer;
   let client: ClientKafka;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
-        TransactionProducer,
+        TransactionEventProducer,
         {
           provide: kafkaClientInjectionToken,
           useValue: {
@@ -23,11 +23,11 @@ describe('TransactionProducer', () => {
       ],
     }).compile();
 
-    transactionProducer = moduleRef.get<TransactionProducer>(TransactionProducer);
+    transactionEventProducer = moduleRef.get<TransactionEventProducer>(TransactionEventProducer);
     client = moduleRef.get<ClientKafka>(kafkaClientInjectionToken);
 
     // Disable logger for test runs
-    transactionProducer.logger.localInstance.setLogLevels([]);
+    transactionEventProducer.logger.localInstance.setLogLevels([]);
   });
 
   afterEach(() => {
@@ -35,7 +35,7 @@ describe('TransactionProducer', () => {
   });
 
   it('should be defined', () => {
-    expect(transactionProducer).toBeDefined();
+    expect(transactionEventProducer).toBeDefined();
   });
 
   describe('sendKafkaMessage', () => {
@@ -55,7 +55,7 @@ describe('TransactionProducer', () => {
       };
       const emitSpy = jest.spyOn(client, 'emit');
 
-      transactionProducer.sendKafkaMessage(testTopicName, testPayload);
+      transactionEventProducer.sendKafkaMessage(testTopicName, testPayload);
 
       expect(emitSpy).toBeCalledTimes(1);
       expect(emitSpy).toBeCalledWith(testTopicName, testPayload);

@@ -8,13 +8,13 @@ import {
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../kafka';
+import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeBlockedTransaction } from './whiteboard-node-blocked.transaction';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionProducerMock = {
+const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
@@ -40,7 +40,7 @@ const testMessagePayload: IMessage<IWhiteboardNodeBlockUpdate> = {
 };
 
 describe('WhiteboardNodeBlockedTransaction', () => {
-  let transactionProducer: TransactionProducer;
+  let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
   let serviceRefs: TransactionServiceRefs;
@@ -48,17 +48,17 @@ describe('WhiteboardNodeBlockedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
-    transactionProducer = app.get<TransactionProducer>(TransactionProducer);
+    transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
     serviceRefs = {
-      transactionProducer: transactionProducer,
+      transactionEventProducer: transactionEventProducer,
       cacheService: cacheService,
       databaseService: databaseService,
     };
@@ -70,7 +70,7 @@ describe('WhiteboardNodeBlockedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -89,7 +89,7 @@ describe('WhiteboardNodeBlockedTransaction', () => {
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+      jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
         throw new Error();
       });
 
@@ -100,7 +100,7 @@ describe('WhiteboardNodeBlockedTransaction', () => {
     });
 
     it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, {
         context: testMessageContext,

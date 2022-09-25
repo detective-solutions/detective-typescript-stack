@@ -15,14 +15,14 @@ import { CacheService, DatabaseService } from '../services';
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../kafka';
+import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeAddedTransaction } from './whiteboard-node-added.transaction';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionProducerMock = {
+const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
@@ -48,7 +48,7 @@ const testMessageContext = {
 };
 
 describe('WhiteboardNodeAddedTransaction', () => {
-  let transactionProducer: TransactionProducer;
+  let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
   let serviceRefs: TransactionServiceRefs;
@@ -56,17 +56,17 @@ describe('WhiteboardNodeAddedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
       ],
     }).compile();
 
-    transactionProducer = app.get<TransactionProducer>(TransactionProducer);
+    transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
     serviceRefs = {
-      transactionProducer: transactionProducer,
+      transactionEventProducer: transactionEventProducer,
       cacheService: cacheService,
       databaseService: databaseService,
     };
@@ -99,7 +99,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       };
 
       it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertTableOccurrenceMethodName)
@@ -129,7 +129,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertTableOccurrenceMethodName)
@@ -156,7 +156,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addTableOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertTableOccurrenceMethodName)
@@ -201,7 +201,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       };
 
       it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
@@ -231,7 +231,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
@@ -258,7 +258,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addUserQueryOccurrenceToCasefileSpy = jest
           .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
@@ -303,7 +303,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       };
 
       it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
@@ -333,7 +333,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
@@ -360,7 +360,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
       });
 
       it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+        const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
         const addEmbeddingToCasefileSpy = jest
           .spyOn(databaseService, insertEmbeddingMethodName)
@@ -402,7 +402,7 @@ describe('WhiteboardNodeAddedTransaction', () => {
         body: testWhiteboardNode,
       };
 
-      jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+      jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
         throw new Error();
       });
       jest.spyOn(databaseService, insertTableOccurrenceMethodName).mockResolvedValue({});

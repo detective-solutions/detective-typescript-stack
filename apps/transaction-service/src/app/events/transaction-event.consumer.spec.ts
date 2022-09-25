@@ -2,8 +2,8 @@ import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { TransactionConsumer } from './transaction.consumer';
 import { TransactionCoordinationService } from '../services';
+import { TransactionEventConsumer } from './transaction-event.consumer';
 import { coordinationServiceInjectionToken } from '../utils';
 
 const mockEventCoordinatorService = {
@@ -11,16 +11,16 @@ const mockEventCoordinatorService = {
 };
 
 describe('TransactionConsumer', () => {
-  let transactionConsumer: TransactionConsumer;
+  let transactionConsumer: TransactionEventConsumer;
   let coordinationService: TransactionCoordinationService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [TransactionConsumer],
+      controllers: [TransactionEventConsumer],
       providers: [{ provide: coordinationServiceInjectionToken, useValue: mockEventCoordinatorService }],
     }).compile();
 
-    transactionConsumer = moduleRef.get<TransactionConsumer>(TransactionConsumer);
+    transactionConsumer = moduleRef.get<TransactionEventConsumer>(TransactionEventConsumer);
     coordinationService = moduleRef.get<TransactionCoordinationService>(coordinationServiceInjectionToken);
 
     // Disable logger for test runs

@@ -2,7 +2,7 @@ import { CacheService, DatabaseService, TransactionCoordinationService } from '.
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
 import { DGraphGrpcClientEnvironment, DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { RedisClientEnvironment, RedisClientModule } from '@detective.solutions/backend/redis-client';
-import { TransactionConsumer, TransactionProducer } from './kafka';
+import { TransactionEventConsumer, TransactionEventProducer } from './events';
 
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
@@ -36,9 +36,9 @@ import { kafkaConfig } from './kafka-config';
       debug: !environment.production,
     }),
   ],
-  controllers: [TransactionConsumer],
+  controllers: [TransactionEventConsumer],
   providers: [
-    TransactionProducer,
+    TransactionEventProducer,
     { provide: coordinationServiceInjectionToken, useClass: TransactionCoordinationService },
     CacheService,
     DatabaseService,

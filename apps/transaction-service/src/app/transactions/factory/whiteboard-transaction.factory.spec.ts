@@ -4,7 +4,7 @@ import { MessageEventType, UserRole } from '@detective.solutions/shared/data-acc
 import { InternalServerErrorException } from '@nestjs/common';
 import { LoadWhiteboardDataTransaction } from '../load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../../kafka';
+import { TransactionEventProducer } from '../../events';
 import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -16,7 +16,7 @@ describe('TransactionCoordinationService', () => {
     const app = await Test.createTestingModule({
       providers: [
         WhiteboardTransactionFactory,
-        { provide: TransactionProducer, useValue: jest.fn() },
+        { provide: TransactionEventProducer, useValue: jest.fn() },
         { provide: CacheService, useValue: jest.fn() },
         { provide: DatabaseService, useValue: jest.fn() },
       ],
