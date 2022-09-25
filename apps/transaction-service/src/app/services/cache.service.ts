@@ -1,7 +1,7 @@
+import { ICachedCasefileForWhiteboard, IUserForWhiteboard } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { DatabaseService } from './database.service';
-import { ICachedCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
@@ -37,12 +37,14 @@ export class CacheService {
     return this.clientService.client.json.get(casefileId) as any;
   }
 
-  async getActiveWhiteboardUsersByCasefile(casefileId: string) {
+  async getActiveWhiteboardUsersByCasefile(casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
-    return this.clientService.client.json.get(`.${casefileId}.active-users`);
+    // Can't match Redis client return types with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.clientService.client.json.get(`.${casefileId}.active-users`) as any;
   }
 
-  async addActiveWhiteboardUser(userId: string, casefileId: string) {
+  async addActiveWhiteboardUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
     const user = await this.databaseService.getUserById(userId);
     this.logger.debug('USER INFO:', user);
@@ -51,6 +53,6 @@ export class CacheService {
     if (!response || response !== 'OK') {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
-    return response;
+    return user;
   }
 }
