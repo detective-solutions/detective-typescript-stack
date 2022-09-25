@@ -17,7 +17,6 @@ export const getUserByIdQuery = `
       title: User.title
       role: User.role
       avatarUrl: User.avatarUrl
-      }
     }
   }
 `;
