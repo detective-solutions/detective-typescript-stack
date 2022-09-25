@@ -35,6 +35,7 @@ export class LoadWhiteboardDataTransaction extends Transaction {
   }
 
   private async handleMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
+    this.logger.log(`No cache found for casefile ${casefileId}. Setting up a new cache`);
     const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
     await this.cacheService.saveCasefile(casefileData);
     return casefileData;
