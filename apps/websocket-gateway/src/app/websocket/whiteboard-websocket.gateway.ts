@@ -161,7 +161,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       (info.req as any).client.context = clientContext; // Assign context to client that requests to connect
 
       // Notify backend to start a WHITEBOARD_USER_JOINED transaction
-      this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, {
+      const message = {
         context: {
           ...clientContext,
           timestamp: new Date().getTime(),
@@ -169,8 +169,9 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
           userRole: clientContext.userRole as UserRole,
         },
         body: null,
-      });
-      console.log();
+      };
+      console.log('USER JOINED MESSAGE', message);
+      this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, message);
 
       this.logger.verbose(
         `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
