@@ -37,7 +37,6 @@ export class WhiteboardFacadeService {
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
-    this.store.dispatch(WhiteboardGeneralActions.LoadWhiteboardData());
   }
 
   getForceGraph(options: WhiteboardOptions): ForceDirectedGraph {
