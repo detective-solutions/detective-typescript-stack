@@ -3,6 +3,7 @@ import {
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
+  MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
@@ -21,13 +22,22 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const userId = this.messageContext?.userId;
 
     try {
-      const cacheExists = (await this.cacheService.isCasefileCached(casefileId)) as number;
+      const cacheExists = await this.cacheService.isCasefileCached(casefileId);
       if (!cacheExists) {
-        await this.handleMissingCache(casefileId);
+        await this.setupMissingCache(casefileId);
       }
+
+      // First add user to cache, then trigger LOAD_CASEFILE_DATA transaction for the new user
       const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
+      this.transactionCoordinationService.createTransactionByEventType(MessageEventType.LoadWhiteboardData, {
+        context: this.messageContext,
+        body: null,
+      });
+
+      // Forward user info to other clients
       this.message.body = user;
       this.forwardMessageToOtherClients();
+
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
@@ -35,14 +45,14 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     }
   }
 
-  private async handleMissingCache(casefileId: string): Promise<void> {
+  private async setupMissingCache(casefileId: string): Promise<void> {
     const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
     await this.cacheService.saveCasefile(casefileData);
-    this.logger.log(`${this.logContext} Successfully created new casefile cache`);
+    this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
   }
 
   private handleError(nodeId: string, casefileId: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not block node ${nodeId} in casefile ${casefileId}`);
+    throw new InternalServerErrorException(`Could not add new user ${nodeId} to casefile ${casefileId}`);
   }
 }

@@ -2,9 +2,9 @@ import { CacheService, DatabaseService, TransactionCoordinationService } from '.
 import { ICachedCasefileForWhiteboard, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
-import { LoadWhiteboardDataTransaction } from './load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../events';
+import { WhiteboardUserJoinedTransaction } from './whiteboard-user-joined.transaction';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
@@ -26,8 +26,6 @@ const databaseServiceMock = {
   [getCasefileByIdMethodName]: jest.fn(),
 };
 
-const transactionCoordinationServiceMock = {};
-
 const testMessagePayload = {
   context: {
     eventType: MessageEventType.LoadWhiteboardData,
@@ -42,8 +40,8 @@ const testMessagePayload = {
 };
 
 // TODO: Fix tests
-xdescribe('LoadWhiteboardDataTransaction', () => {
-  let loadWhiteboardDataTransaction: LoadWhiteboardDataTransaction;
+xdescribe('WhiteboardUserJoinedTransaction', () => {
+  let whiteboardUserJoinedTransaction: WhiteboardUserJoinedTransaction;
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -55,7 +53,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: TransactionCoordinationService, useValue: transactionCoordinationServiceMock },
+        { provide: TransactionCoordinationService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -63,7 +61,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
     transactionCoordinationService = app.get<TransactionCoordinationService>(TransactionCoordinationService);
-    loadWhiteboardDataTransaction = new LoadWhiteboardDataTransaction(
+    whiteboardUserJoinedTransaction = new WhiteboardUserJoinedTransaction(
       {
         transactionEventProducer: transactionEventProducer,
         cacheService: cacheService,
@@ -74,7 +72,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
     );
 
     // Disable logger for test runs
-    loadWhiteboardDataTransaction.logger.localInstance.setLogLevels([]);
+    whiteboardUserJoinedTransaction.logger.localInstance.setLogLevels([]);
   });
 
   afterEach(() => {
@@ -82,7 +80,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
   });
 
   it('should be defined', () => {
-    expect(loadWhiteboardDataTransaction).toBeDefined();
+    expect(whiteboardUserJoinedTransaction).toBeDefined();
   });
 
   describe('execute', () => {
@@ -103,7 +101,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      await loadWhiteboardDataTransaction.execute();
+      await whiteboardUserJoinedTransaction.execute();
 
       const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
@@ -113,7 +111,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
       expect(getCasfileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
       expect(saveCasefileToCacheSpy).toHaveBeenCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(whiteboardUserJoinedTransaction.targetTopic, modifiedPayload);
     });
 
     it('should correctly load casefile data from cache if it exists', async () => {
@@ -125,7 +123,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      await loadWhiteboardDataTransaction.execute();
+      await whiteboardUserJoinedTransaction.execute();
 
       const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
@@ -136,7 +134,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
       expect(getCasfileByIdSpy).toBeCalledTimes(0);
       expect(saveCasefileToCacheSpy).toBeCalledTimes(0);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(loadWhiteboardDataTransaction.targetTopic, modifiedPayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(whiteboardUserJoinedTransaction.targetTopic, modifiedPayload);
     });
 
     xit('should throw an InternalServerException if any error occurs during the transaction', async () => {
@@ -144,18 +142,7 @@ xdescribe('LoadWhiteboardDataTransaction', () => {
         throw new Error();
       });
 
-      await expect(loadWhiteboardDataTransaction.execute()).rejects.toThrow(InternalServerErrorException);
-    });
-
-    xit('should retry query after a failed request and eventually throw an InternalServerErrorException', async () => {
-      const getCasfileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName).mockResolvedValue(null);
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-
-      // await loadWhiteboardDataTransaction.execute();
-      await expect(loadWhiteboardDataTransaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-      expect(getCasfileByIdSpy).toBeCalledTimes(loadWhiteboardDataTransaction.maxRetries + 1);
-      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+      await expect(whiteboardUserJoinedTransaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
   });
 });

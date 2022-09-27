@@ -17,10 +17,7 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     try {
       // No message body check, because it is empty on purpose and will be filled by this transaction
       const casefileId = this.messageContext.casefileId;
-      const cacheExists = (await this.cacheService.isCasefileCached(casefileId)) as number;
-      const casefileData = cacheExists
-        ? await this.cacheService.getCasefileById(casefileId)
-        : await this.handleMissingCache(casefileId);
+      const casefileData = await this.cacheService.getCasefileById(casefileId);
       if (!casefileData) {
         throw new Error(`Could not fetch data for casefile ${casefileId}`);
       }
@@ -32,13 +29,6 @@ export class LoadWhiteboardDataTransaction extends Transaction {
     }
 
     this.logger.log(`${this.logContext} Transaction successful`);
-  }
-
-  private async handleMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
-    this.logger.log(`No cache found for casefile ${casefileId}. Setting up a new cache`);
-    const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
-    await this.cacheService.saveCasefile(casefileData);
-    return casefileData;
   }
 
   private handleError(error) {

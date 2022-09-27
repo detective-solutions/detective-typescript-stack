@@ -1,4 +1,4 @@
-import { CacheService, DatabaseService } from '../../services';
+import { CacheService, DatabaseService, TransactionCoordinationService } from '../../services';
 import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
 
 import { Logger } from '@nestjs/common';
@@ -15,6 +15,7 @@ export abstract class Transaction {
   readonly transactionEventProducer: TransactionEventProducer;
   readonly cacheService: CacheService;
   readonly databaseService: DatabaseService;
+  readonly transactionCoordinationService: TransactionCoordinationService;
 
   message: IMessage<any>;
   messageContext: IMessageContext;
