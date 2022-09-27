@@ -1,4 +1,4 @@
-import { CacheService, DatabaseService, TransactionCoordinationService } from '../../services';
+import { CacheService, DatabaseService } from '../../services';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';

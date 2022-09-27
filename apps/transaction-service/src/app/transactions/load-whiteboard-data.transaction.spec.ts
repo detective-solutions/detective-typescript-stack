@@ -26,8 +26,6 @@ const databaseServiceMock = {
   [getCasefileByIdMethodName]: jest.fn(),
 };
 
-const transactionCoordinationServiceMock = {};
-
 const testMessagePayload = {
   context: {
     eventType: MessageEventType.LoadWhiteboardData,
