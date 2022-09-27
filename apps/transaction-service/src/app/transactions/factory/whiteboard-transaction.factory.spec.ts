@@ -9,8 +9,7 @@ import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// TODO: Fix test
-xdescribe('TransactionCoordinationService', () => {
+describe('TransactionCoordinationService', () => {
   let whiteboardTransactionFactory: WhiteboardTransactionFactory;
 
   beforeAll(async () => {
@@ -20,7 +19,6 @@ xdescribe('TransactionCoordinationService', () => {
         { provide: TransactionEventProducer, useValue: jest.fn() },
         { provide: CacheService, useValue: jest.fn() },
         { provide: DatabaseService, useValue: jest.fn() },
-        { provide: TransactionCoordinationService, useValue: jest.fn() },
       ],
     }).compile();
 

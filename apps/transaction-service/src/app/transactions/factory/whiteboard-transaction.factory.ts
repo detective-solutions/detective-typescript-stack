@@ -1,12 +1,11 @@
-import { CacheService, DatabaseService, TransactionCoordinationService } from '../../services';
-import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { CacheService, DatabaseService } from '../../services';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { SingleTransactionKey, TransactionKeys, transactionMap } from './transaction-map';
 
 import { IMessage } from '@detective.solutions/shared/data-access';
 import { Transaction } from '../abstract';
 import { TransactionEventProducer } from '../../events';
 import { TransactionServiceRefs } from './transaction-service-refs.type';
-import { coordinationServiceInjectionToken } from '../../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -18,15 +17,12 @@ export class WhiteboardTransactionFactory {
     transactionEventProducer: this.transactionEventProducer,
     cacheService: this.cacheService,
     databaseService: this.databaseService,
-    transactionCoordinationService: this.transactionCoordinationService,
   };
 
   constructor(
     private readonly transactionEventProducer: TransactionEventProducer,
     private readonly cacheService: CacheService,
-    private readonly databaseService: DatabaseService,
-    @Inject(coordinationServiceInjectionToken)
-    private readonly transactionCoordinationService: TransactionCoordinationService
+    private readonly databaseService: DatabaseService
   ) {}
 
   // Dynamically instantiate transaction classes based on the incoming event type

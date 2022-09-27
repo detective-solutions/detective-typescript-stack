@@ -1,4 +1,4 @@
-import { CacheService, DatabaseService, TransactionCoordinationService } from '../services';
+import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
   ITable,
@@ -74,7 +74,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
-  let transactionCoordinationService: TransactionCoordinationService;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
@@ -83,7 +82,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: TransactionCoordinationService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -94,7 +92,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       transactionEventProducer: transactionEventProducer,
       cacheService: cacheService,
       databaseService: databaseService,
-      transactionCoordinationService: transactionCoordinationService,
     };
   });
 

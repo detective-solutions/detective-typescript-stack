@@ -1,4 +1,4 @@
-import { CacheService, DatabaseService, TransactionCoordinationService } from '../services';
+import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
   IWhiteboardNodeDeleteUpdate,
@@ -48,7 +48,6 @@ describe('WhiteboardNodeDeletedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
-  let transactionCoordinationService: TransactionCoordinationService;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
@@ -57,19 +56,16 @@ describe('WhiteboardNodeDeletedTransaction', () => {
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: TransactionCoordinationService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
     transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
-    transactionCoordinationService = app.get<TransactionCoordinationService>(TransactionCoordinationService);
     serviceRefs = {
       transactionEventProducer: transactionEventProducer,
       cacheService: cacheService,
       databaseService: databaseService,
-      transactionCoordinationService: transactionCoordinationService,
     };
   });
 

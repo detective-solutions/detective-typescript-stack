@@ -1,4 +1,4 @@
-import { CacheService, DatabaseService, TransactionCoordinationService } from '../services';
+import { CacheService, DatabaseService } from '../services';
 import { ICachedCasefileForWhiteboard, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
@@ -45,7 +45,6 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
-  let transactionCoordinationService: TransactionCoordinationService;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
@@ -53,20 +52,17 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: TransactionCoordinationService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
     transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
-    transactionCoordinationService = app.get<TransactionCoordinationService>(TransactionCoordinationService);
     whiteboardUserJoinedTransaction = new WhiteboardUserJoinedTransaction(
       {
         transactionEventProducer: transactionEventProducer,
         cacheService: cacheService,
         databaseService: databaseService,
-        transactionCoordinationService: transactionCoordinationService,
       },
       testMessagePayload
     );

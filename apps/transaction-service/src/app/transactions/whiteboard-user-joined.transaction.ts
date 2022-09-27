@@ -3,7 +3,6 @@ import {
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
-  MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
@@ -29,9 +28,13 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       // First add user to cache, then trigger LOAD_CASEFILE_DATA transaction for the new user
       const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
-      this.transactionCoordinationService.createTransactionByEventType(MessageEventType.LoadWhiteboardData, {
+      const casefileData = await this.cacheService.getCasefileById(casefileId);
+      if (!casefileData) {
+        throw new Error(`Could not fetch data for casefile ${casefileId}`);
+      }
+      this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
         context: this.messageContext,
-        body: null,
+        body: casefileData,
       });
 
       // Forward user info to other clients
