@@ -3,6 +3,7 @@ import {
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
+  MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
@@ -33,7 +34,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         throw new Error(`Could not fetch data for casefile ${casefileId}`);
       }
       this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
-        context: this.messageContext,
+        context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: casefileData,
       });
 
