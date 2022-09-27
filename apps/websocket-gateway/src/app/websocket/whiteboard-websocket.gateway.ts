@@ -160,6 +160,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       }
       (info.req as any).client.context = clientContext; // Assign context to client that requests to connect
 
+      this.logger.verbose(
+        `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
+      );
+
       // Notify backend to start a WHITEBOARD_USER_JOINED transaction
       const message = {
         context: {
@@ -170,12 +174,8 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         },
         body: null,
       };
-      console.log('USER JOINED MESSAGE', message);
       this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, message);
 
-      this.logger.verbose(
-        `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
-      );
       this.logger.log(`Currently handling ${server.clients.size + 1} simultaneous client connections`);
       cb(true, 200, 'Verified');
     } else {
