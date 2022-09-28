@@ -9,22 +9,25 @@ import {
 } from '../models/';
 import { Observable, map } from 'rxjs';
 
+import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { IGetAllUsersResponse } from '../models/get-all-users-response.interface';
 import { Injectable } from '@angular/core';
-import { ProductDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class SubscriptionService {
   private static provisioningBasePath = 'http://localhost:3004/';
+  // private static provisioningBasePath = `${environment.baseApiPath}`;
   private getAllUsersWatchQuery!: QueryRef<Response>;
+
   invoice$!: Observable<IInvoiceListResponse>;
   GetAllUsersGQL: any;
 
   constructor(
-    private readonly httpClient: HttpClient, // private readonly logger: LogService
-    private readonly getAllUsersGQL: GetAllUsersGQL
+    private readonly httpClient: HttpClient,
+    private readonly getAllUsersGQL: GetAllUsersGQL,
+    private readonly authService: AuthService
   ) {}
 
   static convertAmountToCurrencyString(Amount: number, Currency: string): string {
@@ -48,89 +51,66 @@ export class SubscriptionService {
     }
   }
 
-  // 1. get tenant id for current user
-  // 2. get invoice data
-  getInvoices(): Observable<IInvoiceListResponse> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
+  getHeader(): HttpHeaders {
+    const token: string = this.authService.getAccessToken();
     const headers = new HttpHeaders().set('Authentication', token);
     headers.set('Access-Control-Allow-Origin', '*');
+    return headers;
+  }
 
+  getInvoices(): Observable<IInvoiceListResponse> {
     return this.httpClient.get<IInvoiceListResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningListInvoicesV1,
-      { headers: headers }
+      { headers: this.getHeader() }
     );
   }
 
   cancelSubscription(): Observable<{ status: boolean }> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.get<any>(SubscriptionService.provisioningBasePath + environment.provisioningCancelSubV1, {
-      headers: headers,
+      headers: this.getHeader(),
     });
   }
 
   updateSubscription(planId: string): Observable<{ status: boolean }> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.post<any>(
       SubscriptionService.provisioningBasePath + environment.provisioningUpdateSubV1,
       { planId: planId },
-      { headers: headers }
+      { headers: this.getHeader() }
     );
   }
 
   getSubscriptionPaymentMethod(): Observable<IGetSubscriptionPaymentResponse> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.get<IGetSubscriptionPaymentResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningPaymentSubV1,
       {
-        headers: headers,
+        headers: this.getHeader(),
       }
     );
   }
 
   getProductDescription(): Observable<IGetProductResponse> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.get<IGetProductResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningProductV1,
       {
-        headers: headers,
+        headers: this.getHeader(),
       }
     );
   }
 
   getAllProductPlan(): Observable<IGetAllProductResponse> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.get<IGetAllProductResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningAllProductListV1,
       {
-        headers: headers,
+        headers: this.getHeader(),
       }
     );
   }
 
   getChangePaymentPortal(): Observable<IGetChangePaymentResponse> {
-    const token: string = JSON.parse(localStorage.getItem('detective_access_token') || '');
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
     return this.httpClient.get<IGetChangePaymentResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningChangePaymentV1,
       {
-        headers: headers,
+        headers: this.getHeader(),
       }
     );
   }
