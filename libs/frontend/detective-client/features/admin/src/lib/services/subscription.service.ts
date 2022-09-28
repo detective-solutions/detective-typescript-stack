@@ -7,7 +7,7 @@ import {
   IGetSubscriptionPaymentResponse,
   IInvoiceListResponse,
 } from '../models/';
-import { Observable, map } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { IGetAllUsersResponse } from '../models/get-all-users-response.interface';

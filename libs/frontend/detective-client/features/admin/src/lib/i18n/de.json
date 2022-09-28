@@ -67,6 +67,12 @@
     "utils": {
       "of": "von",
       "users": "Nutzern"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Verbindungsdaten konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   }
 }
