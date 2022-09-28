@@ -6,6 +6,7 @@ import {
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { CacheService } from '../services';
 
 import { Transaction } from './abstract';
 
@@ -22,9 +23,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const userId = this.messageContext?.userId;
 
     try {
-      const casefileData = await this.cacheService.getCasefileById(casefileId);
+      let casefileData = await this.cacheService.getCasefileById(casefileId);
       if (!casefileData) {
-        await this.setupMissingCache(casefileId);
+        casefileData = await this.setupMissingCache(casefileId);
       }
 
       // Add connected user to cache
@@ -46,10 +47,11 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     }
   }
 
-  private async setupMissingCache(casefileId: string): Promise<void> {
+  private async setupMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
     const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
-    await this.cacheService.saveCasefile(casefileData);
+    await this.cacheService.saveCasefile({ ...casefileData, temporary: { [CacheService.ACTIVE_USERS_CACHE_KEY]: [] } });
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
+    return casefileData;
   }
 
   private handleError(nodeId: string, casefileId: string) {
