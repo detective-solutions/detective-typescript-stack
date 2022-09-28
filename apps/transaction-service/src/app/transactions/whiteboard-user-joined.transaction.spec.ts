@@ -1,5 +1,10 @@
 import { CacheService, DatabaseService } from '../services';
-import { ICachedCasefileForWhiteboard, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import {
+  ICachedCasefileForWhiteboard,
+  IUserForWhiteboard,
+  MessageEventType,
+  UserRole,
+} from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -12,13 +17,13 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const isCasefileCachedMethodName = 'isCasefileCached';
 const getCachedCasefileByIdMethodName = 'getCasefileById';
 const saveCasefileToCacheMethodName = 'saveCasefile';
+const addActiveWhiteboardUserMethodName = 'addActiveWhiteboardUser';
 const cacheServiceMock = {
-  [isCasefileCachedMethodName]: jest.fn(),
   [getCachedCasefileByIdMethodName]: jest.fn(),
   [saveCasefileToCacheMethodName]: jest.fn(),
+  [addActiveWhiteboardUserMethodName]: jest.fn(),
 };
 
 const getCasefileByIdMethodName = 'getCasefileById';
@@ -39,8 +44,7 @@ const testMessagePayload = {
   body: undefined,
 };
 
-// TODO: Fix tests
-xdescribe('WhiteboardUserJoinedTransaction', () => {
+describe('WhiteboardUserJoinedTransaction', () => {
   let whiteboardUserJoinedTransaction: WhiteboardUserJoinedTransaction;
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
@@ -79,7 +83,7 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
     expect(whiteboardUserJoinedTransaction).toBeDefined();
   });
 
-  describe('execute', () => {
+  xdescribe('execute', () => {
     const getCasefileByIdResponse: ICachedCasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
@@ -88,13 +92,26 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       embeddings: [],
       temporary: { activeUsers: [] },
     };
+    const testUserForWhiteboard: IUserForWhiteboard = {
+      id: testMessagePayload.context.userId,
+      email: 'test@test.com',
+      firstname: 'John',
+      lastname: 'Doe',
+      title: 'Data Scientist',
+      avatarUrl: 'http://localhost/testImage',
+    };
 
     it('should correctly load casefile data from database if no cache exists', async () => {
-      const isCasefileCachedSpy = jest.spyOn(cacheService, isCasefileCachedMethodName).mockResolvedValue(0);
-      const getCasfileByIdSpy = jest
+      const getCachedCasefileByIdCacheSpy = jest
+        .spyOn(cacheService, getCachedCasefileByIdMethodName)
+        .mockResolvedValue(undefined);
+      const getDatabaseCasefileByIdSpy = jest
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
+      const addActiveWhiteboardUserSpy = jest
+        .spyOn(cacheService, addActiveWhiteboardUserMethodName)
+        .mockResolvedValue(testUserForWhiteboard);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
@@ -102,16 +119,32 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       const modifiedPayload = { ...testMessagePayload };
       modifiedPayload.body = getCasefileByIdResponse;
 
-      expect(isCasefileCachedSpy).toBeCalledTimes(1);
-      expect(getCasfileByIdSpy).toBeCalledTimes(1);
-      expect(getCasfileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
+      expect(getCachedCasefileByIdCacheSpy).toBeCalledTimes(1);
+      expect(getCachedCasefileByIdCacheSpy).toBeCalledWith(testMessagePayload.context.casefileId);
+      expect(getDatabaseCasefileByIdSpy).toBeCalledTimes(1);
+      expect(getDatabaseCasefileByIdSpy).toBeCalledWith(testMessagePayload.context.casefileId);
       expect(saveCasefileToCacheSpy).toHaveBeenCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(whiteboardUserJoinedTransaction.targetTopic, modifiedPayload);
+      expect(saveCasefileToCacheSpy).toBeCalledWith(getCasefileByIdResponse);
+      expect(addActiveWhiteboardUserSpy).toBeCalledTimes(1);
+      expect(addActiveWhiteboardUserSpy).toBeCalledWith(
+        testMessagePayload.context.userId,
+        testMessagePayload.context.casefileId
+      );
+      expect(sendKafkaMessageSpy).toBeCalledTimes(2);
+      expect(sendKafkaMessageSpy).toBeCalledWith(whiteboardUserJoinedTransaction.targetTopic, {
+        context: testMessagePayload.context,
+        body: getCasefileByIdResponse,
+      });
+      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(whiteboardUserJoinedTransaction.targetTopic, {
+        context: testMessagePayload.context,
+        body: testUserForWhiteboard,
+      });
     });
 
     it('should correctly load casefile data from cache if it exists', async () => {
-      const isCasefileCachedSpy = jest.spyOn(cacheService, isCasefileCachedMethodName).mockResolvedValue(1);
+      const isCasefileCachedSpy = jest
+        .spyOn(cacheService, getCachedCasefileByIdMethodName)
+        .mockResolvedValue(getCasefileByIdResponse);
       const getCachedCasefileByIdSpy = jest
         .spyOn(cacheService, getCachedCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
@@ -134,7 +167,7 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
     });
 
     xit('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(cacheService, isCasefileCachedMethodName).mockImplementation(() => {
+      jest.spyOn(cacheService, getCachedCasefileByIdMethodName).mockImplementation(() => {
         throw new Error();
       });
 
