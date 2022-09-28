@@ -2,10 +2,10 @@ import { CacheService, DatabaseService } from '../../services';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
-import { LoadWhiteboardDataTransaction } from '../load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../../events';
 import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
+import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -39,7 +39,7 @@ describe('TransactionCoordinationService', () => {
   describe('createTransaction', () => {
     const testMessagePayload = {
       context: {
-        eventType: MessageEventType.LoadWhiteboardData,
+        eventType: MessageEventType.WhiteboardUserJoined,
         tenantId: 'tenantId',
         casefileId: 'casefileId',
         userId: 'userId',
@@ -49,15 +49,15 @@ describe('TransactionCoordinationService', () => {
       },
       body: {},
     };
-    const transactionSpy = jest.spyOn(LoadWhiteboardDataTransaction.prototype as any, 'execute').mockImplementation();
+    const transactionSpy = jest.spyOn(WhiteboardUserJoinedTransaction.prototype as any, 'execute').mockImplementation();
 
     it('should correctly create a new transaction instance if the given event type is part of the transaction map', () => {
       const transaction = whiteboardTransactionFactory.createTransaction(
-        MessageEventType.LoadWhiteboardData,
+        MessageEventType.WhiteboardUserJoined,
         testMessagePayload
       );
 
-      expect(transaction).toBeInstanceOf(LoadWhiteboardDataTransaction);
+      expect(transaction).toBeInstanceOf(WhiteboardUserJoinedTransaction);
       expect(transactionSpy).toBeCalledTimes(1);
     });
 

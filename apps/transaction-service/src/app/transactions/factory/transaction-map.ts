@@ -1,4 +1,3 @@
-import { LoadWhiteboardDataTransaction } from '../load-whiteboard-data.transaction';
 import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transaction';
 import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
@@ -13,9 +12,6 @@ import { WhiteboardUserLeftTransaction } from '../whiteboard-user-left.transacti
 
 const tempTransactionMap: any = {};
 Object.values(MessageEventType).forEach((eventType: string) => {
-  if (eventType === MessageEventType.LoadWhiteboardData) {
-    tempTransactionMap[eventType] = LoadWhiteboardDataTransaction;
-  }
   if (eventType === MessageEventType.WhiteboardUserJoined) {
     tempTransactionMap[eventType] = WhiteboardUserJoinedTransaction;
   }
