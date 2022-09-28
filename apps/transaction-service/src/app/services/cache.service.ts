@@ -6,6 +6,8 @@ import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
 export class CacheService {
+  private static ACTIVE_USERS_CACHE_KEY = 'activeUsers';
+
   readonly logger = new Logger(CacheService.name);
 
   constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {}
@@ -41,18 +43,30 @@ export class CacheService {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
     // Can't match Redis client return types with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(`.${casefileId}.active-users`) as any;
+    return this.clientService.client.json.get(`.${casefileId}.${CacheService.ACTIVE_USERS_CACHE_KEY}`) as any;
   }
 
   async addActiveWhiteboardUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
     const user = await this.databaseService.getUserById(userId);
-    this.logger.debug('USER INFO:', user);
-    const response = await this.clientService.client.json.set(casefileId, '.active-users', user);
-
+    const response = await this.clientService.client.json.set(
+      casefileId,
+      `.${CacheService.ACTIVE_USERS_CACHE_KEY}`,
+      user
+    );
     if (!response || response !== 'OK') {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
     return user;
+  }
+
+  async removeActiveWhiteboardUser(userId: string, casefileId: string) {
+    this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
+    const response = await this.clientService.client.json.del(
+      `.${casefileId}.${CacheService.ACTIVE_USERS_CACHE_KEY}.${userId}`
+    );
+    if (!response) {
+      throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
+    }
   }
 }
