@@ -22,17 +22,14 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const userId = this.messageContext?.userId;
 
     try {
-      const cacheExists = await this.cacheService.isCasefileCached(casefileId);
-      if (!cacheExists) {
+      const casefileData = await this.cacheService.getCasefileById(casefileId);
+      if (!casefileData) {
         await this.setupMissingCache(casefileId);
       }
 
-      // First add user to cache, then trigger LOAD_CASEFILE_DATA transaction for the new user
+      // Add connected user to cache
       const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
-      const casefileData = await this.cacheService.getCasefileById(casefileId);
-      if (!casefileData) {
-        throw new Error(`Could not fetch data for casefile ${casefileId}`);
-      }
+      // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: casefileData,
