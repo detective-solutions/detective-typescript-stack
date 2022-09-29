@@ -72,15 +72,17 @@ export class CacheService {
       `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
       userId
     );
+    this.logger.debug('INDEX', index);
     const response = await this.clientService.client.json.arrPop(
       casefileId,
       `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      +index
+      Number(index)
     );
     if (!response) {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
-    this.logger.debug('REMOVED USER FROM CACHE RESPONSE', response);
+    this.logger.debug('REMOVED USER FROM CACHE RESPONSE');
+    console.debug(response);
     return response;
   }
 }
