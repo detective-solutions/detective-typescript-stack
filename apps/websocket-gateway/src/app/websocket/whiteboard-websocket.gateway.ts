@@ -49,7 +49,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   }
 
   handleDisconnect(client: any) {
-    this.logger.debug('CLIENT', client);
+    this.logger.debug(client);
     this.logger.log(`${buildLogContext(client.context)} Client has disconnected`);
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
       context: client.context,
