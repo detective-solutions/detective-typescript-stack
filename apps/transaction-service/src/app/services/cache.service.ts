@@ -18,11 +18,6 @@ export class CacheService {
 
   constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {}
 
-  async isCasefileCached(casefileId: string): Promise<number> {
-    this.logger.verbose(`Checking if casefile ${casefileId} is cached already`);
-    return this.clientService.client.exists(casefileId);
-  }
-
   async saveCasefile(casefile: ICasefileForWhiteboard): Promise<ICachedCasefileForWhiteboard> {
     if (!casefile) {
       throw new InternalServerErrorException();
@@ -58,17 +53,16 @@ export class CacheService {
 
   async addActiveWhiteboardUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
-    const user = await this.databaseService.getUserById(userId);
-    const response = await this.clientService.client.json.arrAppend(
+    const whiteboardUser = await this.databaseService.getUserById(userId);
+    const response = (await this.clientService.client.json.arrAppend(
       casefileId,
       `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      user
-    );
+      whiteboardUser
+    )) as number;
     if (!response) {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
-    this.logger.debug('ADD USER TO CACHE RESPONSE', response);
-    return user;
+    return whiteboardUser;
   }
 
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
