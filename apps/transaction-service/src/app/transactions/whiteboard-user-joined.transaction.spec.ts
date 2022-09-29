@@ -108,7 +108,9 @@ describe('WhiteboardUserJoinedTransaction', () => {
       const getDatabaseCasefileByIdSpy = jest
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
-      const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
+      const saveCasefileToCacheSpy = jest
+        .spyOn(cacheService, saveCasefileToCacheMethodName)
+        .mockResolvedValue(getCasefileByIdResponse);
       const addActiveWhiteboardUserSpy = jest
         .spyOn(cacheService, addActiveWhiteboardUserMethodName)
         .mockResolvedValue(testUserForWhiteboard);

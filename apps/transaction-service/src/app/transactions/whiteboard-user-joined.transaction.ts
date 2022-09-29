@@ -1,12 +1,12 @@
 import {
   ICachedCasefileForWhiteboard,
+  ICasefileForWhiteboard,
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { CacheService } from '../services';
 
 import { Transaction } from './abstract';
 
@@ -48,10 +48,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   }
 
   private async setupMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
-    const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICachedCasefileForWhiteboard;
-    await this.cacheService.saveCasefile({ ...casefileData, temporary: { [CacheService.ACTIVE_USERS_CACHE_KEY]: [] } });
+    const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICasefileForWhiteboard;
+    const enhancedCasefile = await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
-    return casefileData;
+    return enhancedCasefile;
   }
 
   private handleError(nodeId: string, casefileId: string) {

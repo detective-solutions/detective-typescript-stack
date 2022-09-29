@@ -1,4 +1,8 @@
-import { ICachedCasefileForWhiteboard, IUserForWhiteboard } from '@detective.solutions/shared/data-access';
+import {
+  ICachedCasefileForWhiteboard,
+  ICasefileForWhiteboard,
+  IUserForWhiteboard,
+} from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { DatabaseService } from './database.service';
@@ -6,7 +10,9 @@ import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 @Injectable()
 export class CacheService {
-  static readonly ACTIVE_USERS_CACHE_KEY = 'activeUsers';
+  static readonly TEMPORARY_DATA_JSON_KEY = 'temporary';
+  static readonly ACTIVE_USERS_JSON_KEY = 'activeUsers';
+  static readonly ACTIVE_USERS_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.ACTIVE_USERS_JSON_KEY}`;
 
   readonly logger = new Logger(CacheService.name);
 
@@ -17,19 +23,23 @@ export class CacheService {
     return this.clientService.client.exists(casefileId);
   }
 
-  async saveCasefile(casefile: ICachedCasefileForWhiteboard): Promise<string> {
+  async saveCasefile(casefile: ICasefileForWhiteboard): Promise<ICachedCasefileForWhiteboard> {
     if (!casefile) {
       throw new InternalServerErrorException();
     }
     this.logger.log(`Saving casefile ${casefile?.id} to cache`);
+    const enhancedCasefile = {
+      ...casefile,
+      [CacheService.TEMPORARY_DATA_JSON_KEY]: { [CacheService.ACTIVE_USERS_JSON_KEY]: [] },
+    };
     // Can't match expected Redis client type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await this.clientService.client.json.set(casefile.id, '.', casefile as any);
+    const response = await this.clientService.client.json.set(casefile.id, '.', enhancedCasefile as any);
 
     if (!response || response !== 'OK') {
       throw new InternalServerErrorException(`Could not save casefile ${casefile.id} to cache`);
     }
-    return response;
+    return enhancedCasefile;
   }
 
   async getCasefileById(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
@@ -43,30 +53,40 @@ export class CacheService {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
     // Can't match Redis client return types with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(`${casefileId}.temporary.${CacheService.ACTIVE_USERS_CACHE_KEY}`) as any;
+    return this.clientService.client.json.get(`${casefileId}.${CacheService.ACTIVE_USERS_JSON_PATH}`) as any;
   }
 
   async addActiveWhiteboardUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user ${userId} to casefile ${casefileId}`);
     const user = await this.databaseService.getUserById(userId);
-    const response = await this.clientService.client.json.set(
+    const response = await this.clientService.client.json.arrAppend(
       casefileId,
-      `temporary.${CacheService.ACTIVE_USERS_CACHE_KEY}`,
+      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
       user
     );
-    if (!response || response !== 'OK') {
+    if (!response) {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
+    this.logger.debug('ADD USER TO CACHE RESPONSE', response);
     return user;
   }
 
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
-    const response = await this.clientService.client.json.del(
-      `${casefileId}.temporary.${CacheService.ACTIVE_USERS_CACHE_KEY}.${userId}`
+    const index = await this.clientService.client.json.arrIndex(
+      casefileId,
+      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+      userId
+    );
+    const response = await this.clientService.client.json.arrPop(
+      casefileId,
+      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+      +index
     );
     if (!response) {
       throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
     }
+    this.logger.debug('REMOVED USER FROM CACHE RESPONSE', response);
+    return response;
   }
 }

@@ -26,8 +26,8 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
       }
 
       // TODO: REMOVE ME
-      const test = await this.cacheService.getActiveWhiteboardUsersByCasefile(casefileId);
-      this.logger.debug('TEST ACTIVE USERS', test);
+      const test = await this.cacheService.getCasefileById(casefileId);
+      this.logger.debug('CURRENT CACHE', test);
 
       this.forwardMessageToOtherClients();
       const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
