@@ -12,7 +12,7 @@ export const environment = {
   provisioningListInvoicesV1: 'v1/payment/invoices',
   provisioningCancelSubV1: 'v1/subscription/cancel',
   provisioningUpdateSubV1: 'v1/subscription/update',
-  provisioningPaymentSubV1: 'v1/payment/create',
+  provisioningPaymentSubV1: 'v1/payment/card',
   provisioningProductV1: 'v1/product/info',
   provisioningAllProductListV1: 'v1/subscription/config',
   provisioningChangePaymentV1: 'v1/payment/change',
