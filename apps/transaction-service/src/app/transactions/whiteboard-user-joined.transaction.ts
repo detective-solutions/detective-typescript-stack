@@ -30,6 +30,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       // Add connected user to cache
       const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
+      // Add connected user to casefile temporary data
+      casefileData.temporary.activeUsers.push(user);
       // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
