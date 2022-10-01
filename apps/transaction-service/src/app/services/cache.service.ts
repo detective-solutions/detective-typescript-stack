@@ -69,8 +69,8 @@ export class CacheService {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
     const index = await this.clientService.client.json.arrIndex(
       casefileId,
-      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      `[?(@.id == ${userId})]`
+      `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+      `[?(@.id==${userId})]`
     );
     this.logger.debug('INDEX', index);
     const response = await this.clientService.client.json.arrPop(
