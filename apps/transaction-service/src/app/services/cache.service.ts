@@ -70,7 +70,7 @@ export class CacheService {
     const index = await this.clientService.client.json.arrIndex(
       casefileId,
       `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      `?(@.id==${userId})`
+      userId
     );
     this.logger.debug('INDEX', index);
     const response = await this.clientService.client.json.arrPop(
