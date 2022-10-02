@@ -91,8 +91,8 @@ export class CacheService {
 
   async blockWhiteboardNode(casefileId: string, nodeId: string, userId: string) {
     this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
-    const nodes = await this.getNodesByCasefile(casefileId);
-    this.logger.debug('NODES:');
-    this.logger.debug(nodes);
+    // const nodes = await this.getNodesByCasefile(casefileId);
+    // this.logger.debug('NODES:');
+    // this.logger.debug(nodes);
   }
 }
