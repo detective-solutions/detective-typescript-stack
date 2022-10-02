@@ -11,8 +11,9 @@ import {
 } from '@angular/core';
 import {
   AnyWhiteboardNode,
-  ICasefile,
+  ICachableCasefileForWhiteboard,
   IMessage,
+  IUserForWhiteboard,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
   MessageEventType,
@@ -21,7 +22,12 @@ import {
 } from '@detective.solutions/shared/data-access';
 import { EmbeddingWhiteboardNode, ForceDirectedGraph, TableWhiteboardNode } from '../../models';
 import { Subscription, combineLatest, delayWhen, filter, map, pluck, switchMap, take, tap } from 'rxjs';
-import { WhiteboardGeneralActions, WhiteboardNodeActions, selectWhiteboardContextState } from '../../state';
+import {
+  WhiteboardGeneralActions,
+  WhiteboardMetadataActions,
+  WhiteboardNodeActions,
+  selectWhiteboardContextState,
+} from '../../state';
 
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
@@ -191,10 +197,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
           pluck('body')
         )
-        .subscribe((messageData: ICasefile) => {
+        .subscribe((messageData: ICachableCasefileForWhiteboard) => {
           this.store.dispatch(
             WhiteboardGeneralActions.WhiteboardDataLoaded({
-              casefile: messageData as ICasefile,
+              casefile: messageData,
             })
           );
         })
@@ -296,6 +302,34 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               updates: updates as Update<AnyWhiteboardNode>[],
             })
           );
+        })
+    );
+
+    // Listen to WHITEBOARD_USER_JOINED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardUserJoined),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
+          this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserJoined({ user: messageData.body }));
+        })
+    );
+
+    // Listen to WHITEBOARD_USER_LEFT websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardUserLeft)))
+        .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
+          this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserLeft({ userId: messageData.context.userId }));
         })
     );
   }
