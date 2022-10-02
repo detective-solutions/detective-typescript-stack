@@ -71,7 +71,14 @@ export class DatabaseService {
       title: casefileData.title,
       description: casefileData.description,
       // TODO: Check if additional types are needed
-      nodes: [...(casefileData.tables as AnyWhiteboardNode[]), ...(casefileData.embeddings as AnyWhiteboardNode[])],
+      nodes: [
+        ...(casefileData.tables.map((node) => {
+          return { ...node, type: WhiteboardNodeType.TABLE };
+        }) as AnyWhiteboardNode[]),
+        ...(casefileData.embeddings.map((node) => {
+          return { ...node, type: WhiteboardNodeType.EMBEDDING };
+        }) as AnyWhiteboardNode[]),
+      ],
       temporary: { activeUsers: [] },
     };
     await validateDto(CachableCasefileForWhiteboardDTO, convertedCasefile, this.logger);
