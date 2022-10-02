@@ -13,8 +13,6 @@ export class CacheService {
   static readonly TEMPORARY_DATA_JSON_KEY = 'temporary';
   static readonly ACTIVE_USERS_JSON_KEY = 'activeUsers';
   static readonly ACTIVE_USERS_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.ACTIVE_USERS_JSON_KEY}`;
-  static readonly NODES_JSON_KEY = 'nodes';
-  static readonly NODES_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.NODES_JSON_KEY}`;
 
   readonly logger = new Logger(CacheService.name);
 
@@ -86,13 +84,15 @@ export class CacheService {
     this.logger.log(`Requesting nodes for casefile ${casefileId}`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId, { path: CacheService.NODES_JSON_PATH }) as any;
+    return this.clientService.client.json.get(casefileId, {
+      path: ['.tables', '.embeddings', '.pdfs', '.stickynotes'],
+    }) as any;
   }
 
   async blockWhiteboardNode(casefileId: string, nodeId: string, userId: string) {
     this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
-    // const nodes = await this.getNodesByCasefile(casefileId);
-    // this.logger.debug('NODES:');
-    // this.logger.debug(nodes);
+    const nodes = await this.getNodesByCasefile(casefileId);
+    this.logger.debug('NODES:');
+    this.logger.debug(nodes);
   }
 }
