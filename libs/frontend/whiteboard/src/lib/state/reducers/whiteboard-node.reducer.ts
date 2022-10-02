@@ -5,6 +5,7 @@ import { createReducer, on } from '@ngrx/store';
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components/node-components/table/state';
 import { createEntityAdapter } from '@ngrx/entity';
+import { serializeWhiteboardNodes } from '../../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -15,7 +16,7 @@ export const whiteboardNodeReducer = createReducer(
   on(
     WhiteboardGeneralActions.WhiteboardDataLoaded,
     (state: IWhiteboardNodeState, action: { casefile: ICachableCasefileForWhiteboard }) =>
-      whiteboardNodeEntityAdapter.setAll(action.casefile.nodes, state)
+      whiteboardNodeEntityAdapter.setAll(serializeWhiteboardNodes(action.casefile.nodes), state)
   ),
   on(WhiteboardGeneralActions.ResetWhiteboardData, (state: IWhiteboardNodeState) =>
     whiteboardNodeEntityAdapter.removeAll(state)
