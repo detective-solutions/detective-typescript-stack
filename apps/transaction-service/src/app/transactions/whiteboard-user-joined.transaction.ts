@@ -1,6 +1,5 @@
 import {
   ICachedCasefileForWhiteboard,
-  ICasefileForWhiteboard,
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
@@ -28,9 +27,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         casefileData = await this.setupMissingCache(casefileId);
       }
 
-      // Add connected user to cache
-      const user = await this.cacheService.addActiveWhiteboardUser(userId, casefileId);
-      // Add connected user to casefile temporary data
+      // Add new connected user to cache
+      const user = await this.cacheService.addActiveUser(userId, casefileId);
+      // Add new connected user to casefile temporary data
       casefileData.temporary.activeUsers.push(user);
       // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
@@ -50,7 +49,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   }
 
   private async setupMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
-    const casefileData = (await this.databaseService.getCasefileById(casefileId)) as ICasefileForWhiteboard;
+    const casefileData = await this.databaseService.getCasefileById(casefileId);
     const enhancedCasefile = await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
     return enhancedCasefile;
