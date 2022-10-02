@@ -1,4 +1,5 @@
 import {
+  AnyWhiteboardNode,
   ICachedCasefileForWhiteboard,
   ICasefileForWhiteboard,
   IUserForWhiteboard,
@@ -24,8 +25,9 @@ export class CacheService {
     // Enhance casefile with temporary object keys
     const enhancedCasefile = {
       ...casefile,
+      nodes: [...casefile.tables, ...casefile.queries, ...casefile.embeddings],
       [CacheService.TEMPORARY_DATA_JSON_KEY]: { [CacheService.ACTIVE_USERS_JSON_KEY]: [] },
-    };
+    } as ICachedCasefileForWhiteboard;
 
     // Can't match expected Redis client type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,19 +82,25 @@ export class CacheService {
     return cacheResponse;
   }
 
-  async getNodesByCasefile(casefileId: string) {
+  async getNodesByCasefile(casefileId: string): Promise<AnyWhiteboardNode[]> {
     this.logger.log(`Requesting nodes for casefile ${casefileId}`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId, {
-      path: ['.tables', '.embeddings'], // TODO: Add other applicable node types
-    }) as any;
+    return this.clientService.client.json.get(casefileId, { path: '.nodes' }) as any;
   }
 
-  async blockWhiteboardNode(casefileId: string, nodeId: string, userId: string) {
+  async updateWhiteboardNodeBlock(casefileId: string, nodeId: string, userId: string | null): Promise<boolean> {
     this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
     const nodes = await this.getNodesByCasefile(casefileId);
+
+    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
+    if (nodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node.temporary.blockedBy)) {
+      return false;
+    }
+
+    nodes.map((node: AnyWhiteboardNode) => (node.id === nodeId ? (node.temporary.blockedBy = userId) : node));
     this.logger.debug('NODES:');
     console.log(nodes);
+    return true;
   }
 }

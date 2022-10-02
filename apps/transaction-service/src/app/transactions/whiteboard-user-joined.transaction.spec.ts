@@ -87,6 +87,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
     const getCasefileByIdResponse: ICachedCasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
+      nodes: [],
       tables: [],
       queries: [],
       embeddings: [],

@@ -1,11 +1,10 @@
+import { AnyWhiteboardNode, ICachedCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components/node-components/table/state';
 import { createEntityAdapter } from '@ngrx/entity';
-import { serializeWhiteboardNodes } from '../../utils/serialize-whiteboard-nodes';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -13,11 +12,13 @@ export const whiteboardNodeEntityAdapter = createEntityAdapter<AnyWhiteboardNode
 
 export const whiteboardNodeReducer = createReducer(
   whiteboardNodeEntityAdapter.getInitialState(),
+  on(
+    WhiteboardGeneralActions.WhiteboardDataLoaded,
+    (state: IWhiteboardNodeState, action: { casefile: ICachedCasefileForWhiteboard }) =>
+      whiteboardNodeEntityAdapter.setAll(action.casefile.nodes, state)
+  ),
   on(WhiteboardGeneralActions.ResetWhiteboardData, (state: IWhiteboardNodeState) =>
     whiteboardNodeEntityAdapter.removeAll(state)
-  ),
-  on(WhiteboardGeneralActions.WhiteboardDataLoaded, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.setAll(serializeWhiteboardNodes(action.casefile), state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeAdded, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.addOne(action.addedNode, state)

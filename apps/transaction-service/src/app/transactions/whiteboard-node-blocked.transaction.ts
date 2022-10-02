@@ -21,10 +21,15 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
-      // TODO: Add check if node is already blocked!
       await validateDto(WhiteboardNodeBlockUpdateDTO, this.messageBody as IWhiteboardNodeBlockUpdate, this.logger);
-      await this.cacheService.blockWhiteboardNode(casefileId, nodeId, this.messageBody.temporary.blockedBy);
-      this.forwardMessageToOtherClients();
+      const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
+        casefileId,
+        nodeId,
+        this.messageBody.temporary.blockedBy
+      );
+      if (isBlockSuccessful) {
+        this.forwardMessageToOtherClients();
+      }
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
