@@ -67,22 +67,28 @@ export class CacheService {
 
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
-    const index = await this.clientService.client.json.arrIndex(
-      casefileId,
-      `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      userId
-    );
-    this.logger.debug('INDEX', index);
-    const response = await this.clientService.client.json.arrPop(
-      casefileId,
-      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-      Number(index)
-    );
-    if (!response) {
-      throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
-    }
-    this.logger.debug('REMOVED USER FROM CACHE RESPONSE');
-    console.debug(response);
-    return response;
+    const activeUsers = (await this.clientService.client.json.get(
+      `${casefileId}.${CacheService.ACTIVE_USERS_JSON_PATH}`
+    )) as IUserForWhiteboard[];
+    console.log('ACTIVE USERS', activeUsers);
+    // TODO: Remove user from array
+    // TODO: Set update array back to redis
+    // const index = await this.clientService.client.json.arrIndex(
+    //   casefileId,
+    //   `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+    //   userId
+    // );
+    // this.logger.debug('INDEX', index);
+    // const response = await this.clientService.client.json.arrPop(
+    //   casefileId,
+    //   `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+    //   Number(index)
+    // );
+    // if (!response) {
+    //   throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
+    // }
+    // this.logger.debug('REMOVED USER FROM CACHE RESPONSE');
+    // console.debug(response);
+    // return response;
   }
 }
