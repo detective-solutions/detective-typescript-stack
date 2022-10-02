@@ -1,5 +1,5 @@
 import {
-  ICachedCasefileForWhiteboard,
+  ICachableCasefileForWhiteboard,
   IMessage,
   IUserForWhiteboard,
   KafkaTopic,
@@ -48,11 +48,11 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     }
   }
 
-  private async setupMissingCache(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
-    const casefileData = await this.databaseService.getCasefileById(casefileId);
-    const enhancedCasefile = await this.cacheService.saveCasefile(casefileData);
+  private async setupMissingCache(casefileId: string): Promise<ICachableCasefileForWhiteboard> {
+    const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
+    await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
-    return enhancedCasefile;
+    return casefileData;
   }
 
   private handleError(nodeId: string, casefileId: string) {

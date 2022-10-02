@@ -1,5 +1,6 @@
 import {
   AnyWhiteboardNode,
+  ICachableCasefileForWhiteboard,
   ICasefileForWhiteboard,
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
@@ -8,6 +9,7 @@ import {
   IWhiteboardNodePositionUpdate,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
+import { CachableCasefileForWhiteboardDTO, CasefileForWhiteboardDTO } from '../models';
 import {
   IGetCasefileById,
   IGetUid,
@@ -19,7 +21,6 @@ import {
 import { IGetUserById, getUserByIdQuery, getUserByIdQueryName } from './queries/get-user-by-id.query';
 import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common';
 
-import { CasefileForWhiteboardDTO } from '../models';
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
 import { UserForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
@@ -36,7 +37,7 @@ export class DatabaseService {
 
   constructor(private readonly dGraphClient: DGraphGrpcClientService) {}
 
-  async getCasefileById(id: string): Promise<ICasefileForWhiteboard> | null {
+  async getCachableCasefileById(id: string): Promise<ICachableCasefileForWhiteboard> | null {
     this.logger.verbose(`Requesting data for casefile ${id}`);
 
     const queryVariables = { $id: id };
@@ -61,10 +62,21 @@ export class DatabaseService {
     }
 
     this.logger.verbose(`Received data for casefile ${id}`);
-    const casefileData = response[getCasefileByIdQueryName][0];
+    const casefileData = response[getCasefileByIdQueryName][0] as ICasefileForWhiteboard;
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
-    return casefileData;
+    // Convert ICasefileForWhiteboard to ICachableCasefileForWhiteboard
+    const convertedCasefile = {
+      id: casefileData.id,
+      title: casefileData.title,
+      description: casefileData.description,
+      // TODO: Check if additional types are needed
+      nodes: [...(casefileData.tables as AnyWhiteboardNode[]), ...(casefileData.embeddings as AnyWhiteboardNode[])],
+      temporary: { activeUsers: [] },
+    };
+    await validateDto(CachableCasefileForWhiteboardDTO, convertedCasefile, this.logger);
+
+    return convertedCasefile;
   }
 
   async getWhiteboardUserById(userId: string): Promise<IUserForWhiteboard> | null {

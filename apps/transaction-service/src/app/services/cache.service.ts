@@ -1,7 +1,6 @@
 import {
   AnyWhiteboardNode,
-  ICachedCasefileForWhiteboard,
-  ICasefileForWhiteboard,
+  ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
@@ -19,26 +18,19 @@ export class CacheService {
 
   constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {}
 
-  async saveCasefile(casefile: ICasefileForWhiteboard): Promise<ICachedCasefileForWhiteboard> {
+  async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<'OK'> {
     this.logger.log(`Saving casefile ${casefile.id} to cache`);
-
-    // Enhance casefile with temporary object keys
-    const enhancedCasefile = {
-      ...casefile,
-      nodes: [...casefile.tables, ...casefile.queries, ...casefile.embeddings],
-      [CacheService.TEMPORARY_DATA_JSON_KEY]: { [CacheService.ACTIVE_USERS_JSON_KEY]: [] },
-    } as ICachedCasefileForWhiteboard;
 
     // Can't match expected Redis client type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cacheResponse = await this.clientService.client.json.set(casefile.id, '.', enhancedCasefile as any);
+    const cacheResponse = await this.clientService.client.json.set(casefile.id, '.', casefile as any);
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not save casefile ${casefile.id} to cache`);
     }
-    return enhancedCasefile;
+    return cacheResponse;
   }
 
-  async getCasefileById(casefileId: string): Promise<ICachedCasefileForWhiteboard> {
+  async getCasefileById(casefileId: string): Promise<ICachableCasefileForWhiteboard> {
     this.logger.log(`Requesting casefile ${casefileId} data from cache`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

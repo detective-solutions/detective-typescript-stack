@@ -1,6 +1,6 @@
 import { CacheService, DatabaseService } from '../services';
 import {
-  ICachedCasefileForWhiteboard,
+  ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
   MessageEventType,
   UserRole,
@@ -26,7 +26,7 @@ const cacheServiceMock = {
   [addActiveWhiteboardUserMethodName]: jest.fn(),
 };
 
-const getCasefileByIdMethodName = 'getCasefileById';
+const getCasefileByIdMethodName = 'getCachableCasefileById';
 const databaseServiceMock = {
   [getCasefileByIdMethodName]: jest.fn(),
 };
@@ -84,13 +84,10 @@ describe('WhiteboardUserJoinedTransaction', () => {
   });
 
   xdescribe('execute', () => {
-    const getCasefileByIdResponse: ICachedCasefileForWhiteboard = {
+    const getCasefileByIdResponse: ICachableCasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
       nodes: [],
-      tables: [],
-      queries: [],
-      embeddings: [],
       temporary: { activeUsers: [] },
     };
     const testUserForWhiteboard: IUserForWhiteboard = {
@@ -109,9 +106,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
       const getDatabaseCasefileByIdSpy = jest
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
-      const saveCasefileToCacheSpy = jest
-        .spyOn(cacheService, saveCasefileToCacheMethodName)
-        .mockResolvedValue(getCasefileByIdResponse);
+      const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
       const addActiveWhiteboardUserSpy = jest
         .spyOn(cacheService, addActiveWhiteboardUserMethodName)
         .mockResolvedValue(testUserForWhiteboard);
