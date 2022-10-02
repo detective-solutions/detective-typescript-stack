@@ -48,7 +48,7 @@ export class CacheService {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
     // Can't match Redis client return types with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(`${casefileId}.${CacheService.ACTIVE_USERS_JSON_PATH}`) as any;
+    return this.clientService.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
   }
 
   async addActiveWhiteboardUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
@@ -67,9 +67,7 @@ export class CacheService {
 
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
-    const activeUsers = (await this.clientService.client.json.get(
-      `${casefileId}.${CacheService.ACTIVE_USERS_JSON_PATH}`
-    )) as IUserForWhiteboard[];
+    const activeUsers = await this.getActiveWhiteboardUsersByCasefile(casefileId);
     console.log('ACTIVE USERS', activeUsers);
     // TODO: Remove user from array
     // TODO: Set update array back to redis
