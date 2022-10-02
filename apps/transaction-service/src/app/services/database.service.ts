@@ -67,7 +67,7 @@ export class DatabaseService {
     return casefileData;
   }
 
-  async getUserById(userId: string): Promise<IUserForWhiteboard> | null {
+  async getWhiteboardUserById(userId: string): Promise<IUserForWhiteboard> | null {
     this.logger.log(`Requesting info for user ${userId} from database`);
 
     const queryVariables = { $id: userId };

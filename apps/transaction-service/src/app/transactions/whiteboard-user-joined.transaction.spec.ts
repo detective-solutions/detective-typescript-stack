@@ -19,7 +19,7 @@ const transactionEventProducerMock = {
 
 const getCachedCasefileByIdMethodName = 'getCasefileById';
 const saveCasefileToCacheMethodName = 'saveCasefile';
-const addActiveWhiteboardUserMethodName = 'addActiveWhiteboardUser';
+const addActiveWhiteboardUserMethodName = 'addActiveUser';
 const cacheServiceMock = {
   [getCachedCasefileByIdMethodName]: jest.fn(),
   [saveCasefileToCacheMethodName]: jest.fn(),
