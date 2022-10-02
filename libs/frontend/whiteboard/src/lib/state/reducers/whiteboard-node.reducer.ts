@@ -1,4 +1,4 @@
-import { AnyWhiteboardNode, ICachedCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, ICachableCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
@@ -14,7 +14,7 @@ export const whiteboardNodeReducer = createReducer(
   whiteboardNodeEntityAdapter.getInitialState(),
   on(
     WhiteboardGeneralActions.WhiteboardDataLoaded,
-    (state: IWhiteboardNodeState, action: { casefile: ICachedCasefileForWhiteboard }) =>
+    (state: IWhiteboardNodeState, action: { casefile: ICachableCasefileForWhiteboard }) =>
       whiteboardNodeEntityAdapter.setAll(action.casefile.nodes, state)
   ),
   on(WhiteboardGeneralActions.ResetWhiteboardData, (state: IWhiteboardNodeState) =>
