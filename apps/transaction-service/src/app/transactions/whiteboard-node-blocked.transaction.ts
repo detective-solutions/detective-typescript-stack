@@ -21,6 +21,7 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
+      console.debug('BLOCK MESSAGE PAYLOAD', this.messageBody);
       await validateDto(WhiteboardNodeBlockUpdateDTO, this.messageBody as IWhiteboardNodeBlockUpdate, this.logger);
       const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
         casefileId,
