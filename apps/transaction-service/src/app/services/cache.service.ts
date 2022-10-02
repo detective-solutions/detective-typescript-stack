@@ -13,6 +13,8 @@ export class CacheService {
   static readonly TEMPORARY_DATA_JSON_KEY = 'temporary';
   static readonly ACTIVE_USERS_JSON_KEY = 'activeUsers';
   static readonly ACTIVE_USERS_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.ACTIVE_USERS_JSON_KEY}`;
+  static readonly NODES_JSON_KEY = 'nodes';
+  static readonly NODES_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.NODES_JSON_KEY}`;
 
   readonly logger = new Logger(CacheService.name);
 
@@ -44,7 +46,7 @@ export class CacheService {
   }
 
   async getActiveUsersByCasefile(casefileId: string): Promise<IUserForWhiteboard[]> {
-    this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
+    this.logger.log(`Requesting active users for casefile ${casefileId}`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.clientService.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
@@ -65,7 +67,7 @@ export class CacheService {
     return whiteboardUser;
   }
 
-  async removeActiveUser(userId: string, casefileId: string) {
+  async removeActiveUser(userId: string, casefileId: string): Promise<'OK'> {
     this.logger.log(`Removing active user ${userId} from casefile ${casefileId}`);
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
@@ -78,5 +80,19 @@ export class CacheService {
       throw new InternalServerErrorException(`Could not remove active user ${userId} from casefile ${casefileId}`);
     }
     return cacheResponse;
+  }
+
+  async getNodesByCasefile(casefileId: string) {
+    this.logger.log(`Requesting nodes for casefile ${casefileId}`);
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.clientService.client.json.get(casefileId, { path: CacheService.NODES_JSON_PATH }) as any;
+  }
+
+  async blockWhiteboardNode(casefileId: string, nodeId: string, userId: string) {
+    this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
+    const nodes = await this.getNodesByCasefile(casefileId);
+    this.logger.debug('NODES:');
+    this.logger.debug(nodes);
   }
 }

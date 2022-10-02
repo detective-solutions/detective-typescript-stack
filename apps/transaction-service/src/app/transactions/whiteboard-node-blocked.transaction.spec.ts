@@ -39,7 +39,7 @@ const testMessagePayload: IMessage<IWhiteboardNodeBlockUpdate> = {
   body: testWhiteboardNodeUpdate,
 };
 
-describe('WhiteboardNodeBlockedTransaction', () => {
+xdescribe('WhiteboardNodeBlockedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
