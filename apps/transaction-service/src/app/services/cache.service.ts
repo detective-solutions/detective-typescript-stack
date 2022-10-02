@@ -67,9 +67,9 @@ export class CacheService {
 
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
-    const activeUsers = await this.getActiveWhiteboardUsersByCasefile(casefileId);
+    let activeUsers = await this.getActiveWhiteboardUsersByCasefile(casefileId);
     console.log('ACTIVE USERS BEFORE', activeUsers);
-    activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
+    activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
     console.log('ACTIVE USERS AFTER', activeUsers);
     const response = await this.clientService.client.json.set(
       casefileId,
