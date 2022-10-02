@@ -85,7 +85,7 @@ export class CacheService {
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.clientService.client.json.get(casefileId, {
-      path: ['.tables', '.embeddings', '.pdfs', '.stickynotes'],
+      path: ['.tables'], // TODO: Add other applicable node types
     }) as any;
   }
 
