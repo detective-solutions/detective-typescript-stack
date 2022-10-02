@@ -85,7 +85,7 @@ export class CacheService {
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.clientService.client.json.get(casefileId, {
-      path: ['.tables'], // TODO: Add other applicable node types
+      path: ['.tables', '.embeddings'], // TODO: Add other applicable node types
     }) as any;
   }
 
@@ -93,6 +93,6 @@ export class CacheService {
     this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
     const nodes = await this.getNodesByCasefile(casefileId);
     this.logger.debug('NODES:');
-    this.logger.debug(nodes);
+    console.log(nodes);
   }
 }
