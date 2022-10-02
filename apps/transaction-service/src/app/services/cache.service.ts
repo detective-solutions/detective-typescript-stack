@@ -44,7 +44,7 @@ export class CacheService {
     return this.clientService.client.json.get(casefileId) as any;
   }
 
-  async getActiveWhiteboardUsersByCasefile(casefileId: string): Promise<IUserForWhiteboard> {
+  async getActiveWhiteboardUsersByCasefile(casefileId: string): Promise<IUserForWhiteboard[]> {
     this.logger.log(`Requesting active connection information for casefile ${casefileId} from cache`);
     // Can't match Redis client return types with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,25 +68,19 @@ export class CacheService {
   async removeActiveWhiteboardUser(userId: string, casefileId: string) {
     this.logger.log(`Remove active user ${userId} from casefile ${casefileId}`);
     const activeUsers = await this.getActiveWhiteboardUsersByCasefile(casefileId);
-    console.log('ACTIVE USERS', activeUsers);
-    // TODO: Remove user from array
-    // TODO: Set update array back to redis
-    // const index = await this.clientService.client.json.arrIndex(
-    //   casefileId,
-    //   `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-    //   userId
-    // );
-    // this.logger.debug('INDEX', index);
-    // const response = await this.clientService.client.json.arrPop(
-    //   casefileId,
-    //   `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
-    //   Number(index)
-    // );
-    // if (!response) {
-    //   throw new InternalServerErrorException(`Could not join new user to cache for casefile ${casefileId}`);
-    // }
-    // this.logger.debug('REMOVED USER FROM CACHE RESPONSE');
-    // console.debug(response);
-    // return response;
+    console.log('ACTIVE USERS BEFORE', activeUsers);
+    activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
+    console.log('ACTIVE USERS AFTER', activeUsers);
+    const response = await this.clientService.client.json.set(
+      casefileId,
+      CacheService.ACTIVE_USERS_JSON_PATH,
+      activeUsers
+    );
+    if (!response) {
+      throw new InternalServerErrorException(`Could not remove user (${userId}) from casefile cache (${casefileId})`);
+    }
+    this.logger.debug('REMOVED USER FROM CACHE RESPONSE');
+    console.debug(response);
+    return response;
   }
 }
