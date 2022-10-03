@@ -13,6 +13,7 @@ export class CacheService {
   static readonly TEMPORARY_DATA_JSON_KEY = 'temporary';
   static readonly ACTIVE_USERS_JSON_KEY = 'activeUsers';
   static readonly ACTIVE_USERS_JSON_PATH = `${CacheService.TEMPORARY_DATA_JSON_KEY}.${CacheService.ACTIVE_USERS_JSON_KEY}`;
+  static readonly NODES_PATH = '.nodes';
 
   readonly logger = new Logger(CacheService.name);
 
@@ -78,20 +79,20 @@ export class CacheService {
     this.logger.log(`Requesting nodes for casefile ${casefileId}`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId, { path: '.nodes' }) as any;
+    return this.clientService.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
   }
 
   async updateWhiteboardNodeBlock(casefileId: string, nodeId: string, userId: string | null): Promise<boolean> {
     this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
-    const nodes = await this.getNodesByCasefile(casefileId);
 
+    const nodes = await this.getNodesByCasefile(casefileId);
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
     if (nodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy)) {
       return false;
     }
-
+    // Update blockedBy property
     nodes.map((node: AnyWhiteboardNode) => (node.id === nodeId ? (node.temporary = { blockedBy: userId }) : node));
-    this.logger.debug('NODES:');
+
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.clientService.client.json.set(casefileId, '.nodes', nodes as any);

@@ -2,8 +2,6 @@ import { IMessage, IWhiteboardNodeBlockUpdate, KafkaTopic } from '@detective.sol
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
-import { WhiteboardNodeBlockUpdateDTO } from '../models';
-import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 export class WhiteboardNodeBlockedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeBlockedTransaction.name);
@@ -21,7 +19,6 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
-      await validateDto(WhiteboardNodeBlockUpdateDTO, this.messageBody as IWhiteboardNodeBlockUpdate, this.logger);
       const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
         casefileId,
         nodeId,
