@@ -27,6 +27,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         casefileData = await this.setupMissingCache(casefileId);
       }
 
+      console.debug('CASEFILE DATA');
+      console.debug(casefileData);
+
       // Add new connected user to cache
       const user = await this.cacheService.addActiveUser(userId, casefileId);
       // Add new connected user to casefile temporary data
