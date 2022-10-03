@@ -72,12 +72,16 @@ export class DatabaseService {
       description: casefileData.description,
       // TODO: Check if additional types are needed
       nodes: [
-        ...(casefileData?.tables?.map((node) => {
-          return { ...node, type: WhiteboardNodeType.TABLE };
-        }) as AnyWhiteboardNode[]),
-        ...(casefileData?.embeddings?.map((node) => {
-          return { ...node, type: WhiteboardNodeType.EMBEDDING };
-        }) as AnyWhiteboardNode[]),
+        ...(casefileData.tables
+          ? (casefileData.tables.map((node) => {
+              return { ...node, type: WhiteboardNodeType.TABLE };
+            }) as AnyWhiteboardNode[])
+          : []),
+        ...(casefileData.embeddings
+          ? (casefileData?.embeddings?.map((node) => {
+              return { ...node, type: WhiteboardNodeType.EMBEDDING };
+            }) as AnyWhiteboardNode[])
+          : []),
       ],
       temporary: { activeUsers: [] },
     };
