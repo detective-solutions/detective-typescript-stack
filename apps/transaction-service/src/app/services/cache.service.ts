@@ -90,8 +90,11 @@ export class CacheService {
       return false;
     }
 
-    nodes.map((node: AnyWhiteboardNode) => (node.id === nodeId ? (node.temporary.blockedBy = userId) : node));
+    nodes.map((node: AnyWhiteboardNode) => (node.id === nodeId ? (node.temporary = { blockedBy: userId }) : node));
     this.logger.debug('NODES:');
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.clientService.client.json.set(casefileId, '.nodes', nodes as any);
     console.log(nodes);
     return true;
   }
