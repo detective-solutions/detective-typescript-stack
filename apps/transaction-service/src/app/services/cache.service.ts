@@ -50,7 +50,7 @@ export class CacheService {
     const whiteboardUser = await this.databaseService.getWhiteboardUserById(userId);
     const cacheResponse = await this.clientService.client.json.arrAppend(
       casefileId,
-      `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
       whiteboardUser
     );
     // 0 or 1
