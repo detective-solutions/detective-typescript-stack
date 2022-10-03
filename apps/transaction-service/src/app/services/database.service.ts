@@ -65,6 +65,9 @@ export class DatabaseService {
     const casefileData = response[getCasefileByIdQueryName][0] as ICasefileForWhiteboard;
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
+    console.debug('CASEFILE DATA');
+    console.debug(casefileData);
+
     // Convert ICasefileForWhiteboard to ICachableCasefileForWhiteboard
     const convertedCasefile = {
       id: casefileData.id,
@@ -72,10 +75,10 @@ export class DatabaseService {
       description: casefileData.description,
       // TODO: Check if additional types are needed
       nodes: [
-        ...(casefileData.tables.map((node) => {
+        ...(casefileData?.tables.map((node) => {
           return { ...node, type: WhiteboardNodeType.TABLE };
         }) as AnyWhiteboardNode[]),
-        ...(casefileData.embeddings.map((node) => {
+        ...(casefileData?.embeddings.map((node) => {
           return { ...node, type: WhiteboardNodeType.EMBEDDING };
         }) as AnyWhiteboardNode[]),
       ],
