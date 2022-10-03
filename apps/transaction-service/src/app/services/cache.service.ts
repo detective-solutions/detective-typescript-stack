@@ -50,20 +50,22 @@ export class CacheService {
     const whiteboardUser = await this.databaseService.getWhiteboardUserById(userId);
     const cacheResponse = await this.clientService.client.json.arrAppend(
       casefileId,
-      `$.${CacheService.ACTIVE_USERS_JSON_PATH}`,
+      `.${CacheService.ACTIVE_USERS_JSON_PATH}`,
       whiteboardUser
     );
     // 0 or 1
     if (!cacheResponse) {
-      throw new InternalServerErrorException(`Could not add active user to casefile ${casefileId}`);
+      throw new InternalServerErrorException(`Could not add active user ${userId} to casefile ${casefileId}`);
     }
     return whiteboardUser;
   }
 
   async removeActiveUser(userId: string, casefileId: string): Promise<'OK'> {
     this.logger.log(`Removing active user ${userId} from casefile ${casefileId}`);
+
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
+
     const cacheResponse = await this.clientService.client.json.set(
       casefileId,
       CacheService.ACTIVE_USERS_JSON_PATH,
@@ -72,6 +74,7 @@ export class CacheService {
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not remove active user ${userId} from casefile ${casefileId}`);
     }
+
     return cacheResponse;
   }
 
@@ -97,5 +100,35 @@ export class CacheService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, nodes as any);
     return true;
+  }
+
+  async addNode(casefileId: string, node: AnyWhiteboardNode): Promise<void> {
+    this.logger.log(`Adding node ${node?.id} to casefile ${casefileId}`);
+
+    const cacheResponse = await this.clientService.client.json.arrAppend(
+      casefileId,
+      CacheService.NODES_PATH,
+      node as any
+    );
+    // 0 or 1
+    if (!cacheResponse) {
+      throw new InternalServerErrorException(`Could not add node ${node?.id} to casefile ${casefileId}`);
+    }
+  }
+
+  async deleteNode(casefileId: string, nodeId: string): Promise<'OK'> {
+    this.logger.log(`Deleting node ${nodeId} from casefile ${casefileId}`);
+
+    let nodes = await this.getNodesByCasefile(casefileId);
+    nodes = nodes.filter((node: AnyWhiteboardNode) => node.id !== nodeId);
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cacheResponse = await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, nodes as any);
+    if (cacheResponse !== 'OK') {
+      throw new InternalServerErrorException(`Could not remove node ${nodeId} from casefile ${casefileId}`);
+    }
+
+    return cacheResponse;
   }
 }

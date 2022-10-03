@@ -27,13 +27,10 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
+      // TODO: Remove type from DTO
       await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
       this.forwardMessageToOtherClients();
-
-      const response = await this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
-      if (!response) {
-        this.handleError(casefileId, deletedNode.type);
-      }
+      await this.cacheService.deleteNode(casefileId, deletedNode.id);
 
       this.logger.log(`${this.logContext} Transaction successful`);
       this.logger.verbose(
