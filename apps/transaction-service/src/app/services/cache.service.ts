@@ -64,6 +64,7 @@ export class CacheService {
     this.logger.log(`Removing active user ${userId} from casefile ${casefileId}`);
 
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
+    console.debug('ACTIVE USERS', activeUsers);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
     const cacheResponse = await this.clientService.client.json.set(
@@ -105,6 +106,8 @@ export class CacheService {
   async addNode(casefileId: string, node: AnyWhiteboardNode): Promise<void> {
     this.logger.log(`Adding node ${node?.id} to casefile ${casefileId}`);
 
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cacheResponse = await this.clientService.client.json.arrAppend(
       casefileId,
       CacheService.NODES_PATH,
