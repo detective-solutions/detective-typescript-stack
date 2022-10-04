@@ -20,15 +20,11 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
-      // TODO: Add check if nodes are already blocked, if so abort position update
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
 
-      // TODO: REMOVE ME
-      const test = await this.cacheService.getCasefileById(casefileId);
-      this.logger.debug('CURRENT CACHE', test);
-
+      await this.cacheService.updateNodePositions(this.messageBody, this.messageContext);
       this.forwardMessageToOtherClients();
       const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
       if (!response) {

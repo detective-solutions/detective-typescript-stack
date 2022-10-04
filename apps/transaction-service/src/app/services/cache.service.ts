@@ -1,7 +1,9 @@
 import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
+  IMessageContext,
   IUserForWhiteboard,
+  IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
@@ -85,8 +87,37 @@ export class CacheService {
     return this.clientService.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
   }
 
+  async updateNodePositions(updates: IWhiteboardNodePositionUpdate[], context: IMessageContext) {
+    this.logger.log(`Update position of whiteboard node "${context.nodeId}" in casefile "${context.casefileId}"`);
+
+    // TODO: Check if nodes are already blocked, if so abort position update
+    const nodes = await this.getNodesByCasefile(context.casefileId);
+    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
+    if (
+      nodes.some(
+        (node: AnyWhiteboardNode) => node.id === context.nodeId && node?.temporary?.blockedBy === context.userId
+      )
+    ) {
+      return false;
+    }
+
+    updates.forEach((update: IWhiteboardNodePositionUpdate) => {
+      nodes.map((node: AnyWhiteboardNode) => {
+        if (node.id === update.id) {
+          node.x = update.x;
+          node.y = update.y;
+        }
+      });
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.clientService.client.json.set(context.casefileId, CacheService.NODES_PATH, nodes as any);
+    return true;
+  }
+
   async updateWhiteboardNodeBlock(casefileId: string, nodeId: string, userId: string | null): Promise<boolean> {
-    this.logger.log(`Mark whiteboard node ${nodeId} as blocked by user ${userId}`);
+    this.logger.log(`Mark whiteboard node "${nodeId}" as blocked by user "${userId}"`);
 
     const nodes = await this.getNodesByCasefile(casefileId);
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
