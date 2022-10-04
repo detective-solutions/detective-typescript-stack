@@ -15,8 +15,12 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     if (!this.messageBody) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
-    const nodeId = this.messageContext?.nodeId;
+    if (!this.messageContext.nodeId) {
+      throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
+    }
+
     const casefileId = this.messageContext.casefileId;
+    const nodeId = this.messageContext?.nodeId;
 
     try {
       const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
