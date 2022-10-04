@@ -64,7 +64,6 @@ export class CacheService {
     this.logger.log(`Removing active user ${userId} from casefile ${casefileId}`);
 
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
-    console.debug('ACTIVE USERS', activeUsers);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
     const cacheResponse = await this.clientService.client.json.set(
@@ -94,13 +93,35 @@ export class CacheService {
     if (nodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy)) {
       return false;
     }
+
     // Update blockedBy property
-    nodes.map((node: AnyWhiteboardNode) => (node.id === nodeId ? (node.temporary = { blockedBy: userId }) : node));
+    nodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === nodeId) {
+        node.temporary = { blockedBy: userId };
+      }
+    });
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, nodes as any);
     return true;
+  }
+
+  async unblockAllWhiteboardNodesByUserId(casefileId: string, userId: string) {
+    this.logger.log(`Unblock all whiteboard nodes for user ${userId} in casefile ${casefileId}`);
+
+    const nodes = await this.getNodesByCasefile(casefileId);
+
+    // Unblock all nodes by user id
+    nodes.forEach((node: AnyWhiteboardNode) => {
+      if (node?.temporary?.blockedBy === userId) {
+        node.temporary = { blockedBy: null };
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, nodes as any);
   }
 
   async addNode(casefileId: string, node: AnyWhiteboardNode): Promise<void> {

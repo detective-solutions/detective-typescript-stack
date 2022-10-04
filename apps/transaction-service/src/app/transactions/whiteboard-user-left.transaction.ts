@@ -13,11 +13,12 @@ export class WhiteboardUserLeftTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     const casefileId = this.messageContext.casefileId;
-    const userId = this.messageContext?.userId;
+    const userId = this.messageContext.userId;
 
     try {
-      await this.cacheService.removeActiveUser(userId, casefileId);
       this.forwardMessageToOtherClients();
+      await this.cacheService.removeActiveUser(userId, casefileId);
+      await this.cacheService.unblockAllWhiteboardNodesByUserId(casefileId, userId);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
