@@ -28,6 +28,7 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
         nodeId,
         this.messageBody?.temporary?.blockedBy ?? null
       );
+      console.log('IS BLOCK SUCCESSFUL', isBlockSuccessful);
       if (isBlockSuccessful) {
         this.forwardMessageToOtherClients();
       }
