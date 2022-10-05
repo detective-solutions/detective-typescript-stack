@@ -176,11 +176,11 @@ export class CacheService {
     let cachedNodes = await this.getNodesByCasefile(casefileId);
     cachedNodes = cachedNodes.filter((node: AnyWhiteboardNode) => node.id !== nodeId);
 
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cacheResponse = await this.clientService.client.json.set(
       casefileId,
       CacheService.NODES_PATH,
+      // Can't match Redis client return type with domain type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cachedNodes as any
     );
     if (cacheResponse !== 'OK') {
