@@ -39,6 +39,9 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeBlockedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
+  on(WhiteboardNodeActions.WhiteboardUnblockAllNodesOnUserLeft, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
+  ),
   on(WhiteboardNodeActions.WhiteboardNodeUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),

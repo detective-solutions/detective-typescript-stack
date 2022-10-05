@@ -19,3 +19,16 @@ export const selectAllWhiteboardNodes = createSelector(selectWhiteboardNodeState
 );
 export const selectWhiteboardNodeById = (id: string) =>
   createSelector(selectWhiteboardNodeEntities, (entities: Dictionary<AnyWhiteboardNode>) => entities[id]);
+
+export const selectWhiteboardNodesBlockedByUserId = (userId: string) =>
+  createSelector(selectWhiteboardNodeEntities, (entities: Dictionary<AnyWhiteboardNode>) => {
+    const blockedNodes: string[] = [];
+    Object.entries(entities).forEach(([key, value]) => {
+      if (value) {
+        if (value.temporary?.blockedBy === userId) {
+          blockedNodes.push(key);
+        }
+      }
+    });
+    return blockedNodes;
+  });

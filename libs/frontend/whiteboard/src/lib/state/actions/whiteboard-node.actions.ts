@@ -50,6 +50,11 @@ export const WhiteboardNodeBlockedRemotely = createAction(
   props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
 );
 
+export const WhiteboardUnblockAllNodesOnUserLeft = createAction(
+  `${actionPrefix} Unblocking all nodes blocked by a user that left`,
+  props<{ updates: Update<IWhiteboardNodeBlockUpdate>[] }>()
+);
+
 export const WhiteboardNodesPositionUpdated = createAction(
   `${actionPrefix} Node positions updated`,
   props<{ updates: Update<IWhiteboardNodePositionUpdate>[] }>()

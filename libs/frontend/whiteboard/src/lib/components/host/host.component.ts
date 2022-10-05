@@ -27,6 +27,7 @@ import {
   WhiteboardMetadataActions,
   WhiteboardNodeActions,
   selectWhiteboardContextState,
+  selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
 import { Store } from '@ngrx/store';
@@ -266,6 +267,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           map(([messageData, _context]) => messageData)
         )
         .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
+          console.log('DISPATCHING BLOCK ACTION');
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
@@ -330,6 +332,20 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardUserLeft)))
         .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserLeft({ userId: messageData.context.userId }));
+
+          // Unblock all nodes that are still blocked by the user that left
+          this.store
+            .select(selectWhiteboardNodesBlockedByUserId(messageData.context.userId))
+            .pipe(take(1))
+            .subscribe((blockedNodeIds: string[]) => {
+              this.store.dispatch(
+                WhiteboardNodeActions.WhiteboardUnblockAllNodesOnUserLeft({
+                  updates: blockedNodeIds.map((nodeId: string) => {
+                    return { id: nodeId, changes: { temporary: { blockedBy: null } } };
+                  }) as Update<IWhiteboardNodeBlockUpdate>[],
+                })
+              );
+            });
         })
     );
   }
