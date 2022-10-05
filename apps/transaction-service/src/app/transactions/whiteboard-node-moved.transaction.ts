@@ -23,13 +23,12 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
 
     const casefileId = this.messageContext.casefileId;
     const userId = this.messageContext.userId;
-    const nodeId = this.messageContext.nodeId;
 
     try {
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
-      await this.cacheService.updateNodePositions(casefileId, userId, nodeId, this.messageBody);
+      await this.cacheService.updateNodePositions(casefileId, userId, this.messageBody);
       this.forwardMessageToOtherClients();
       this.logger.log(`${this.logContext} Transaction successful`);
       this.logger.verbose(`Node positions were successfully updated in casefile "${casefileId}"`);

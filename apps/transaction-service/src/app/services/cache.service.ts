@@ -92,14 +92,17 @@ export class CacheService {
   async updateNodePositions(
     casefileId: string,
     userId: string,
-    nodeId: string,
     positionUpdates: IWhiteboardNodePositionUpdate[]
   ): Promise<boolean> {
-    this.logger.log(`Update position of whiteboard node "${nodeId}" in casefile "${casefileId}"`);
+    this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
+    if (
+      positionUpdates.some((update: IWhiteboardNodePositionUpdate) =>
+        cachedNodes.some((node: AnyWhiteboardNode) => node.id === update.id && node?.temporary?.blockedBy === userId)
+      )
+    ) {
       return false;
     }
 
