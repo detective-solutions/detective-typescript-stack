@@ -267,7 +267,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           map(([messageData, _context]) => messageData)
         )
         .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
-          console.log('DISPATCHING BLOCK ACTION');
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
