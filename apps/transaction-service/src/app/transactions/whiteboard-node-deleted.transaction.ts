@@ -1,14 +1,7 @@
-import {
-  AnyWhiteboardNode,
-  IMessage,
-  IWhiteboardNodeDeleteUpdate,
-  KafkaTopic,
-} from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
-import { WhiteboardNodeDeleteUpdateDTO } from '../models';
-import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 export class WhiteboardNodeDeletedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeDeletedTransaction.name);
@@ -22,20 +15,22 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
     if (!this.messageBody) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
+    if (!this.messageContext.nodeId) {
+      throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
+    }
 
-    const deletedNode = this.messageBody as IWhiteboardNodeDeleteUpdate;
     const casefileId = this.messageContext.casefileId;
+    const nodeId = this.messageContext.nodeId;
 
     try {
-      await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
       this.forwardMessageToOtherClients();
-      await this.cacheService.deleteNode(casefileId, deletedNode.id);
+      await this.cacheService.deleteNode(casefileId, nodeId);
 
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(`Node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`);
+      this.logger.verbose(`Node "${nodeId}" was successfully deleted from casefile "${casefileId}"`);
     } catch (error) {
       this.logger.error(error);
-      this.handleError(casefileId, deletedNode.id);
+      this.handleError(casefileId, nodeId);
     }
   }
 

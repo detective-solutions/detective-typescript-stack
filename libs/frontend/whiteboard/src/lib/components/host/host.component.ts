@@ -246,7 +246,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe(([messageData, _context]) => {
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
-              deletedNode: messageData.body as AnyWhiteboardNode,
+              deletedNode: messageData.context.nodeId as AnyWhiteboardNode,
             })
           );
         })
