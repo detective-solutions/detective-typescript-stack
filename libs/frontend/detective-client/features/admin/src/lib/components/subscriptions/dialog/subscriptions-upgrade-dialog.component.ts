@@ -1,8 +1,8 @@
 /* eslint-disable sort-imports */
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { SubscriptionService } from '../../../services';
@@ -11,13 +11,22 @@ import { IGetAllProductResponse } from '../../../models';
 
 @Component({
   selector: 'subscriptions-upgrade-dialog',
-  styleUrls: ['subscriptions-upgrade-dialog.component.scss'],
-  templateUrl: 'subscriptions-upgrade-dialog.component.html',
+  styleUrls: ['./subscriptions-upgrade-dialog.component.scss'],
+  templateUrl: './subscriptions-upgrade-dialog.component.html',
 })
-export class SubscriptionUpgradeDialogComponent implements OnInit {
+export class SubscriptionUpgradeDialogComponent {
   isSubmitting = false;
   selectedPlan = '';
-  availablePlans$!: Observable<IGetAllProductResponse>;
+
+  availablePlans$: Observable<IGetAllProductResponse> = this.subscriptionService.getAllProductPlan().pipe(
+    map((response: IGetAllProductResponse) => {
+      return {
+        prices: response.prices || [],
+      };
+    })
+  );
+
+  @ViewChildren('upgradeCard', { read: ElementRef }) upgradeCards!: QueryList<ElementRef>;
 
   constructor(
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
@@ -28,31 +37,23 @@ export class SubscriptionUpgradeDialogComponent implements OnInit {
     private readonly logger: LogService
   ) {}
 
-  ngOnInit() {
-    this.availablePlans$ = this.subscriptionService.getAllProductPlan().pipe(
-      map((response: IGetAllProductResponse) => {
-        return {
-          prices: response.prices || [],
-        };
-      })
-    );
-  }
-
   closeModal() {
     this.dialogRef.close();
   }
 
   lockUpgrade(planId: string) {
     this.selectedPlan = planId;
-    document.querySelectorAll('.mat-card')?.forEach((element) => {
-      element.classList.remove('selected-plan');
+    this.upgradeCards.forEach((card) => {
+      const cardElement = card.nativeElement;
+      if (cardElement.id === this.selectedPlan) {
+        cardElement.classList.add('selected-plan');
+      } else {
+        cardElement.classList.remove('selected-plan');
+      }
     });
-
-    const locked = document.getElementById(planId);
-    locked?.classList.add('selected-plan');
   }
 
-  getPriceTag(amount: number, currency: string, iteration: string) {
+  getPriceTag(amount: number, currency: string, iteration: string): string {
     return `${SubscriptionService.convertAmountToCurrencyString(amount, currency)} / ${iteration}`;
   }
 
@@ -60,17 +61,28 @@ export class SubscriptionUpgradeDialogComponent implements OnInit {
     this.subscriptionService
       .updateSubscription(this.selectedPlan)
       .pipe(take(1))
-      .subscribe((subscriptionState: any) => console.log(subscriptionState));
+      .subscribe((subscriptionState: StatusResponse) => {
+        this.handleResponse('update subscription', subscriptionState);
+      });
     this.dialogRef.close();
   }
-  private handleError(error: Error) {
-    this.logger.error('Encountered an error while submitting connection deletion request');
-    console.error(error);
+
+  private handleResponse(actionName: string, response: StatusResponse) {
+    let toastMsg = 'actionFailed';
+    let toastType = ToastType.ERROR;
+
+    if (response.status) {
+      toastMsg = 'actionSuccessful';
+      toastType = ToastType.INFO;
+      this.logger.info(`${actionName}: ${response.status}`);
+    } else {
+      this.logger.error(`${actionName}: ${response.status}`);
+    }
     this.translationService
-      .selectTranslate('connections.toastMessages.formSubmitError', {}, this.translationScope)
+      .selectTranslate(`subscriptions.toastMessages.${toastMsg}`, {}, this.translationScope)
       .pipe(take(1))
       .subscribe((translation: string) => {
-        this.toastService.showToast(translation, 'Close', ToastType.ERROR);
+        this.toastService.showToast(translation, 'Close', toastType);
       });
     this.dialogRef.close();
   }

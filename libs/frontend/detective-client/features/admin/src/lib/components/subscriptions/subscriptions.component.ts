@@ -33,9 +33,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 export class SubscriptionsComponent implements OnInit, OnDestroy {
   readonly pageSize = 10;
 
-  readonly activeUsers$: Observable<number> = this.SubscriptionService.getAllUsers().pipe(
-    map((response: IGetAllUsersResponse) => response.totalElementsCount)
-  );
+  readonly activeUsers$: Observable<number> = this.subscriptionService
+    .getAllUsers()
+    .pipe(map((response: IGetAllUsersResponse) => response.totalElementsCount));
 
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
@@ -64,7 +64,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly SubscriptionService: SubscriptionService,
+    private readonly subscriptionService: SubscriptionService,
     private readonly translationService: TranslocoService,
     private readonly matDialog: MatDialog,
     private readonly tableCellEventService: TableCellEventService,
@@ -72,7 +72,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.productInfo$ = this.SubscriptionService.getProductDescription().pipe(
+    this.productInfo$ = this.subscriptionService.getProductDescription().pipe(
       map((product: IGetProductResponse) => {
         return {
           name: product.name || '',
@@ -92,7 +92,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.tableItems$ = this.SubscriptionService.getInvoices().pipe(
+    this.tableItems$ = this.subscriptionService.getInvoices().pipe(
       map((invoices: IInvoiceListResponse) => {
         return {
           tableItems: this.transformToTableStructure(invoices.data),
@@ -101,7 +101,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.paymentMethod$ = this.SubscriptionService.getSubscriptionPaymentMethod().pipe(
+    this.paymentMethod$ = this.subscriptionService.getSubscriptionPaymentMethod().pipe(
       map((payment: IGetSubscriptionPaymentResponse) => {
         return {
           id: payment.id || '',
@@ -180,7 +180,8 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   }
 
   changePayment() {
-    this.SubscriptionService.getChangePaymentPortal()
+    this.subscriptionService
+      .getChangePaymentPortal()
       .pipe(take(1))
       .subscribe((response: IGetChangePaymentResponse) => {
         window.open(response.url, '_blank');
@@ -208,7 +209,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
               cellData: {
                 id: invoice.invoice,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: SubscriptionService.invoiceId(String(invoice.invoice)),
+                text: SubscriptionService.checkInvoiceIdFallback(String(invoice.invoice)),
               },
             },
             interval: {

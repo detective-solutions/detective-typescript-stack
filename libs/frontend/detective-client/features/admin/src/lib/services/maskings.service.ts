@@ -14,7 +14,6 @@ export class MaskingsService {
 
   constructor(
     private readonly getAllMaskingsGQL: GetAllMaskingsGQL,
-    // private readonly httpClient: HttpClient,
     private readonly tableCellEventService: TableCellEventService,
     private readonly logger: LogService
   ) {}
@@ -42,13 +41,13 @@ export class MaskingsService {
     );
   }
 
-  refreshConnections() {
+  refreshMaskings() {
     const currentResult = this.getAllMaskingsWatchQuery.getCurrentResult()?.data as any;
     const alreadyLoadedMaskingCount = (currentResult as IGetAllMaskingsGQLResponse)?.queryMasking?.length;
     if (alreadyLoadedMaskingCount) {
       this.getAllMaskingsWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedMaskingCount });
     } else {
-      this.logger.error('Could not determine currently loaded connection count. Reusing values of last query...');
+      this.logger.error('Could not determine currently loaded masking count. Reusing values of last query...');
       this.getAllMaskingsWatchQuery.refetch();
     }
   }

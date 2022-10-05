@@ -18,7 +18,6 @@ export class IconButtonTableCellComponent {
   constructor(private readonly tableCellEventService: TableCellEventService) {}
 
   onClick(clickEventKey: string) {
-    console.log(clickEventKey);
     this.tableCellEventService.tableCellEvents$.next({
       id: this.cellData.id,
       type: TableCellEventType.ICON_BUTTON_CLICK,

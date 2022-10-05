@@ -5,6 +5,7 @@
   </div>
   <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
     <mat-card
+      #upgradeCard
       class="upgrade-card"
       id="{{ plan.id }}"
       fxFlex="50"
@@ -13,8 +14,12 @@
       (click)="lockUpgrade(plan.id)"
       *ngFor="let plan of (availablePlans$ | async)?.prices; let i = index"
     >
-      <mat-card-subtitle>{{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}</mat-card-subtitle>
+      <mat-card-subtitle>
+        {{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}
+        <span class="material-icons check-icon"> check_circle </span>
+      </mat-card-subtitle>
       <mat-card-title>{{ plan.nickname }}</mat-card-title>
+
       <mat-card-content height="20px">
         <p>{{ plan.metadata.description }}</p>
       </mat-card-content>

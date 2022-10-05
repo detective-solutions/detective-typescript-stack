@@ -1,5 +1,5 @@
 $highlight: #fc1767;
-$highlight-bg: #f5f5f5;
+$highlight-bg: #fc1767;
 .upgrade-dialog-wrapper {
   padding: 10px 0;
 
@@ -16,10 +16,19 @@ $highlight-bg: #f5f5f5;
       cursor: pointer;
       min-height: 300px;
       max-height: 600px;
-      border: 2px solid #ccc;
+      border: 2px solid rgba(245, 245, 245, 0);
       margin: 20px;
+      box-shadow: 2px 4px 3px #ccc;
       &:hover {
-        border: 2px solid $highlight !important;
+        background-color: rgb(245, 245, 245);
+        border: 2px solid rgb(245, 245, 245);
+      }
+
+      .check-icon {
+        font-size: 18px;
+        float: right;
+        vertical-align: center;
+        color: rgba(245, 245, 245, 0);
       }
 
       .mat-card-content {
@@ -35,8 +44,10 @@ $highlight-bg: #f5f5f5;
     }
 
     .selected-plan {
-      border: 2px solid $highlight !important;
-      background-color: $highlight-bg;
+      background-color: rgb(245, 245, 245);
+      .check-icon {
+        color: $highlight;
+      }
     }
   }
 }

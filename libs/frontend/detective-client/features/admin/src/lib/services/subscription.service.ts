@@ -7,22 +7,21 @@ import {
   IGetSubscriptionPaymentResponse,
   IInvoiceListResponse,
 } from '../models/';
-import { Observable, map, take } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { IGetAllUsersResponse } from '../models/get-all-users-response.interface';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
+import { StatusResponse } from '@detective.solutions/frontend/shared/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class SubscriptionService {
-  private static provisioningBasePath = 'http://localhost:3004/';
-  // private static provisioningBasePath = `${environment.baseApiPath}`;
+  private static provisioningBasePath = `${environment.baseApiPath}`;
   private getAllUsersWatchQuery!: QueryRef<Response>;
 
   invoice$!: Observable<IInvoiceListResponse>;
-  GetAllUsersGQL: any;
 
   constructor(
     private readonly httpClient: HttpClient,
@@ -30,20 +29,21 @@ export class SubscriptionService {
     private readonly authService: AuthService
   ) {}
 
-  static convertAmountToCurrencyString(Amount: number, Currency: string): string {
-    let value = '';
-    switch (Currency) {
-      case 'eur':
-        value = String(`${(Amount / 100).toFixed(2)}€`);
-        break;
-      case 'usd':
-        value = String('$' + `${(Amount / 100).toFixed(2)}`);
-        break;
+  static convertAmountToCurrencyString(amount: number, currency: string): string {
+    switch (currency) {
+      case 'eur': {
+        return `${String((amount / 100).toFixed(2))}€`;
+      }
+      case 'usd': {
+        return `$${String((amount / 100).toFixed(2))}`;
+      }
+      default: {
+        throw new Error('Could not convert amount to currency string');
+      }
     }
-    return value;
   }
 
-  static invoiceId(invoiceId: string): string {
+  static checkInvoiceIdFallback(invoiceId: string): string {
     if (invoiceId === 'null') {
       return 'Next';
     } else {
@@ -65,13 +65,13 @@ export class SubscriptionService {
     );
   }
 
-  cancelSubscription(): Observable<{ status: boolean }> {
+  cancelSubscription(): Observable<StatusResponse> {
     return this.httpClient.get<any>(SubscriptionService.provisioningBasePath + environment.provisioningCancelSubV1, {
       headers: this.getHeader(),
     });
   }
 
-  updateSubscription(planId: string): Observable<{ status: boolean }> {
+  updateSubscription(planId: string): Observable<StatusResponse> {
     return this.httpClient.post<any>(
       SubscriptionService.provisioningBasePath + environment.provisioningUpdateSubV1,
       { planId: planId },

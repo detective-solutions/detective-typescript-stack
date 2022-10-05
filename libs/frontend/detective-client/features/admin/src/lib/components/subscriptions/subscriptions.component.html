@@ -1,22 +1,21 @@
-<!-- subscription section -->
 <div
   class="subscriptions-wrapper"
   [class.is-mobile]="isMobile$ | async"
   *transloco="let t; read: 'admin.subscriptions.utils'"
 >
-  <div class="top-row" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+  <div class="top-row" fxLayout="row" fxLayout.xs="column" fxFlexFill *ngIf="productInfo$ | async as productInfo">
     <div fxFlex="50" class="section" fxFlex.xs="55">
       <p>
-        <small class="subscription-chip">{{ (productInfo$ | async)?.name }}</small>
+        <small class="subscription-chip">{{ productInfo.name }}</small>
         Plan
       </p>
-      <p>{{ activeUsers$ | async }} {{ t('of') }} {{ (productInfo$ | async)?.userLimit }} {{ t('users') }}</p>
+      <p>{{ activeUsers$ | async }} {{ t('of') }} {{ productInfo.userLimit }} {{ t('users') }}</p>
       <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}"></mat-progress-bar>
     </div>
     <div fxFlex="50" class="section" fxFlex.xs="55">
       <p>
-        <b>{{ (productInfo$ | async)?.priceTag }}</b>
-        <small> /{{ (productInfo$ | async)?.iteration }}</small>
+        <b>{{ productInfo.priceTag }}</b>
+        <small> /{{ productInfo.iteration }}</small>
       </p>
       <span fxLayoutAlign="left" fxHide.sm fxHide.xs>
         <button mat-raised-button color="accent" class="invite-button" (click)="openUpgradeDialog()">Upgrade</button>

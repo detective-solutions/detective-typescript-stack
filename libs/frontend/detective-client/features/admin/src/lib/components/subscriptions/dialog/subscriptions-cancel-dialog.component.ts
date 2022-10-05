@@ -1,7 +1,7 @@
 /* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import { take } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SubscriptionService } from '../../../services';
@@ -29,7 +29,9 @@ export class SubscriptionCancelDialogComponent {
     this.subscriptionService
       .cancelSubscription()
       .pipe(take(1))
-      .subscribe((subscriptionState: any) => console.log(subscriptionState));
+      .subscribe((subscriptionState: StatusResponse) => {
+        this.handleResponse('cancel subscription', subscriptionState);
+      });
     this.dialogRef.close();
   }
 
@@ -37,14 +39,22 @@ export class SubscriptionCancelDialogComponent {
     this.dialogRef.close();
   }
 
-  private handleError(error: Error) {
-    this.logger.error('Encountered an error while submitting connection deletion request');
-    console.error(error);
+  private handleResponse(actionName: string, response: StatusResponse) {
+    let toastMsg = 'actionFailed';
+    let toastType = ToastType.ERROR;
+
+    if (response.status) {
+      toastMsg = 'actionSuccessful';
+      toastType = ToastType.INFO;
+      this.logger.info(`${actionName}: ${response.status}`);
+    } else {
+      this.logger.error(`${actionName}: ${response.status}`);
+    }
     this.translationService
-      .selectTranslate('connections.toastMessages.formSubmitError', {}, this.translationScope)
+      .selectTranslate(`subscriptions.toastMessages.${toastMsg}`, {}, this.translationScope)
       .pipe(take(1))
       .subscribe((translation: string) => {
-        this.toastService.showToast(translation, 'Close', ToastType.ERROR);
+        this.toastService.showToast(translation, 'Close', toastType);
       });
     this.dialogRef.close();
   }
