@@ -1,5 +1,6 @@
-import { IWhiteboardNodePositionUpdate, WhiteboardNodeType } from '@detective.solutions/shared/data-access';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+
+import { IWhiteboardNodePositionUpdate } from '@detective.solutions/shared/data-access';
 
 export class WhiteboardNodePositionUpdateDTO implements IWhiteboardNodePositionUpdate {
   @IsUUID()
@@ -13,8 +14,4 @@ export class WhiteboardNodePositionUpdateDTO implements IWhiteboardNodePositionU
   @IsNumber()
   @IsNotEmpty()
   y!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  type!: WhiteboardNodeType;
 }

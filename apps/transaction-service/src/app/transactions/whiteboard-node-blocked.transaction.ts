@@ -25,10 +25,9 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     try {
       const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
         casefileId,
-        nodeId,
-        this.messageBody?.temporary?.blockedBy ?? null
+        this.messageBody?.temporary?.blockedBy ?? null,
+        nodeId
       );
-      console.log('IS BLOCK SUCCESSFUL', isBlockSuccessful);
       if (isBlockSuccessful) {
         this.forwardMessageToOtherClients();
       }

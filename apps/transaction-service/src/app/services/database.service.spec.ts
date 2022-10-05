@@ -1,4 +1,5 @@
 import {
+  ICachableCasefileForWhiteboard,
   ICasefileForWhiteboard,
   IEmbeddingWhiteboardNode,
   ITable,
@@ -49,12 +50,22 @@ describe('DatabaseService', () => {
     expect(databaseService).toBeTruthy();
   });
 
-  xdescribe('getCasefileDataById', () => {
+  describe('getCasefileDataById', () => {
     const testCasefile: ICasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
+      description: 'test',
       tables: [],
+      queries: [],
       embeddings: [],
+    };
+
+    const convertedCasefile: ICachableCasefileForWhiteboard = {
+      id: testCasefile.id,
+      title: testCasefile.title,
+      description: testCasefile.description,
+      nodes: [],
+      temporary: { activeUsers: [] },
     };
 
     it('should return a Casefile object with all mandatory properties', async () => {
@@ -64,7 +75,7 @@ describe('DatabaseService', () => {
 
       const res = await databaseService.getCachableCasefileById(testCasefile.id);
 
-      expect(res).toBe(testCasefile);
+      expect(res).toEqual(convertedCasefile);
       expect(sendQuerySpy).toBeCalledTimes(1);
       expect(sendQuerySpy).toBeCalledWith(getCasefileByIdQuery, {
         $id: testCasefile.id,

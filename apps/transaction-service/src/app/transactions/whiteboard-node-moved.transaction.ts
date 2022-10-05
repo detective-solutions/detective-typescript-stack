@@ -17,22 +17,22 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     if (!this.messageBody || !Array.isArray(this.messageBody)) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
+    if (!this.messageContext.nodeId) {
+      throw new InternalServerErrorException('Could not update node position due to missing node id');
+    }
+
     const casefileId = this.messageContext.casefileId;
+    const userId = this.messageContext.userId;
+    const nodeId = this.messageContext.nodeId;
 
     try {
       for (const node of this.messageBody) {
         await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
       }
-
-      await this.cacheService.updateNodePositions(this.messageBody, this.messageContext);
+      await this.cacheService.updateNodePositions(casefileId, userId, nodeId, this.messageBody);
       this.forwardMessageToOtherClients();
-      const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
-      if (!response) {
-        this.handleError(casefileId);
-      }
-
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(`Node positions were successfully updated in casefile ${casefileId}`);
+      this.logger.verbose(`Node positions were successfully updated in casefile "${casefileId}"`);
     } catch (error) {
       this.logger.error(error);
       this.handleError(casefileId);

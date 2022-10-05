@@ -6,7 +6,6 @@ import {
   ITableWhiteboardNode,
   IUserForWhiteboard,
   IUserQueryWhiteboardNode,
-  IWhiteboardNodePositionUpdate,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 import { CachableCasefileForWhiteboardDTO, CasefileForWhiteboardDTO } from '../models';
@@ -66,15 +65,20 @@ export class DatabaseService {
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
     // Convert ICasefileForWhiteboard to ICachableCasefileForWhiteboard
+    // Merge different node types under "nodes" key for better handling
     const convertedCasefile = {
       id: casefileData.id,
       title: casefileData.title,
       description: casefileData.description,
-      // TODO: Check if additional types are needed
       nodes: [
         ...(casefileData.tables
           ? (casefileData.tables.map((node) => {
               return { ...node, type: WhiteboardNodeType.TABLE };
+            }) as AnyWhiteboardNode[])
+          : []),
+        ...(casefileData.queries
+          ? (casefileData.queries.map((node) => {
+              return { ...node, type: WhiteboardNodeType.USER_QUERY };
             }) as AnyWhiteboardNode[])
           : []),
         ...(casefileData.embeddings
@@ -85,8 +89,8 @@ export class DatabaseService {
       ],
       temporary: { activeUsers: [] },
     };
-    await validateDto(CachableCasefileForWhiteboardDTO, convertedCasefile, this.logger);
 
+    await validateDto(CachableCasefileForWhiteboardDTO, convertedCasefile, this.logger);
     return convertedCasefile;
   }
 
@@ -206,25 +210,6 @@ export class DatabaseService {
     };
     return this.sendDeleteMutation(mutationJson).catch(() => {
       this.logger.error(`There was a problem while trying to delete node ${nodeId} of type ${nodeType}`);
-      return null;
-    });
-  }
-
-  async updateNodePositionsInCasefile(
-    casefileId: string,
-    updatedNodes: IWhiteboardNodePositionUpdate[]
-  ): Promise<Record<string, any> | null> {
-    const mutations = [];
-    for (const node of updatedNodes) {
-      mutations.push({
-        uid: await this.getUidByType(node.id, node.type),
-        [`${node.type}.x`]: node.x,
-        [`${node.type}.y`]: node.y,
-      });
-    }
-
-    return this.sendMutation(mutations).catch(() => {
-      this.logger.error(`There was a problem updating node positions in casefile ${casefileId}`);
       return null;
     });
   }

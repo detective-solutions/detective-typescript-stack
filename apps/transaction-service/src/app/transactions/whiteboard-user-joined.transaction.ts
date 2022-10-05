@@ -19,7 +19,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     this.logger.log(`${this.logContext} Executing transaction`);
 
     const casefileId = this.messageContext.casefileId;
-    const userId = this.messageContext?.userId;
+    const userId = this.messageContext.userId;
 
     try {
       let casefileData = await this.cacheService.getCasefileById(casefileId);
@@ -27,13 +27,11 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         casefileData = await this.setupMissingCache(casefileId);
       }
 
-      console.debug('CASEFILE DATA');
-      console.debug(casefileData);
-
       // Add new connected user to cache
       const user = await this.cacheService.addActiveUser(userId, casefileId);
       // Add new connected user to casefile temporary data
       casefileData.temporary.activeUsers.push(user);
+
       // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },

@@ -22,11 +22,6 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const updateNodePositionMethodName = 'updateNodePositionsInCasefile';
-const databaseServiceMock = {
-  [updateNodePositionMethodName]: jest.fn(),
-};
-
 const testMessagePayload: IMessage<ITableWhiteboardNode[]> = {
   context: {
     eventType: MessageEventType.WhiteboardNodeAdded,
@@ -81,7 +76,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       providers: [
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: DatabaseService, useValue: databaseServiceMock },
       ],
     }).compile();
 
@@ -103,10 +97,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      const updateNodePositionsInCasefileSpy = jest
-        .spyOn(databaseService, updateNodePositionMethodName)
-        .mockResolvedValue({});
-
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
@@ -114,16 +104,9 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-      expect(updateNodePositionsInCasefileSpy).toBeCalledTimes(1);
-      expect(updateNodePositionsInCasefileSpy).toBeCalledWith(
-        testMessagePayload.context.casefileId,
-        testMessagePayload.body
-      );
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
-      jest.spyOn(databaseService, updateNodePositionMethodName).mockResolvedValue({});
-
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, { ...testMessagePayload, body: undefined });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
@@ -134,7 +117,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
         throw new Error();
       });
-      jest.spyOn(databaseService, updateNodePositionMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -145,10 +127,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
     it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      const updateNodePositionsInCasefileSpy = jest
-        .spyOn(databaseService, updateNodePositionMethodName)
-        .mockResolvedValue({});
-
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, {
         context: testMessagePayload.context,
         body: { ...testMessagePayload.body[0], type: undefined },
@@ -158,15 +136,10 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-      expect(updateNodePositionsInCasefileSpy).toBeCalledTimes(0);
     });
 
     it('should throw an InternalServerErrorException if the database response is invalid', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-
-      const updateNodePositionsInCasefileSpy = jest
-        .spyOn(databaseService, updateNodePositionMethodName)
-        .mockResolvedValue(null);
 
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -175,11 +148,6 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-      expect(updateNodePositionsInCasefileSpy).toBeCalledTimes(1);
-      expect(updateNodePositionsInCasefileSpy).toBeCalledWith(
-        testMessagePayload.context.casefileId,
-        testMessagePayload.body
-      );
     });
   });
 });

@@ -17,7 +17,7 @@ export class WhiteboardUserLeftTransaction extends Transaction {
 
     try {
       this.forwardMessageToOtherClients();
-      await this.cacheService.removeActiveUser(userId, casefileId);
+      await this.cacheService.removeActiveUser(casefileId, userId);
       await this.cacheService.unblockAllWhiteboardNodesByUserId(casefileId, userId);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
