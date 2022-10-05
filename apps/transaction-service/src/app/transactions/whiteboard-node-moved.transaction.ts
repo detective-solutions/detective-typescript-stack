@@ -17,9 +17,6 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     if (!this.messageBody || !Array.isArray(this.messageBody)) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
-    if (!this.messageContext.nodeId) {
-      throw new InternalServerErrorException('Could not update node position due to missing node id');
-    }
 
     const casefileId = this.messageContext.casefileId;
     const userId = this.messageContext.userId;
