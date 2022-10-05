@@ -158,7 +158,6 @@ export class WhiteboardNodeEffects {
                   id: update.id,
                   x: update.changes.x,
                   y: update.changes.y,
-                  type: update.changes.type,
                 };
               }),
             },

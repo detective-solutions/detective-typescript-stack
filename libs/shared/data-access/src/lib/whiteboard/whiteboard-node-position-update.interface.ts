@@ -1,6 +1,4 @@
-import { IGeneralWhiteboardNode } from './general-whiteboard-node.interface';
-
-export interface IWhiteboardNodePositionUpdate extends IGeneralWhiteboardNode {
+export interface IWhiteboardNodePositionUpdate {
   id: string;
   x: number;
   y: number;
