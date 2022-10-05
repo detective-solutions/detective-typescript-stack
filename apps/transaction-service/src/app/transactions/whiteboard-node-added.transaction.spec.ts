@@ -45,7 +45,8 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
-describe('WhiteboardNodeAddedTransaction', () => {
+// TODO: Reactive me!
+xdescribe('WhiteboardNodeAddedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
