@@ -12,9 +12,6 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    if (!this.messageBody) {
-      throw new InternalServerErrorException(this.missingMessageBodyErrorText);
-    }
     if (!this.messageContext.nodeId) {
       throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
     }
