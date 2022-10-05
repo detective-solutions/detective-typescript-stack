@@ -103,7 +103,7 @@ export class CacheService {
         cachedNodes.some((node: AnyWhiteboardNode) => node.id === update.id && node?.temporary?.blockedBy === userId)
       )
     ) {
-      return false;
+      // return false;
     }
 
     positionUpdates.forEach((update: IWhiteboardNodePositionUpdate) =>
