@@ -1,7 +1,6 @@
 import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
-  IMessageContext,
   IUserForWhiteboard,
   IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
