@@ -36,7 +36,6 @@ const testMessageContext = {
 
 const testWhiteboardNode: IWhiteboardNodeDeleteUpdate = {
   id: testMessageContext.nodeId,
-  type: WhiteboardNodeType.TABLE,
 };
 
 const testMessagePayload: IMessage<IWhiteboardNodeDeleteUpdate> = {

@@ -70,7 +70,7 @@ export class WhiteboardNodeEffects {
                 userId: context.userId,
                 nodeId: action.deletedNode.id,
               } as IMessageContext,
-              body: { id: action.deletedNode.id, type: action.deletedNode.type },
+              body: { id: action.deletedNode.id },
             },
           })
         )

@@ -99,7 +99,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
   delete() {
     this.store.dispatch(
       WhiteboardNodeActions.WhiteboardNodeDeleted({
-        deletedNode: { id: this.node.id, type: this.node.type },
+        deletedNode: { id: this.node.id },
       })
     );
   }

@@ -27,23 +27,20 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
-      // TODO: Remove type from DTO
       await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
       this.forwardMessageToOtherClients();
       await this.cacheService.deleteNode(casefileId, deletedNode.id);
 
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(
-        `${deletedNode.type} node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`
-      );
+      this.logger.verbose(`Node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`);
     } catch (error) {
       this.logger.error(error);
-      this.handleError(casefileId, deletedNode.type);
+      this.handleError(casefileId, deletedNode.id);
     }
   }
 
-  private handleError(casefileId: string, nodeType: string) {
+  private handleError(casefileId: string, nodeId: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not delete ${nodeType} node from casefile ${casefileId}`);
+    throw new InternalServerErrorException(`Could not delete node ${nodeId} from casefile ${casefileId}`);
   }
 }
