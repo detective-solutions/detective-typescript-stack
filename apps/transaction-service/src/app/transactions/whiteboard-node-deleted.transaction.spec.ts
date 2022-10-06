@@ -1,11 +1,5 @@
 import { CacheService, DatabaseService } from '../services';
-import {
-  IMessage,
-  IWhiteboardNodeDeleteUpdate,
-  MessageEventType,
-  UserRole,
-  WhiteboardNodeType,
-} from '@detective.solutions/shared/data-access';
+import { IMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -19,11 +13,6 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const deleteNodeInCasefileMethodName = 'deleteNodeInCasefile';
-const databaseServiceMock = {
-  [deleteNodeInCasefileMethodName]: jest.fn(),
-};
-
 const testMessageContext = {
   eventType: MessageEventType.WhiteboardNodeDeleted,
   tenantId: uuidv4(),
@@ -34,13 +23,9 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
-const testWhiteboardNode: IWhiteboardNodeDeleteUpdate = {
-  id: testMessageContext.nodeId,
-};
-
-const testMessagePayload: IMessage<IWhiteboardNodeDeleteUpdate> = {
+const testMessagePayload: IMessage<void> = {
   context: testMessageContext,
-  body: testWhiteboardNode,
+  body: null,
 };
 
 // TODO: Reactivate me!
@@ -55,7 +40,7 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
       providers: [
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: DatabaseService, useValue: databaseServiceMock },
+        { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -77,8 +62,6 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      const deleteNodeInCasefileSpy = jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
-
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
@@ -86,13 +69,9 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-      expect(deleteNodeInCasefileSpy).toBeCalledTimes(1);
-      expect(deleteNodeInCasefileSpy).toBeCalledWith(testMessagePayload.context.nodeId, WhiteboardNodeType.TABLE);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
-      jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
-
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, { ...testMessagePayload, body: undefined });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
@@ -103,7 +82,6 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
       jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
         throw new Error();
       });
-      jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -114,26 +92,19 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
     it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
-      const deleteNodeInCasefileSpy = jest.spyOn(databaseService, deleteNodeInCasefileMethodName).mockResolvedValue({});
-
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, {
         context: testMessageContext,
-        body: { ...testWhiteboardNode, type: undefined },
+        body: null,
       });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-      expect(deleteNodeInCasefileSpy).toBeCalledTimes(0);
     });
 
     it('should throw an InternalServerErrorException if the database response is invalid', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-
-      const deleteNodeInCasefileSpy = jest
-        .spyOn(databaseService, deleteNodeInCasefileMethodName)
-        .mockResolvedValue(null);
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -142,8 +113,6 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-      expect(deleteNodeInCasefileSpy).toBeCalledTimes(1);
-      expect(deleteNodeInCasefileSpy).toBeCalledWith(testMessagePayload.context.nodeId, WhiteboardNodeType.TABLE);
     });
   });
 });
