@@ -121,41 +121,41 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   }
 
   selectCardImage(card: string): string {
-    const base = 'assets/images/payment';
-    let path = base + '/visa.png';
+    const basePath = 'assets/images/payment';
+    let result = '';
     switch (card) {
       case 'amex':
-        path = base + '/amex.png';
+        result = basePath + '/amex.png';
         break;
       case 'visa':
-        path = base + '/visa.png';
+        result = basePath + '/visa.png';
         break;
       case 'discover':
-        path = base + '/discover.png';
+        result = basePath + '/discover.png';
         break;
       case 'jcb':
-        path = base + '/jcb.png';
+        result = basePath + '/jcb.png';
         break;
       case 'maestro':
-        path = base + '/maestro.png';
+        result = basePath + '/maestro.png';
         break;
       case 'master':
-        path = base + '/mastercard.png';
+        result = basePath + '/mastercard.png';
         break;
       case 'sage':
-        path = base + '/sage.png';
+        result = basePath + '/sage.png';
         break;
       case 'dinersclub':
-        path = base + '/dinersclub.png';
+        result = basePath + '/dinersclub.png';
         break;
       case 'western':
-        path = base + '/westernunion.png';
+        result = basePath + '/westernunion.png';
         break;
       case 'paypal':
-        path = base + '/paypal.png';
+        result = basePath + '/paypal.png';
         break;
     }
-    return path;
+    return result;
   }
 
   openCancelDialog(componentToOpen?: ComponentType<SubscriptionDialogComponent>, config?: MatDialogConfig) {
