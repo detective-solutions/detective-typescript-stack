@@ -20,6 +20,7 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
     const addedWhiteboardNode = this.messageBody as AnyWhiteboardNode;
 
     try {
+      this.forwardMessageToOtherClients();
       await this.cacheService.addNode(casefileId, addedWhiteboardNode);
       this.logger.verbose(`Node "${addedWhiteboardNode.id}" was successfully added to casefile "${casefileId}"`);
       this.logger.log(`${this.logContext} Transaction successful`);
