@@ -1,7 +1,6 @@
 import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodeDeleteUpdate,
   IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
@@ -15,14 +14,11 @@ export const WhiteboardNodeAdded = createAction(
   props<{ addedNode: AnyWhiteboardNode; addedManually: boolean }>()
 );
 
-export const WhiteboardNodeDeleted = createAction(
-  `${actionPrefix} Node deleted`,
-  props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
-);
+export const WhiteboardNodeDeleted = createAction(`${actionPrefix} Node deleted`, props<{ deletedNodeId: string }>());
 
 export const WhiteboardNodeDeletedRemotely = createAction(
   `${actionPrefix} Node deleted remotely`,
-  props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
+  props<{ deletedNodeId: string }>()
 );
 
 export const WhiteboardNodeUpdate = createAction(

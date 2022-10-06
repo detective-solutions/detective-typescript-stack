@@ -68,7 +68,7 @@ export class WhiteboardNodeEffects {
                 ...context,
                 eventType: MessageEventType.WhiteboardNodeDeleted,
                 userId: context.userId,
-                nodeId: action.deletedNode.id,
+                nodeId: action.deletedNodeId,
               } as IMessageContext,
               body: null,
             },
