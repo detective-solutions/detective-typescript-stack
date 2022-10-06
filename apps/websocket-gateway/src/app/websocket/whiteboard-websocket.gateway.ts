@@ -51,9 +51,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   handleDisconnect(client: any) {
     this.logger.log(`${buildLogContext(client._socket.context)} Client has disconnected`);
 
-    console.log('SERVER');
-    console.log(this.server);
-
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
       context: {
         ...client._socket.context,
@@ -150,6 +147,9 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   }
 
   private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {
+    console.log('CONNECTED CLIENTS:');
+    console.log(this.server.clients);
+
     const requestUrl = info.req.url;
     this.logger.debug(`Incoming connection request on url ${requestUrl}`);
 
