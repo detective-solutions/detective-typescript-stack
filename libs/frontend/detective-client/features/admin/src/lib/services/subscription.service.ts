@@ -18,7 +18,7 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class SubscriptionService {
-  private static provisioningBasePath = `${environment.baseApiPath}`;
+  private static provisioningBasePath = 'http://localhost:3004/v1/provisioning'; //`${environment.baseApiPath}`;
   private getAllUsersWatchQuery!: QueryRef<Response>;
 
   invoice$!: Observable<IInvoiceListResponse>;
@@ -66,13 +66,16 @@ export class SubscriptionService {
   }
 
   cancelSubscription(): Observable<StatusResponse> {
-    return this.httpClient.get<any>(SubscriptionService.provisioningBasePath + environment.provisioningCancelSubV1, {
-      headers: this.getHeader(),
-    });
+    return this.httpClient.get<StatusResponse>(
+      SubscriptionService.provisioningBasePath + environment.provisioningCancelSubV1,
+      {
+        headers: this.getHeader(),
+      }
+    );
   }
 
   updateSubscription(planId: string): Observable<StatusResponse> {
-    return this.httpClient.post<any>(
+    return this.httpClient.post<StatusResponse>(
       SubscriptionService.provisioningBasePath + environment.provisioningUpdateSubV1,
       { planId: planId },
       { headers: this.getHeader() }

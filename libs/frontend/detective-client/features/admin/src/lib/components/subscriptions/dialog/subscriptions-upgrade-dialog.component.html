@@ -3,7 +3,13 @@
   <div mat-dialog-content align="center">
     {{ t('upgradeDialogText') }}
   </div>
-  <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+  <div
+    class="upgrade-choice-wrapper"
+    fxLayout="row"
+    fxLayout.xs="column"
+    fxFlexFill
+    *ngFor="let plan of (availablePlans$ | async)?.prices; let i = index"
+  >
     <mat-card
       #upgradeCard
       class="upgrade-card"
@@ -12,7 +18,6 @@
       class="section"
       fxFlex.xs="55"
       (click)="lockUpgrade(plan.id)"
-      *ngFor="let plan of (availablePlans$ | async)?.prices; let i = index"
     >
       <mat-card-subtitle>
         {{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}
