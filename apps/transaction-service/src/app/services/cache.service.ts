@@ -5,6 +5,7 @@ import {
   IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { RedisClientType, RedisDefaultModules } from 'redis';
 
 import { DatabaseService } from './database.service';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
@@ -19,14 +20,18 @@ export class CacheService {
 
   readonly logger = new Logger(CacheService.name);
 
-  constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {}
+  private client: RedisClientType<RedisDefaultModules>;
+
+  constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {
+    this.client = clientService.createClient();
+  }
 
   async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<'OK'> {
     this.logger.log(`Saving casefile "${casefile.id}" to cache`);
 
     // Can't match expected Redis client type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cacheResponse = await this.clientService.client.json.set(casefile.id, '.', casefile as any);
+    const cacheResponse = await this.client.json.set(casefile.id, '.', casefile as any);
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not save casefile "${casefile.id}" to cache`);
     }
@@ -38,20 +43,20 @@ export class CacheService {
     this.logger.log(`Requesting casefile "${casefileId}" data from cache`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId) as any;
+    return this.client.json.get(casefileId) as any;
   }
 
   async getActiveUsersByCasefile(casefileId: string): Promise<IUserForWhiteboard[]> {
     this.logger.log(`Requesting all active users for casefile "${casefileId}"`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
+    return this.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
   }
 
   async addActiveUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user "${userId}" to casefile "${casefileId}"`);
     const whiteboardUser = await this.databaseService.getWhiteboardUserById(userId);
-    const cacheResponse = await this.clientService.client.json.arrAppend(
+    const cacheResponse = await this.client.json.arrAppend(
       casefileId,
       CacheService.ACTIVE_USERS_JSON_PATH,
       whiteboardUser
@@ -70,11 +75,7 @@ export class CacheService {
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
-    const cacheResponse = await this.clientService.client.json.set(
-      casefileId,
-      CacheService.ACTIVE_USERS_JSON_PATH,
-      activeUsers
-    );
+    const cacheResponse = await this.client.json.set(casefileId, CacheService.ACTIVE_USERS_JSON_PATH, activeUsers);
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not remove active user ${userId} from casefile ${casefileId}`);
     }
@@ -86,7 +87,7 @@ export class CacheService {
     this.logger.log(`Requesting nodes for casefile "${casefileId}"`);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.clientService.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
+    return this.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
   }
 
   async updateNodePositions(
@@ -113,7 +114,7 @@ export class CacheService {
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
     // Only return position updates for nodes that are not blocked by other users
     return filteredPositionUpdates;
   }
@@ -135,7 +136,7 @@ export class CacheService {
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
     return true;
   }
 
@@ -151,13 +152,13 @@ export class CacheService {
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.clientService.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
   }
 
   async addNode(casefileId: string, node: AnyWhiteboardNode): Promise<void> {
     this.logger.log(`Adding node "${node.id}" to casefile "${casefileId}"`);
 
-    const cacheResponse = await this.clientService.client.json.arrAppend(
+    const cacheResponse = await this.client.json.arrAppend(
       casefileId,
       CacheService.NODES_PATH,
       // Can't match Redis client return type with domain type
@@ -176,7 +177,7 @@ export class CacheService {
     let cachedNodes = await this.getNodesByCasefile(casefileId);
     cachedNodes = cachedNodes.filter((node: AnyWhiteboardNode) => node.id !== nodeId);
 
-    const cacheResponse = await this.clientService.client.json.set(
+    const cacheResponse = await this.client.json.set(
       casefileId,
       CacheService.NODES_PATH,
       // Can't match Redis client return type with domain type

@@ -6,15 +6,27 @@ import { RedisClientType, RedisDefaultModules, createClient } from 'redis';
 export class RedisClientService implements OnModuleDestroy {
   readonly logger = new Logger(RedisClientService.name);
 
-  client: RedisClientType<RedisDefaultModules>;
+  clients: RedisClientType<RedisDefaultModules>[] = [];
+
+  private moduleOptions: IRedisClientOptions;
 
   constructor(@Inject(REDIS_CLIENT_MODULE_OPTIONS) moduleOptions: IRedisClientOptions) {
-    this.client = createClient({ url: `redis://${moduleOptions.address}` });
-    this.client.on('error', (err) => this.logger.error('Redis Client Error', err));
-    this.client.connect();
+    this.moduleOptions = moduleOptions;
   }
 
-  public async onModuleDestroy() {
-    await this.client.quit();
+  createClient(): RedisClientType<RedisDefaultModules> {
+    const client = createClient({
+      url: `redis://${this.moduleOptions.address}`,
+    });
+    client.on('error', (err) => this.logger.error('Redis Client Error', err));
+    client.connect();
+    this.clients.push(client as RedisClientType<RedisDefaultModules>);
+    return client as RedisClientType<RedisDefaultModules>;
+  }
+
+  async onModuleDestroy() {
+    for (const client of this.clients) {
+      await client.quit();
+    }
   }
 }
