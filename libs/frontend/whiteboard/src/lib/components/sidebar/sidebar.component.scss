@@ -1,6 +1,8 @@
+$sidebar-height: 350px;
+
 #sidebar-wrapper {
   position: absolute;
-  min-height: 350px;
+  min-height: $sidebar-height;
   width: 50px;
   left: 50px;
   top: 50%;
