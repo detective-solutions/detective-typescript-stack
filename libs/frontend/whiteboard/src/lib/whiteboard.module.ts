@@ -14,6 +14,7 @@ import {
   SidebarComponent,
   TableNodeComponent,
   TestLinkComponent,
+  TopbarComponent,
 } from './components';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
@@ -57,6 +58,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
   ],
   declarations: [
     HostComponent,
+    TopbarComponent,
     SidebarComponent,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,

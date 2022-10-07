@@ -57,7 +57,11 @@
             "libs/frontend/detective-client/theme"
           ]
         },
-        "styles": ["libs/frontend/shared/styles/src/index.scss", "libs/frontend/detective-client/theme/themes.scss"],
+        "styles": [
+          "libs/frontend/shared/styles/src/index.scss",
+          "libs/frontend/detective-client/theme/themes.scss",
+          "libs/frontend/whiteboard/src/lib/theme/themes.scss"
+        ],
         "scripts": []
       },
       "configurations": {

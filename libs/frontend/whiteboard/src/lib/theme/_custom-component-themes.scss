@@ -1,0 +1,5 @@
+@import '../components/topbar/topbar.component-theme';
+
+@mixin custom-components-theme($theme) {
+  @include topbar-component-theme($theme);
+}

@@ -1,0 +1,12 @@
+@use '@angular/material' as mat;
+
+@import 'shared-themes';
+@import './custom-component-themes';
+
+// Declare classes for additional themes here
+// Take care to only import theming for components that are used
+.default-theme {
+  @include mat.core-theme($default-theme);
+  @include mat.tooltip-theme($default-theme);
+  @include custom-components-theme($default-theme);
+}

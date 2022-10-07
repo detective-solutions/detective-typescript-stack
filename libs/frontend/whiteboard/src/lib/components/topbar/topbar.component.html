@@ -1,0 +1,22 @@
+<div id="topbar-wrapper">
+  <div fxFlex="0 0 150px" fxLayout="row" fxLayoutAlign="center center" id="topbar-logo">
+    <img src="assets/images/detective-logo.png" alt="Logo" /><span>detective</span>
+  </div>
+  <input fxFlex id="title-input" placeholder="Casefile Title" [value]="title$ | async" />
+  <div fxFlex="1 1 250px" fxLayoutAlign="center center" id="topbar-invite-button-wrapper">
+    <button mat-raised-button color="accent">Invite</button>
+  </div>
+  <div fxFlex class="active-users-wrapper">
+    <div *ngFor="let user of activeUsers$ | async" class="user-avatar">
+      <img
+        *ngIf="user.avatarUrl; else noAvatarUrl"
+        [src]="user.avatarUrl"
+        [matTooltip]="getUserFullName(user)"
+        alt="User Avatar"
+      />
+      <ng-template #noAvatarUrl
+        ><span [matTooltip]="getUserFullName(user)">{{ getUserInitialia(user) }}</span></ng-template
+      >
+    </div>
+  </div>
+</div>
