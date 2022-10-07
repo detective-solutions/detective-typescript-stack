@@ -1,4 +1,8 @@
-import { AnyWhiteboardNode, ICachableCasefileForWhiteboard, IUser } from '@detective.solutions/shared/data-access';
+import {
+  AnyWhiteboardNode,
+  ICachableCasefileForWhiteboard,
+  IUserForWhiteboard,
+} from '@detective.solutions/shared/data-access';
 
 import { CasefileDTO } from '@detective.solutions/backend/shared/data-access';
 import { IsNotEmpty } from 'class-validator';
@@ -12,5 +16,5 @@ export class CachableCasefileForWhiteboardDTO
   nodes!: AnyWhiteboardNode[];
 
   @IsNotEmpty()
-  temporary: { activeUsers: IUser[] };
+  temporary: { activeUsers: IUserForWhiteboard[] };
 }
