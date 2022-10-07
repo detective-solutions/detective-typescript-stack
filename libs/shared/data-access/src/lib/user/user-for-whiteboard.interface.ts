@@ -1,6 +1,6 @@
 import { IUser } from './user.interface';
 
-export type IUserForWhiteboard = Pick<
+export type IUserForWhiteboard = { email: string; firstname: string; lastname: string; avatarUrl: string } & Pick<
   IUser,
-  'id' | 'email' | 'firstname' | 'lastname' | 'title' | 'role' | 'avatarUrl'
+  'id' | 'title' | 'role'
 >;

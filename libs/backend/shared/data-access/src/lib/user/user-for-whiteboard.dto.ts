@@ -3,5 +3,5 @@ import { PickType } from '@nestjs/mapped-types';
 import { UserDTO } from './user.dto';
 
 export class UserForWhiteboardDTO
-  extends PickType(UserDTO, ['id', 'firstname', 'lastname', 'title', 'role', 'avatarUrl'] as const)
+  extends PickType(UserDTO, ['email', 'id', 'firstname', 'lastname', 'title', 'role', 'avatarUrl'] as const)
   implements IUserForWhiteboard {}
