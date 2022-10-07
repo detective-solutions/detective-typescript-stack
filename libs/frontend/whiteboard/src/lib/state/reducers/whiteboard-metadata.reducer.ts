@@ -33,16 +33,20 @@ export const whiteboardMetadataReducer = createReducer(
   on(
     WhiteboardMetadataActions.WhiteboardUserJoined,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      const activeUsers = [...state.activeUsers];
+      const activeUsers = [...state.activeUsers]; // deep-copy array
       activeUsers.push(action.user);
-      return { ...state, activeUsers: activeUsers };
+      // Sort users by their ids
+      return { ...state, activeUsers: activeUsers.sort((a, b) => a.id.localeCompare(b.id)) };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserLeft,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      state.activeUsers.filter((user) => user.id !== action.userId);
-      return state;
+      // Filter & sort users by their ids
+      const updatedActiveUsers = state.activeUsers
+        .filter((user) => user.id !== action.userId)
+        .sort((a, b) => a.id.localeCompare(b.id));
+      return { ...state, activeUsers: updatedActiveUsers };
     }
   )
 );
