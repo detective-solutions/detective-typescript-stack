@@ -75,9 +75,6 @@ export class CacheService {
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
-    console.log('ACTIVE USERS:');
-    console.log(activeUsers.length);
-    console.log(activeUsers);
     if (activeUsers.length === 0) {
       // Save casefile data to database
       // Remove casefile data from cache
