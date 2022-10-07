@@ -3,20 +3,12 @@
   <div mat-dialog-content align="center">
     {{ t('upgradeDialogText') }}
   </div>
-  <div
-    class="upgrade-choice-wrapper"
-    fxLayout="row"
-    fxLayout.xs="column"
-    fxFlexFill
-    *ngFor="let plan of (availablePlans$ | async)?.prices; let i = index"
-  >
+  <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
     <mat-card
       #upgradeCard
-      class="upgrade-card"
-      id="{{ plan.id }}"
-      fxFlex="50"
-      class="section"
-      fxFlex.xs="55"
+      fxFlex="30"
+      fxFlex.xs="35"
+      *ngFor="let plan of (availablePlans$ | async)?.prices"
       (click)="lockUpgrade(plan.id)"
     >
       <mat-card-subtitle>

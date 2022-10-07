@@ -7,6 +7,7 @@ import {
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
 import { ConnectionsService, MaskingsService, SubscriptionService } from './services';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GetAllConnectionsGQL, GetAllMaskingsGQL, GetAllUsersGQL, GetConnectionByIdGQL } from './graphql';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -20,7 +21,6 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
@@ -37,6 +37,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     AdminRoutingModule,
     TranslocoModule,
     NavigationModule,
