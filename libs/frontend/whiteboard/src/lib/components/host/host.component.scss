@@ -3,6 +3,11 @@
     z-index: 1001;
   }
 
+  #whiteboard {
+    // Workaround to prevent showing vertical scrollbar
+    height: calc(100vh - 4px);
+  }
+
   .loading-backdrop {
     position: absolute;
     width: 100%;
