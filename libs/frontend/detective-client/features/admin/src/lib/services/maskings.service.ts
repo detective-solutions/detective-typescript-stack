@@ -8,6 +8,8 @@ import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 @Injectable()
 export class MaskingsService {
   private getAllMaskingsWatchQuery!: QueryRef<Response>;

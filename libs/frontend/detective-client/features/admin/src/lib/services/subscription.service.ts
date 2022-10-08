@@ -18,7 +18,7 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class SubscriptionService {
-  private static provisioningBasePath = 'http://localhost:3004/v1/provisioning'; //`${environment.baseApiPath}`;
+  private static provisioningBasePath = `${environment.baseApiPath}${environment.provisioningApiPathV1}`;
   private getAllUsersWatchQuery!: QueryRef<Response>;
 
   invoice$!: Observable<IInvoiceListResponse>;

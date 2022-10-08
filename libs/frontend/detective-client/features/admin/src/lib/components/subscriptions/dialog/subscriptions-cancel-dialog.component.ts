@@ -40,18 +40,18 @@ export class SubscriptionCancelDialogComponent {
   }
 
   private handleResponse(actionName: string, response: StatusResponse) {
-    let toastMsg = 'actionFailed';
+    let toastMessage = 'actionFailed';
     let toastType = ToastType.ERROR;
 
     if (response.status) {
-      toastMsg = 'actionSuccessful';
+      toastMessage = 'actionSuccessful';
       toastType = ToastType.INFO;
       this.logger.info(`${actionName}: ${response.status}`);
     } else {
       this.logger.error(`${actionName}: ${response.status}`);
     }
     this.translationService
-      .selectTranslate(`subscriptions.toastMessages.${toastMsg}`, {}, this.translationScope)
+      .selectTranslate(`subscriptions.toastMessages.${toastMessage}`, {}, this.translationScope)
       .pipe(take(1))
       .subscribe((translation: string) => {
         this.toastService.showToast(translation, 'Close', toastType);
