@@ -8,6 +8,7 @@ export type TableCellData =
   | IMultiTableCell
   | IStateTableCell
   | ITextTableCell
+  | ILinkTableCell
   | IUserAvatarListTableCell;
 
 export enum TableCellTypes {
@@ -18,6 +19,7 @@ export enum TableCellTypes {
   MULTI_TABLE_CELL = 'multiTableCell',
   STATUS_TABLE_CELL = 'statusTableCell',
   TEXT_TABLE_CELL = 'textTableCell',
+  LINK_TABLE_CELL = 'linkTableCell',
   USER_AVATAR_LIST_TABLE_CELL = 'userIconListTableCell',
 }
 
@@ -69,6 +71,12 @@ export interface IStateTableCell extends IBaseTableCell {
 export interface ITextTableCell extends IBaseTableCell {
   type: TableCellTypes.TEXT_TABLE_CELL;
   text: string;
+}
+
+export interface ILinkTableCell extends IBaseTableCell {
+  type: TableCellTypes.LINK_TABLE_CELL;
+  text: string;
+  link: string;
 }
 
 export interface IUserAvatarListTableCell extends IBaseTableCell {

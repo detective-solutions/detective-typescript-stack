@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AdminContainerComponent } from './admin-container.component';
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { HttpClientTestingModule } from '@angular/common/http/testing';

@@ -1,0 +1,61 @@
+$highlight: #fc1767;
+$highlight-bg: #fc1767;
+
+.upgrade-dialog-wrapper {
+  padding: 10px 0;
+
+  .mat-dialog-content {
+    margin: 15px 0;
+  }
+
+  .mat-dialog-actions {
+    padding-bottom: 20px;
+  }
+
+  .upgrade-choice-wrapper {
+    .mat-card {
+      cursor: pointer;
+      min-height: 300px;
+      max-height: 600px;
+      border: 2px solid rgba(245, 245, 245, 0);
+      margin: 20px;
+      box-shadow: 2px 4px 3px #ccc;
+      &:hover {
+        background-color: rgb(245, 245, 245);
+        border: 2px solid rgb(245, 245, 245);
+      }
+
+      .check-icon {
+        font-size: 18px;
+        float: right;
+        vertical-align: center;
+        color: rgba(245, 245, 245, 0);
+      }
+
+      .mat-card-content {
+        min-height: 50px;
+        max-height: 100px;
+      }
+
+      .mat-card-footer {
+        ul li {
+          list-style: none;
+        }
+      }
+    }
+
+    .selected-plan {
+      background-color: rgb(245, 245, 245);
+      .check-icon {
+        color: $highlight;
+      }
+    }
+  }
+}
+
+.mat-progress-bar {
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+}

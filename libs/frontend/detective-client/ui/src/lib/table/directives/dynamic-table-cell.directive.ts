@@ -3,6 +3,7 @@ import {
   DateTableCellComponent,
   FavorizedTableCellComponent,
   IconButtonTableCellComponent,
+  LinkTableCellComponent,
   MultiTableCellComponent,
   StatusTableCellComponent,
   TextTableCellComponent,
@@ -55,6 +56,9 @@ export class DynamicTableCellDirective implements OnInit {
       }
       case TableCellTypes.TEXT_TABLE_CELL: {
         return this.viewContainerRef.createComponent(TextTableCellComponent);
+      }
+      case TableCellTypes.LINK_TABLE_CELL: {
+        return this.viewContainerRef.createComponent(LinkTableCellComponent);
       }
       case TableCellTypes.USER_AVATAR_LIST_TABLE_CELL: {
         return this.viewContainerRef.createComponent(UserAvatarListTableCellComponent);
