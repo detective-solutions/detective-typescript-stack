@@ -130,6 +130,8 @@ export class DatabaseService {
     const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
     const mutations = [];
 
+    console.log('CURRENTLY SAVED CASEFILE', currentlySavedCasefile);
+
     const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
       casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id !== cachedNode.id)
     );
