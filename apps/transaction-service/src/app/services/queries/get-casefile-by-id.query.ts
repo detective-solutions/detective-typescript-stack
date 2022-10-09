@@ -23,11 +23,6 @@ export const getCasefileByIdQuery = `
         locked: TableOccurrence.locked
         lastUpdatedBy: TableOccurrence.lastUpdatedBy {
           id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
@@ -46,11 +41,6 @@ export const getCasefileByIdQuery = `
         locked: UserQueryOccurrence.locked
         lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy {
           id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
@@ -72,11 +62,6 @@ export const getCasefileByIdQuery = `
         }
         lastUpdatedBy: Embedding.lastUpdatedBy {
           id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
         }
         lastUpdated: Embedding.lastUpdated
         created: Embedding.created
