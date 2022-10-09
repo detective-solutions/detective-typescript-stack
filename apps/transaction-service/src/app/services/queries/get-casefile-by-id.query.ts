@@ -27,6 +27,7 @@ export const getCasefileByIdQuery = `
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
         entity: TableOccurrence.entity {
+          id: Table.xid
           name: Table.name
           description: Table.description
         }
@@ -48,6 +49,7 @@ export const getCasefileByIdQuery = `
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
         entity: UserQueryOccurrence.entity {
+          id: UserQuery.xid
           code: UserQuery.code
         }
       }
