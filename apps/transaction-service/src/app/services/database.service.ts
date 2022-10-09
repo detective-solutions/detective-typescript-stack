@@ -132,8 +132,8 @@ export class DatabaseService {
     // Generating mutations for deleted nodes
     try {
       const currentlySavedCasefile = await this.getCachableCasefileById(casefile.id);
-      const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
-        casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
+      const deletedNodes = currentlySavedCasefile.nodes.filter(
+        (node: AnyWhiteboardNode) => !casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
       );
       console.log('DELETED NODES', deletedNodes);
       if (deletedNodes && deletedNodes.length > 0) {
