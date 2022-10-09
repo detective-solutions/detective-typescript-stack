@@ -130,14 +130,17 @@ export class DatabaseService {
     const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
     const mutations = [];
 
-    console.log('CURRENTLY SAVED CASEFILE', currentlySavedCasefile);
-
     const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
-      casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id !== cachedNode.id)
+      casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
     );
-    console.log('DELETED NODES', deletedNodes);
 
-    // TODO: Run check which nodes have been deleted and create delete mutations for them
+    console.log('DELETED NODES', deletedNodes);
+    if (deletedNodes && deletedNodes.length > 0) {
+      deletedNodes.forEach((deletedNode: AnyWhiteboardNode) => {
+        mutations.push(this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
+      });
+    }
+    console.log('DELETED NODE MUTATIONS', mutations);
 
     casefile.nodes.forEach((node: AnyWhiteboardNode) => {
       switch (node.type) {
@@ -175,6 +178,7 @@ export class DatabaseService {
     casefileUid: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
+    console.log('Creating mutation for', tableWhiteboardNode);
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     return {
       uid: DatabaseService.mutationNodeReference,
@@ -306,6 +310,12 @@ export class DatabaseService {
       );
       return null;
     });
+  }
+
+  async getDeleteNodeInCasefileMutation(nodeId: string, nodeType: WhiteboardNodeType): Promise<Record<string, any>> {
+    return {
+      uid: await this.getUidByType(nodeId, nodeType),
+    };
   }
 
   async deleteNodeInCasefile(nodeId: string, nodeType: WhiteboardNodeType) {
