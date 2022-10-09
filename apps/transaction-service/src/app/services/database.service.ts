@@ -126,49 +126,71 @@ export class DatabaseService {
   }
 
   async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<Record<string, any> | null> {
-    const currentlySavedCasefile = await this.getCachableCasefileById(casefile.id);
-    const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
     const mutations = [];
+    const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
 
-    const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
-      casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
-    );
-
-    console.log('DELETED NODES', deletedNodes);
-    if (deletedNodes && deletedNodes.length > 0) {
-      deletedNodes.forEach((deletedNode: AnyWhiteboardNode) => {
-        mutations.push(this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
-      });
-    }
-    console.log('DELETED NODE MUTATIONS', mutations);
-
-    casefile.nodes.forEach((node: AnyWhiteboardNode) => {
-      switch (node.type) {
-        case WhiteboardNodeType.TABLE: {
-          // TODO: Query existing table nodes for casefile
-          mutations.push(this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
-          break;
-        }
-        case WhiteboardNodeType.USER_QUERY: {
-          mutations.push(this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode));
-          break;
-        }
-        case WhiteboardNodeType.EMBEDDING: {
-          mutations.push(this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
-          break;
-        }
-        default: {
-          throw new InternalServerErrorException(
-            `Could not match given node type ${node.type} for saving the node to the database`
-          );
-        }
+    // Generating mutations for deleted nodes
+    try {
+      const currentlySavedCasefile = await this.getCachableCasefileById(casefile.id);
+      const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
+        casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
+      );
+      console.log('DELETED NODES', deletedNodes);
+      if (deletedNodes && deletedNodes.length > 0) {
+        deletedNodes.forEach((deletedNode: AnyWhiteboardNode) => {
+          mutations.push(this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
+        });
       }
-    });
+      console.log('DELETED NODE MUTATIONS', mutations);
+    } catch (error) {
+      this.logger.error(
+        `Could not determine deleted nodes while saving casefile ${casefile.id}. Skipping delete mutations ...`
+      );
+      console.error(error);
+    }
 
-    // TODO: Add mutation JSON for casefile metadata
+    // Generating mutations for added/updated nodes
+    try {
+      casefile.nodes.forEach((node: AnyWhiteboardNode) => {
+        switch (node.type) {
+          case WhiteboardNodeType.TABLE: {
+            mutations.push(this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
+            break;
+          }
+          case WhiteboardNodeType.USER_QUERY: {
+            mutations.push(
+              this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode)
+            );
+            break;
+          }
+          case WhiteboardNodeType.EMBEDDING: {
+            mutations.push(this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
+            break;
+          }
+          default: {
+            throw new InternalServerErrorException(
+              `Could not match given node type ${node.type} for saving the node to the database`
+            );
+          }
+        }
+      });
+    } catch (error) {
+      this.logger.error(`Could not generate all node mutations while saving casefile ${casefile.id}`);
+      console.error(error);
+    }
 
-    const json = [{ uid: casefileUid }, ...mutations];
-    return this.sendMutation(json).catch(() => {
+    // Generating mutation for casefile metadata
+    try {
+      mutations.push({
+        uid: casefileUid,
+        'Casefile.title': casefile.title ?? null,
+        'Casefile.description': casefile.description ?? null,
+      });
+    } catch (error) {
+      this.logger.error(`Could not create metadata mutation while saving casefile ${casefile.id}`);
+    }
+
+    return this.sendMutation(mutations).catch(() => {
       this.logger.error(`There was a problem while trying to save casefile "${casefile.id}"`);
       return null;
     });
@@ -364,12 +386,12 @@ export class DatabaseService {
   private async createBasicNodeInsertMutation(addedWhiteboardNode: AnyWhiteboardNode) {
     return {
       [`${addedWhiteboardNode.type}.xid`]: addedWhiteboardNode.id,
-      [`${addedWhiteboardNode.type}.title`]: addedWhiteboardNode.title,
+      [`${addedWhiteboardNode.type}.title`]: addedWhiteboardNode.title ?? null,
       [`${addedWhiteboardNode.type}.x`]: addedWhiteboardNode.x,
       [`${addedWhiteboardNode.type}.y`]: addedWhiteboardNode.y,
       [`${addedWhiteboardNode.type}.width`]: addedWhiteboardNode.width,
       [`${addedWhiteboardNode.type}.height`]: addedWhiteboardNode.height,
-      [`${addedWhiteboardNode.type}.locked`]: addedWhiteboardNode.locked,
+      [`${addedWhiteboardNode.type}.locked`]: addedWhiteboardNode.locked ?? null,
       [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
         uid: await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User'),
       },
