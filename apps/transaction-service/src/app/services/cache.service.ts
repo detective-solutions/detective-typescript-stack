@@ -44,7 +44,7 @@ export class CacheService {
 
     // Can't match expected Redis client type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cacheResponse = await this.client.json.del(casefileId);
+    const cacheResponse = await this.client.json.del(casefileId, '$');
     // 0 or 1
     if (!cacheResponse) {
       throw new InternalServerErrorException(`Could not delete casefile "${casefileId}" from cache`);
