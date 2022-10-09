@@ -31,15 +31,16 @@ export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   @IsNotEmpty()
   locked!: boolean;
 
+  @IsUUID()
   @IsNotEmpty()
-  author!: IUser;
+  author!: string;
 
   @IsNotEmpty()
   editors!: IUser[];
 
   @IsUUID()
   @IsNotEmpty()
-  lastUpdatedBy!: IUser;
+  lastUpdatedBy!: string;
 
   @IsString()
   @IsNotEmpty()

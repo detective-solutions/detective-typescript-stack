@@ -1,4 +1,4 @@
-import { ITable, ITableOccurrence, IUser } from '@detective.solutions/shared/data-access';
+import { ITable, ITableOccurrence } from '@detective.solutions/shared/data-access';
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class TableOccurrenceDTO implements ITableOccurrence {
@@ -33,7 +33,7 @@ export class TableOccurrenceDTO implements ITableOccurrence {
 
   @IsUUID()
   @IsNotEmpty()
-  lastUpdatedBy!: IUser;
+  lastUpdatedBy!: string;
 
   @IsString()
   @IsNotEmpty()

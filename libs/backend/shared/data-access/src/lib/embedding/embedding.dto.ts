@@ -36,15 +36,16 @@ export class EmbeddingDTO implements IEmbedding {
   @IsNotEmpty()
   locked!: boolean;
 
+  @IsUUID()
   @IsNotEmpty()
-  author!: IUser;
+  author!: string;
 
   // TODO: Add validation
   editors!: IUser[];
 
   @IsUUID()
   @IsNotEmpty()
-  lastUpdatedBy!: IUser;
+  lastUpdatedBy!: string;
 
   @IsString()
   @IsNotEmpty()

@@ -221,7 +221,7 @@ export class DatabaseService {
       uid: DatabaseService.mutationNodeReference,
       ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
+        uid: await this.getUidByType(userQueryWhiteboardNode.author, 'User'),
       },
       [`${userQueryWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
@@ -241,7 +241,7 @@ export class DatabaseService {
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
       [`${userQueryWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
+        uid: await this.getUidByType(userQueryWhiteboardNode.author, 'User'),
       },
       [`${userQueryWhiteboardNode.type}.entity`]: {
         uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
@@ -271,7 +271,7 @@ export class DatabaseService {
       ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
+        uid: await this.getUidByType(embeddingWhiteboardNode.author, 'User'),
       },
       [`${embeddingWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
@@ -289,7 +289,7 @@ export class DatabaseService {
       uid: DatabaseService.mutationNodeReference,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
+        uid: await this.getUidByType(embeddingWhiteboardNode.author, 'User'),
       },
       [`${embeddingWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
@@ -359,7 +359,7 @@ export class DatabaseService {
       [`${addedWhiteboardNode.type}.height`]: addedWhiteboardNode.height,
       [`${addedWhiteboardNode.type}.locked`]: addedWhiteboardNode.locked,
       [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
-        uid: await this.getUidByType(addedWhiteboardNode.lastUpdatedBy.id, 'User'),
+        uid: await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User'),
       },
       [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated,
       [`${addedWhiteboardNode.type}.created`]: addedWhiteboardNode.created,
