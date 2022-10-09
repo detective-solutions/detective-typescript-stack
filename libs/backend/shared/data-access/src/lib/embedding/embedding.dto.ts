@@ -44,7 +44,6 @@ export class EmbeddingDTO implements IEmbedding {
   editors!: IUser[];
 
   @IsUUID()
-  @IsNotEmpty()
   lastUpdatedBy!: string;
 
   @IsString()

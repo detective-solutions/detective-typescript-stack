@@ -39,7 +39,6 @@ export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   editors!: IUser[];
 
   @IsUUID()
-  @IsNotEmpty()
   lastUpdatedBy!: string;
 
   @IsString()
