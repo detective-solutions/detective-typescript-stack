@@ -127,7 +127,11 @@ export class DatabaseService {
 
   async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<Record<string, any> | null> {
     const mutations = [];
+
     const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
+    if (!casefileUid) {
+      throw new InternalServerErrorException(`Could not retrieve casefile UID for casefile ${casefile.id}`);
+    }
 
     // Generating mutations for deleted nodes
     try {
