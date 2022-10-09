@@ -9,7 +9,6 @@ import { RedisClientType, RedisDefaultModules } from 'redis';
 
 import { DatabaseService } from './database.service';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
-import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y/input-modality/input-modality-detector';
 
 @Injectable()
 export class CacheService {
