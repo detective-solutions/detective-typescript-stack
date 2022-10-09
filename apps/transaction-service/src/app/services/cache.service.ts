@@ -39,6 +39,19 @@ export class CacheService {
     return cacheResponse;
   }
 
+  async deleteCasefile(casefileId: string): Promise<void> {
+    this.logger.log(`Deleting casefile "${casefileId}" from cache`);
+
+    // Can't match expected Redis client type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cacheResponse = await this.client.json.del(casefileId);
+    // 0 or 1
+    if (!cacheResponse) {
+      throw new InternalServerErrorException(`Could not delete casefile "${casefileId}" from cache`);
+    }
+    console.log(`Deleted cache for casefile ${casefileId}`); // TODO: Remove me!
+  }
+
   async getCasefileById(casefileId: string): Promise<ICachableCasefileForWhiteboard> {
     this.logger.log(`Requesting casefile "${casefileId}" data from cache`);
     // Can't match Redis client return type with domain type
@@ -75,9 +88,10 @@ export class CacheService {
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
     activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
+    // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
-      // Save casefile data to database
-      // Remove casefile data from cache
+      this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
+      this.deleteCasefile(casefileId);
     }
 
     const cacheResponse = await this.client.json.set(casefileId, CacheService.ACTIVE_USERS_JSON_PATH, activeUsers);

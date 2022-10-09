@@ -95,7 +95,7 @@ export class DatabaseService {
   }
 
   async getWhiteboardUserById(userId: string): Promise<IUserForWhiteboard> | null {
-    this.logger.log(`Requesting info for user ${userId} from database`);
+    this.logger.log(`Requesting info for user "${userId}" from database`);
 
     const queryVariables = { $id: userId };
     const response = (await this.sendQuery(getUserByIdQuery, queryVariables)) as IGetUserById;
@@ -125,6 +125,68 @@ export class DatabaseService {
     return userData;
   }
 
+  async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<Record<string, any> | null> {
+    const currentlySavedCasefile = await this.getCachableCasefileById(casefile.id);
+    const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
+    const mutations = [];
+
+    const deletedNodes = currentlySavedCasefile.nodes.filter((node: AnyWhiteboardNode) =>
+      casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id !== cachedNode.id)
+    );
+    console.log('DELETED NODES', deletedNodes);
+
+    // TODO: Run check which nodes have been deleted and create delete mutations for them
+
+    casefile.nodes.forEach((node: AnyWhiteboardNode) => {
+      switch (node.type) {
+        case WhiteboardNodeType.TABLE: {
+          // TODO: Query existing table nodes for casefile
+          mutations.push(this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
+          break;
+        }
+        case WhiteboardNodeType.USER_QUERY: {
+          mutations.push(this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode));
+          break;
+        }
+        case WhiteboardNodeType.EMBEDDING: {
+          mutations.push(this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
+          break;
+        }
+        default: {
+          throw new InternalServerErrorException(
+            `Could not match given node type ${node.type} for saving the node to the database`
+          );
+        }
+      }
+    });
+
+    // TODO: Add mutation JSON for casefile metadata
+
+    const json = [{ uid: casefileUid }, ...mutations];
+    return this.sendMutation(json).catch(() => {
+      this.logger.error(`There was a problem while trying to save casefile "${casefile.id}"`);
+      return null;
+    });
+  }
+
+  async getTableOccurrenceToCasefileMutation(
+    casefileUid: string,
+    tableWhiteboardNode: ITableWhiteboardNode
+  ): Promise<Record<string, any> | null> {
+    const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
+    return {
+      uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
+      [`${tableWhiteboardNode.type}.entity`]: {
+        uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
+      },
+      [`${tableWhiteboardNode.type}.casefile`]: {
+        uid: casefileUid,
+        'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
+      },
+    };
+  }
+
   async insertTableOccurrenceToCasefile(
     casefileId: string,
     tableWhiteboardNode: ITableWhiteboardNode
@@ -148,6 +210,27 @@ export class DatabaseService {
       );
       return null;
     });
+  }
+
+  async getUserQueryOccurrenceToCasefileMutation(
+    casefileUid: string,
+    userQueryWhiteboardNode: IUserQueryWhiteboardNode
+  ): Promise<Record<string, any> | null> {
+    const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
+    return {
+      uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
+      [`${userQueryWhiteboardNode.type}.author`]: {
+        uid: await this.getUidByType(userQueryWhiteboardNode.author.id, 'User'),
+      },
+      [`${userQueryWhiteboardNode.type}.entity`]: {
+        uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
+      },
+      [`${userQueryWhiteboardNode.type}.casefile`]: {
+        uid: casefileUid,
+        'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
+      },
+    };
   }
 
   async insertUserQueryOccurrenceToCasefile(
@@ -176,6 +259,25 @@ export class DatabaseService {
       );
       return null;
     });
+  }
+
+  async getEmbeddingToCasefileMutation(
+    casefileUid: string,
+    embeddingWhiteboardNode: IEmbeddingWhiteboardNode
+  ): Promise<Record<string, any> | null> {
+    const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
+    return {
+      uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
+      [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
+      [`${embeddingWhiteboardNode.type}.author`]: {
+        uid: await this.getUidByType(embeddingWhiteboardNode.author.id, 'User'),
+      },
+      [`${embeddingWhiteboardNode.type}.casefile`]: {
+        uid: casefileUid,
+        'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
+      },
+    };
   }
 
   async insertEmbeddingToCasefile(
