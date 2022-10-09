@@ -137,9 +137,9 @@ export class DatabaseService {
       );
       console.log('DELETED NODES', deletedNodes);
       if (deletedNodes && deletedNodes.length > 0) {
-        deletedNodes.forEach((deletedNode: AnyWhiteboardNode) => {
-          mutations.push(this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
-        });
+        for (const deletedNode of deletedNodes) {
+          mutations.push(await this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
+        }
       }
       console.log('DELETED NODE MUTATIONS', mutations);
     } catch (error) {
