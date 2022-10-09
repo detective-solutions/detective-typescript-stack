@@ -1,18 +1,5 @@
 import { IEmbedding, IUser } from '@detective.solutions/shared/data-access';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  IsUrl,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
-
-import { Type } from 'class-transformer';
-import { UserForWhiteboardDTO } from '../user';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, IsUrl, MaxLength } from 'class-validator';
 
 export class EmbeddingDTO implements IEmbedding {
   @IsUUID()
@@ -55,8 +42,7 @@ export class EmbeddingDTO implements IEmbedding {
   // TODO: Add validation
   editors!: IUser[];
 
-  @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboardDTO)
+  @IsUUID()
   @IsNotEmpty()
   lastUpdatedBy!: IUser;
 
