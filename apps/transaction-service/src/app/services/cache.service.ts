@@ -9,6 +9,7 @@ import { RedisClientType, RedisDefaultModules } from 'redis';
 
 import { DatabaseService } from './database.service';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
+import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y/input-modality/input-modality-detector';
 
 @Injectable()
 export class CacheService {
@@ -94,6 +95,8 @@ export class CacheService {
       return 'OK';
     }
 
+    await this.unblockAllWhiteboardNodesByUserId(casefileId, userId);
+
     const cacheResponse = await this.client.json.set(casefileId, CacheService.ACTIVE_USERS_JSON_PATH, activeUsers);
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not remove active user ${userId} from casefile ${casefileId}`);
@@ -159,7 +162,7 @@ export class CacheService {
     return true;
   }
 
-  async unblockAllWhiteboardNodesByUserId(casefileId: string, userId: string) {
+  async unblockAllWhiteboardNodesByUserId(casefileId: string, userId: string): Promise<void> {
     this.logger.log(`Unblocking all whiteboard nodes blocked by user "${userId}" in casefile "${casefileId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
