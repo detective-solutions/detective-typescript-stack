@@ -135,13 +135,12 @@ export class DatabaseService {
       const deletedNodes = currentlySavedCasefile.nodes.filter(
         (node: AnyWhiteboardNode) => !casefile.nodes.some((cachedNode: AnyWhiteboardNode) => node.id === cachedNode.id)
       );
-      console.log('DELETED NODES', deletedNodes);
       if (deletedNodes && deletedNodes.length > 0) {
         for (const deletedNode of deletedNodes) {
           mutations.push(await this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
         }
       }
-      console.log('DELETED NODE MUTATIONS', mutations);
+      console.debug('DELETED NODE MUTATIONS', mutations); // TODO: Remove me!
     } catch (error) {
       this.logger.error(
         `Could not determine deleted nodes while saving casefile ${casefile.id}. Skipping delete mutations ...`
@@ -151,20 +150,20 @@ export class DatabaseService {
 
     // Generating mutations for added/updated nodes
     try {
-      casefile.nodes.forEach((node: AnyWhiteboardNode) => {
+      for (const node of casefile.nodes) {
         switch (node.type) {
           case WhiteboardNodeType.TABLE: {
-            mutations.push(this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
+            mutations.push(await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
             break;
           }
           case WhiteboardNodeType.USER_QUERY: {
             mutations.push(
-              this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode)
+              await this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode)
             );
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
-            mutations.push(this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
+            mutations.push(await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
             break;
           }
           default: {
@@ -173,7 +172,7 @@ export class DatabaseService {
             );
           }
         }
-      });
+      }
     } catch (error) {
       this.logger.error(`Could not generate all node mutations while saving casefile ${casefile.id}`);
       console.error(error);
