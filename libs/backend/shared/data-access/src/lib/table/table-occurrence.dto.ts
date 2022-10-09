@@ -32,6 +32,7 @@ export class TableOccurrenceDTO implements ITableOccurrence {
   locked!: boolean;
 
   @IsUUID()
+  @IsOptional()
   lastUpdatedBy!: string;
 
   @IsString()

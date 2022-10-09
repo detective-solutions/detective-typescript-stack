@@ -1,5 +1,5 @@
 import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   @IsUUID()
@@ -39,6 +39,7 @@ export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   editors!: IUser[];
 
   @IsUUID()
+  @IsOptional()
   lastUpdatedBy!: string;
 
   @IsString()
