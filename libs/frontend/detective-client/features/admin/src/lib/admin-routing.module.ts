@@ -1,3 +1,4 @@
+/* eslint-disable no-alert, no-console */
 import { RouterModule, Routes } from '@angular/router';
 
 import { AdminContainerComponent } from './components/admin-container.component';
@@ -5,6 +6,7 @@ import { ConnectionsComponent } from './components/connections/connections.compo
 import { GroupsComponent } from './components/groups/groups.component';
 import { MasksComponent } from './components/masks/masks.component';
 import { NgModule } from '@angular/core';
+import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
 
 const routes: Routes = [
   {
@@ -15,6 +17,7 @@ const routes: Routes = [
       { path: 'connections', component: ConnectionsComponent },
       { path: 'groups', component: GroupsComponent },
       { path: 'masks', component: MasksComponent },
+      { path: 'subscriptions', component: SubscriptionsComponent },
     ],
   },
 ];

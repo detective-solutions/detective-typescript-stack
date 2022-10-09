@@ -1,6 +1,11 @@
 {
   "navigation": {
-    "sidenavItems": { "connections": "Connections", "groups": "Groups", "masks": "Masks" },
+    "sidenavItems": {
+      "connections": "Connections",
+      "groups": "Groups",
+      "masks": "Masks",
+      "subscriptions": "Subscription"
+    },
     "sidenavBottomItem": "Home"
   },
   "connections": {
@@ -20,6 +25,48 @@
       "deleteDialogHeader": "Delete connection",
       "deleteDialogText": "You are about to delete {{connectionName}}.",
       "deleteButtonText": "I want to delete this connection"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch connection data. Please contact support",
+      "formSubmitError": "Could not submit connection data. Please contact support"
+    }
+  },
+  "masks": {
+    "addMaskingButtonText": "New Masking",
+    "columnNames": {
+      "lastUpdatedColumn": "Last Updated",
+      "table": "Masked Table"
+    }
+  },
+  "subscriptions": {
+    "columnNames": {
+      "invoice": "Invoice Nr.",
+      "period": "Period",
+      "interval": "Interval",
+      "amount": "Amount",
+      "currency": "Currency",
+      "status": "Paid",
+      "invoice_pdf": "Invoice",
+      "download": "Download"
+    },
+    "cancelDialog": {
+      "cancelDialogHeader": "Delete account",
+      "cancelDialogText": "You are about to delete the account and lose access to your discussions",
+      "cancelExecuteButtonText": "Unsubscribe",
+      "cancelCancelButtonText": "Keep on investigating"
+    },
+    "upgradeDialog": {
+      "upgradeDialogHeader": "Choose your upgrade",
+      "upgradeDialogText": "You can modify your subscriptions any time. This way you have the full flexbility",
+      "cancelUpgradeButtonText": "Cancel",
+      "upgradeNowButtonText": "Upgrade",
+      "userLimit": "User"
+    },
+    "utils": {
+      "of": "of",
+      "users": "users"
     },
     "toastMessages": {
       "actionSuccessful": "Action performed successfully",

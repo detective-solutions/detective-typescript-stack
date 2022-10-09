@@ -1,6 +1,11 @@
 {
   "navigation": {
-    "sidenavItems": { "connections": "Verbindungen", "groups": "Gruppen", "masks": "Masken" },
+    "sidenavItems": {
+      "connections": "Verbindungen",
+      "groups": "Gruppen",
+      "masks": "Masken",
+      "subscriptions": "Subscription"
+    },
     "sidenavBottomItem": "Home"
   },
   "connections": {
@@ -20,6 +25,48 @@
       "deleteDialogHeader": "Verbindung entfernen",
       "deleteDialogText": "Sie sind dabei die Verbindung {{connectionName}} zu entfernen.",
       "deleteButtonText": "Ich möchte diese Verbindung entfernen"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Verbindungsdaten konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
+    }
+  },
+  "masks": {
+    "addMaskingButtonText": "Neue Maskierung anlegen",
+    "columnNames": {
+      "lastUpdatedColumn": "Zuletzt aktualisiert",
+      "table": "Maskierte Tabelle"
+    }
+  },
+  "subscriptions": {
+    "columnNames": {
+      "invoice": "Rechnung Nr.",
+      "period": "Abrechnungszeitraum",
+      "interval": "Interval",
+      "amount": "Betrag",
+      "currency": "Währung",
+      "status": "Bezahlt",
+      "invoice_pdf": "Rechnung",
+      "download": "Download"
+    },
+    "cancelDialog": {
+      "cancelDialogHeader": "Account löschen",
+      "cancelDialogText": "Sie sind dabei die Account zu löschen und den Zugriff auf ihre Diskussionen zu verlieren",
+      "cancelExecuteButtonText": "Abonement kündigen",
+      "cancelCancelButtonText": "Abbrechen"
+    },
+    "upgradeDialog": {
+      "upgradeDialogHeader": "Wähle dein Upgrade",
+      "upgradeDialogText": "Du kannst dein Abonement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
+      "cancelUpgradeButtonText": "Abbrechen",
+      "upgradeNowButtonText": "Ausführen",
+      "userLimit": "Nuzter"
+    },
+    "utils": {
+      "of": "von",
+      "users": "Nutzern"
     },
     "toastMessages": {
       "actionSuccessful": "Aktion erfolgreich ausgeführt",

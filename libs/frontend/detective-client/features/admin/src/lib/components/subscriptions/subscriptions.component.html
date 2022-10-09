@@ -1,0 +1,40 @@
+<div
+  class="subscriptions-wrapper"
+  [class.is-mobile]="isMobile$ | async"
+  *transloco="let t; read: 'admin.subscriptions.utils'"
+>
+  <div class="top-row" fxLayout="row" fxLayout.xs="column" fxFlexFill *ngIf="productInfo$ | async as productInfo">
+    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+      <p>
+        <small class="subscription-chip">{{ productInfo.name }}</small>
+        Plan
+      </p>
+      <p>{{ activeUsers$ | async }} {{ t('of') }} {{ productInfo.userLimit }} {{ t('users') }}</p>
+      <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}"></mat-progress-bar>
+    </div>
+    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+      <p>
+        <b>{{ productInfo.priceTag }}</b>
+        <small> /{{ productInfo.iteration }}</small>
+      </p>
+      <span fxLayoutAlign="left" fxHide.sm fxHide.xs>
+        <button mat-raised-button color="accent" class="invite-button" (click)="openUpgradeDialog()">Upgrade</button>
+      </span>
+    </div>
+    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+      <p>
+        <img src="{{ (paymentMethod$ | async)?.cardType }}" alt="card-logo" class="card-logo" /><span>
+          **** {{ (paymentMethod$ | async)?.number }}</span
+        >
+      </p>
+      <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="add-connection-button-wrapper">
+        <button mat-stroked-button (click)="changePayment()">change payment</button>
+        <button mat-stroked-button (click)="openCancelDialog()">cancel</button>
+      </span>
+    </div>
+    <div fxFlex="50" class="info-section" fxFlex.xs="55"></div>
+  </div>
+  <div class="invoice-row">
+    <table-view [tableRows$]="tableItems$" [pageSize]="pageSize"></table-view>
+  </div>
+</div>
