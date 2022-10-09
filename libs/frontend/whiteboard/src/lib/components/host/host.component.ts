@@ -30,6 +30,7 @@ import {
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
+import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
@@ -117,6 +118,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('Could not extract drag data for adding whiteboard node');
     }
 
+    const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
 
     // TODO: Remove these when actual node data is loaded
@@ -130,64 +132,63 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       '',
     ];
 
-    const now = formatDate(new Date());
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1))
+      .subscribe((context: IWhiteboardContextState) => {
+        if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
+          // TODO: Remove when data from dragged element is used
+          const tableNode = TableWhiteboardNode.Build({
+            id: uuidv4(),
+            title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+            x: convertedDOMPoint.x,
+            y: convertedDOMPoint.y,
+            width: 900,
+            height: 500,
+            locked: false,
+            lastUpdatedBy: context.userId,
+            lastUpdated: now,
+            created: now,
+            entity: {
+              id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
+            },
+          });
 
-    if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
-      // TODO: Remove when data from dragged element is used
-      const tableNode = TableWhiteboardNode.Build({
-        id: uuidv4(),
-        title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-        x: convertedDOMPoint.x,
-        y: convertedDOMPoint.y,
-        width: 900,
-        height: 500,
-        locked: false,
-        lastUpdatedBy: {
-          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-        },
-        lastUpdated: now,
-        created: now,
-        entity: {
-          id: '9ebc4874-7135-11ec-8798-287fcf6e789d',
-        },
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeAdded({
+              addedNode: tableNode,
+              addedManually: true,
+            })
+          );
+        }
+
+        if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
+          // TODO: Remove when data from dragged element is used
+          const href = 'google.com';
+          const embeddingNode = EmbeddingWhiteboardNode.Build({
+            id: uuidv4(),
+            title: href,
+            href: href,
+            x: convertedDOMPoint.x,
+            y: convertedDOMPoint.y,
+            width: 900,
+            height: 500,
+            locked: false,
+            author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+            editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+            lastUpdatedBy: context.userId,
+            lastUpdated: now,
+            created: now,
+          });
+
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeAdded({
+              addedNode: embeddingNode,
+              addedManually: true,
+            })
+          );
+        }
       });
-
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeAdded({
-          addedNode: tableNode,
-          addedManually: true,
-        })
-      );
-    }
-
-    if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
-      // TODO: Remove when data from dragged element is used
-      const href = 'detective.solutions';
-      const embeddingNode = EmbeddingWhiteboardNode.Build({
-        id: uuidv4(),
-        title: href,
-        href: href,
-        x: convertedDOMPoint.x,
-        y: convertedDOMPoint.y,
-        width: 900,
-        height: 500,
-        locked: false,
-        author: { id: '78b4daab-dfe4-4bad-855f-ac575cc59730' },
-        editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-        lastUpdatedBy: {
-          id: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-        },
-        lastUpdated: now,
-        created: now,
-      });
-
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeAdded({
-          addedNode: embeddingNode,
-          addedManually: true,
-        })
-      );
-    }
   }
 
   private initializeCollaborationSubscriptions() {
