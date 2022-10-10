@@ -144,7 +144,6 @@ export class DatabaseService {
           mutations.push(await this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
         }
       }
-      console.debug('DELETED NODE MUTATIONS', mutations); // TODO: Remove me!
     } catch (error) {
       this.logger.error(
         `Could not determine deleted nodes while saving casefile ${casefile.id}. Skipping delete mutations ...`
@@ -192,6 +191,8 @@ export class DatabaseService {
     } catch (error) {
       this.logger.error(`Could not create metadata mutation while saving casefile ${casefile.id}`);
     }
+
+    console.debug('SAVE MUTATIONS', mutations); // TODO: Remove me!
 
     return this.sendMutation(mutations).catch(() => {
       this.logger.error(`There was a problem while trying to save casefile "${casefile.id}"`);
