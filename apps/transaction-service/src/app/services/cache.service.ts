@@ -91,11 +91,6 @@ export class CacheService {
     if (activeUsers.length === 0) {
       this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
       this.deleteCasefile(casefileId);
-
-      // TODO: Remove me!
-      const cache = await this.getCasefileById(casefileId);
-      console.log('YO', cache);
-
       return 'OK';
     }
 
@@ -213,11 +208,6 @@ export class CacheService {
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could not remove node "${nodeId}" from casefile "${casefileId}"`);
     }
-
-    // TODO: Remove me!
-    const cache = await this.getCasefileById(casefileId);
-    console.log('YO', cache);
-
     return cacheResponse;
   }
 }
