@@ -93,7 +93,7 @@ export class CacheService {
       this.deleteCasefile(casefileId);
 
       // TODO: Remove me!
-      const cache = this.getCasefileById(casefileId);
+      const cache = await this.getCasefileById(casefileId);
       console.log('YO', cache);
 
       return 'OK';
@@ -215,7 +215,7 @@ export class CacheService {
     }
 
     // TODO: Remove me!
-    const cache = this.getCasefileById(casefileId);
+    const cache = await this.getCasefileById(casefileId);
     console.log('YO', cache);
 
     return cacheResponse;
