@@ -25,8 +25,13 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       let casefileData;
       try {
         casefileData = await this.cacheService.getCasefileById(casefileId);
-        console.log('GOT CACHED CASEFILE');
+        console.log('GOT CACHED CASEFILE', casefileData);
       } catch {
+        casefileData = await this.setupMissingCache(casefileId);
+        console.log('CREATED NEW CASEFILE CACHE');
+      }
+
+      if (!casefileData) {
         casefileData = await this.setupMissingCache(casefileId);
         console.log('CREATED NEW CASEFILE CACHE');
       }
