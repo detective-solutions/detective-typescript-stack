@@ -208,7 +208,6 @@ export class DatabaseService {
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
-    console.log('Creating mutation for', tableWhiteboardNode);
     return {
       uid: DatabaseService.mutationNodeReference,
       ...basicMutationJson,
@@ -220,31 +219,6 @@ export class DatabaseService {
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
     };
-  }
-
-  async insertTableOccurrenceToCasefile(
-    casefileId: string,
-    tableWhiteboardNode: ITableWhiteboardNode
-  ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
-    const finalMutationJson = {
-      uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
-      [`${tableWhiteboardNode.type}.entity`]: {
-        uid: (await this.getUidByType(tableWhiteboardNode.entity.id, 'Table')) ?? null,
-      },
-      [`${tableWhiteboardNode.type}.casefile`]: {
-        uid: await this.getUidByType(casefileId, 'Casefile'),
-        'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
-      },
-    };
-
-    return this.sendMutation(finalMutationJson).catch(() => {
-      this.logger.error(
-        `There was a problem while trying to add a ${tableWhiteboardNode.type} node to casefile ${casefileId}`
-      );
-      return null;
-    });
   }
 
   async getUserQueryOccurrenceToCasefileMutation(
@@ -268,34 +242,6 @@ export class DatabaseService {
     };
   }
 
-  async insertUserQueryOccurrenceToCasefile(
-    casefileId: string,
-    userQueryWhiteboardNode: IUserQueryWhiteboardNode
-  ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
-    const finalMutationJson = {
-      uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
-      [`${userQueryWhiteboardNode.type}.author`]: {
-        uid: (await this.getUidByType(userQueryWhiteboardNode.author, 'User')) ?? null,
-      },
-      [`${userQueryWhiteboardNode.type}.entity`]: {
-        uid: (await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery')) ?? null,
-      },
-      [`${userQueryWhiteboardNode.type}.casefile`]: {
-        uid: await this.getUidByType(casefileId, 'Casefile'),
-        'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
-      },
-    };
-
-    return this.sendMutation(finalMutationJson).catch(() => {
-      this.logger.error(
-        `There was a problem while trying to add a ${userQueryWhiteboardNode.type} node to casefile ${casefileId}`
-      );
-      return null;
-    });
-  }
-
   async getEmbeddingToCasefileMutation(
     casefileUid: string,
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode
@@ -313,32 +259,6 @@ export class DatabaseService {
         'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
       },
     };
-  }
-
-  async insertEmbeddingToCasefile(
-    casefileId: string,
-    embeddingWhiteboardNode: IEmbeddingWhiteboardNode
-  ): Promise<Record<string, any> | null> {
-    const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
-    const finalMutationJson = {
-      uid: DatabaseService.mutationNodeReference,
-      ...basicMutationJson,
-      [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
-      [`${embeddingWhiteboardNode.type}.author`]: {
-        uid: (await this.getUidByType(embeddingWhiteboardNode.author, 'User')) ?? null,
-      },
-      [`${embeddingWhiteboardNode.type}.casefile`]: {
-        uid: await this.getUidByType(casefileId, 'Casefile'),
-        'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
-      },
-    };
-
-    return this.sendMutation(finalMutationJson).catch(() => {
-      this.logger.error(
-        `There was a problem while trying to add a ${embeddingWhiteboardNode} node to casefile ${casefileId}`
-      );
-      return null;
-    });
   }
 
   async getDeleteNodeInCasefileMutation(nodeId: string, nodeType: WhiteboardNodeType): Promise<Record<string, any>> {
@@ -372,8 +292,9 @@ export class DatabaseService {
     }
 
     if (queryResponse[getUidByTypeQueryName].length > 1) {
-      this.logger.error(`Found more than one objects with id ${id} while fetching uid`);
-      throw new InternalServerErrorException();
+      this.logger.warn(
+        `Found more than one objects with id ${id} while fetching uid. Using the first returned entry for now.`
+      );
     }
 
     if (queryResponse[getUidByTypeQueryName].length === 0) {
