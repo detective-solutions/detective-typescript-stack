@@ -22,18 +22,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const userId = this.messageContext.userId;
 
     try {
-      let casefileData;
-      try {
-        casefileData = await this.cacheService.getCasefileById(casefileId);
-        console.log('GOT CACHED CASEFILE', casefileData);
-      } catch {
-        casefileData = await this.setupMissingCache(casefileId);
-        console.log('CREATED NEW CASEFILE CACHE');
-      }
-
+      let casefileData = await this.cacheService.getCasefileById(casefileId);
       if (!casefileData) {
         casefileData = await this.setupMissingCache(casefileId);
-        console.log('CREATED NEW CASEFILE CACHE');
       }
 
       // Add new connected user to cache
