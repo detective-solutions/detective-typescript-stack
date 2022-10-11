@@ -42,7 +42,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       casefileData.temporary.activeUsers.push(user);
 
       // Send LOAD_CASEFILE_DATA event to connected user
-      this.transactionEventProducer.sendKafkaMessage(this.targetTopic, {
+      this.transactionEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: casefileData,
       });
