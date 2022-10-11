@@ -205,7 +205,7 @@ export class DatabaseService {
     casefileUid: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const uid = this.getUidByType(tableWhiteboardNode.id, 'TableOccurrence');
+    const uid = await this.getUidByType(tableWhiteboardNode.id, 'TableOccurrence');
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     return {
       uid: uid ?? DatabaseService.mutationNodeReference,
@@ -224,7 +224,7 @@ export class DatabaseService {
     casefileUid: string,
     userQueryWhiteboardNode: IUserQueryWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    const uid = this.getUidByType(userQueryWhiteboardNode.id, 'TableOccurrence');
+    const uid = await this.getUidByType(userQueryWhiteboardNode.id, 'TableOccurrence');
     const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
     return {
       uid: uid ?? DatabaseService.mutationNodeReference,
