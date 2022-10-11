@@ -267,16 +267,6 @@ export class DatabaseService {
     };
   }
 
-  async deleteNodeInCasefile(nodeId: string, nodeType: WhiteboardNodeType) {
-    const mutationJson = {
-      uid: await this.getUidByType(nodeId, nodeType),
-    };
-    return this.sendDeleteMutation(mutationJson).catch(() => {
-      this.logger.error(`There was a problem while trying to delete node ${nodeId} of type ${nodeType}`);
-      return null;
-    });
-  }
-
   async getUidByType(id: string, type: string): Promise<string> {
     this.logger.log(`Requesting uid for type ${type} from database`);
 
