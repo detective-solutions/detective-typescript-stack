@@ -23,6 +23,7 @@ import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableExc
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
 import { UserForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
+import { formatDate } from '@detective.solutions/shared/utils';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -128,8 +129,10 @@ export class DatabaseService {
   async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<Record<string, any> | null> {
     const mutations = [];
 
-    const casefileUid = await this.getUidByType(casefile.id, 'Casefile');
-    if (!casefileUid) {
+    let casefileUid: string;
+    try {
+      casefileUid = await this.getUidByType(casefile.id, 'Casefile');
+    } catch (error) {
       throw new InternalServerErrorException(`Could not retrieve casefile UID for casefile ${casefile.id}`);
     }
 
@@ -204,13 +207,13 @@ export class DatabaseService {
     casefileUid: string,
     tableWhiteboardNode: ITableWhiteboardNode
   ): Promise<Record<string, any> | null> {
-    console.log('Creating mutation for', tableWhiteboardNode);
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
+    console.log('Creating mutation for', tableWhiteboardNode);
     return {
       uid: DatabaseService.mutationNodeReference,
       ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
-        uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
+        uid: (await this.getUidByType(tableWhiteboardNode.entity.id, 'Table')) ?? null,
       },
       [`${tableWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
@@ -226,14 +229,14 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
-        uid: await this.getUidByType(tableWhiteboardNode.entity.id, 'Table'),
+        uid: (await this.getUidByType(tableWhiteboardNode.entity.id, 'Table')) ?? null,
       },
       [`${tableWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.tables': { uid: DatabaseService.mutationNodeReference },
       },
-      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -253,10 +256,10 @@ export class DatabaseService {
       uid: DatabaseService.mutationNodeReference,
       ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.author, 'User'),
+        uid: (await this.getUidByType(userQueryWhiteboardNode.author, 'User')) ?? null,
       },
       [`${userQueryWhiteboardNode.type}.entity`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
+        uid: (await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery')) ?? null,
       },
       [`${userQueryWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
@@ -272,17 +275,17 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.author, 'User'),
+        uid: (await this.getUidByType(userQueryWhiteboardNode.author, 'User')) ?? null,
       },
       [`${userQueryWhiteboardNode.type}.entity`]: {
-        uid: await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery'),
+        uid: (await this.getUidByType(userQueryWhiteboardNode.entity.id, 'UserQuery')) ?? null,
       },
       [`${userQueryWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.queries': { uid: DatabaseService.mutationNodeReference },
       },
-      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -303,7 +306,7 @@ export class DatabaseService {
       ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(embeddingWhiteboardNode.author, 'User'),
+        uid: (await this.getUidByType(embeddingWhiteboardNode.author, 'User')) ?? null,
       },
       [`${embeddingWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
@@ -319,15 +322,15 @@ export class DatabaseService {
     const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
     const finalMutationJson = {
       uid: DatabaseService.mutationNodeReference,
+      ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
-        uid: await this.getUidByType(embeddingWhiteboardNode.author, 'User'),
+        uid: (await this.getUidByType(embeddingWhiteboardNode.author, 'User')) ?? null,
       },
       [`${embeddingWhiteboardNode.type}.casefile`]: {
         uid: await this.getUidByType(casefileId, 'Casefile'),
         'Casefile.embeddings': { uid: DatabaseService.mutationNodeReference },
       },
-      ...basicMutationJson,
     };
 
     return this.sendMutation(finalMutationJson).catch(() => {
@@ -397,9 +400,9 @@ export class DatabaseService {
       [`${addedWhiteboardNode.type}.height`]: addedWhiteboardNode.height,
       [`${addedWhiteboardNode.type}.locked`]: addedWhiteboardNode.locked ?? null,
       [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
-        uid: await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User'),
+        uid: (await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User')) ?? null,
       },
-      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated,
+      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated ?? formatDate(new Date()),
       [`${addedWhiteboardNode.type}.created`]: addedWhiteboardNode.created,
       'dgraph.type': addedWhiteboardNode.type,
     };
