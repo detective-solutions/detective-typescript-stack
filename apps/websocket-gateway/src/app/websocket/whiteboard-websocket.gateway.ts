@@ -24,6 +24,7 @@ import { MessageContextDTO } from '@detective.solutions/backend/shared/data-acce
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
+import { broadcastWebSocketContext } from '../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -59,6 +60,11 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       },
       body: null,
     });
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
+  async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
+    this.sendMessageByContext(message, broadcastWebSocketContext);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
