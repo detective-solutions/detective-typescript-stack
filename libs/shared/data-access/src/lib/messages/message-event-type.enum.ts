@@ -1,5 +1,6 @@
 export enum MessageEventType {
   LoadWhiteboardData = 'LOAD_WHITEBOARD_DATA',
+  WhiteboardCursorMoved = 'WHITEBOARD_CURSOR_MOVED',
   WhiteboardUserJoined = 'WHITEBOARD_USER_JOINED',
   WhiteboardUserLeft = 'WHITEBOARD_USER_LEFT',
   WhiteboardNodeAdded = 'WHITEBOARD_NODE_ADDED',
