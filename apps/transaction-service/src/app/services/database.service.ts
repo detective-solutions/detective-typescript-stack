@@ -127,7 +127,8 @@ export class DatabaseService {
   }
 
   async saveCasefile(casefile: ICachableCasefileForWhiteboard): Promise<Record<string, any> | null> {
-    const mutations = [];
+    const setMutations = [];
+    const deleteMutations = [];
 
     let casefileUid: string;
     try {
@@ -144,7 +145,7 @@ export class DatabaseService {
       );
       if (deletedNodes && deletedNodes.length > 0) {
         for (const deletedNode of deletedNodes) {
-          mutations.push(await this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
+          deleteMutations.push(await this.getDeleteNodeInCasefileMutation(deletedNode.id, deletedNode.type));
         }
       }
     } catch (error) {
@@ -159,19 +160,19 @@ export class DatabaseService {
       for (const [index, node] of casefile.nodes.entries()) {
         switch (node.type) {
           case WhiteboardNodeType.TABLE: {
-            mutations.push(
+            setMutations.push(
               await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode, index)
             );
             break;
           }
           case WhiteboardNodeType.USER_QUERY: {
-            mutations.push(
+            setMutations.push(
               await this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode, index)
             );
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
-            mutations.push(
+            setMutations.push(
               await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode, index)
             );
             break;
@@ -190,7 +191,7 @@ export class DatabaseService {
 
     // Generating mutation for casefile metadata
     try {
-      mutations.push({
+      setMutations.push({
         uid: casefileUid,
         'Casefile.title': casefile.title ?? null,
         'Casefile.description': casefile.description ?? null,
@@ -199,7 +200,7 @@ export class DatabaseService {
       this.logger.error(`Could not create metadata mutation while saving casefile ${casefile.id}`);
     }
 
-    return this.sendMutation(mutations).catch(() => {
+    return this.sendMutation(setMutations, deleteMutations).catch(() => {
       this.logger.error(`There was a problem while trying to save casefile "${casefile.id}"`);
       return null;
     });
@@ -339,23 +340,19 @@ export class DatabaseService {
   }
 
   /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)
-  private async sendMutation(mutationJson: object): Promise<Record<string, any>> {
+  private async sendMutation(
+    setMutationJson?: object | object[],
+    deleteMutationJson?: object | object[]
+  ): Promise<Record<string, any>> {
     const mutation = this.dGraphClient.createMutation();
     mutation.setCommitNow(true);
-    mutation.setSetJson(mutationJson);
 
-    const txn = this.dGraphClient.client.newTxn();
-    return txn.mutate(mutation).catch((err) => {
-      this.logger.error('There was an error while sending a mutation to the database', err);
-      throw new ServiceUnavailableException();
-    });
-  }
-
-  /* istanbul ignore next */ // Ignore for test coverage (library code that is already tested)
-  private async sendDeleteMutation(mutationJson: object): Promise<Record<string, any>> {
-    const mutation = this.dGraphClient.createMutation();
-    mutation.setCommitNow(true);
-    mutation.setDeleteJson(mutationJson);
+    if (setMutationJson) {
+      mutation.setSetJson(setMutationJson);
+    }
+    if (deleteMutationJson) {
+      mutation.setDeleteJson(deleteMutationJson);
+    }
 
     const txn = this.dGraphClient.client.newTxn();
     return txn.mutate(mutation).catch((err) => {
