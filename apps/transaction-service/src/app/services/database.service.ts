@@ -156,20 +156,24 @@ export class DatabaseService {
 
     // Generating mutations for added/updated nodes
     try {
-      for (const node of casefile.nodes) {
+      for (const [index, node] of casefile.nodes.entries()) {
         switch (node.type) {
           case WhiteboardNodeType.TABLE: {
-            mutations.push(await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode));
+            mutations.push(
+              await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode, index)
+            );
             break;
           }
           case WhiteboardNodeType.USER_QUERY: {
             mutations.push(
-              await this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode)
+              await this.getUserQueryOccurrenceToCasefileMutation(casefileUid, node as IUserQueryWhiteboardNode, index)
             );
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
-            mutations.push(await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode));
+            mutations.push(
+              await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode, index)
+            );
             break;
           }
           default: {
@@ -203,31 +207,33 @@ export class DatabaseService {
 
   async getTableOccurrenceToCasefileMutation(
     casefileUid: string,
-    tableWhiteboardNode: ITableWhiteboardNode
+    tableWhiteboardNode: ITableWhiteboardNode,
+    index: number
   ): Promise<Record<string, any> | null> {
     const uid = await this.getUidByType(tableWhiteboardNode.id, 'TableOccurrence');
     const basicMutationJson = await this.createBasicNodeInsertMutation(tableWhiteboardNode);
     return {
-      uid: uid ?? DatabaseService.mutationNodeReference,
+      uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
       [`${tableWhiteboardNode.type}.entity`]: {
         uid: (await this.getUidByType(tableWhiteboardNode.entity.id, 'Table')) ?? null,
       },
       [`${tableWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
-        'Casefile.tables': { uid: uid ?? DatabaseService.mutationNodeReference },
+        'Casefile.tables': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
       },
     };
   }
 
   async getUserQueryOccurrenceToCasefileMutation(
     casefileUid: string,
-    userQueryWhiteboardNode: IUserQueryWhiteboardNode
+    userQueryWhiteboardNode: IUserQueryWhiteboardNode,
+    index: number
   ): Promise<Record<string, any> | null> {
     const uid = await this.getUidByType(userQueryWhiteboardNode.id, 'TableOccurrence');
     const basicMutationJson = await this.createBasicNodeInsertMutation(userQueryWhiteboardNode);
     return {
-      uid: uid ?? DatabaseService.mutationNodeReference,
+      uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
       [`${userQueryWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(userQueryWhiteboardNode.author, 'User')) ?? null,
@@ -237,19 +243,20 @@ export class DatabaseService {
       },
       [`${userQueryWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
-        'Casefile.queries': { uid: uid ?? DatabaseService.mutationNodeReference },
+        'Casefile.queries': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
       },
     };
   }
 
   async getEmbeddingToCasefileMutation(
     casefileUid: string,
-    embeddingWhiteboardNode: IEmbeddingWhiteboardNode
+    embeddingWhiteboardNode: IEmbeddingWhiteboardNode,
+    index: number
   ): Promise<Record<string, any> | null> {
     const uid = await this.getUidByType(embeddingWhiteboardNode.id, 'Embedding');
     const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
     return {
-      uid: uid ?? DatabaseService.mutationNodeReference,
+      uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
       [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
@@ -257,7 +264,7 @@ export class DatabaseService {
       },
       [`${embeddingWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
-        'Casefile.embeddings': { uid: uid ?? DatabaseService.mutationNodeReference },
+        'Casefile.embeddings': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
       },
     };
   }
