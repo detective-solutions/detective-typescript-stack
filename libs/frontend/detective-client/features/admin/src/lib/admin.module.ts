@@ -2,13 +2,21 @@ import {
   AdminContainerComponent,
   ConnectionsComponent,
   GroupsComponent,
-  MasksComponent,
+  MaskingsComponent,
   SubscriptionsComponent,
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { ConnectionsService, MaskingsService, SubscriptionService } from './services';
+import { ConnectionsService, MaskingService, SubscriptionService } from './services';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GetAllConnectionsGQL, GetAllMaskingsGQL, GetAllUsersGQL, GetConnectionByIdGQL } from './graphql';
+import {
+  GetAllConnectionsGQL,
+  GetAllMaskingsGQL,
+  GetAllUserGroupsGQL,
+  GetAllUsersGQL,
+  GetConnectionByIdGQL,
+  GetTablesBySourceConnectionIdGQL,
+} from './graphql';
+import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
   SubscriptionCancelDialogComponent,
@@ -20,6 +28,7 @@ import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
+import { GetMaskingByIdGQL } from './graphql/get-masking-by-id.gql';
 import { NgModule } from '@angular/core';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
@@ -29,11 +38,13 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsComponent,
     ConnectionsAddEditDialogComponent,
     ConnectionsDeleteDialogComponent,
+    GroupsComponent,
+    MaskingsComponent,
+    MaskingAddEditDialogComponent,
+    MaskingDeleteDialogComponent,
+    SubscriptionsComponent,
     SubscriptionCancelDialogComponent,
     SubscriptionUpgradeDialogComponent,
-    GroupsComponent,
-    MasksComponent,
-    SubscriptionsComponent,
   ],
   imports: [
     CommonModule,
@@ -57,9 +68,12 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsService,
     GetConnectionByIdGQL,
     GetAllConnectionsGQL,
-    MaskingsService,
+    GetTablesBySourceConnectionIdGQL,
+    MaskingService,
     GetAllMaskingsGQL,
+    GetMaskingByIdGQL,
     GetAllUsersGQL,
+    GetAllUserGroupsGQL,
     SubscriptionService,
   ],
 })

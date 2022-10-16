@@ -6,6 +6,7 @@ export type TableCellData =
   | IFavorizedTableCell
   | IIconButtonTableCell
   | IMultiTableCell
+  | IMultiTableCellWithoutIcon
   | IStateTableCell
   | ITextTableCell
   | ILinkTableCell
@@ -17,6 +18,7 @@ export enum TableCellTypes {
   FAVORIZED_TABLE_CELL = 'favorizedTableCell',
   ICON_BUTTON_TABLE_CELL = 'iconButtonTableCell',
   MULTI_TABLE_CELL = 'multiTableCell',
+  MULTI_TABLE_CELL_WITHOUT_THUMBNAIL = 'multiTableCellWithoutIcon',
   STATUS_TABLE_CELL = 'statusTableCell',
   TEXT_TABLE_CELL = 'textTableCell',
   LINK_TABLE_CELL = 'linkTableCell',
@@ -58,6 +60,12 @@ export interface IIconButtonTableCell extends IBaseTableCell {
 export interface IMultiTableCell extends IBaseTableCell {
   type: TableCellTypes.MULTI_TABLE_CELL;
   thumbnail: string;
+  name: string;
+  description: string;
+}
+
+export interface IMultiTableCellWithoutIcon extends IBaseTableCell {
+  type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL;
   name: string;
   description: string;
 }

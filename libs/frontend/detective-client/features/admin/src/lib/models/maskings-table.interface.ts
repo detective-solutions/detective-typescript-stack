@@ -3,5 +3,8 @@ import { IAbstractTableDef, IColumnDef } from '@detective.solutions/frontend/det
 export interface IMaskingTableDef extends IAbstractTableDef {
   maskingInfo: IColumnDef;
   table: IColumnDef;
+  userGroups: IColumnDef;
+  lastUpdatedBy: IColumnDef;
   lastUpdated: IColumnDef;
+  actions: IColumnDef;
 }

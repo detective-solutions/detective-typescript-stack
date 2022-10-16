@@ -16,6 +16,16 @@ export class GetAllMaskingsGQL extends Query<Response> {
         name
         table {
           name
+          dataSource {
+            name
+          }
+        }
+        groups {
+          name
+        }
+        lastUpdatedBy {
+          firstname
+          lastname
         }
         lastUpdated
       }

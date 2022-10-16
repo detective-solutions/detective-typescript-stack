@@ -1,6 +1,7 @@
 import {
   GetAllConnectionsGQL,
   GetConnectionByIdGQL,
+  GetTablesBySourceConnectionIdGQL,
   IGetAllConnectionsGQLResponse,
   IGetConnectionByIdGQLResponse,
 } from '../graphql';
@@ -31,10 +32,12 @@ export class ConnectionsService {
 
   private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
+  private getAllTablesWatchQuery!: QueryRef<Response>;
 
   constructor(
     private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
+    private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly httpClient: HttpClient,
     private readonly tableCellEventService: TableCellEventService,
     private readonly logger: LogService
@@ -45,6 +48,14 @@ export class ConnectionsService {
     return this.getConnectionByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetConnectionByIdGQLResponse) => response.getSourceConnection)
+    );
+  }
+
+  getTablesOfConnection(id: string): Observable<any> {
+    this.getAllTablesWatchQuery = this.getTablesBySourceConnectionIdGQL.watch({ id: id });
+    return this.getAllTablesWatchQuery.valueChanges.pipe(
+      map((response: any) => response.data),
+      map((response: any) => response.getSourceConnection)
     );
   }
 

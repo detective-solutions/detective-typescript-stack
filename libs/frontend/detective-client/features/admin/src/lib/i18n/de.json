@@ -3,7 +3,7 @@
     "sidenavItems": {
       "connections": "Verbindungen",
       "groups": "Gruppen",
-      "masks": "Masken",
+      "maskings": "Masken",
       "subscriptions": "Subscription"
     },
     "sidenavBottomItem": "Home"
@@ -33,11 +33,29 @@
       "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
-  "masks": {
+  "maskings": {
     "addMaskingButtonText": "Neue Maskierung anlegen",
     "columnNames": {
+      "maskNameColumn": "Name",
+      "maskingDataSource": "Datenquelle",
+      "userGroupsColumn": "Nutzergruppen",
       "lastUpdatedColumn": "Zuletzt aktualisiert",
-      "table": "Maskierte Tabelle"
+      "lastUpdatedByColumn": "Zuletzt geändert von",
+      "tableNameColumn": "Maskierte Tabelle"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Maskierung entfernen",
+      "deleteDialogText": "Sie sind dabei die Verbindung {{maskingName}} zu entfernen.",
+      "deleteButtonText": "Ich möchte diese Verbindung entfernen"
+    },
+    "addEditDialog": {
+      "addDialogHeader": "Neue Maskierung anlegen",
+      "editDialogHeader": "Verbindung bearbeiten",
+      "maskingNameLabel": "Name der Maskierung",
+      "maskingDescriptionLabel": "Kurze Beschreibung",
+      "sourceConnectionDropdownLabel": "Wählen Sie eine Datenquelle aus",
+      "saveButtonText": "Speichern",
+      "cancelButtonText": "Abbrechen"
     }
   },
   "subscriptions": {

@@ -1,12 +1,14 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ComponentType, OverlayContainer } from '@angular/cdk/overlay';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, map, shareReplay, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { ISidenavItem } from '../interfaces';
+import { InviteDialogComponent } from './dialog';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { NavigationEventService } from '../services';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 
 @Component({
@@ -36,12 +38,14 @@ export class NavigationComponent {
   );
 
   private cdkOverlay: HTMLElement;
+  email!: string;
 
   constructor(
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly navigationEventService: NavigationEventService,
     private readonly overlayContainer: OverlayContainer,
+    private readonly matDialog: MatDialog,
     private readonly router: Router
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
@@ -53,6 +57,17 @@ export class NavigationComponent {
 
   toggleViews(toggleChange: MatSlideToggleChange) {
     this.navigationEventService.showTableView$.next(toggleChange.checked);
+  }
+
+  openInviteDialog(componentToOpen?: ComponentType<InviteDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? InviteDialogComponent, {
+      ...{
+        width: '600px',
+        minWidth: '600px',
+        data: { email: this.email },
+      },
+      ...config,
+    });
   }
 
   logout() {

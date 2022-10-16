@@ -85,3 +85,20 @@ export class SourceConnectionDTO implements ISourceConnection {
     }
   }
 }
+
+export interface ConnectionTable {
+  xid: string;
+  name: string;
+}
+
+export interface ISourceConnectionTables {
+  connectedTables: ConnectionTable[];
+}
+
+export class SourceConnectionTableDTO implements ISourceConnectionTables {
+  constructor(public connectedTables: ConnectionTable[]) {}
+
+  static Build(tables: ISourceConnectionTables) {
+    return new SourceConnectionTableDTO(tables.connectedTables);
+  }
+}

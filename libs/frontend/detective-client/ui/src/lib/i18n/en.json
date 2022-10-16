@@ -2,6 +2,12 @@
   "navigation": {
     "searchbarPlaceholder": "Search Casefiles",
     "inviteButtonText": "Invite",
+    "inviteModal": {
+      "InviteDialogHeader": "Invite",
+      "InviteDialogText": "Send an invitation by email to friends, colleagues and sleuths",
+      "InviteExecuteButtonText": "Send",
+      "InviteCancelButtonText": "Cancel"
+    },
     "userMenu": {
       "account": { "buttonText": "My Account" },
       "documentation": { "buttonText": "API & Documentation" },

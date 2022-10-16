@@ -3,7 +3,7 @@
     "sidenavItems": {
       "connections": "Connections",
       "groups": "Groups",
-      "masks": "Masks",
+      "maskings": "Maskings",
       "subscriptions": "Subscription"
     },
     "sidenavBottomItem": "Home"
@@ -33,11 +33,29 @@
       "formSubmitError": "Could not submit connection data. Please contact support"
     }
   },
-  "masks": {
+  "maskings": {
     "addMaskingButtonText": "New Masking",
     "columnNames": {
+      "maskName": "Name",
+      "maskingDataSource": "Data source",
+      "userGroupsColumn": "User groups",
       "lastUpdatedColumn": "Last Updated",
-      "table": "Masked Table"
+      "lastUpdatedByColumn": "Last Updated by",
+      "tableNameColumn": "Masked Table"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Delete masking",
+      "deleteDialogText": "You are about to delete {{maskingName}}.",
+      "deleteButtonText": "I want to delete this masking"
+    },
+    "addEditDialog": {
+      "addDialogHeader": "Add a new masking",
+      "editDialogHeader": "Edit a masking",
+      "maskingNameLabel": "Name of new masking",
+      "maskingDescriptionLabel": "Short description",
+      "sourceConnectionDropdownLabel": "Select a data source",
+      "saveButtonText": "Save",
+      "cancelButtonText": "Cancel"
     }
   },
   "subscriptions": {
