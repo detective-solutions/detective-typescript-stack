@@ -22,6 +22,28 @@
         <g *ngSwitchCase="nodeType.EMBEDDING" embeddingNode [node]="node"></g>
       </ng-container>
     </ng-container>
+    <g id="collaboration-cursors-wrapper">
+      <foreignObject
+        *ngFor="let cursor of collaborationCursors; trackBy: trackCollaborationCursorByUserId"
+        [ngStyle]="{ transform: 'translate(' + cursor.x + 'px,' + cursor.y + 'px' }"
+        class="collaboration-cursor"
+      >
+        <div class="cursor-arrow"></div>
+        <div class="cursor-circle">
+          <img
+            *ngIf="cursor.userInfo.avatarUrl; else noAvatarUrl"
+            [src]="cursor.userInfo.avatarUrl"
+            alt="{{ getUserFullName(cursor.userInfo) }} Avatar"
+            [matTooltip]="getUserFullName(cursor.userInfo)"
+          />
+          <ng-template #noAvatarUrl>
+            <div [matTooltip]="getUserFullName(cursor.userInfo)">
+              {{ getUserInitialia(cursor.userInfo) }}
+            </div>
+          </ng-template>
+        </div>
+      </foreignObject>
+    </g>
     <!-- <g [linkVisual]="link" *ngFor="let link of links$ | async"></g> -->
   </g>
 </svg>

@@ -32,6 +32,28 @@ export class WhiteboardGeneralEffects {
     { dispatch: false }
   );
 
+  readonly cursorMoved$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(WhiteboardGeneralActions.WhiteboardCursorMoved),
+        switchMap((action) =>
+          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
+        ),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        tap(([context, action]) => {
+          this.whiteboardFacade.sendWebsocketMessage({
+            event: MessageEventType.WhiteboardCursorMoved,
+            data: {
+              context: { ...context, eventType: MessageEventType.WhiteboardCursorMoved } as IMessageContext,
+              body: { x: action.x, y: action.y },
+            },
+          });
+        })
+      );
+    },
+    { dispatch: false }
+  );
+
   constructor(
     private readonly actions$: Actions,
     private readonly store: Store,

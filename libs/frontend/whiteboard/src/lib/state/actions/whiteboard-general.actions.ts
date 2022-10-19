@@ -11,3 +11,10 @@ export const WhiteboardDataLoaded = createAction(
   props<{ casefile: ICachableCasefileForWhiteboard }>()
 );
 export const ResetWhiteboardData = createAction(`${actionPrefix} Resetting whiteboard data`);
+
+export const WhiteboardCursorMoved = createAction(`${actionPrefix} Cursor moved`, props<{ x: number; y: number }>());
+
+export const WhiteboardCursorMovedRemotely = createAction(
+  `${actionPrefix} Cursor moved remotely`,
+  props<{ x: number; y: number }>()
+);

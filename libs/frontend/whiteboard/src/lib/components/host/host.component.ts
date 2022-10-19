@@ -20,12 +20,30 @@ import {
   WhiteboardNodeType,
   WhiteboardOptions,
 } from '@detective.solutions/shared/data-access';
-import { EmbeddingWhiteboardNode, ForceDirectedGraph, TableWhiteboardNode } from '../../models';
-import { Subscription, combineLatest, delayWhen, filter, map, pluck, switchMap, take, tap } from 'rxjs';
+import {
+  EmbeddingWhiteboardNode,
+  ForceDirectedGraph,
+  IWhiteboardCollaborationCursor,
+  TableWhiteboardNode,
+} from '../../models';
+import {
+  Subject,
+  Subscription,
+  combineLatest,
+  debounceTime,
+  delayWhen,
+  filter,
+  map,
+  pluck,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import {
   WhiteboardGeneralActions,
   WhiteboardMetadataActions,
   WhiteboardNodeActions,
+  selectActiveUsers,
   selectWhiteboardContextState,
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
@@ -52,26 +70,35 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
 
+  collaborationCursors: IWhiteboardCollaborationCursor[] = [];
+
   readonly whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
     // Buffer node updates while user is dragging
     delayWhen(() => this.whiteboardFacade.isDragging$.pipe(filter((isDragging: boolean) => !isDragging))),
     // Update underlying graph nodes
     tap((nodes: AnyWhiteboardNode[]) => this.forceGraph.updateNodes(nodes))
   );
-
   readonly isWhiteboardInitialized$ = this.whiteboardFacade.isWhiteboardInitialized$;
   readonly isConnectedToWebSocketServer$ = this.whiteboardFacade.isConnectedToWebSocketServer$;
   readonly webSocketConnectionFailedEventually$ = this.whiteboardFacade.webSocketConnectionFailedEventually$;
+  readonly cursorMovement$ = new Subject<MouseEvent>();
 
   readonly forceGraph: ForceDirectedGraph = this.whiteboardFacade.getForceGraph(HostComponent.options);
   readonly nodeType = WhiteboardNodeType;
+  readonly cursorTimeoutInterval = 7000;
   readonly whiteboardHtmlId = 'whiteboard';
 
   private readonly subscriptions = new Subscription();
+
   // Reset element selection when clicking blank space on the whiteboard
   @HostListener('pointerdown', ['$event'])
   private resetElementSelection(event: PointerEvent) {
     (event.target as HTMLElement).id === this.whiteboardHtmlId && this.whiteboardFacade.resetSelection();
+  }
+
+  @HostListener('mousemove', ['$event'])
+  private mirrorCursorMovement(event: MouseEvent) {
+    this.cursorMovement$.next(event);
   }
 
   constructor(
@@ -79,6 +106,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly store: Store
   ) {}
+
   ngOnInit() {
     // Bind Angular change detection to each graph tick for render sync
     this.subscriptions.add(this.forceGraph.ticker$.subscribe(() => this.changeDetectorRef.markForCheck()));
@@ -191,7 +219,29 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  trackCollaborationCursorByUserId(_index: number, collaborationCursor: IWhiteboardCollaborationCursor) {
+    return collaborationCursor.userInfo.id;
+  }
+
+  getUserFullName(user: IUserForWhiteboard) {
+    return `${user.firstname} ${user.lastname}`;
+  }
+
+  getUserInitialia(user: IUserForWhiteboard) {
+    return (user.firstname.charAt(0) + user.lastname.charAt(0)).toUpperCase();
+  }
+
   private initializeCollaborationSubscriptions() {
+    this.subscriptions.add(
+      // Debounce outgoing cursor updates to dispatch only if mouse wasn't moved for at least 300 ms
+      this.cursorMovement$.pipe(debounceTime(300)).subscribe((event: MouseEvent) => {
+        const convertedCoordinates = this.convertDOMToSVGCoordinates(event.x, event.y);
+        this.store.dispatch(
+          WhiteboardGeneralActions.WhiteboardCursorMoved({ x: convertedCoordinates.x, y: convertedCoordinates.y })
+        );
+      })
+    );
+
     // Listen to LOAD_WHITEBOARD_DATA websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
@@ -206,6 +256,24 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             })
           );
         })
+    );
+
+    // Listen to WHITEBOARD_CURSOR_MOVED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardCursorMoved),
+              this.store.select(selectWhiteboardContextState),
+              this.store.select(selectActiveUsers),
+            ])
+          ),
+          filter(([messageData, context, _activeUsers]) => messageData.context.userId !== context.userId)
+        )
+        .subscribe(([messageData, _context, activeUsers]) =>
+          this.handleIncomingCollaborationCursor(messageData, activeUsers)
+        )
     );
 
     // Listen to WHITEBOARD_NODE_ADDED websocket message event
@@ -356,5 +424,41 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       throw new Error('Could not get screen CTM for the SVG zoom group while transforming DOM to SVG coordinates');
     }
     return new DOMPoint(x, y).matrixTransform(screenCTM.inverse());
+  }
+
+  private handleIncomingCollaborationCursor(
+    messageData: IMessage<IWhiteboardCollaborationCursor>,
+    activeUsers: IUserForWhiteboard[]
+  ) {
+    const userInfo = activeUsers.find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
+    if (!userInfo) {
+      throw new Error(
+        `Could not build collaboration cursor info. Could not find active user info for user ${messageData.context.userId}`
+      );
+    }
+
+    const existingCursor = this.collaborationCursors.find(
+      (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id === messageData.context.userId
+    );
+
+    const cursorTimeoutHandler = () => {
+      this.collaborationCursors = this.collaborationCursors.filter(
+        (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id !== existingCursor?.userInfo.id
+      );
+    };
+
+    if (existingCursor) {
+      window.clearInterval(existingCursor.timeout);
+      existingCursor.x = messageData.body.x;
+      existingCursor.y = messageData.body.y;
+      existingCursor.timeout = window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval);
+    } else {
+      this.collaborationCursors.push({
+        x: messageData.body.x,
+        y: messageData.body.y,
+        userInfo: userInfo,
+        timeout: window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval),
+      });
+    }
   }
 }
