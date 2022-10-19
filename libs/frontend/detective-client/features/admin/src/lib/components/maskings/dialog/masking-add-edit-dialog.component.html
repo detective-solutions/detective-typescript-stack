@@ -6,12 +6,10 @@
     <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
       <mat-form-field>
         <mat-label>{{ t('sourceConnectionDropdownLabel') }}</mat-label>
-        <mat-select formControlName="connector">
-          <mat-option
-            *ngFor="let connection of (availableConnections$ | async)!.connections"
-            [value]="connection.name"
-            >{{ connection.name }}</mat-option
-          >
+        <mat-select formControlName="connector" (selectionChange)="updateAvailableTables($event)">
+          <mat-option *ngFor="let connection of (availableConnections$ | async)!.connections" [value]="connection.id">{{
+            connection.name
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
     </form>

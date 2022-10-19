@@ -121,7 +121,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
                 id: maskings.xid,
                 type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
                 name: maskings.name,
-                description: String(translation['maskingDataSource']) + ': ' + maskings.table.dataSource.name,
+                description: String(maskings.description),
               },
             },
             table: {

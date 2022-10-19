@@ -116,7 +116,7 @@ describe('DataSourceService', () => {
 
   function _createSourceConnection(): SourceConnectionDTO {
     return SourceConnectionDTO.Build({
-      id: uuidv4(),
+      xid: uuidv4(),
       name: 'Test Connection',
       connectorName: 'connector',
       description: '',

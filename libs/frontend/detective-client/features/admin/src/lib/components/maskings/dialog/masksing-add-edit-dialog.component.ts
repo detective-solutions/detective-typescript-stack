@@ -17,10 +17,11 @@ import { ToastService } from '@detective.solutions/frontend/shared/ui';
 import { ConnectionsService, MaskingService } from '../../../services';
 import { IDropDownValues } from '@detective.solutions/shared/data-access';
 import { ConnectionTable } from '@detective.solutions/frontend/shared/data-access';
+import { v4 as uuidv4 } from 'uuid';
 
 const USER_DATA = [
   {
-    id: 1,
+    id: uuidv4(),
     columnName: 'Users',
     visible: '',
     valueName: 'John Smith',
@@ -162,6 +163,7 @@ export class MaskingAddEditDialogComponent {
     );
 
     this.availableConnections$ = this.connectionsService.getAllConnections(0, 500);
+    this.availableConnections$.subscribe((e) => console.log(e));
     this.maskingService.getAvailableUserGroups().subscribe((x) => {
       this.userGroups$ = x;
     });
@@ -184,7 +186,7 @@ export class MaskingAddEditDialogComponent {
 
   addRow() {
     const newRow = {
-      id: Math.floor(Math.random() * 1000000),
+      id: uuidv4(),
       columnName: '',
       visible: '',
       valueName: '',
@@ -195,8 +197,19 @@ export class MaskingAddEditDialogComponent {
     this.dataSource = [newRow, ...this.dataSource];
   }
 
-  removeRow(id: number) {
+  removeRow(id: string) {
     this.dataSource = this.dataSource.filter((u) => u.id !== id);
+  }
+
+  updateAvailableTables(id: any) {
+    console.log(id);
+    // this.connectionsService.getTablesOfConnection(id).subscribe((x) => {
+    //   const result: IDropDownValues[] = [];
+    //   x.connectedTables.forEach((data: ConnectionTable) => {
+    //     result.push({ key: data.xid, value: data.name });
+    //   });
+    //   this.connectorTables$ = result;
+    // });
   }
 
   private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string | boolean>[] {

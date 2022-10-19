@@ -5,6 +5,7 @@ export interface UserGroupColumn {
 export interface IMasking {
   xid: string;
   name: string;
+  description: string;
   groups: UserGroupColumn[];
   table: {
     name: string;

@@ -14,9 +14,10 @@ export class GetAllConnectionsGQL extends Query<Response> {
       querySourceConnection(offset: $paginationOffset, first: $pageSize, order: { asc: name }) {
         xid
         name
-        description
         connectorName
+        description
         status
+        lastUpdated
       }
       aggregateSourceConnection {
         count
