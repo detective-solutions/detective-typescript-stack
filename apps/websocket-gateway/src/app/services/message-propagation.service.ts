@@ -23,7 +23,7 @@ export class MessagePropagationService implements OnModuleDestroy {
     this.publisherClient.publish(channel, JSON.stringify(message));
   }
 
-  subscribeToChannel(channel: string, callback: (message: IMessage<any>) => void) {
+  subscribeToChannel(channel: string, callback: (message: string) => void) {
     this.subscribedChannels.add(channel);
     this.subscriberClient.subscribe(channel, callback as any);
   }

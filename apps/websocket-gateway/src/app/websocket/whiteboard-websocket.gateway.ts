@@ -55,9 +55,9 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     // Subscribe to cursor message propagations
     this.messagePropagationService.subscribeToChannel(
       WhiteboardWebSocketGateway.cursorMessagePropagationChannel,
-      (message: IMessage<any>) => {
-        console.log('PROPAGATED MESSAGE', message); // TODO: Remove me!
-        this.sendMessageByContext(message, broadcastWebSocketContext);
+      (message: string) => {
+        console.log('PROPAGATED MESSAGE', JSON.parse(message)); // TODO: Remove me!
+        this.sendMessageByContext(JSON.parse(message), broadcastWebSocketContext);
       }
     );
   }
