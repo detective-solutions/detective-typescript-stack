@@ -6,13 +6,8 @@
 
   $primary-palette: map.get($color-config, 'primary');
   $primary-color: mat.get-color-from-palette($primary-palette);
-  $primary-color-lighter: mat.get-color-from-palette($primary-palette, 500);
 
   #topbar-wrapper {
     background: $primary-color;
-
-    .user-avatar {
-      background-color: $primary-color-lighter;
-    }
   }
 }

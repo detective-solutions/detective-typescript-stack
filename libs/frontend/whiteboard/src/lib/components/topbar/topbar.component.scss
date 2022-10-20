@@ -5,13 +5,16 @@ $active-user-avatar-size: 32px;
 #topbar-wrapper {
   position: absolute;
   top: 0;
-  height: $topbar-height;
   width: 100%;
+  height: $topbar-height;
   box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
 
-  #topbar-logo {
+  .topbar-element {
+    margin: 0 20px;
+  }
+
+  .topbar-logo {
     color: white;
-    margin-right: 100px;
 
     img {
       width: $logo-size;
@@ -24,14 +27,14 @@ $active-user-avatar-size: 32px;
     color: white;
     background: none;
     border: none;
+    text-overflow: ellipsis;
   }
 
   .active-users-wrapper {
     display: flex;
-    justify-content: center;
+    justify-content: right;
     align-items: center;
     height: inherit;
-    width: 250px;
 
     .user-avatar {
       width: $active-user-avatar-size;
@@ -40,8 +43,6 @@ $active-user-avatar-size: 32px;
       margin-left: -12px;
       overflow: hidden;
       position: relative;
-      color: white;
-      // border: 1px solid black;
       cursor: pointer;
       transition: transform 0.3s ease;
 
@@ -61,15 +62,19 @@ $active-user-avatar-size: 32px;
         display: flex;
         justify-content: center;
         align-items: center;
+        color: gray;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0, rgba(0, 0, 0, 0) 100%);
+        background-color: white;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: lightgray;
+        }
       }
     }
   }
 
-  #topbar-invite-button-wrapper {
-    margin: 0 20px;
-
-    button {
-      width: 80%;
-    }
+  .topbar-invite-button-wrapper button {
+    width: 80%;
   }
 }

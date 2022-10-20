@@ -1,4 +1,9 @@
 {
+  "topbar": {
+    "titlePlaceholder": "Casefile Name",
+    "userAvatarAltAttribute": "detective Nutzer Avatar",
+    "inviteButtonText": "Einladen"
+  },
   "toastMessages": {
     "webSocketConnection": {
       "reconnecting": "Die Verbindung zum Server ist abgebrochen. Verbindung wird wiederhergestellt ...",

@@ -1,4 +1,9 @@
 {
+  "topbar": {
+    "titlePlaceholder": "Casefile title",
+    "userAvatarAltAttribute": "detective user avatar",
+    "inviteButtonText": "Invite"
+  },
   "toastMessages": {
     "webSocketConnection": {
       "reconnecting": "Lost connection to the server. Reconnecting ...",

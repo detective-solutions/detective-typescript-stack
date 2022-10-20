@@ -3,7 +3,6 @@ import { selectActiveUsers, selectWhiteboardTitle } from '../../state';
 
 import { IUserForWhiteboard } from '@detective.solutions/shared/data-access';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'whiteboard-topbar',
@@ -12,16 +11,8 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopbarComponent {
-  // @ViewChild('tableOccurrence', { read: ElementRef }) tableOccurrence!: ElementRef;
-
   title$ = this.store.select(selectWhiteboardTitle);
-  activeUsers$ = this.store.select(selectActiveUsers).pipe(
-    map((users) =>
-      users.map((user) => {
-        return { ...user, avatarUrl: '' };
-      })
-    )
-  );
+  activeUsers$ = this.store.select(selectActiveUsers);
 
   constructor(private readonly store: Store) {}
 
