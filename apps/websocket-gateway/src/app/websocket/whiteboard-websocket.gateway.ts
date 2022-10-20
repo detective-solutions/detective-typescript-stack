@@ -59,7 +59,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       WhiteboardWebSocketGateway.cursorMessagePropagationChannel,
       (message: string) => {
         const parsedMessage = JSON.parse(message) as IPropagationMessage;
-        if (parsedMessage.propagationClientId === WhiteboardWebSocketGateway.propagationClientId) {
+        if (parsedMessage.propagationClientId !== WhiteboardWebSocketGateway.propagationClientId) {
           console.log('PROPAGATED MESSAGE', parsedMessage); // TODO: Remove me!
           this.sendMessageByContext(parsedMessage, broadcastWebSocketContext);
         }
