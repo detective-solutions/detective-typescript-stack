@@ -5,6 +5,7 @@ import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { MessagePropagationService } from '../services';
 import { Test } from '@nestjs/testing';
 import { WS } from 'jest-websocket-mock';
 import { WebSocket } from 'ws';
@@ -32,6 +33,7 @@ describe('WhiteboardWebsocketGateway', () => {
       providers: [
         WhiteboardWebSocketGateway,
         { provide: WhiteboardEventProducer, useValue: mockWhiteboardProducer },
+        { provide: MessagePropagationService, useValue: {} },
         { provide: JwtService, useValue: {} },
         ConfigService,
       ],

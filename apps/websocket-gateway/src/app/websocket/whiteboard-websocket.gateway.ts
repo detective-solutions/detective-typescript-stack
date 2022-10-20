@@ -21,6 +21,7 @@ import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
+import { MessagePropagationService } from '../services';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
 import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
@@ -30,6 +31,8 @@ import { broadcastWebSocketContext } from '../utils';
 
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
+  private static cursorMessagePropagationChannel = 'cursor_message_propagation';
+
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
@@ -37,6 +40,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
 
   constructor(
     private readonly whiteboardEventProducer: WhiteboardEventProducer,
+    private readonly messagePropagationService: MessagePropagationService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService
   ) {}
@@ -47,6 +51,15 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
         this.handleNewClientConnection(server, info, cb),
     };
+
+    // Subscribe to cursor message propagations
+    this.messagePropagationService.subscribeToChannel(
+      WhiteboardWebSocketGateway.cursorMessagePropagationChannel,
+      (message: IMessage<any>) => {
+        console.log('PROPAGATED MESSAGE', message); // TODO: Remove me!
+        this.sendMessageByContext(message, broadcastWebSocketContext);
+      }
+    );
   }
 
   handleDisconnect(client: any) {
@@ -64,6 +77,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
 
   @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
   async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
+    this.messagePropagationService.propagateEvent(WhiteboardWebSocketGateway.cursorMessagePropagationChannel, message);
     this.sendMessageByContext(message, broadcastWebSocketContext);
   }
 
