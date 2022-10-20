@@ -32,8 +32,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
-  private static cursorMessagePropagationChannel = 'cursor_message_propagation';
-  private static propagationClientId = uuidv4();
+  private static cursorPropagationChannel = 'ws_gateway_cursor_propagation';
+  private static propagationSourceId = uuidv4();
 
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
@@ -54,13 +54,12 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         this.handleNewClientConnection(server, info, cb),
     };
 
-    // Subscribe to cursor message propagations
+    // Subscribe to cursor message propagations from other websocket gateways
     this.messagePropagationService.subscribeToChannel(
-      WhiteboardWebSocketGateway.cursorMessagePropagationChannel,
+      WhiteboardWebSocketGateway.cursorPropagationChannel,
       (message: string) => {
         const parsedMessage = JSON.parse(message) as IPropagationMessage;
-        if (parsedMessage.propagationClientId !== WhiteboardWebSocketGateway.propagationClientId) {
-          console.log('PROPAGATED MESSAGE', parsedMessage); // TODO: Remove me!
+        if (parsedMessage.propagationSourceId !== WhiteboardWebSocketGateway.propagationSourceId) {
           this.sendMessageByContext(parsedMessage, broadcastWebSocketContext);
         }
       }
@@ -82,9 +81,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
 
   @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
   async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
-    this.messagePropagationService.propagateEvent(WhiteboardWebSocketGateway.cursorMessagePropagationChannel, {
+    // Propagate message to other websocket gateways that subscribed to the same channel
+    this.messagePropagationService.propagateEvent(WhiteboardWebSocketGateway.cursorPropagationChannel, {
       ...message,
-      propagationClientId: WhiteboardWebSocketGateway.propagationClientId,
+      propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
     });
     this.sendMessageByContext(message, broadcastWebSocketContext);
   }
