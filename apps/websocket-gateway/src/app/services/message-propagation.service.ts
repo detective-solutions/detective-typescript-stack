@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
 
-import { IMessage } from '@detective.solutions/shared/data-access';
+import { IPropagationMessage } from '../models';
 import { RedisClientService } from '@detective.solutions/backend/redis-client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -19,7 +19,7 @@ export class MessagePropagationService implements OnModuleDestroy {
     this.subscriberClient = clientService.createClient();
   }
 
-  propagateEvent(channel: string, message: IMessage<any>) {
+  propagateEvent(channel: string, message: IPropagationMessage) {
     this.publisherClient.publish(channel, JSON.stringify(message));
   }
 
