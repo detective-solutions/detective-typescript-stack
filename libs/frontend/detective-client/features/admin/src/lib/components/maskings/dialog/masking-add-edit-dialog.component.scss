@@ -13,9 +13,42 @@
   }
 }
 
+.add-mask-button {
+  position: relative;
+  float: right;
+}
+
 .mat-progress-bar {
   position: absolute;
   height: 5px;
   bottom: 0;
   left: 0;
+}
+
+.mat-table {
+  width: 90%;
+  margin-top: 20px;
+  text-align: left;
+
+  .mat-header-cell {
+    text-align: left;
+    font-size: 12px;
+    margin: auto;
+    padding: 2px;
+    width: 10px;
+  }
+
+  .mat-cell {
+    margin: auto;
+    font-size: 12px;
+    width: 10px;
+    padding: 2px;
+  }
+
+  .btn-edit {
+    display: inline-flex;
+    margin: auto;
+    width: 10px;
+    font-size: 12px;
+  }
 }

@@ -7,18 +7,23 @@
       <mat-form-field>
         <mat-label>{{ t('sourceConnectionDropdownLabel') }}</mat-label>
         <mat-select formControlName="connector" (selectionChange)="updateAvailableTables($event)">
-          <mat-option *ngFor="let connection of (availableConnections$ | async)!.connections" [value]="connection.id">{{
-            connection.name
-          }}</mat-option>
+          <mat-option
+            *ngFor="let connection of (availableConnections$ | async)!.connections"
+            [value]="connection.xid"
+            >{{ connection.name }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
     </form>
 
     <ng-container *ngIf="formFieldDefinitions$ | async as formFieldDefinitions">
-      <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
+      <dynamic-form
+        [formFieldDefinitions]="formFieldDefinitions"
+        (selectionChange)="updateAvailableColumns($event)"
+      ></dynamic-form>
     </ng-container>
 
-    <div mat-dialog-actions *ngIf="showSubmitButton" align="right">
+    <div mat-dialog-actions *ngIf="showSubmitButton" class="add-mask-button">
       <button mat-raised-button (click)="addRow()">Add Mask</button>
     </div>
 
@@ -47,8 +52,8 @@
             </div>
             <ng-container *ngSwitchCase="'text'">
               <mat-select [(ngModel)]="element[col.key]">
-                <mat-option [value]="active" *ngFor="let active of activeList">
-                  {{ active }}
+                <mat-option [value]="type" *ngFor="let type of getDropdownValues(col.key)">
+                  {{ type }}
                 </mat-option>
               </mat-select>
             </ng-container>

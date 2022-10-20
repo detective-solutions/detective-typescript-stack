@@ -14,6 +14,10 @@ export class GetTablesBySourceConnectionIdGQL extends Query<Response> {
         connectedTables {
           xid
           name
+          columns {
+            xid
+            columnName
+          }
         }
       }
     }

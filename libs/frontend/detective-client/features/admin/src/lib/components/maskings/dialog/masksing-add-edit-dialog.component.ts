@@ -10,9 +10,7 @@ import { Component, Inject } from '@angular/core';
 import { EMPTY, Subscription, catchError, map, pluck, tap, Observable } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IConnectorPropertiesResponse, IGetAllConnectionsResponse } from '../../../models';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { ToastService } from '@detective.solutions/frontend/shared/ui';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { ConnectionsService, MaskingService } from '../../../services';
 import { IDropDownValues } from '@detective.solutions/shared/data-access';
@@ -32,29 +30,34 @@ const USER_DATA = [
 
 const COLUMNS_SCHEMA = [
   {
+    key: 'filterType',
+    type: 'text',
+    label: 'Filter',
+  },
+  {
     key: 'columnName',
     type: 'text',
-    label: 'Column name',
+    label: 'Column',
   },
   {
     key: 'visible',
     type: 'text',
-    label: 'Hide column',
+    label: 'Hide',
   },
   {
     key: 'valueName',
     type: 'text',
-    label: 'Value to Mask',
+    label: 'Value',
   },
   {
     key: 'replaceType',
     type: 'text',
-    label: 'Masking method',
+    label: 'Method',
   },
   {
     key: 'customReplaceType',
     type: 'text',
-    label: 'custom masking value',
+    label: 'custom value',
   },
   {
     key: 'isEdit',
@@ -70,6 +73,22 @@ const COLUMNS_SCHEMA = [
 })
 export class MaskingAddEditDialogComponent {
   private static readonly connectorFormFieldName = 'connector';
+  private connector!: string;
+  private readonly subscriptions = new Subscription();
+  readonly availableConnections$: Observable<IGetAllConnectionsResponse>;
+
+  readonly defaultDropDownValues = [{ key: '', value: '' }];
+
+  userGroups$: IDropDownValues[] = this.defaultDropDownValues;
+  connectorTables$: IDropDownValues[] = this.defaultDropDownValues;
+
+  availableColumns$: { table: string; columns: { xid: string; columnName: string }[] }[] = [
+    { table: '', columns: [{ xid: '', columnName: '' }] },
+  ];
+  tableColumns$: { table: string; columns: [{ xid: string; columnName: string }] } = {
+    table: '',
+    columns: [{ xid: '', columnName: '' }],
+  };
 
   isAddDialog = !this.dialogInputData?.id;
   showSubmitButton = false;
@@ -80,8 +99,11 @@ export class MaskingAddEditDialogComponent {
   // TODO: Replace with SelectionGroup once defined
   columnsSchema: { key: string; type: string; label: string }[] = COLUMNS_SCHEMA;
 
-  // TODO: Replace with masking options
-  activeList = ['Yes', 'No'];
+  dropDownValues: { columnName: string[]; visible: string[]; filterType: string[] } = {
+    columnName: ['test', 'test2', 'test3'],
+    visible: ['yes', 'no'],
+    filterType: ['row', 'column'],
+  };
 
   readonly connectorTypeFormGroup = this.formBuilder.group({
     connector: MaskingAddEditDialogComponent.connectorFormFieldName,
@@ -91,8 +113,7 @@ export class MaskingAddEditDialogComponent {
     .get(MaskingAddEditDialogComponent.connectorFormFieldName)
     ?.valueChanges.pipe(
       tap((selectedConnectorType: string) => (this.connector = selectedConnectorType)),
-      map((selectedConnector: string) => {
-        console.log(selectedConnector);
+      map(() => {
         return {
           properties: [
             {
@@ -144,13 +165,6 @@ export class MaskingAddEditDialogComponent {
       })
     );
 
-  private connector!: string;
-  private readonly subscriptions = new Subscription();
-  readonly availableConnections$: Observable<IGetAllConnectionsResponse>;
-
-  userGroups$: IDropDownValues[] = [{ key: '', value: '' }];
-  connectorTables$: IDropDownValues[] = [{ key: '', value: '' }];
-
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     private readonly maskingService: MaskingService,
@@ -170,8 +184,6 @@ export class MaskingAddEditDialogComponent {
 
     // TODO: Query dynamically on connector selection
     this.connectionsService.getTablesOfConnection('5a38e2ca-a16c-432e-ab51-8a4c75cb6d5e').subscribe((x) => {
-      // TODO: Remove console log once running smooth
-      console.log(x);
       const result: IDropDownValues[] = [];
       x.connectedTables.forEach((data: ConnectionTable) => {
         result.push({ key: data.xid, value: data.name });
@@ -181,6 +193,7 @@ export class MaskingAddEditDialogComponent {
   }
 
   submitForm(formGroup?: FormGroup) {
+    formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
     console.log(formGroup);
   }
 
@@ -201,15 +214,29 @@ export class MaskingAddEditDialogComponent {
     this.dataSource = this.dataSource.filter((u) => u.id !== id);
   }
 
-  updateAvailableTables(id: any) {
-    console.log(id);
-    // this.connectionsService.getTablesOfConnection(id).subscribe((x) => {
-    //   const result: IDropDownValues[] = [];
-    //   x.connectedTables.forEach((data: ConnectionTable) => {
-    //     result.push({ key: data.xid, value: data.name });
-    //   });
-    //   this.connectorTables$ = result;
-    // });
+  updateAvailableTables(selectedObject: any) {
+    this.connectionsService.getTablesOfConnection(selectedObject.value).subscribe((x) => {
+      const tables: IDropDownValues[] = [];
+      const columns: { table: string; columns: { xid: string; columnName: string }[] }[] = [
+        { table: '', columns: [{ xid: '', columnName: '' }] },
+      ];
+      x.connectedTables.forEach((data: ConnectionTable) => {
+        tables.push({ key: data.xid, value: data.name });
+        columns.push({ table: data.xid, columns: data.columns });
+      });
+      this.connectorTables$ = tables;
+      this.availableColumns$ = columns;
+    });
+  }
+
+  updateAvailableColumns(selectedObject: any) {
+    console.log('table: ', selectedObject.value);
+  }
+
+  getDropdownValues(key: any) {
+    type StatusKey = keyof typeof this.dropDownValues;
+    const dropDownKey: StatusKey = key;
+    return this.dropDownValues[dropDownKey];
   }
 
   private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string | boolean>[] {

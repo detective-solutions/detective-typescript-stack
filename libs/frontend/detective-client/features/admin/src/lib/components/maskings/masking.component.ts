@@ -48,7 +48,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
   private readonly initialPageOffset = 0;
 
   private readonly dialogDefaultConfig = {
-    width: '750px',
+    width: '60%',
     minWidth: '400px',
   };
 

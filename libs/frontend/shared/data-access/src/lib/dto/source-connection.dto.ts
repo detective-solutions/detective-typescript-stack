@@ -89,6 +89,10 @@ export class SourceConnectionDTO implements ISourceConnection {
 export interface ConnectionTable {
   xid: string;
   name: string;
+  columns: {
+    xid: string;
+    columnName: string;
+  }[];
 }
 
 export interface ISourceConnectionTables {
