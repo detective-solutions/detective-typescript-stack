@@ -82,7 +82,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
   async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
     // Propagate message to other websocket gateways that subscribed to the same channel
-    this.messagePropagationService.propagateEvent(WhiteboardWebSocketGateway.cursorPropagationChannel, {
+    this.messagePropagationService.propagateMessage(WhiteboardWebSocketGateway.cursorPropagationChannel, {
       ...message,
       propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
     });

@@ -9,9 +9,9 @@ import { RedisClientService } from '@detective.solutions/backend/redis-client';
 @Injectable()
 export class MessagePropagationService implements OnModuleDestroy {
   readonly logger = new Logger(MessagePropagationService.name);
+  readonly publisherClient: RedisClientType<RedisDefaultModules>;
+  readonly subscriberClient: RedisClientType<RedisDefaultModules>;
 
-  private readonly publisherClient: RedisClientType<RedisDefaultModules>;
-  private readonly subscriberClient: RedisClientType<RedisDefaultModules>;
   private readonly subscribedChannels = new Set<string>();
 
   constructor(private readonly clientService: RedisClientService) {
@@ -19,7 +19,7 @@ export class MessagePropagationService implements OnModuleDestroy {
     this.subscriberClient = clientService.createClient();
   }
 
-  propagateEvent(channel: string, message: IPropagationMessage) {
+  propagateMessage(channel: string, message: IPropagationMessage) {
     this.publisherClient.publish(channel, JSON.stringify(message));
   }
 
