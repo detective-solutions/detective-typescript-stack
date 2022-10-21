@@ -7,7 +7,7 @@ import {
   DropdownFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
-import { EMPTY, Subscription, catchError, map, pluck, tap, Observable } from 'rxjs';
+import { EMPTY, Subscription, catchError, map, pluck, tap, Observable, delay } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IConnectorPropertiesResponse, IGetAllConnectionsResponse } from '../../../models';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -75,7 +75,10 @@ export class MaskingAddEditDialogComponent {
   private static readonly connectorFormFieldName = 'connector';
   private connector!: string;
   private readonly subscriptions = new Subscription();
-  readonly availableConnections$: Observable<IGetAllConnectionsResponse>;
+  readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.connectionsService.getAllConnections(
+    0,
+    500
+  );
 
   readonly defaultDropDownValues = [{ key: '', value: '' }];
 
@@ -93,6 +96,7 @@ export class MaskingAddEditDialogComponent {
   isAddDialog = !this.dialogInputData?.id;
   showSubmitButton = false;
   isSubmitting = false;
+  isSubscribed = false;
   displayedColumns: string[] = COLUMNS_SCHEMA.map((col) => col.key);
   dataSource = USER_DATA;
 
@@ -121,8 +125,8 @@ export class MaskingAddEditDialogComponent {
               displayName: 'Table',
               description: 'Which table is the masking for',
               default: '',
-              values: this.connectorTables$,
-              type: 'select',
+              options: this.connectorTables$,
+              type: 'dropdown',
               required: true,
             },
             {
@@ -130,8 +134,8 @@ export class MaskingAddEditDialogComponent {
               displayName: 'User Group',
               description: 'For which user groups',
               default: '',
-              values: this.userGroups$,
-              type: 'select',
+              options: this.userGroups$,
+              type: 'dropdown',
               required: true,
             },
             {
@@ -139,7 +143,7 @@ export class MaskingAddEditDialogComponent {
               displayName: 'Title',
               description: 'The name of the masking displayed later on',
               default: '',
-              values: [{ key: '', value: '' }],
+              options: [{ key: '', value: '' }],
               type: 'string',
               required: true,
             },
@@ -148,7 +152,7 @@ export class MaskingAddEditDialogComponent {
               displayName: 'Description',
               description: 'When and and how this masking should be applied',
               default: '',
-              values: [{ key: '', value: '' }],
+              options: [{ key: '', value: '' }],
               type: 'string',
               required: true,
             },
@@ -176,25 +180,19 @@ export class MaskingAddEditDialogComponent {
       this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
     );
 
-    this.availableConnections$ = this.connectionsService.getAllConnections(0, 500);
     this.availableConnections$.subscribe((e) => console.log(e));
     this.maskingService.getAvailableUserGroups().subscribe((x) => {
       this.userGroups$ = x;
     });
 
-    // TODO: Query dynamically on connector selection
-    this.connectionsService.getTablesOfConnection('5a38e2ca-a16c-432e-ab51-8a4c75cb6d5e').subscribe((x) => {
-      const result: IDropDownValues[] = [];
-      x.connectedTables.forEach((data: ConnectionTable) => {
-        result.push({ key: data.xid, value: data.name });
-      });
-      this.connectorTables$ = result;
+    this.formFieldDefinitions$?.pipe(delay(500)).subscribe((e) => {
+      this.dynamicFormControlService.get('table')?.valueChanges.pipe(map(console.log));
     });
   }
 
   submitForm(formGroup?: FormGroup) {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
-    console.log(formGroup);
+    console.log(this.dynamicFormControlService);
   }
 
   addRow() {
@@ -230,7 +228,7 @@ export class MaskingAddEditDialogComponent {
   }
 
   updateAvailableColumns(selectedObject: any) {
-    console.log('table: ', selectedObject.value);
+    console.log('table: ', selectedObject);
   }
 
   getDropdownValues(key: any) {
@@ -283,13 +281,13 @@ export class MaskingAddEditDialogComponent {
           );
           break;
         }
-        case 'select': {
+        case 'dropdown': {
           formFields.push(
             new DropdownFormField({
               type: 'dropdown',
               key: data.propertyName,
               label: data.displayName,
-              options: data.values,
+              options: data.options,
               value: String(data.default),
               required: data.required,
               hint: data.description,

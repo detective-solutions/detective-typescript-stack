@@ -17,10 +17,7 @@
     </form>
 
     <ng-container *ngIf="formFieldDefinitions$ | async as formFieldDefinitions">
-      <dynamic-form
-        [formFieldDefinitions]="formFieldDefinitions"
-        (selectionChange)="updateAvailableColumns($event)"
-      ></dynamic-form>
+      <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
     </ng-container>
 
     <div mat-dialog-actions *ngIf="showSubmitButton" class="add-mask-button">

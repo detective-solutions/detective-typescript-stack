@@ -30,6 +30,10 @@ export class DynamicFormControlService {
     return this.formGroup;
   }
 
+  get(key: string) {
+    return this.formGroup.get(key);
+  }
+
   submitForm() {
     this.formSubmit$.next(this.formGroup);
   }
