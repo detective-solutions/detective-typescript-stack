@@ -32,8 +32,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
-  private static cursorPropagationChannel = 'ws_gateway_cursor_propagation';
-  private static propagationSourceId = uuidv4();
+  static cursorPropagationChannel = 'ws_gateway_cursor_propagation';
+  static propagationSourceId = uuidv4();
 
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 

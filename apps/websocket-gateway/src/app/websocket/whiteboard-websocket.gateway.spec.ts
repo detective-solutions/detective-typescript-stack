@@ -20,6 +20,10 @@ const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const mockWhiteboardProducer = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
+const propagateMessageMethodName = 'propagateMessage';
+const mockMessagePropagationService = {
+  [propagateMessageMethodName]: jest.fn(),
+};
 
 describe('WhiteboardWebsocketGateway', () => {
   const webSocketUrl = 'ws://localhost:1234';
@@ -33,7 +37,7 @@ describe('WhiteboardWebsocketGateway', () => {
       providers: [
         WhiteboardWebSocketGateway,
         { provide: WhiteboardEventProducer, useValue: mockWhiteboardProducer },
-        { provide: MessagePropagationService, useValue: {} },
+        { provide: MessagePropagationService, useValue: mockMessagePropagationService },
         { provide: JwtService, useValue: {} },
         ConfigService,
       ],
@@ -54,6 +58,24 @@ describe('WhiteboardWebsocketGateway', () => {
 
   it('should be defined', () => {
     expect(webSocketGateway).toBeDefined();
+  });
+
+  describe('onWhiteboardCursorMovedEvent', () => {
+    it('should correctly propagate and forward WHITEBOARD_CURSOR_MOVED events', async () => {
+      const propagateMessageMock = jest.spyOn(mockMessagePropagationService, propagateMessageMethodName);
+      const sendMessageByContextSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
+      const testMessage = { context: _createContext(MessageEventType.LoadWhiteboardData), body: testMessageBody };
+
+      await webSocketGateway.onWhiteboardCursorMovedEvent(testMessage);
+
+      expect(propagateMessageMock).toHaveBeenCalledTimes(1);
+      expect(propagateMessageMock).toHaveBeenCalledWith(WhiteboardWebSocketGateway.cursorPropagationChannel, {
+        ...testMessage,
+        propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
+      });
+      expect(sendMessageByContextSpy).toHaveBeenCalledTimes(1);
+      expect(sendMessageByContextSpy).toHaveBeenCalledWith(testMessage, broadcastWebSocketContext);
+    });
   });
 
   describe('onLoadWhiteboardDataEvent', () => {
