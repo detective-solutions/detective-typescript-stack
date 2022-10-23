@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 export class DynamicFormControlService {
   formGroup!: FormGroup;
   formSubmit$ = new Subject<FormGroup>();
+  selectionChanged$ = new Subject<boolean>();
 
   get currentFormGroup(): FormGroup {
     if (this.formGroup) {

@@ -20,6 +20,7 @@
         [formControlName]="formFieldDefinition.key"
         [value]="formFieldValue"
         [required]="formFieldDefinition.required"
+        (selectionChange)="onSelectionChange()"
       >
         <mat-option *ngFor="let option of formFieldDefinition.options" [value]="option.key">{{
           option.value
