@@ -113,6 +113,11 @@ export class CacheService {
     return this.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
   }
 
+  async updateCasefileTitle(casefileId: string, title: string) {
+    this.logger.log(`Updating title of casefile "${casefileId}" in cache`);
+    this.client.json.set(casefileId, '.title', title);
+  }
+
   async updateNodePositions(
     casefileId: string,
     userId: string,

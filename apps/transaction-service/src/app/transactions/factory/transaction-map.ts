@@ -8,8 +8,6 @@ import { WhiteboardUserLeftTransaction } from '../whiteboard-user-left.transacti
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// TODO: Split transaction map into persistent & temporary transactions for better performance
-
 const tempTransactionMap: any = {};
 Object.values(MessageEventType).forEach((eventType: string) => {
   if (eventType === MessageEventType.WhiteboardUserJoined) {
@@ -28,6 +26,9 @@ Object.values(MessageEventType).forEach((eventType: string) => {
     tempTransactionMap[eventType] = WhiteboardNodeBlockedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardNodeMoved) {
+    tempTransactionMap[eventType] = WhiteboardNodeMovedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardTitleUpdated) {
     tempTransactionMap[eventType] = WhiteboardNodeMovedTransaction;
   }
 });

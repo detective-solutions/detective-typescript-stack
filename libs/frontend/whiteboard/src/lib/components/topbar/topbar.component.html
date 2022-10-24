@@ -2,7 +2,13 @@
   <div fxFlex="0 0 150px" fxLayoutAlign="center center" class="topbar-element topbar-logo">
     <img src="assets/images/detective-logo.png" alt="Logo" /><span>detective</span>
   </div>
-  <input fxFlex="1 0 150px" class="topbar-element" placeholder="{{ t('titlePlaceholder') }}" [value]="title$ | async" />
+  <input
+    fxFlex="1 0 150px"
+    class="topbar-element"
+    placeholder="{{ t('titlePlaceholder') }}"
+    [value]="title$ | async"
+    (keyup)="onTitleInputChange($event)"
+  />
   <div fxFlex="1 1 125px" class="topbar-element active-users-wrapper">
     <div *ngFor="let user of activeUsers$ | async" class="user-avatar">
       <img

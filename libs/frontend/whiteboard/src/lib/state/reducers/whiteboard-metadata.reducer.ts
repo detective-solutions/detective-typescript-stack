@@ -48,5 +48,17 @@ export const whiteboardMetadataReducer = createReducer(
         .sort((a, b) => a.id.localeCompare(b.id));
       return { ...state, activeUsers: updatedActiveUsers };
     }
+  ),
+  on(
+    WhiteboardMetadataActions.WhiteboardTitleUpdated,
+    (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
+      return { ...state, title: action.title };
+    }
+  ),
+  on(
+    WhiteboardMetadataActions.WhiteboardTitleUpdatedRemotely,
+    (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
+      return { ...state, title: action.title };
+    }
   )
 );

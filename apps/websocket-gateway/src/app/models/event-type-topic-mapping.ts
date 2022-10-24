@@ -18,5 +18,9 @@ export const EventTypeTopicMapping = {
     targetTopic: KafkaTopic.TransactionInput,
   },
   whiteboardNodeMoved: { eventType: MessageEventType.WhiteboardNodeMoved, targetTopic: KafkaTopic.TransactionInput },
+  whiteboardTitleUpdated: {
+    eventType: MessageEventType.WhiteboardTitleUpdated,
+    targetTopic: KafkaTopic.TransactionInput,
+  },
   queryTable: { eventType: MessageEventType.QueryTable, targetTopic: KafkaTopic.QueryInput },
 };

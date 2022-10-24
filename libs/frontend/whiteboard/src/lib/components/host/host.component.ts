@@ -416,6 +416,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             });
         })
     );
+
+    // Listen to WHITEBOARD_TITLE_UPDATED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardTitleUpdated)))
+        .subscribe((messageData: IMessage<string>) =>
+          this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleUpdatedRemotely({ title: messageData.body }))
+        )
+    );
   }
 
   private convertDOMToSVGCoordinates(x: number, y: number): DOMPoint {
