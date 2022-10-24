@@ -417,6 +417,25 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         })
     );
 
+    // Listen to WHITEBOARD_TITLE_FOCUSED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardTitleFocused),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<boolean>) =>
+          this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocusedRemotely({ isFocused: messageData.body }))
+        )
+    );
+
     // Listen to WHITEBOARD_TITLE_UPDATED websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$

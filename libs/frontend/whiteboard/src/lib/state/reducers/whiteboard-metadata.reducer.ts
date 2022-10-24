@@ -9,6 +9,7 @@ import { IWhiteboardMetadataState } from '../interfaces';
 export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
   id: '',
   title: '',
+  isTitleFocused: false,
   description: '',
   activeUsers: [],
 };

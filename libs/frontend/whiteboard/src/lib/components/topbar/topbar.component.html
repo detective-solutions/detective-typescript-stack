@@ -7,7 +7,10 @@
     class="topbar-element"
     placeholder="{{ t('titlePlaceholder') }}"
     [value]="title$ | async"
+    [disabled]="isTitleFocused$ | async"
     (keyup)="onTitleInputChange($event)"
+    (focus)="onTitleInputFocus()"
+    (blur)="onTitleInputBlur()"
   />
   <div fxFlex="1 1 125px" class="topbar-element active-users-wrapper">
     <div *ngFor="let user of activeUsers$ | async" class="user-avatar">

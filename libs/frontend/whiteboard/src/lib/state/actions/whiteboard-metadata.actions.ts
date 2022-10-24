@@ -6,6 +6,11 @@ const actionPrefix = '[Whiteboard Metadata]';
 
 export const WhiteboardUserJoined = createAction(`${actionPrefix} User joined`, props<{ user: IUserForWhiteboard }>());
 export const WhiteboardUserLeft = createAction(`${actionPrefix} User left`, props<{ userId: string }>());
+export const WhiteboardTitleFocused = createAction(`${actionPrefix} Title focused`, props<{ isFocused: boolean }>());
+export const WhiteboardTitleFocusedRemotely = createAction(
+  `${actionPrefix} Title focused remotely`,
+  props<{ isFocused: boolean }>()
+);
 export const WhiteboardTitleUpdated = createAction(`${actionPrefix} Title updated`, props<{ title: string }>());
 export const WhiteboardTitleUpdatedRemotely = createAction(
   `${actionPrefix} Title updated remotely`,
