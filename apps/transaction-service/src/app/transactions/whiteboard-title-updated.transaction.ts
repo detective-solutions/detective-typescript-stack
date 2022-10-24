@@ -11,6 +11,8 @@ export class WhiteboardTitleUpdatedTransaction extends Transaction {
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
+    console.log(this.message);
+    console.log(this.messageBody);
 
     if (!this.messageBody) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
