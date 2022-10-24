@@ -20,7 +20,7 @@ export class WhiteboardTitleFocusedTransaction extends Transaction {
 
     try {
       this.forwardMessageToOtherClients();
-      await this.cacheService.updateCasefileTitle(casefileId, this.messageBody);
+      await this.cacheService.updateCasefileTitleFocus(casefileId, this.messageBody);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
