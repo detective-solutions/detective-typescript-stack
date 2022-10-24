@@ -31,10 +31,10 @@ Object.values(MessageEventType).forEach((eventType: string) => {
     tempTransactionMap[eventType] = WhiteboardNodeMovedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardTitleFocused) {
-    tempTransactionMap[eventType] = WhiteboardTitleUpdatedTransaction;
+    tempTransactionMap[eventType] = WhiteboardTitleFocusedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardTitleUpdated) {
-    tempTransactionMap[eventType] = WhiteboardTitleFocusedTransaction;
+    tempTransactionMap[eventType] = WhiteboardTitleUpdatedTransaction;
   }
 });
 
