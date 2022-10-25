@@ -10,7 +10,7 @@ const selectWhiteboardMetaDataState = createSelector(
 
 export const selectIsWhiteboardTitleFocused = createSelector(
   selectWhiteboardMetaDataState,
-  (state: IWhiteboardMetadataState) => state.isTitleFocused
+  (state: IWhiteboardMetadataState) => state.titleFocusedBy
 );
 
 export const selectWhiteboardTitle = createSelector(

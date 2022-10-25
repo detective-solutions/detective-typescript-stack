@@ -33,7 +33,7 @@ export class WhiteboardMetadataEffects {
                 eventType: MessageEventType.WhiteboardTitleFocused,
                 userId: context.userId,
               } as IMessageContext,
-              body: action.isFocused,
+              body: action.titleFocusedBy,
             },
           });
         })

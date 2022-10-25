@@ -113,7 +113,7 @@ export class CacheService {
     return this.client.json.get(casefileId, { path: CacheService.NODES_PATH }) as any;
   }
 
-  async updateCasefileTitleFocus(casefileId: string, isFocused: boolean) {
+  async updateCasefileTitleFocus(casefileId: string, isFocused: string) {
     this.logger.log(`Updating focus state of title in casefile "${casefileId}"`);
     this.client.json.set(casefileId, '.isTitleFocused', isFocused);
   }

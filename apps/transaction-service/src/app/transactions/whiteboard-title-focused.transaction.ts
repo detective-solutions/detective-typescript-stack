@@ -7,12 +7,13 @@ export class WhiteboardTitleFocusedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardTitleFocusedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<boolean>; // Define message body type
+  override message: IMessage<string | null>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    if (!this.messageBody) {
+    // Explicitly check for undefined because messageBody can be null
+    if (this.messageBody === undefined) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
 

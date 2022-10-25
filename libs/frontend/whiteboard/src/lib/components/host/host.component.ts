@@ -27,6 +27,8 @@ import {
   TableWhiteboardNode,
 } from '../../models';
 import {
+  Observable,
+  ReplaySubject,
   Subject,
   Subscription,
   combineLatest,
@@ -49,6 +51,7 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
+import { RxWebSocketWrapperSubject } from '@detective.solutions/rx-websocket-wrapper';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
@@ -431,8 +434,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<boolean>) =>
-          this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocusedRemotely({ isFocused: messageData.body }))
+        .subscribe((messageData: IMessage<string | null>) =>
+          this.store.dispatch(
+            WhiteboardMetadataActions.WhiteboardTitleFocusedRemotely({ titleFocusedBy: messageData.body })
+          )
         )
     );
 

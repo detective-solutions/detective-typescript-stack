@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, filter, take } from 'rxjs';
 import {
   WhiteboardMetadataActions,
   selectActiveUsers,
   selectIsWhiteboardTitleFocused,
+  selectWhiteboardContextState,
   selectWhiteboardTitle,
 } from '../../state';
 
 import { IUserForWhiteboard } from '@detective.solutions/shared/data-access';
+import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -35,13 +37,16 @@ export class TopbarComponent implements OnInit {
   }
 
   onTitleInputFocus() {
-    console.log('FOCUS');
-    this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ isFocused: true }));
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1))
+      .subscribe((context: IWhiteboardContextState) =>
+        this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: context.userRole }))
+      );
   }
 
   onTitleInputBlur() {
-    console.log('BLUR');
-    this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ isFocused: false }));
+    this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: null }));
   }
 
   getUserFullName(user: IUserForWhiteboard) {

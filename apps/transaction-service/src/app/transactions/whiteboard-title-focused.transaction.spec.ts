@@ -27,9 +27,9 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
-const testMessagePayload: IMessage<string> = {
+const testMessagePayload: IMessage<string | null> = {
   context: testMessageContext,
-  body: 'test title',
+  body: testMessageContext.userId,
 };
 
 describe('WhiteboardTitleFocusedTransaction', () => {
@@ -72,6 +72,19 @@ describe('WhiteboardTitleFocusedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
+    });
+
+    it('should correctly execute transaction if messageBody is null', async () => {
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const modifiedMessagePayload = { context: testMessageContext, body: null };
+
+      const transaction = new WhiteboardTitleFocusedTransaction(serviceRefs, modifiedMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await transaction.execute();
+
+      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
+      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, modifiedMessagePayload);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {

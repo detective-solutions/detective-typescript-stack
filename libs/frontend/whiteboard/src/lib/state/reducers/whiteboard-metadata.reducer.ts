@@ -9,7 +9,7 @@ import { IWhiteboardMetadataState } from '../interfaces';
 export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
   id: '',
   title: '',
-  isTitleFocused: false,
+  titleFocusedBy: null,
   description: '',
   activeUsers: [],
 };
@@ -48,6 +48,18 @@ export const whiteboardMetadataReducer = createReducer(
         .filter((user) => user.id !== action.userId)
         .sort((a, b) => a.id.localeCompare(b.id));
       return { ...state, activeUsers: updatedActiveUsers };
+    }
+  ),
+  on(
+    WhiteboardMetadataActions.WhiteboardTitleFocused,
+    (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
+      return { ...state, titleFocusedBy: action.titleFocusedBy };
+    }
+  ),
+  on(
+    WhiteboardMetadataActions.WhiteboardTitleFocusedRemotely,
+    (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
+      return { ...state, titleFocusedBy: action.titleFocusedBy };
     }
   ),
   on(
