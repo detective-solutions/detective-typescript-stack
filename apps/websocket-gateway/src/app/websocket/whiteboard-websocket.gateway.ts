@@ -1,3 +1,4 @@
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventTypeTopicMapping, IPropagationMessage, IWebSocketClient, WebSocketClientContext } from '../models';
 import {
   IJwtTokenPayload,
@@ -194,6 +195,17 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         client.send(JSON.stringify({ event: message.context.eventType, data: message }));
       }
     });
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  private saveActiveCasefiles() {
+    const activeCasefileIds = new Set<string>();
+    this.server.clients.forEach((client: IWebSocketClient) => {
+      const clientContext = client._socket.context;
+      activeCasefileIds.add(clientContext.casefileId);
+    });
+    this.logger.debug('Called every 30 seconds');
+    this.logger.debug(activeCasefileIds);
   }
 
   private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {

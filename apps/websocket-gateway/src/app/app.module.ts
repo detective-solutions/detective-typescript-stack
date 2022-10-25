@@ -6,6 +6,7 @@ import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
 import { MessagePropagationService } from './services';
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { WhiteboardWebSocketGateway } from './websocket';
 import { defaultEnvConfig } from './default-env.config';
 import { kafkaConfig } from './kafka-config';
@@ -24,6 +25,7 @@ import { kafkaConfig } from './kafka-config';
       }`,
     }),
     AuthModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [WhiteboardEventConsumer],
   providers: [WhiteboardEventProducer, WhiteboardWebSocketGateway, MessagePropagationService],
