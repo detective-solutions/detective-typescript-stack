@@ -401,6 +401,11 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserLeft({ userId: messageData.context.userId }));
 
+          // Remove collaboration cursor
+          this.collaborationCursors = this.collaborationCursors.filter(
+            (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id !== messageData.context.userId
+          );
+
           // Unblock all nodes that are still blocked by the user that left
           this.store
             .select(selectWhiteboardNodesBlockedByUserId(messageData.context.userId))
