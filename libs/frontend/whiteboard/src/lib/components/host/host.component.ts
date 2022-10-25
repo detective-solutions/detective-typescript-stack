@@ -467,9 +467,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     const userInfo = activeUsers.find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
     if (!userInfo) {
-      throw new Error(
+      console.warn(
         `Could not build collaboration cursor info. Could not find active user info for user ${messageData.context.userId}`
       );
+      return;
     }
 
     const existingCursor = this.collaborationCursors.find(
