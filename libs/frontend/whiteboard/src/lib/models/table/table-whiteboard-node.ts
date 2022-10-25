@@ -3,7 +3,6 @@ import {
   ITableNode,
   ITableNodeTemporaryData,
   ITableWhiteboardNode,
-  IUser,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
