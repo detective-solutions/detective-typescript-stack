@@ -27,8 +27,6 @@ import {
   TableWhiteboardNode,
 } from '../../models';
 import {
-  Observable,
-  ReplaySubject,
   Subject,
   Subscription,
   combineLatest,
@@ -51,7 +49,6 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
-import { RxWebSocketWrapperSubject } from '@detective.solutions/rx-websocket-wrapper';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
