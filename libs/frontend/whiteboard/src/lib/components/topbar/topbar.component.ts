@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, filter, take } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, take } from 'rxjs';
 import {
   WhiteboardMetadataActions,
   selectActiveUsers,
-  selectIsWhiteboardTitleFocused,
+  selectIsWhiteboardTitleFocusedByDifferentUserId,
   selectWhiteboardContextState,
   selectWhiteboardTitle,
 } from '../../state';
@@ -21,14 +21,22 @@ import { Store } from '@ngrx/store';
 export class TopbarComponent implements OnInit {
   title$ = this.store.select(selectWhiteboardTitle);
   titleInput$ = new Subject<string>();
-  isTitleFocused$ = this.store.select(selectIsWhiteboardTitleFocused);
+  isTitleFocusedByDifferentUser$ = this.store
+    .select(selectWhiteboardContextState)
+    .pipe(
+      switchMap((context: IWhiteboardContextState) =>
+        this.store.select(selectIsWhiteboardTitleFocusedByDifferentUserId(context.userId))
+      )
+    );
   activeUsers$ = this.store.select(selectActiveUsers);
+
+  private readonly titleInputDebounceTime = 600;
 
   constructor(private readonly store: Store) {}
 
   ngOnInit() {
     this.titleInput$
-      .pipe(debounceTime(600), filter(Boolean), distinctUntilChanged())
+      .pipe(debounceTime(this.titleInputDebounceTime), filter(Boolean), distinctUntilChanged())
       .subscribe((title: string) => this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleUpdated({ title })));
   }
 
@@ -41,12 +49,16 @@ export class TopbarComponent implements OnInit {
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((context: IWhiteboardContextState) =>
-        this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: context.userRole }))
+        this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: context.userId }))
       );
   }
 
   onTitleInputBlur() {
-    this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: null }));
+    // Add timeout to be in sync with debounced value update in the titleInput$ observable
+    setTimeout(
+      () => this.store.dispatch(WhiteboardMetadataActions.WhiteboardTitleFocused({ titleFocusedBy: null })),
+      this.titleInputDebounceTime
+    );
   }
 
   getUserFullName(user: IUserForWhiteboard) {

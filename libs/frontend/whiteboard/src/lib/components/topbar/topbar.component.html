@@ -7,7 +7,7 @@
     class="topbar-element"
     placeholder="{{ t('titlePlaceholder') }}"
     [value]="title$ | async"
-    [disabled]="isTitleFocused$ | async"
+    [disabled]="isTitleFocusedByDifferentUser$ | async"
     (keyup)="onTitleInputChange($event)"
     (focus)="onTitleInputFocus()"
     (blur)="onTitleInputBlur()"
