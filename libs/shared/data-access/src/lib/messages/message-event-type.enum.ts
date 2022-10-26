@@ -9,5 +9,6 @@ export enum MessageEventType {
   WhiteboardNodeMoved = 'WHITEBOARD_NODE_MOVED',
   WhiteboardTitleFocused = 'WHITEBOARD_TITLE_FOCUSED',
   WhiteboardTitleUpdated = 'WHITEBOARD_TITLE_UPDATED',
+  SaveWhiteboard = 'SAVE_WHITEBOARD',
   QueryTable = 'QUERY_TABLE',
 }

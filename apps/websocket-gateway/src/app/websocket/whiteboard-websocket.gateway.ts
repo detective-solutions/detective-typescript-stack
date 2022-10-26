@@ -4,6 +4,7 @@ import {
   IJwtTokenPayload,
   IMessage,
   IMessageContext,
+  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
@@ -178,6 +179,26 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
   }
 
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  saveActiveCasefiles() {
+    const activeClientContexts = new Set<WebSocketClientContext>();
+    this.server.clients.forEach((client: IWebSocketClient) => activeClientContexts.add(client._socket.context));
+
+    activeClientContexts.forEach((clientContext: WebSocketClientContext) => {
+      const message = {
+        context: {
+          ...clientContext,
+          timestamp: new Date().getTime(),
+          eventType: MessageEventType.SaveWhiteboard,
+          userId: null,
+          userRole: null,
+        },
+        body: null,
+      };
+      this.whiteboardEventProducer.sendKafkaMessage(KafkaTopic.TransactionInput, message);
+    });
+  }
+
   sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
     this.server.clients.forEach((client: IWebSocketClient) => {
       const clientContext = client._socket.context;
@@ -195,17 +216,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         client.send(JSON.stringify({ event: message.context.eventType, data: message }));
       }
     });
-  }
-
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  private saveActiveCasefiles() {
-    const activeCasefileIds = new Set<string>();
-    this.server.clients.forEach((client: IWebSocketClient) => {
-      const clientContext = client._socket.context;
-      activeCasefileIds.add(clientContext.casefileId);
-    });
-    this.logger.debug('Called every 30 seconds');
-    this.logger.debug(activeCasefileIds);
   }
 
   private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {

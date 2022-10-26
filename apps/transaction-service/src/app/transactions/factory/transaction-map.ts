@@ -3,6 +3,7 @@ import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transac
 import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
 import { WhiteboardNodeMovedTransaction } from '../whiteboard-node-moved.transaction';
+import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
 import { WhiteboardTitleFocusedTransaction } from '../whiteboard-title-focused.transaction';
 import { WhiteboardTitleUpdatedTransaction } from '../whiteboard-title-updated.transaction';
 import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
@@ -36,9 +37,16 @@ Object.values(MessageEventType).forEach((eventType: string) => {
   if (eventType === MessageEventType.WhiteboardTitleUpdated) {
     tempTransactionMap[eventType] = WhiteboardTitleUpdatedTransaction;
   }
+  if (eventType === MessageEventType.SaveWhiteboard) {
+    tempTransactionMap[eventType] = WhiteboardSaveTransaction;
+  }
 });
 
 export const transactionMap = Object.assign({}, tempTransactionMap);
+
+console.log('DEBUGGING TRANSACTION MAP');
+console.log(transactionMap);
+
 export type TransactionMap = typeof transactionMap;
 export type TransactionKeys = keyof TransactionMap;
 export type SingleTransactionKey<K> = [K] extends (K extends TransactionKeys ? [K] : any) ? K : any;

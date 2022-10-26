@@ -1,5 +1,5 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IMessageContext, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { IMessageContext, KafkaTopic, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
@@ -236,6 +236,22 @@ describe('WhiteboardWebsocketGateway', () => {
         InternalServerErrorException
       );
       expect(producerMock).toBeCalledTimes(0);
+    });
+  });
+
+  describe('saveActiveCasefiles', () => {
+    it('should correctly forward SAVE_WHITEBOARD events for each active casefile', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const context1 = _createContext(MessageEventType.SaveWhiteboard);
+      const context2 = _createContext(MessageEventType.SaveWhiteboard);
+      const context3 = _createContext(MessageEventType.SaveWhiteboard);
+      await _createWebSocketClient(context1);
+      await _createWebSocketClient(context2);
+      await _createWebSocketClient(context3);
+
+      webSocketGateway.saveActiveCasefiles();
+
+      expect(producerMock).toBeCalledTimes(3);
     });
   });
 
