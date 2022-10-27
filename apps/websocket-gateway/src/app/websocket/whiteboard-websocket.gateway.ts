@@ -179,7 +179,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
   }
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   saveActiveCasefiles() {
     const activeClientContexts = new Set<WebSocketClientContext>();
     this.server.clients.forEach((client: IWebSocketClient) => activeClientContexts.add(client._socket.context));
