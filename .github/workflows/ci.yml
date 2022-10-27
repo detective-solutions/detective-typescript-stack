@@ -96,9 +96,8 @@ jobs:
         env:
           CURRENT_BRANCH: ${{github.ref_name}}
         run: |
-          SERVICE_NAME=$(python setup.py --name)
-          SERVICE_VERSION=$(python setup.py --version)
-          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${SERVICE_NAME}
+          IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${{matrix.app}}
+          APP_VERSION=$(node --print "require('./package.json').version")
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             BASE_TAG=${IMAGE_NAME}:${SERVICE_VERSION}
             TARGET_TAGS=${BASE_TAG}

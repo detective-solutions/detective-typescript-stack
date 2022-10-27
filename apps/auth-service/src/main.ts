@@ -8,8 +8,6 @@ import { environment } from '@detective.solutions/backend/shared/environments';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }));
 
-  console.log(); // TODO: Remove me!
-
   app.enableVersioning({
     type: VersioningType.URI,
   });

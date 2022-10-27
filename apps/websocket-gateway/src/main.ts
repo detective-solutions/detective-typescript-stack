@@ -9,7 +9,6 @@ import { kafkaConfig } from './app/kafka-config';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, kafkaConfig as KafkaOptions);
-  console.log(); // TODO: Remove me!
   app.useWebSocketAdapter(new WsAdapter(app));
   await app.listen();
   Logger.log(
