@@ -99,16 +99,16 @@ jobs:
           IMAGE_NAME=${{env.DOCKER_REGISTRY}}/${{env.ORGANIZATION}}/${{matrix.app}}
           APP_VERSION=$(node --print "require('./package.json').version")
           if [[ $CURRENT_BRANCH == 'main' ]]; then
-            BASE_TAG=${IMAGE_NAME}:${SERVICE_VERSION}
-            TARGET_TAGS=${BASE_TAG}
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
-            BASE_TAG=${IMAGE_NAME}:${SERVICE_VERSION}
-            TARGET_TAGS="${BASE_TAG},${IMAGE_NAME}:development"
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
+            TARGET_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
-            BASE_TAG=${IMAGE_NAME}:${SERVICE_VERSION}-${SANITIZED_BRANCH_NAME}
-            TARGET_TAGS=${BASE_TAG}
+            BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
+            TARGET_TAGS="--tag=${BASE_TAG}"
           fi
           echo "::set-output name=target-tags::${TARGET_TAGS}"
 
