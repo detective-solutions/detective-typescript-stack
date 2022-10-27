@@ -190,8 +190,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
           ...clientContext,
           timestamp: new Date().getTime(),
           eventType: MessageEventType.SaveWhiteboard,
-          userId: null,
-          userRole: null,
         },
         body: null,
       };
@@ -297,7 +295,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
             tenantId: tenantId,
             casefileId: casefileId,
             userId: tokenPayload.sub,
-            userRole: tokenPayload.role,
+            userRole: tokenPayload.role as UserRole,
           })
         : reject(null);
     });
