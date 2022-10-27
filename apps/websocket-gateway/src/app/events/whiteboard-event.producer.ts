@@ -14,7 +14,7 @@ export class WhiteboardEventProducer {
   constructor(@Inject(kafkaClientInjectionToken) private readonly client: ClientKafka) {}
 
   sendKafkaMessage(topicName: string, payload: IMessage<any>) {
-    this.logger.debug(`${buildLogContext(payload.context)} Forwarding Kafka message to topic ${topicName}`);
+    this.logger.verbose(`${buildLogContext(payload.context)} Forwarding Kafka message to topic ${topicName}`);
     this.client.emit(topicName, payload);
   }
 }
