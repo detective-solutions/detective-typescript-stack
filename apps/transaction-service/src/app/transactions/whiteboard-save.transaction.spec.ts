@@ -91,6 +91,20 @@ describe('WhiteboardSaveTransaction', () => {
       expect(saveCasefileSpy).toHaveBeenCalledWith(testCachableCasefile);
     });
 
+    it('should do nothing if no casefile id was returned from cache', async () => {
+      const getCasefileByIdSpy = jest.spyOn(cacheService, getCasefileByIdMethodName).mockResolvedValue(null);
+      const saveCasefileSpy = jest.spyOn(databaseService, saveCasefileMethodName);
+
+      const transaction = new WhiteboardSaveTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await transaction.execute();
+
+      expect(getCasefileByIdSpy).toBeCalledTimes(1);
+      expect(getCasefileByIdSpy).toBeCalledWith(testMessageContext.casefileId);
+      expect(saveCasefileSpy).toBeCalledTimes(0);
+    });
+
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
       jest.spyOn(cacheService, getCasefileByIdMethodName).mockImplementation(() => {
         throw new Error();
