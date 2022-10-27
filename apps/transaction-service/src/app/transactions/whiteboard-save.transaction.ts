@@ -15,8 +15,11 @@ export class WhiteboardSaveTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
 
     try {
-      await this.databaseService.saveCasefile(await this.cacheService.getCasefileById(casefileId));
-      this.logger.log(`${this.logContext} Transaction successful`);
+      const cachedCasefileId = await this.cacheService.getCasefileById(casefileId);
+      if (cachedCasefileId) {
+        await this.databaseService.saveCasefile(cachedCasefileId);
+        this.logger.log(`${this.logContext} Transaction successful`);
+      }
     } catch (error) {
       this.logger.error(error);
       this.handleError(casefileId);
