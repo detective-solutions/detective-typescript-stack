@@ -43,10 +43,6 @@ Object.values(MessageEventType).forEach((eventType: string) => {
 });
 
 export const transactionMap = Object.assign({}, tempTransactionMap);
-
-console.log('DEBUGGING TRANSACTION MAP');
-console.log(transactionMap);
-
 export type TransactionMap = typeof transactionMap;
 export type TransactionKeys = keyof TransactionMap;
 export type SingleTransactionKey<K> = [K] extends (K extends TransactionKeys ? [K] : any) ? K : any;
