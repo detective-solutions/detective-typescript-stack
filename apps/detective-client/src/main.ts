@@ -7,6 +7,8 @@ if (environment.production) {
   enableProdMode();
 }
 
+console.log(); // TODO: Remove me!
+
 setTimeout(() => {
   platformBrowserDynamic()
     .bootstrapModule(AppModule)
