@@ -122,7 +122,7 @@ jobs:
       - name: Build and push docker image
         uses: docker/build-push-action@v3
         with:
-          context: ./apps/${{matrix.app}}/docker
+          context: /apps/${{matrix.app}}/docker
           push: true
           tags: ${{steps.image-metadata.outputs.target-tags}}
 
