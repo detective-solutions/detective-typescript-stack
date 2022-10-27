@@ -3,8 +3,6 @@ import { enableProdMode } from '@angular/core';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-console.log(); // TODO: Remove me!
-
 if (environment.production) {
   enableProdMode();
 }

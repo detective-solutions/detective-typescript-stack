@@ -16,19 +16,19 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v2
+        uses: nrwl/nx-set-shas@v3.0.1
 
       - name: Install npm dependencies (without scripts)
         run: npm ci --ignore-scripts --no-audit --no-fund
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
@@ -73,10 +73,10 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
@@ -113,16 +113,16 @@ jobs:
           echo "::set-output name=target-tags::${TARGET_TAGS}"
 
       - name: Login to quay.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v2.1.0
         with:
           registry: ${{env.DOCKER_REGISTRY}}
           username: ${{secrets.DOCKER_REGISTRY_USER}}
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
       - name: Build and push docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3.2.0
         with:
-          file: /apps/${{matrix.app}}/docker
+          file: apps/${{matrix.app}}/docker
           push: true
           tags: ${{steps.image-metadata.outputs.target-tags}}
           context: .
@@ -134,7 +134,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       # PRs with event_name 'pull_request_target' always run in the PR target branch
       - name: Switch branch on PR
@@ -142,7 +142,7 @@ jobs:
         run: git checkout ${{github.event.pull_request.head.sha}}
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
