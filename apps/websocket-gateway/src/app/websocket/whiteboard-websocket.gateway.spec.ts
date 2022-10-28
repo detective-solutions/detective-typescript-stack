@@ -1,5 +1,5 @@
 import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IMessageContext, KafkaTopic, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { IMessageContext, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
