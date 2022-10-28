@@ -74,7 +74,17 @@ describe('WhiteboardTitleFocusedTransaction', () => {
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
     });
 
-    it('should correctly execute transaction if messageBody is null', async () => {
+    it('should throw an InternalServerException if the given message is missing a body', async () => {
+      const transaction = new WhiteboardTitleFocusedTransaction(serviceRefs, {
+        ...testMessagePayload,
+        body: undefined,
+      });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should still execute transaction if messageBody is null', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
       const modifiedMessagePayload = { context: testMessageContext, body: null };
 
@@ -85,16 +95,6 @@ describe('WhiteboardTitleFocusedTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, modifiedMessagePayload);
-    });
-
-    it('should throw an InternalServerException if the given message is missing a body', async () => {
-      const transaction = new WhiteboardTitleFocusedTransaction(serviceRefs, {
-        ...testMessagePayload,
-        body: undefined,
-      });
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
