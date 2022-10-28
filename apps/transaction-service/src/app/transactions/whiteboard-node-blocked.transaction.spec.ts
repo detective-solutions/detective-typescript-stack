@@ -18,7 +18,8 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const cacheServiceMock = {};
+const updateNodeBlockMethodName = 'updateNodeBlock';
+const cacheServiceMock = { [updateNodeBlockMethodName]: jest.fn() };
 
 const testMessageContext = {
   eventType: MessageEventType.WhiteboardNodeDeleted,
@@ -30,16 +31,16 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
-const testWhiteboardNodeUpdate: IWhiteboardNodeBlockUpdate = {
+const testMessageBody: IWhiteboardNodeBlockUpdate = {
   temporary: { blockedBy: testMessageContext.userId },
 };
 
 const testMessagePayload: IMessage<IWhiteboardNodeBlockUpdate> = {
   context: testMessageContext,
-  body: testWhiteboardNodeUpdate,
+  body: testMessageBody,
 };
 
-xdescribe('WhiteboardNodeBlockedTransaction', () => {
+describe('WhiteboardNodeBlockedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -69,16 +70,51 @@ xdescribe('WhiteboardNodeBlockedTransaction', () => {
   });
 
   describe('execute', () => {
-    it('should correctly execute transaction', async () => {
+    it('should correctly execute transaction if blocking was successful', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const updateNodeBlockSpy = jest.spyOn(cacheService, updateNodeBlockMethodName).mockResolvedValue(true);
 
       const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
+      expect(updateNodeBlockSpy).toBeCalledTimes(1);
+      expect(updateNodeBlockSpy).toBeCalledWith(
+        testMessageContext.casefileId,
+        testMessageBody.temporary.blockedBy,
+        testMessageContext.nodeId
+      );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
+    });
+
+    it('should skip transaction forwarding if blocking was not successful', async () => {
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const updateNodeBlockSpy = jest.spyOn(cacheService, updateNodeBlockMethodName).mockResolvedValue(false);
+
+      const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await transaction.execute();
+
+      expect(updateNodeBlockSpy).toBeCalledTimes(1);
+      expect(updateNodeBlockSpy).toBeCalledWith(
+        testMessageContext.casefileId,
+        testMessageBody.temporary.blockedBy,
+        testMessageContext.nodeId
+      );
+      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+    });
+
+    it('should throw an InternalServerException if the given message context is missing a nodeId', async () => {
+      const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, {
+        context: { ...testMessageContext, nodeId: undefined },
+        body: testMessageBody,
+      });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
@@ -89,7 +125,7 @@ xdescribe('WhiteboardNodeBlockedTransaction', () => {
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+      jest.spyOn(cacheService, updateNodeBlockMethodName).mockImplementation(() => {
         throw new Error();
       });
 
@@ -97,20 +133,6 @@ xdescribe('WhiteboardNodeBlockedTransaction', () => {
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-
-      const transaction = new WhiteboardNodeBlockedTransaction(serviceRefs, {
-        context: testMessageContext,
-        body: { temporary: undefined },
-      });
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
     });
   });
 });
