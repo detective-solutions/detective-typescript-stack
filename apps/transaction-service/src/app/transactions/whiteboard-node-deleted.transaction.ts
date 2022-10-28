@@ -22,9 +22,7 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
     try {
       this.forwardMessageToOtherClients();
       await this.cacheService.deleteNode(casefileId, nodeId);
-
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(`Node "${nodeId}" was successfully deleted from casefile "${casefileId}"`);
     } catch (error) {
       this.logger.error(error);
       this.handleError(casefileId, nodeId);
