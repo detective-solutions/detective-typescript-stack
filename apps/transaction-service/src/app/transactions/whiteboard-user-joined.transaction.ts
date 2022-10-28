@@ -27,20 +27,26 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         casefileData = await this.setupMissingCache(casefileId);
       }
 
-      // Add new connected user to cache
-      const user = await this.cacheService.addActiveUser(userId, casefileId);
-      // Add new connected user to casefile temporary data
-      casefileData.temporary.activeUsers.push(user);
-
       // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: casefileData,
       });
 
-      // Forward user info to other clients
-      this.message.body = user;
-      this.forwardMessageToOtherClients();
+      // Add connected user to cache if it doesn't already exist
+      // Might be the case if a user refreshes and hasn't been cleared from cache yet
+      const isActiveUserAlreadyCached = casefileData.temporary.activeUsers.some(
+        (user: IUserForWhiteboard) => user.id === userId
+      );
+      if (!isActiveUserAlreadyCached) {
+        const user = await this.cacheService.addActiveUser(userId, casefileId);
+        // Add new connected user to casefile temporary data
+        casefileData.temporary.activeUsers.push(user);
+
+        // Forward user info to other clients
+        this.message.body = user;
+        this.forwardMessageToOtherClients();
+      }
 
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
