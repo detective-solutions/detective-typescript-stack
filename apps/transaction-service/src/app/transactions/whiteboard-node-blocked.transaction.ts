@@ -23,15 +23,17 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
     const nodeId = this.messageContext?.nodeId;
 
     try {
-      const isBlockSuccessful = await this.cacheService.updateWhiteboardNodeBlock(
+      const isBlockSuccessful = await this.cacheService.updateNodeBlock(
         casefileId,
         this.messageBody?.temporary?.blockedBy ?? null,
         nodeId
       );
       if (isBlockSuccessful) {
         this.forwardMessageToOtherClients();
+        this.logger.log(`${this.logContext} Transaction successful`);
+      } else {
+        this.logger.warn(`${this.logContext} Node blocking skipped because it is already blocked`);
       }
-      this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
       this.handleError(nodeId, casefileId);

@@ -152,7 +152,7 @@ export class CacheService {
     return filteredPositionUpdates;
   }
 
-  async updateWhiteboardNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
+  async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
     this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
