@@ -23,14 +23,21 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
 
     try {
       for (const node of this.messageBody) {
-        await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
+        try {
+          await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
+        } catch {
+          // Remove invalid position updates from message body
+          this.messageBody = this.messageBody.filter(
+            (nodePositionUpdate: IWhiteboardNodePositionUpdate) => nodePositionUpdate.id !== node.id
+          );
+        }
       }
+
       // Only return position updates for nodes that are not blocked by other users
+      // Updating the message.body property instead of messageBody, because it is used for message forwarding
       this.message.body = await this.cacheService.updateNodePositions(casefileId, userId, this.messageBody);
       this.forwardMessageToOtherClients();
-
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(`Node positions were successfully updated in casefile "${casefileId}"`);
     } catch (error) {
       this.logger.error(error);
       this.handleError(casefileId);
