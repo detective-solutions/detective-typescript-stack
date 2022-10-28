@@ -53,7 +53,7 @@ describe('WhiteboardSaveTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: TransactionEventProducer, useValue: {} },
+        { provide: TransactionEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
       ],
