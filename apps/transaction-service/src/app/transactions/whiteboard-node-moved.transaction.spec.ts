@@ -21,50 +21,70 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const testMessagePayload: IMessage<ITableWhiteboardNode[]> = {
-  context: {
-    eventType: MessageEventType.WhiteboardNodeAdded,
-    tenantId: uuidv4(),
-    casefileId: uuidv4(),
-    userId: uuidv4(),
-    userRole: UserRole.BASIC,
-    nodeId: uuidv4(),
-    timestamp: 123456,
-  },
-  body: [
-    {
-      id: uuidv4(),
-      title: 'test',
-      x: 1,
-      y: 1,
-      width: 1,
-      height: 1,
-      locked: false,
-      lastUpdatedBy: uuidv4(),
-      lastUpdated: formatDate(new Date()),
-      created: formatDate(new Date()),
-      entity: { id: uuidv4() } as ITable,
-      type: WhiteboardNodeType.TABLE,
-    },
-    {
-      id: uuidv4(),
-      title: 'test',
-      x: 1,
-      y: 1,
-      width: 1,
-      height: 1,
-      locked: false,
-      lastUpdatedBy: uuidv4(),
-      lastUpdated: formatDate(new Date()),
-      created: formatDate(new Date()),
-      entity: { id: uuidv4() } as ITable,
-      type: WhiteboardNodeType.TABLE,
-    },
-  ],
+const updateNodePositionsMethodName = 'updateNodePositions';
+const cacheServiceMock = { [updateNodePositionsMethodName]: jest.fn() };
+
+const testMessageContext = {
+  eventType: MessageEventType.WhiteboardNodeAdded,
+  tenantId: uuidv4(),
+  casefileId: uuidv4(),
+  userId: uuidv4(),
+  userRole: UserRole.BASIC,
+  nodeId: uuidv4(),
+  timestamp: 123456,
 };
 
-// TODO: Reactivate me
-xdescribe('WhiteboardNodeMovedTransaction', () => {
+const testMessageBody = [
+  {
+    id: uuidv4(),
+    title: 'test1',
+    x: 1,
+    y: 1,
+    width: 1,
+    height: 1,
+    locked: false,
+    lastUpdatedBy: uuidv4(),
+    lastUpdated: formatDate(new Date()),
+    created: formatDate(new Date()),
+    entity: { id: uuidv4() } as ITable,
+    type: WhiteboardNodeType.TABLE,
+  },
+  {
+    id: uuidv4(),
+    title: 'test2',
+    x: 2,
+    y: 2,
+    width: 2,
+    height: 2,
+    locked: true,
+    lastUpdatedBy: uuidv4(),
+    lastUpdated: formatDate(new Date()),
+    created: formatDate(new Date()),
+    entity: { id: uuidv4() } as ITable,
+    type: WhiteboardNodeType.TABLE,
+  },
+  {
+    id: uuidv4(),
+    title: 'test3',
+    x: 3,
+    y: 3,
+    width: 3,
+    height: 3,
+    locked: false,
+    lastUpdatedBy: uuidv4(),
+    lastUpdated: formatDate(new Date()),
+    created: formatDate(new Date()),
+    entity: { id: uuidv4() } as ITable,
+    type: WhiteboardNodeType.TABLE,
+  },
+];
+
+const testMessagePayload: IMessage<ITableWhiteboardNode[]> = {
+  context: testMessageContext,
+  body: testMessageBody,
+};
+
+describe('WhiteboardNodeMovedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -74,7 +94,8 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
     const app = await Test.createTestingModule({
       providers: [
         { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
-        { provide: CacheService, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: CacheService, useValue: cacheServiceMock },
+        { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -95,12 +116,19 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const updateNodePositionsSpy = jest.spyOn(cacheService, updateNodePositionsMethodName);
 
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
+      expect(updateNodePositionsSpy).toBeCalledTimes(1);
+      expect(updateNodePositionsSpy).toBeCalledWith(
+        testMessageContext.casefileId,
+        testMessageContext.userId,
+        testMessageBody
+      );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
     });
@@ -112,8 +140,15 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
+    it('should throw an InternalServerException if the given message body is not any array', async () => {
+      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, { ...testMessagePayload, body: {} });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+    });
+
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+      jest.spyOn(cacheService, updateNodePositionsMethodName).mockImplementation(() => {
         throw new Error();
       });
 
@@ -123,30 +158,24 @@ xdescribe('WhiteboardNodeMovedTransaction', () => {
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
-    it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
+    it('should remove invalid position updates from message body if they do not pass the DTO validation', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const updateNodePositionsSpy = jest.spyOn(cacheService, updateNodePositionsMethodName);
 
       const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, {
         context: testMessagePayload.context,
-        body: { ...testMessagePayload.body[0], type: undefined },
+        body: [testMessageBody[0], { ...testMessageBody[1], x: undefined }, testMessageBody[2]],
       });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+      await transaction.execute();
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-    });
-
-    it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
+      expect(updateNodePositionsSpy).toBeCalledTimes(1);
+      expect(updateNodePositionsSpy).toHaveBeenCalledWith(testMessageContext.casefileId, testMessageContext.userId, [
+        testMessageBody[0],
+        testMessageBody[2],
+      ]);
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
     });
   });
 });
