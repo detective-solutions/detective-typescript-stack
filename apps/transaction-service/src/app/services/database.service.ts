@@ -88,7 +88,7 @@ export class DatabaseService {
             }) as AnyWhiteboardNode[])
           : []),
       ],
-      temporary: { activeUsers: [] },
+      temporary: { activeUsers: new Set<IUserForWhiteboard>() },
     };
 
     await validateDto(CachableCasefileForWhiteboardDTO, convertedCasefile, this.logger);

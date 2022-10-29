@@ -65,7 +65,7 @@ xdescribe('DatabaseService', () => {
       title: testCasefile.title,
       description: testCasefile.description,
       nodes: [],
-      temporary: { activeUsers: [] },
+      temporary: { activeUsers: new Set() },
     };
 
     it('should return a Casefile object with all mandatory properties', async () => {

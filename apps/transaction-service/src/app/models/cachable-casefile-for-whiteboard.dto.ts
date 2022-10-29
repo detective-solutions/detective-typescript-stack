@@ -16,5 +16,5 @@ export class CachableCasefileForWhiteboardDTO
   nodes!: AnyWhiteboardNode[];
 
   @IsNotEmpty()
-  temporary: { activeUsers: IUserForWhiteboard[] };
+  temporary: { activeUsers: Set<IUserForWhiteboard> };
 }
