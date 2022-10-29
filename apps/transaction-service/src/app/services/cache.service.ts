@@ -65,7 +65,7 @@ export class CacheService {
     return this.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
   }
 
-  async addActiveUser(userId: string, casefileId: string): Promise<IUserForWhiteboard> {
+  async addActiveUser(casefileId: string, userId: string): Promise<IUserForWhiteboard> {
     this.logger.log(`Adding active user "${userId}" to casefile "${casefileId}"`);
     const whiteboardUser = await this.databaseService.getWhiteboardUserById(userId);
     const cacheResponse = await this.client.json.arrAppend(

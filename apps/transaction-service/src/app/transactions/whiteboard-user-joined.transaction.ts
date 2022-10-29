@@ -39,7 +39,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         (user: IUserForWhiteboard) => user.id === userId
       );
       if (!isActiveUserAlreadyCached) {
-        const user = await this.cacheService.addActiveUser(userId, casefileId);
+        const user = await this.cacheService.addActiveUser(casefileId, userId);
         // Add new connected user to casefile temporary data
         casefileData.temporary.activeUsers.push(user);
 

@@ -129,7 +129,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
       expect(saveCasefileToCacheSpy).toBeCalledWith(getCasefileByIdResponse);
 
       expect(addActiveWhiteboardUserSpy).toBeCalledTimes(1);
-      expect(addActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.userId, testMessageContext.casefileId);
+      expect(addActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.userId);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
       expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
@@ -170,7 +170,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
       expect(saveCasefileToCacheSpy).toBeCalledTimes(0);
 
       expect(addActiveWhiteboardUserSpy).toBeCalledTimes(1);
-      expect(addActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.userId, testMessageContext.casefileId);
+      expect(addActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.userId);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
       expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
