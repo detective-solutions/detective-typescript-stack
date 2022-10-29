@@ -190,16 +190,12 @@ describe('WhiteboardUserJoinedTransaction', () => {
         title: 'testCasefile',
         nodes: [],
         temporary: {
-          activeUsers: [
-            { id: testMessageContext.userId, email: 'test', firstname: 'test', lastname: 'test', avatarUrl: 'test' },
-          ],
+          activeUsers: [testUserForWhiteboard],
         },
       };
 
       jest.spyOn(cacheService, getCachedCasefileByIdMethodName).mockResolvedValue(getCasefileByIdResponse);
-      const addActiveWhiteboardUserSpy = jest
-        .spyOn(cacheService, addActiveWhiteboardUserMethodName)
-        .mockResolvedValue(testUserForWhiteboard);
+      const addActiveWhiteboardUserSpy = jest.spyOn(cacheService, addActiveWhiteboardUserMethodName);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
