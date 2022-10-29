@@ -383,11 +383,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             combineLatest([
               webSocketSubject$.on$(MessageEventType.WhiteboardUserJoined),
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
+              this.store.select(selectActiveUsers).pipe(take(1)),
             ])
           ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          filter(
+            ([messageData, context, activeUsers]) =>
+              messageData.context.userId !== context.userId &&
+              !activeUsers.some((activeUser: IUserForWhiteboard) => activeUser.id === messageData.body.id)
+          ),
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
+          map(([messageData, _context, _activeUsers]) => messageData)
         )
         .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserJoined({ user: messageData.body }));
