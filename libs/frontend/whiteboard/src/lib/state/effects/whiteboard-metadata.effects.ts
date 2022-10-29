@@ -10,13 +10,6 @@ import { selectWhiteboardContextState } from '../selectors';
 
 @Injectable()
 export class WhiteboardMetadataEffects {
-  readonly whiteboardUserLeft$ = createEffect(
-    () => {
-      return this.actions$.pipe(ofType(WhiteboardMetadataActions.WhiteboardUserLeft));
-    },
-    { dispatch: false }
-  );
-
   readonly whiteboardTitleFocused$ = createEffect(
     () => {
       return this.actions$.pipe(
