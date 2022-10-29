@@ -45,9 +45,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
         // Forward user info to other clients
         this.message.body = user;
-        this.forwardMessageToOtherClients();
       }
-
+      this.forwardMessageToOtherClients();
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);

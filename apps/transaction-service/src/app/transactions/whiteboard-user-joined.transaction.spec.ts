@@ -205,10 +205,14 @@ describe('WhiteboardUserJoinedTransaction', () => {
       await whiteboardUserJoinedTransaction.execute();
 
       expect(addActiveWhiteboardUserSpy).toBeCalledTimes(0);
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
+      expect(sendKafkaMessageSpy).toBeCalledTimes(2);
       expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
+      });
+      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputBroadcast, {
+        context: testMessageContext,
+        body: testUserForWhiteboard,
       });
     });
 
