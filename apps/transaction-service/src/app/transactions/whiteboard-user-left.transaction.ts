@@ -7,7 +7,7 @@ export class WhiteboardUserLeftTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserLeftTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<string>; // Define message body type
+  override message: IMessage<void>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
