@@ -41,7 +41,7 @@ const testCachableCasefile: ICachableCasefileForWhiteboard = {
   id: uuidv4(),
   title: 'testCasefile',
   nodes: [],
-  temporary: { activeUsers: [] },
+  temporary: { activeUsers: new Set() },
 };
 
 describe('WhiteboardSaveTransaction', () => {

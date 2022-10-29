@@ -5,5 +5,5 @@ export interface IWhiteboardMetadataState {
   title: string;
   titleFocusedBy: string | null;
   description?: string;
-  activeUsers: IUserForWhiteboard[];
+  activeUsers: Set<IUserForWhiteboard>;
 }

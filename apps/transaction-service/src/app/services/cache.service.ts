@@ -65,20 +65,17 @@ export class CacheService {
     return this.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
   }
 
-  async addActiveUser(casefileId: string, userId: string): Promise<IUserForWhiteboard> {
-    this.logger.log(`Adding active user "${userId}" to casefile "${casefileId}"`);
-    const whiteboardUser = await this.databaseService.getWhiteboardUserById(userId);
-    const cacheResponse = await this.client.json.arrAppend(
+  async insertActiveUsers(casefileId: string, activeUsers: Set<IUserForWhiteboard>): Promise<'OK'> {
+    this.logger.log(`Updating active users in casefile "${casefileId}"`);
+    const cacheResponse = await this.client.json.set(
       casefileId,
       CacheService.ACTIVE_USERS_JSON_PATH,
-      whiteboardUser
+      Array.from(activeUsers)
     );
-    // 0 or 1
-    if (!cacheResponse) {
-      throw new InternalServerErrorException(`Could not add active user ${userId} to casefile ${casefileId}`);
+    if (cacheResponse !== 'OK') {
+      throw new InternalServerErrorException(`Could insert active users to casefile ${casefileId}`);
     }
-
-    return whiteboardUser;
+    return cacheResponse;
   }
 
   async removeActiveUser(casefileId: string, userId: string): Promise<'OK'> {

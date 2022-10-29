@@ -22,21 +22,16 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const userId = this.messageContext.userId;
 
     try {
-      let casefileData = await this.cacheService.getCasefileById(casefileId);
-      if (!casefileData) {
-        casefileData = await this.setupMissingCache(casefileId);
-      }
+      // Get user info from database
+      const newUserInfo = await this.databaseService.getWhiteboardUserById(userId);
 
-      // Add connected user to cache if it doesn't already exist
-      // Might be the case if a user refreshes and hasn't been cleared from cache yet
-      let cachedActiveUser = casefileData.temporary.activeUsers.find((user: IUserForWhiteboard) => user.id === userId);
-      if (!cachedActiveUser) {
-        cachedActiveUser = await this.cacheService.addActiveUser(casefileId, userId);
-        // Add new connected user to casefile temporary data
-        casefileData.temporary.activeUsers.push(cachedActiveUser);
+      // Check if casefile is already cached
+      let casefileData = await this.cacheService.getCasefileById(casefileId);
+      if (casefileData) {
+        casefileData = await this.enhanceCacheWithNewUser(casefileData, newUserInfo);
+      } else {
+        casefileData = await this.setupNewCasefileCache(casefileId, newUserInfo);
       }
-      // Forward user info to other clients
-      this.message.body = cachedActiveUser;
 
       // Send LOAD_CASEFILE_DATA event to connected user
       this.transactionEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
@@ -44,7 +39,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
         body: casefileData,
       });
 
+      // Update message body with new user info & forward to other clients
+      this.message.body = newUserInfo;
       this.forwardMessageToOtherClients();
+
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);
@@ -52,8 +50,23 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     }
   }
 
-  private async setupMissingCache(casefileId: string): Promise<ICachableCasefileForWhiteboard> {
+  private async enhanceCacheWithNewUser(
+    casefileData: ICachableCasefileForWhiteboard,
+    newUserInfo: IUserForWhiteboard
+  ): Promise<ICachableCasefileForWhiteboard> {
+    // Add new connected user to casefile temporary data
+    casefileData.temporary.activeUsers.add(newUserInfo);
+    await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
+    return casefileData;
+  }
+
+  private async setupNewCasefileCache(
+    casefileId: string,
+    newUserInfo: IUserForWhiteboard
+  ): Promise<ICachableCasefileForWhiteboard> {
     const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
+    casefileData.temporary.activeUsers.add(newUserInfo);
+
     await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
     return casefileData;

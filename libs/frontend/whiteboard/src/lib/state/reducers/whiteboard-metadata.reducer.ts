@@ -11,7 +11,7 @@ export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
   title: '',
   titleFocusedBy: null,
   description: '',
-  activeUsers: [],
+  activeUsers: new Set(),
 };
 
 export const whiteboardMetadataReducer = createReducer(
@@ -37,17 +37,17 @@ export const whiteboardMetadataReducer = createReducer(
       const activeUsers = [...state.activeUsers]; // deep-copy array
       activeUsers.push(action.user);
       // Sort users by their ids
-      return { ...state, activeUsers: activeUsers.sort((a, b) => a.id.localeCompare(b.id)) };
+      return { ...state, activeUsers: new Set(activeUsers.sort((a, b) => a.id.localeCompare(b.id))) };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserLeft,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
       // Filter & sort users by their ids
-      const updatedActiveUsers = state.activeUsers
+      const updatedActiveUsers = [...state.activeUsers]
         .filter((user) => user.id !== action.userId)
         .sort((a, b) => a.id.localeCompare(b.id));
-      return { ...state, activeUsers: updatedActiveUsers };
+      return { ...state, activeUsers: new Set(updatedActiveUsers) };
     }
   ),
   on(

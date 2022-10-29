@@ -5,6 +5,6 @@ import { IUserForWhiteboard } from '../user';
 export interface ICachableCasefileForWhiteboard extends Pick<ICasefileForWhiteboard, 'id' | 'title' | 'description'> {
   nodes: AnyWhiteboardNode[];
   temporary: {
-    activeUsers: IUserForWhiteboard[];
+    activeUsers: Set<IUserForWhiteboard>;
   };
 }

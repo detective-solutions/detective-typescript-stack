@@ -29,7 +29,10 @@ export class NodeHeaderComponent implements OnInit {
     // These observables have to be initialized in the OnInit hook,
     // to make sure that all required input values are available
     this.blockInfo$ = combineLatest([this.isBlocked$, this.store.select(selectActiveUsers)]).pipe(
-      map(([userId, activeUsers]) => activeUsers.find((user: IUserForWhiteboard) => user.id === userId) ?? null),
+      map(
+        ([userId, activeUsers]) =>
+          Array.from(activeUsers).find((user: IUserForWhiteboard) => user.id === userId) ?? null
+      ),
       filter(Boolean)
     );
     this.userName$ = this.blockInfo$.pipe(map(NodeHeaderComponent.getFullUserName));

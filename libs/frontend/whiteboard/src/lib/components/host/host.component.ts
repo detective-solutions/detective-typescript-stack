@@ -383,20 +383,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             combineLatest([
               webSocketSubject$.on$(MessageEventType.WhiteboardUserJoined),
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
-              this.store.select(selectActiveUsers).pipe(take(1)),
             ])
           ),
-          filter(
-            ([messageData, context, activeUsers]) =>
-              messageData.context.userId !== context.userId &&
-              !activeUsers.some((activeUser: IUserForWhiteboard) => activeUser.id === messageData.body.id)
-          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context, _activeUsers]) => messageData)
+          map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
-          this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserJoined({ user: messageData.body }));
-        })
+        .subscribe((messageData: IMessage<IUserForWhiteboard>) =>
+          this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserJoined({ user: messageData.body }))
+        )
     );
 
     // Listen to WHITEBOARD_USER_LEFT websocket message event
@@ -468,9 +463,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private handleIncomingCollaborationCursor(
     messageData: IMessage<IWhiteboardCollaborationCursor>,
-    activeUsers: IUserForWhiteboard[]
+    activeUsers: Set<IUserForWhiteboard>
   ) {
-    const userInfo = activeUsers.find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
+    const userInfo = Array.from(activeUsers).find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
     if (!userInfo) {
       console.warn(
         `Could not build collaboration cursor info. Could not find active user info for user ${messageData.context.userId}`
