@@ -65,6 +65,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
     const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
+    console.log('Casefile Data');
+    console.log(casefileData);
     casefileData.temporary.activeUsers.add(newUserInfo);
 
     await this.cacheService.saveCasefile(casefileData);
