@@ -22,6 +22,8 @@ export const whiteboardMetadataReducer = createReducer(
       state: IWhiteboardMetadataState,
       action: { casefile: ICachableCasefileForWhiteboard }
     ): IWhiteboardMetadataState => {
+      console.log('CASEFILE');
+      console.log(action.casefile);
       return {
         ...state,
         id: action.casefile.id,
@@ -37,7 +39,8 @@ export const whiteboardMetadataReducer = createReducer(
       const activeUsers = Array.from(state.activeUsers); // deep-copy array
       activeUsers.push(action.user);
       // Sort users by their ids
-      return { ...state, activeUsers: new Set(activeUsers.sort((a, b) => a.id.localeCompare(b.id))) };
+      activeUsers.sort((a, b) => a.id.localeCompare(b.id));
+      return { ...state, activeUsers: new Set(activeUsers) };
     }
   ),
   on(

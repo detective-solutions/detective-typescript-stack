@@ -56,7 +56,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   ): Promise<ICachableCasefileForWhiteboard> {
     // TODO: Remove me!
     console.log('Casefile Data');
-    console.log(casefileData);
+    console.log(casefileData.temporary.activeUsers);
 
     // Add new connected user to casefile temporary data
     casefileData.temporary.activeUsers.add(newUserInfo);
@@ -72,7 +72,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
     // TODO: Remove me!
     console.log('Casefile Data');
-    console.log(casefileData);
+    console.log(casefileData.temporary.activeUsers);
 
     casefileData.temporary.activeUsers.add(newUserInfo);
 
