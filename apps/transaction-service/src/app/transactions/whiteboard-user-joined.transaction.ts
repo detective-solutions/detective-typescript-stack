@@ -60,8 +60,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     );
     if (!isUserAlreadyCached) {
       casefileData.temporary.activeUsers.push(newUserInfo);
+      await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
     }
-    await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
     return casefileData;
   }
 
