@@ -54,8 +54,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     casefileData: ICachableCasefileForWhiteboard,
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
+    // TODO: Remove me!
     console.log('Casefile Data');
     console.log(casefileData);
+
     // Add new connected user to casefile temporary data
     casefileData.temporary.activeUsers.add(newUserInfo);
     await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
@@ -67,8 +69,11 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
     const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
+
+    // TODO: Remove me!
     console.log('Casefile Data');
     console.log(casefileData);
+
     casefileData.temporary.activeUsers.add(newUserInfo);
 
     await this.cacheService.saveCasefile(casefileData);
