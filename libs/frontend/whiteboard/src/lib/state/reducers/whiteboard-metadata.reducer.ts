@@ -27,14 +27,14 @@ export const whiteboardMetadataReducer = createReducer(
         id: action.casefile.id,
         title: action.casefile.title,
         description: action.casefile.description,
-        activeUsers: action.casefile.temporary.activeUsers,
+        activeUsers: new Set(action.casefile.temporary.activeUsers),
       };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserJoined,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      const activeUsers = [...state.activeUsers]; // deep-copy array
+      const activeUsers = Array.from(state.activeUsers); // deep-copy array
       activeUsers.push(action.user);
       // Sort users by their ids
       return { ...state, activeUsers: new Set(activeUsers.sort((a, b) => a.id.localeCompare(b.id))) };
@@ -44,7 +44,7 @@ export const whiteboardMetadataReducer = createReducer(
     WhiteboardMetadataActions.WhiteboardUserLeft,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
       // Filter & sort users by their ids
-      const updatedActiveUsers = [...state.activeUsers]
+      const updatedActiveUsers = Array.from(state.activeUsers)
         .filter((user) => user.id !== action.userId)
         .sort((a, b) => a.id.localeCompare(b.id));
       return { ...state, activeUsers: new Set(updatedActiveUsers) };
