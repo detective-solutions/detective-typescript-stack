@@ -65,13 +65,9 @@ export class CacheService {
     return this.client.json.get(casefileId, { path: CacheService.ACTIVE_USERS_JSON_PATH }) as any;
   }
 
-  async insertActiveUsers(casefileId: string, activeUsers: Set<IUserForWhiteboard>): Promise<'OK'> {
+  async insertActiveUsers(casefileId: string, activeUsers: IUserForWhiteboard[]): Promise<'OK'> {
     this.logger.log(`Updating active users in casefile "${casefileId}"`);
-    const cacheResponse = await this.client.json.set(
-      casefileId,
-      CacheService.ACTIVE_USERS_JSON_PATH,
-      Array.from(activeUsers)
-    );
+    const cacheResponse = await this.client.json.set(casefileId, CacheService.ACTIVE_USERS_JSON_PATH, activeUsers);
     if (cacheResponse !== 'OK') {
       throw new InternalServerErrorException(`Could insert active users to casefile ${casefileId}`);
     }
@@ -83,8 +79,7 @@ export class CacheService {
 
     // Check if active users are present & filter out the user that left
     const activeUsers =
-      Array.from(await this.getActiveUsersByCasefile(casefileId)) ??
-      [].filter((user: IUserForWhiteboard) => user.id !== userId);
+      (await this.getActiveUsersByCasefile(casefileId)) ?? [].filter((user: IUserForWhiteboard) => user.id !== userId);
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {

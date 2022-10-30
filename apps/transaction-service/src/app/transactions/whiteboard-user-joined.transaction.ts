@@ -27,9 +27,6 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       // Check if casefile is already cached
       let casefileData = await this.cacheService.getCasefileById(casefileId);
-      // TODO: Remove me!
-      console.log('CASEFILE DATA');
-      console.log(casefileData);
       if (casefileData) {
         casefileData = await this.enhanceCacheWithNewUser(casefileData, newUserInfo);
       } else {
@@ -58,9 +55,13 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
     // Add new connected user to casefile temporary data
-    const activeUsers = new Set(casefileData.temporary.activeUsers);
-    activeUsers.add(newUserInfo);
-    await this.cacheService.insertActiveUsers(casefileData.id, activeUsers);
+    const isUserAlreadyCached = casefileData.temporary.activeUsers.some(
+      (activeUsers: IUserForWhiteboard) => activeUsers.id === newUserInfo.id
+    );
+    if (!isUserAlreadyCached) {
+      casefileData.temporary.activeUsers.push(newUserInfo);
+    }
+    await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
     return casefileData;
   }
 
@@ -69,17 +70,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
     const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
-
-    // TODO: Remove me!
-    console.log('Casefile Data');
-    console.log(casefileData.temporary.activeUsers);
-
-    const activeUsers = new Set(casefileData.temporary.activeUsers);
-    activeUsers.add(newUserInfo);
-
-    // casefileData.temporary.activeUsers.add(newUserInfo);
-    casefileData.temporary.activeUsers = activeUsers;
-
+    casefileData.temporary.activeUsers.push(newUserInfo);
     await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
     return casefileData;

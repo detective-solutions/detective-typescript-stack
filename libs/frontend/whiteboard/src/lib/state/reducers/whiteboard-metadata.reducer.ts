@@ -11,7 +11,7 @@ export const initialWhiteboardMetadataState: IWhiteboardMetadataState = {
   title: '',
   titleFocusedBy: null,
   description: '',
-  activeUsers: new Set(),
+  activeUsers: [],
 };
 
 export const whiteboardMetadataReducer = createReducer(
@@ -22,35 +22,34 @@ export const whiteboardMetadataReducer = createReducer(
       state: IWhiteboardMetadataState,
       action: { casefile: ICachableCasefileForWhiteboard }
     ): IWhiteboardMetadataState => {
-      console.log('CASEFILE');
-      console.log(action.casefile);
       return {
         ...state,
         id: action.casefile.id,
         title: action.casefile.title,
         description: action.casefile.description,
-        activeUsers: new Set(action.casefile.temporary.activeUsers),
+        activeUsers: Array.from(action.casefile.temporary.activeUsers),
       };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserJoined,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      const activeUsers = Array.from(state.activeUsers); // deep-copy array
+      const activeUsers = [...state.activeUsers]; // deep-copy array
       activeUsers.push(action.user);
       // Sort users by their ids
-      activeUsers.sort((a, b) => a.id.localeCompare(b.id));
-      return { ...state, activeUsers: new Set(activeUsers) };
+      return { ...state, activeUsers: activeUsers.sort((a, b) => a.id.localeCompare(b.id)) };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserLeft,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
       // Filter & sort users by their ids
-      const updatedActiveUsers = Array.from(state.activeUsers)
-        .filter((user) => user.id !== action.userId)
-        .sort((a, b) => a.id.localeCompare(b.id));
-      return { ...state, activeUsers: new Set(updatedActiveUsers) };
+      return {
+        ...state,
+        activeUsers: [...state.activeUsers] // deep-copy array
+          .filter((user) => user.id !== action.userId)
+          .sort((a, b) => a.id.localeCompare(b.id)),
+      };
     }
   ),
   on(

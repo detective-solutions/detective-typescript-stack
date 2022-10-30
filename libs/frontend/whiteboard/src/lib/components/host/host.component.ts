@@ -26,6 +26,7 @@ import {
   IWhiteboardCollaborationCursor,
   TableWhiteboardNode,
 } from '../../models';
+import { Store, select } from '@ngrx/store';
 import {
   Subject,
   Subscription,
@@ -49,7 +50,6 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
-import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
@@ -383,11 +383,17 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             combineLatest([
               webSocketSubject$.on$(MessageEventType.WhiteboardUserJoined),
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
+              this.store.select(selectActiveUsers).pipe(take(1)),
             ])
           ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          filter(
+            ([messageData, context, activeUsers]) =>
+              messageData.context.userId !== context.userId &&
+              !activeUsers.some((user: IUserForWhiteboard) => user.id === messageData.body) // Check if user already exists
+          ),
+
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
+          map(([messageData, _context, _activeUsers]) => messageData)
         )
         .subscribe((messageData: IMessage<IUserForWhiteboard>) =>
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserJoined({ user: messageData.body }))
@@ -463,38 +469,33 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private handleIncomingCollaborationCursor(
     messageData: IMessage<IWhiteboardCollaborationCursor>,
-    activeUsers: Set<IUserForWhiteboard>
+    activeUsers: IUserForWhiteboard[]
   ) {
-    const userInfo = Array.from(activeUsers).find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
-    if (!userInfo) {
-      console.warn(
-        `Could not build collaboration cursor info. Could not find active user info for user ${messageData.context.userId}`
+    const userInfo = activeUsers.find((user: IUserForWhiteboard) => user.id === messageData.context.userId);
+    if (userInfo) {
+      const existingCursor = this.collaborationCursors.find(
+        (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id === messageData.context.userId
       );
-      return;
-    }
 
-    const existingCursor = this.collaborationCursors.find(
-      (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id === messageData.context.userId
-    );
+      const cursorTimeoutHandler = () => {
+        this.collaborationCursors = this.collaborationCursors.filter(
+          (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id !== existingCursor?.userInfo.id
+        );
+      };
 
-    const cursorTimeoutHandler = () => {
-      this.collaborationCursors = this.collaborationCursors.filter(
-        (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id !== existingCursor?.userInfo.id
-      );
-    };
-
-    if (existingCursor) {
-      window.clearInterval(existingCursor.timeout);
-      existingCursor.x = messageData.body.x;
-      existingCursor.y = messageData.body.y;
-      existingCursor.timeout = window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval);
-    } else {
-      this.collaborationCursors.push({
-        x: messageData.body.x,
-        y: messageData.body.y,
-        userInfo: userInfo,
-        timeout: window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval),
-      });
+      if (existingCursor) {
+        window.clearInterval(existingCursor.timeout);
+        existingCursor.x = messageData.body.x;
+        existingCursor.y = messageData.body.y;
+        existingCursor.timeout = window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval);
+      } else {
+        this.collaborationCursors.push({
+          x: messageData.body.x,
+          y: messageData.body.y,
+          userInfo: userInfo,
+          timeout: window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval),
+        });
+      }
     }
   }
 }

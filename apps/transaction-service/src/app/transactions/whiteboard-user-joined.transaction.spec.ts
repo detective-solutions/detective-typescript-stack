@@ -105,7 +105,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
         id: testMessageContext.casefileId,
         title: 'testCasefile',
         nodes: [],
-        temporary: { activeUsers: new Set() },
+        temporary: { activeUsers: [] },
       };
 
       const getWhiteboardUserByIdSpy = jest
@@ -151,7 +151,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
         id: testMessageContext.casefileId,
         title: 'testCasefile',
         nodes: [],
-        temporary: { activeUsers: new Set() },
+        temporary: { activeUsers: [] },
       };
 
       const getWhiteboardUserByIdSpy = jest
@@ -177,10 +177,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
       expect(saveCasefileToCacheSpy).toBeCalledTimes(0);
 
       expect(addActiveWhiteboardUsersSpy).toBeCalledTimes(1);
-      expect(addActiveWhiteboardUsersSpy).toBeCalledWith(
-        testMessageContext.casefileId,
-        new Set([testUserForWhiteboard])
-      );
+      expect(addActiveWhiteboardUsersSpy).toBeCalledWith(testMessageContext.casefileId, [testUserForWhiteboard]);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
       expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
@@ -200,7 +197,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
         title: 'testCasefile',
         nodes: [],
         temporary: {
-          activeUsers: new Set(),
+          activeUsers: [],
         },
       };
 
