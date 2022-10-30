@@ -27,6 +27,9 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       // Check if casefile is already cached
       let casefileData = await this.cacheService.getCasefileById(casefileId);
+      // TODO: Remove me!
+      console.log('CASEFILE DATA');
+      console.log(casefileData);
       if (casefileData) {
         casefileData = await this.enhanceCacheWithNewUser(casefileData, newUserInfo);
       } else {
@@ -54,13 +57,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     casefileData: ICachableCasefileForWhiteboard,
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
-    // TODO: Remove me!
-    console.log('Casefile Data');
-    console.log(casefileData.temporary.activeUsers);
-
     // Add new connected user to casefile temporary data
-    casefileData.temporary.activeUsers.add(newUserInfo);
-    await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
+    const activeUsers = new Set(casefileData.temporary.activeUsers);
+    activeUsers.add(newUserInfo);
+    await this.cacheService.insertActiveUsers(casefileData.id, activeUsers);
     return casefileData;
   }
 
@@ -74,7 +74,11 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     console.log('Casefile Data');
     console.log(casefileData.temporary.activeUsers);
 
-    casefileData.temporary.activeUsers.add(newUserInfo);
+    const activeUsers = new Set(casefileData.temporary.activeUsers);
+    activeUsers.add(newUserInfo);
+
+    // casefileData.temporary.activeUsers.add(newUserInfo);
+    casefileData.temporary.activeUsers = activeUsers;
 
     await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
