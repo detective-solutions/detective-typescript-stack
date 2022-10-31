@@ -11,7 +11,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../events';
 import { WhiteboardUserJoinedTransaction } from './whiteboard-user-joined.transaction';
-import { _getFocusedElementPierceShadowDom } from '@angular/cdk/platform';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';

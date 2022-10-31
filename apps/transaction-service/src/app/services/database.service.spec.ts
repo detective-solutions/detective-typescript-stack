@@ -1,12 +1,8 @@
 import {
   ICachableCasefileForWhiteboard,
   ICasefileForWhiteboard,
-  IEmbeddingWhiteboardNode,
-  ITable,
-  ITableWhiteboardNode,
-  IUser,
-  IUserQuery,
-  IUserQueryWhiteboardNode,
+  IUserForWhiteboard,
+  UserRole,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 import {
@@ -14,18 +10,19 @@ import {
   getCasefileByIdQuery,
   getCasefileByIdQueryName,
   getUidByTypeQueryName,
+  getWhiteboardUserByIdQuery,
+  getWhiteboardUserByIdQueryName,
 } from './queries';
 
 import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { DatabaseService } from './database.service';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-xdescribe('DatabaseService', () => {
+describe('DatabaseService', () => {
   const testUid = '1x11';
 
   let databaseService: DatabaseService;
@@ -50,7 +47,7 @@ xdescribe('DatabaseService', () => {
     expect(databaseService).toBeTruthy();
   });
 
-  describe('getCasefileDataById', () => {
+  describe('getCachableCasefileById', () => {
     const testCasefile: ICasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
@@ -127,7 +124,6 @@ xdescribe('DatabaseService', () => {
     it('should throw an InternalServerErrorException if the validation for the incoming Casefile object fails', async () => {
       const modifiedCasefile = testCasefile;
       modifiedCasefile.id = ''; // id should not be empty
-      modifiedCasefile.title = undefined; // title should be defined
 
       const sendQuerySpy = jest
         .spyOn(DatabaseService.prototype as any, 'sendQuery')
@@ -140,206 +136,86 @@ xdescribe('DatabaseService', () => {
     });
   });
 
-  describe('addTableOccurrenceToCasefile', () => {
-    const testTableWhiteboardNode: ITableWhiteboardNode = {
+  describe('getWhiteboardUserById', () => {
+    const testUserForWhiteboard: IUserForWhiteboard = {
       id: uuidv4(),
-      title: 'test',
-      x: 1,
-      y: 1,
-      width: 1,
-      height: 1,
-      locked: false,
-      lastUpdatedBy: uuidv4(),
-      lastUpdated: formatDate(new Date()),
-      created: formatDate(new Date()),
-      entity: { id: uuidv4() } as ITable,
-      type: WhiteboardNodeType.TABLE,
+      email: 'test@test.com',
+      firstname: 'John',
+      lastname: 'Doe',
+      title: 'Data Scientist',
+      role: UserRole.BASIC,
+      avatarUrl: 'http://test.de/testImage',
     };
 
-    // it('should return a valid object reference if the database mutation was successful', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue({});
+    it('should return a user object with all mandatory properties', async () => {
+      const sendQuerySpy = jest.spyOn(DatabaseService.prototype as any, 'sendQuery').mockResolvedValue({
+        [getWhiteboardUserByIdQueryName]: [testUserForWhiteboard],
+      });
 
-    //   const expectedMutationJson = {
-    //     uid: DatabaseService.mutationNodeReference,
-    //     [`${WhiteboardNodeType.TABLE}.xid`]: testTableWhiteboardNode.id,
-    //     [`${WhiteboardNodeType.TABLE}.title`]: testTableWhiteboardNode.title,
-    //     [`${WhiteboardNodeType.TABLE}.x`]: testTableWhiteboardNode.x,
-    //     [`${WhiteboardNodeType.TABLE}.y`]: testTableWhiteboardNode.y,
-    //     [`${WhiteboardNodeType.TABLE}.width`]: testTableWhiteboardNode.width,
-    //     [`${WhiteboardNodeType.TABLE}.height`]: testTableWhiteboardNode.height,
-    //     [`${WhiteboardNodeType.TABLE}.locked`]: testTableWhiteboardNode.locked,
-    //     [`${WhiteboardNodeType.TABLE}.lastUpdatedBy`]: {
-    //       uid: testUid,
-    //     },
-    //     [`${WhiteboardNodeType.TABLE}.lastUpdated`]: testTableWhiteboardNode.lastUpdated,
-    //     [`${WhiteboardNodeType.TABLE}.created`]: testTableWhiteboardNode.created,
-    //     [`${WhiteboardNodeType.TABLE}.entity`]: {
-    //       uid: testUid,
-    //     },
-    //     [`${WhiteboardNodeType.TABLE}.casefile`]: {
-    //       uid: testUid,
-    //       'Casefile.tables': {
-    //         uid: DatabaseService.mutationNodeReference,
-    //       },
-    //     },
-    //     'dgraph.type': WhiteboardNodeType.TABLE,
-    //   };
+      const res = await databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    //   const res = await databaseService.insertTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
+      expect(res).toEqual(testUserForWhiteboard);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+      expect(sendQuerySpy).toBeCalledWith(getWhiteboardUserByIdQuery, {
+        $id: testUserForWhiteboard.id,
+      });
+    });
 
-    //   expect(res).toBeTruthy();
-    //   expect(getUidByTypeSpy).toBeCalledTimes(3);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    //   expect(sendMutationSpy).toBeCalledWith(expectedMutationJson);
-    // });
+    it('should return null if the database query returns an empty response', async () => {
+      const sendQuerySpy = jest.spyOn(DatabaseService.prototype as any, 'sendQuery').mockResolvedValue(undefined);
 
-    // it('should return null if an error occurred while sending the mutation to the database', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
+      const res = await databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    //   const res = await databaseService.insertTableOccurrenceToCasefile(uuidv4(), testTableWhiteboardNode);
+      expect(res).toBe(null);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
 
-    //   expect(res).toBe(null);
-    //   expect(getUidByTypeSpy).toBeCalledTimes(3);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    // });
-  });
+    it(`should throw an InternalServerErrorException if the database response misses the ${getWhiteboardUserByIdQuery} property`, async () => {
+      const sendQuerySpy = jest
+        .spyOn(DatabaseService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ testUserData: testUserForWhiteboard });
 
-  describe('addUserQueryOccurrenceToCasefile', () => {
-    const testUserQueryWhiteboardNode: IUserQueryWhiteboardNode = {
-      id: uuidv4(),
-      title: 'test',
-      x: 1,
-      y: 1,
-      width: 1,
-      height: 1,
-      locked: false,
-      author: uuidv4(),
-      editors: [{ id: uuidv4() }, { id: uuidv4() }] as IUser[],
-      lastUpdatedBy: uuidv4(),
-      lastUpdated: formatDate(new Date()),
-      created: formatDate(new Date()),
-      entity: { id: uuidv4() } as IUserQuery,
-      type: WhiteboardNodeType.USER_QUERY,
-    };
+      const getWhiteboardUserByIdPromise = databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    // it('should return a valid object reference if the database mutation was successful', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue({});
+      await expect(getWhiteboardUserByIdPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
 
-    //   const expectedMutationJson = {
-    //     uid: DatabaseService.mutationNodeReference,
-    //     [`${WhiteboardNodeType.USER_QUERY}.xid`]: testUserQueryWhiteboardNode.id,
-    //     [`${WhiteboardNodeType.USER_QUERY}.title`]: testUserQueryWhiteboardNode.title,
-    //     [`${WhiteboardNodeType.USER_QUERY}.x`]: testUserQueryWhiteboardNode.x,
-    //     [`${WhiteboardNodeType.USER_QUERY}.y`]: testUserQueryWhiteboardNode.y,
-    //     [`${WhiteboardNodeType.USER_QUERY}.width`]: testUserQueryWhiteboardNode.width,
-    //     [`${WhiteboardNodeType.USER_QUERY}.height`]: testUserQueryWhiteboardNode.height,
-    //     [`${WhiteboardNodeType.USER_QUERY}.locked`]: testUserQueryWhiteboardNode.locked,
-    //     [`${WhiteboardNodeType.USER_QUERY}.lastUpdatedBy`]: {
-    //       uid: testUid,
-    //     },
-    //     [`${WhiteboardNodeType.USER_QUERY}.lastUpdated`]: testUserQueryWhiteboardNode.lastUpdated,
-    //     [`${WhiteboardNodeType.USER_QUERY}.created`]: testUserQueryWhiteboardNode.created,
-    //     [`${WhiteboardNodeType.USER_QUERY}.author`]: { uid: testUid },
-    //     [`${WhiteboardNodeType.USER_QUERY}.entity`]: {
-    //       uid: testUid,
-    //     },
-    //     [`${WhiteboardNodeType.USER_QUERY}.casefile`]: {
-    //       uid: testUid,
-    //       'Casefile.queries': {
-    //         uid: DatabaseService.mutationNodeReference,
-    //       },
-    //     },
-    //     'dgraph.type': WhiteboardNodeType.USER_QUERY,
-    //   };
+    it('should throw an InternalServerErrorException if more than one user is returned for the given id', async () => {
+      const sendQuerySpy = jest
+        .spyOn(DatabaseService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getWhiteboardUserByIdQuery]: [testUserForWhiteboard, testUserForWhiteboard] });
 
-    //   const res = await databaseService.insertUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
+      const getWhiteboardUserByIdPromise = databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    //   expect(res).toBeTruthy();
-    //   expect(getUidByTypeSpy).toBeCalledTimes(4);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    //   expect(sendMutationSpy).toBeCalledWith(expectedMutationJson);
-    // });
+      await expect(getWhiteboardUserByIdPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
 
-    // it('should return null if an error occurred while sending the mutation to the database', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
+    it('should return null if no user is returned for the given id', async () => {
+      const sendQuerySpy = jest
+        .spyOn(DatabaseService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getWhiteboardUserByIdQueryName]: [] });
 
-    //   const res = await databaseService.insertUserQueryOccurrenceToCasefile(uuidv4(), testUserQueryWhiteboardNode);
+      const res = await databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    //   expect(res).toBe(null);
-    //   expect(getUidByTypeSpy).toBeCalledTimes(4);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    // });
-  });
+      expect(res).toBe(null);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
 
-  describe('addEmbeddingToCasefile', () => {
-    const testEmbeddingWhiteboardNode: IEmbeddingWhiteboardNode = {
-      id: uuidv4(),
-      title: 'test',
-      href: 'detective.solutions',
-      x: 1,
-      y: 1,
-      width: 1,
-      height: 1,
-      locked: false,
-      author: uuidv4(),
-      editors: [{ id: uuidv4() }, { id: uuidv4() }] as IUser[],
-      lastUpdatedBy: uuidv4(),
-      lastUpdated: formatDate(new Date()),
-      created: formatDate(new Date()),
-      type: WhiteboardNodeType.EMBEDDING,
-    };
+    it('should throw an InternalServerErrorException if the validation for the incoming user object fails', async () => {
+      const modifiedUser = testUserForWhiteboard;
+      modifiedUser.id = ''; // id should not be empty
 
-    // it('should return a valid object reference if the database mutation was successful', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue({});
+      const sendQuerySpy = jest
+        .spyOn(DatabaseService.prototype as any, 'sendQuery')
+        .mockResolvedValue({ [getUidByTypeQueryName]: [modifiedUser] });
 
-    //   const expectedMutationJson = {
-    //     uid: DatabaseService.mutationNodeReference,
-    //     [`${WhiteboardNodeType.EMBEDDING}.xid`]: testEmbeddingWhiteboardNode.id,
-    //     [`${WhiteboardNodeType.EMBEDDING}.title`]: testEmbeddingWhiteboardNode.title,
-    //     [`${WhiteboardNodeType.EMBEDDING}.href`]: testEmbeddingWhiteboardNode.href,
-    //     [`${WhiteboardNodeType.EMBEDDING}.x`]: testEmbeddingWhiteboardNode.x,
-    //     [`${WhiteboardNodeType.EMBEDDING}.y`]: testEmbeddingWhiteboardNode.y,
-    //     [`${WhiteboardNodeType.EMBEDDING}.width`]: testEmbeddingWhiteboardNode.width,
-    //     [`${WhiteboardNodeType.EMBEDDING}.height`]: testEmbeddingWhiteboardNode.height,
-    //     [`${WhiteboardNodeType.EMBEDDING}.locked`]: testEmbeddingWhiteboardNode.locked,
-    //     [`${WhiteboardNodeType.EMBEDDING}.lastUpdatedBy`]: {
-    //       uid: testUid,
-    //     },
-    //     [`${WhiteboardNodeType.EMBEDDING}.lastUpdated`]: testEmbeddingWhiteboardNode.lastUpdated,
-    //     [`${WhiteboardNodeType.EMBEDDING}.created`]: testEmbeddingWhiteboardNode.created,
-    //     [`${WhiteboardNodeType.EMBEDDING}.author`]: { uid: testUid },
-    //     [`${WhiteboardNodeType.EMBEDDING}.casefile`]: {
-    //       uid: testUid,
-    //       'Casefile.embeddings': {
-    //         uid: DatabaseService.mutationNodeReference,
-    //       },
-    //     },
-    //     'dgraph.type': WhiteboardNodeType.EMBEDDING,
-    //   };
+      const getWhiteboardUserByIdPromise = databaseService.getWhiteboardUserById(testUserForWhiteboard.id);
 
-    //   const res = await databaseService.insertEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
-
-    //   expect(res).toBeTruthy();
-    //   expect(getUidByTypeSpy).toBeCalledTimes(3);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    //   expect(sendMutationSpy).toBeCalledWith(expectedMutationJson);
-    // });
-
-    // it('should return null if an error occurred while sending the mutation to the database', async () => {
-    //   const getUidByTypeSpy = jest.spyOn(databaseService, 'getUidByType').mockResolvedValue(testUid);
-    //   const sendMutationSpy = jest.spyOn(DatabaseService.prototype as any, 'sendMutation').mockResolvedValue(null);
-
-    //   const res = await databaseService.insertEmbeddingToCasefile(uuidv4(), testEmbeddingWhiteboardNode);
-
-    //   expect(res).toBe(null);
-    //   expect(getUidByTypeSpy).toBeCalledTimes(3);
-    //   expect(sendMutationSpy).toBeCalledTimes(1);
-    // });
+      await expect(getWhiteboardUserByIdPromise).rejects.toThrow(InternalServerErrorException);
+      expect(sendQuerySpy).toBeCalledTimes(1);
+    });
   });
 
   describe('getUidByType', () => {
@@ -377,17 +253,6 @@ xdescribe('DatabaseService', () => {
         .mockResolvedValue({ wrongKey: testResponse });
 
       await expect(databaseService.getUidByType(testId, WhiteboardNodeType.TABLE)).rejects.toThrow(
-        InternalServerErrorException
-      );
-      expect(sendQuerySpy).toBeCalledTimes(1);
-    });
-
-    it('should throw an InternalServerErrorException if more than one uid is returned for the given id', async () => {
-      const sendQuerySpy = jest
-        .spyOn(DatabaseService.prototype as any, 'sendQuery')
-        .mockResolvedValue({ [getUidByTypeQueryName]: [testResponse, testResponse] });
-
-      await expect(databaseService.getUidByType(testId, WhiteboardNodeType.EMBEDDING)).rejects.toThrow(
         InternalServerErrorException
       );
       expect(sendQuerySpy).toBeCalledTimes(1);
