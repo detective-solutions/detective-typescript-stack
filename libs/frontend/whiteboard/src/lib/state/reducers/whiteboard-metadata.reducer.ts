@@ -27,7 +27,7 @@ export const whiteboardMetadataReducer = createReducer(
         id: action.casefile.id,
         title: action.casefile.title,
         description: action.casefile.description,
-        activeUsers: Array.from(action.casefile.temporary.activeUsers),
+        activeUsers: action.casefile.temporary.activeUsers,
       };
     }
   ),

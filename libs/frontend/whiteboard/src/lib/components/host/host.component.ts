@@ -249,13 +249,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
           pluck('body')
         )
-        .subscribe((messageData: ICachableCasefileForWhiteboard) => {
+        .subscribe((messageData: ICachableCasefileForWhiteboard) =>
           this.store.dispatch(
             WhiteboardGeneralActions.WhiteboardDataLoaded({
               casefile: messageData,
             })
-          );
-        })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_CURSOR_MOVED websocket message event
@@ -289,14 +289,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           filter(([messageData, context]) => messageData.context.userId !== context.userId)
         )
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) => {
+        .subscribe(([messageData, _context]) =>
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeAdded({
               addedNode: messageData.body as AnyWhiteboardNode,
               addedManually: false,
             })
-          );
-        })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_NODE_DELETED websocket message event
@@ -312,13 +312,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           filter(([messageData, context]) => messageData.context.userId !== context.userId)
         )
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) => {
+        .subscribe(([messageData, _context]) =>
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
               deletedNodeId: messageData.context.nodeId,
             })
-          );
-        })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
@@ -335,7 +335,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) => {
+        .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) =>
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
@@ -344,8 +344,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
                 changes: messageData.body,
               } as Update<IWhiteboardNodeBlockUpdate>,
             })
-          );
-        })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_NODE_MOVED websocket message event
