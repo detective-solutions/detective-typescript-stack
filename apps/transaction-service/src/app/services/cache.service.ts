@@ -78,8 +78,13 @@ export class CacheService {
     this.logger.log(`Removing active user "${userId}" from casefile "${casefileId}"`);
 
     // Check if active users are present & filter out the user that left
-    const activeUsers =
-      (await this.getActiveUsersByCasefile(casefileId)) ?? [].filter((user: IUserForWhiteboard) => user.id !== userId);
+    const activeUsers = (await this.getActiveUsersByCasefile(casefileId)).filter(
+      (user: IUserForWhiteboard) => user.id !== userId
+    );
+
+    // TODO: Remove me!
+    console.log('ACTIVE USERS');
+    console.log(activeUsers);
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
