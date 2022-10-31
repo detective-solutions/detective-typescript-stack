@@ -26,7 +26,6 @@ import {
   IWhiteboardCollaborationCursor,
   TableWhiteboardNode,
 } from '../../models';
-import { Store, select } from '@ngrx/store';
 import {
   Subject,
   Subscription,
@@ -50,6 +49,7 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
+import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
