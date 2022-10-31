@@ -82,10 +82,6 @@ export class CacheService {
       (user: IUserForWhiteboard) => user.id !== userId
     );
 
-    // TODO: Remove me!
-    console.log('ACTIVE USERS');
-    console.log(activeUsers);
-
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
       await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
