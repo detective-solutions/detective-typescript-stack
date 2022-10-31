@@ -1,8 +1,5 @@
 import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
-
-import { Type } from 'class-transformer';
-import { UserForWhiteboardDTO } from '../user';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   @IsUUID()
@@ -34,16 +31,16 @@ export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   @IsNotEmpty()
   locked!: boolean;
 
+  @IsUUID()
   @IsNotEmpty()
-  author!: IUser;
+  author!: string;
 
   @IsNotEmpty()
   editors!: IUser[];
 
-  @ValidateNested({ each: true })
-  @Type(() => UserForWhiteboardDTO)
-  @IsNotEmpty()
-  lastUpdatedBy!: IUser;
+  @IsUUID()
+  @IsOptional()
+  lastUpdatedBy!: string;
 
   @IsString()
   @IsNotEmpty()

@@ -17,20 +17,27 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     if (!this.messageBody || !Array.isArray(this.messageBody)) {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
+
     const casefileId = this.messageContext.casefileId;
+    const userId = this.messageContext.userId;
 
     try {
       for (const node of this.messageBody) {
-        await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
-      }
-      this.forwardMessageToOtherClients();
-      const response = await this.databaseService.updateNodePositionsInCasefile(casefileId, this.messageBody);
-      if (!response) {
-        this.handleError(casefileId);
+        try {
+          await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
+        } catch {
+          // Remove invalid position updates from message body
+          this.messageBody = this.messageBody.filter(
+            (nodePositionUpdate: IWhiteboardNodePositionUpdate) => nodePositionUpdate.id !== node.id
+          );
+        }
       }
 
+      // Only return position updates for nodes that are not blocked by other users
+      // Updating the message.body property instead of messageBody, because it is used for message forwarding
+      this.message.body = await this.cacheService.updateNodePositions(casefileId, userId, this.messageBody);
+      this.forwardMessageToOtherClients();
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(`Node positions were successfully updated in casefile ${casefileId}`);
     } catch (error) {
       this.logger.error(error);
       this.handleError(casefileId);

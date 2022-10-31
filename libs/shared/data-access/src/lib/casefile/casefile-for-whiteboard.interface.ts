@@ -1,6 +1,6 @@
 import { ICasefile } from './casefile.interface';
 
-export type ICasefileForWhiteboard = Omit<
+export type ICasefileForWhiteboard = Pick<
   ICasefile,
-  'thumbnail' | 'views' | 'author' | 'editors' | 'lastUpdatedBy' | 'lastUpdated' | 'created'
+  'id' | 'title' | 'description' | 'tables' | 'queries' | 'embeddings'
 >;

@@ -5,10 +5,11 @@ import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { MessagePropagationService } from '../services';
 import { Test } from '@nestjs/testing';
 import { WS } from 'jest-websocket-mock';
 import { WebSocket } from 'ws';
-import { WhiteboardProducer } from '../kafka/whiteboard.producer';
+import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
 import { WhiteboardWebSocketGateway } from './whiteboard-websocket.gateway';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,6 +19,10 @@ import { v4 as uuidv4 } from 'uuid';
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const mockWhiteboardProducer = {
   [sendKafkaMessageMethodName]: jest.fn(),
+};
+const propagateMessageMethodName = 'propagateMessage';
+const mockMessagePropagationService = {
+  [propagateMessageMethodName]: jest.fn(),
 };
 
 describe('WhiteboardWebsocketGateway', () => {
@@ -31,7 +36,8 @@ describe('WhiteboardWebsocketGateway', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         WhiteboardWebSocketGateway,
-        { provide: WhiteboardProducer, useValue: mockWhiteboardProducer },
+        { provide: WhiteboardEventProducer, useValue: mockWhiteboardProducer },
+        { provide: MessagePropagationService, useValue: mockMessagePropagationService },
         { provide: JwtService, useValue: {} },
         ConfigService,
       ],
@@ -52,6 +58,24 @@ describe('WhiteboardWebsocketGateway', () => {
 
   it('should be defined', () => {
     expect(webSocketGateway).toBeDefined();
+  });
+
+  describe('onWhiteboardCursorMovedEvent', () => {
+    it('should correctly propagate and forward WHITEBOARD_CURSOR_MOVED events', async () => {
+      const propagateMessageMock = jest.spyOn(mockMessagePropagationService, propagateMessageMethodName);
+      const sendMessageByContextSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
+      const testMessage = { context: _createContext(MessageEventType.LoadWhiteboardData), body: testMessageBody };
+
+      await webSocketGateway.onWhiteboardCursorMovedEvent(testMessage);
+
+      expect(propagateMessageMock).toHaveBeenCalledTimes(1);
+      expect(propagateMessageMock).toHaveBeenCalledWith(WhiteboardWebSocketGateway.cursorPropagationChannel, {
+        ...testMessage,
+        propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
+      });
+      expect(sendMessageByContextSpy).toHaveBeenCalledTimes(1);
+      expect(sendMessageByContextSpy).toHaveBeenCalledWith(testMessage, broadcastWebSocketContext);
+    });
   });
 
   describe('onLoadWhiteboardDataEvent', () => {
@@ -169,6 +193,29 @@ describe('WhiteboardWebsocketGateway', () => {
     });
   });
 
+  describe('onWhiteboardTitleUpdatedEvent', () => {
+    it('should forward WHITEBOARD_TITLE_UPDATED events to the correct target topic', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const testMessage = { context: _createContext(MessageEventType.WhiteboardTitleUpdated), body: 'new title' };
+
+      await webSocketGateway.onWhiteboardTitleUpdated(testMessage);
+
+      expect(producerMock).toBeCalledTimes(1);
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.whiteboardTitleUpdated.targetTopic, testMessage);
+    });
+
+    it('should throw an InternalServerErrorException if the message context validation fails', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const context = _createContext(MessageEventType.WhiteboardTitleUpdated);
+      delete context['tenantId']; // tenantId is required in the MessageContextDTO
+
+      expect(webSocketGateway.onWhiteboardTitleUpdated({ context: context, body: '' })).rejects.toThrow(
+        InternalServerErrorException
+      );
+      expect(producerMock).toBeCalledTimes(0);
+    });
+  });
+
   describe('OnQueryTableEvent', () => {
     it('should forward QUERY_TABLE events to the correct target topic', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
@@ -189,6 +236,22 @@ describe('WhiteboardWebsocketGateway', () => {
         InternalServerErrorException
       );
       expect(producerMock).toBeCalledTimes(0);
+    });
+  });
+
+  describe('saveActiveCasefiles', () => {
+    it('should correctly forward SAVE_WHITEBOARD events for each active casefile', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const context1 = _createContext(MessageEventType.SaveWhiteboard);
+      const context2 = _createContext(MessageEventType.SaveWhiteboard);
+      const context3 = _createContext(MessageEventType.SaveWhiteboard);
+      await _createWebSocketClient(context1);
+      await _createWebSocketClient(context2);
+      await _createWebSocketClient(context3);
+
+      webSocketGateway.saveActiveCasefiles();
+
+      expect(producerMock).toBeCalledTimes(3);
     });
   });
 

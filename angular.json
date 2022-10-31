@@ -4,6 +4,7 @@
     "auth-service": "apps/auth-service",
     "backend-auth": "libs/backend/auth",
     "backend-dgraph-grpc-client": "libs/backend/dgraph-grpc-client",
+    "backend-redis-client": "libs/backend/redis-client",
     "backend-shared-environments": "libs/backend/shared/environments",
     "backend-shared-utils": "libs/backend/shared/utils",
     "backend-users": "libs/backend/users",

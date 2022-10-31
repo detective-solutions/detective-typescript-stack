@@ -5,10 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
-import { microserviceConfig } from './app/microservice-config';
+import { kafkaConfig } from './app/kafka-config';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, microserviceConfig as KafkaOptions);
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, kafkaConfig as KafkaOptions);
   app.useWebSocketAdapter(new WsAdapter(app));
   await app.listen();
   Logger.log(

@@ -1,4 +1,9 @@
 {
+  "topbar": {
+    "titlePlaceholder": "Casefile title",
+    "userAvatarAltAttribute": "detective user avatar",
+    "inviteButtonText": "Invite"
+  },
   "toastMessages": {
     "webSocketConnection": {
       "reconnecting": "Lost connection to the server. Reconnecting ...",
@@ -8,6 +13,7 @@
   },
   "nodeHeader": {
     "titleInputPlaceholder": "Insert title here",
-    "blockedInfoTitle": "blocked by"
+    "blockedInfoTitle": "blocked by",
+    "avatarAltText": "Avatar of blocking user"
   }
 }

@@ -6,5 +6,6 @@ export const defaultEnvConfig = Joi.object({
   REFRESH_TOKEN_SECRET: Joi.string().required(), // TODO: Make AuthModule work without specifying this secret
   KAFKA_SERVICE_NAME: Joi.string().required(),
   KAFKA_PORT: Joi.string().required(),
-  KAFKA_CONNECTION_RETRIES: Joi.number().default(30),
+  KAFKA_CONNECTION_RETRIES: Joi.number().default(10),
+  KAFKA_CONSUMER_GROUP_ID: Joi.string().optional(),
 });

@@ -1,11 +1,11 @@
+import { CacheService, DatabaseService } from '../../services';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../../services';
 import { InternalServerErrorException } from '@nestjs/common';
-import { LoadWhiteboardDataTransaction } from '../load-whiteboard-data.transaction';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../../kafka';
+import { TransactionEventProducer } from '../../events';
 import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
+import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -16,7 +16,8 @@ describe('TransactionCoordinationService', () => {
     const app = await Test.createTestingModule({
       providers: [
         WhiteboardTransactionFactory,
-        { provide: TransactionProducer, useValue: jest.fn() },
+        { provide: TransactionEventProducer, useValue: jest.fn() },
+        { provide: CacheService, useValue: jest.fn() },
         { provide: DatabaseService, useValue: jest.fn() },
       ],
     }).compile();
@@ -38,7 +39,7 @@ describe('TransactionCoordinationService', () => {
   describe('createTransaction', () => {
     const testMessagePayload = {
       context: {
-        eventType: MessageEventType.LoadWhiteboardData,
+        eventType: MessageEventType.WhiteboardUserJoined,
         tenantId: 'tenantId',
         casefileId: 'casefileId',
         userId: 'userId',
@@ -48,15 +49,15 @@ describe('TransactionCoordinationService', () => {
       },
       body: {},
     };
-    const transactionSpy = jest.spyOn(LoadWhiteboardDataTransaction.prototype as any, 'execute').mockImplementation();
+    const transactionSpy = jest.spyOn(WhiteboardUserJoinedTransaction.prototype as any, 'execute').mockImplementation();
 
     it('should correctly create a new transaction instance if the given event type is part of the transaction map', () => {
       const transaction = whiteboardTransactionFactory.createTransaction(
-        MessageEventType.LoadWhiteboardData,
+        MessageEventType.WhiteboardUserJoined,
         testMessagePayload
       );
 
-      expect(transaction).toBeInstanceOf(LoadWhiteboardDataTransaction);
+      expect(transaction).toBeInstanceOf(WhiteboardUserJoinedTransaction);
       expect(transactionSpy).toBeCalledTimes(1);
     });
 

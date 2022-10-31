@@ -1,6 +1,51 @@
+$collaboration-cursor-size: 50px;
+
 :host {
   .loading-spinner-whiteboard:before {
     z-index: 1001;
+  }
+
+  #collaboration-cursors-wrapper {
+    .collaboration-cursor {
+      width: $collaboration-cursor-size;
+      height: $collaboration-cursor-size;
+      transition: transform 0.5s;
+
+      .cursor-arrow {
+        width: calc($collaboration-cursor-size - 25px);
+        height: calc($collaboration-cursor-size - 30px);
+        position: absolute;
+        border: solid #fc1767 2px;
+        background: #fc1767;
+        transform: rotate(90deg);
+        -webkit-transform: rotate(90deg);
+      }
+
+      .cursor-circle {
+        border-radius: 50%;
+        width: calc($collaboration-cursor-size - 10px);
+        height: calc($collaboration-cursor-size - 10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: gray;
+        border: 2px #fc1767 solid;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0, rgba(0, 0, 0, 0) 100%);
+        background-color: white;
+        position: relative;
+
+        img {
+          border-radius: 50%;
+          width: inherit;
+          height: inherit;
+        }
+      }
+    }
+  }
+
+  #whiteboard {
+    // Workaround to prevent showing vertical scrollbar
+    height: calc(100vh - 4px);
   }
 
   .loading-backdrop {
@@ -11,11 +56,5 @@
     background-color: black;
     opacity: 0.8;
     z-index: 1000;
-  }
-
-  mat-progress-bar {
-    position: absolute;
-    bottom: 0;
-    height: 8px;
   }
 }

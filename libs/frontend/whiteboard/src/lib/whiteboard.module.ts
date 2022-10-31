@@ -4,7 +4,6 @@ import {
   DragService,
   WebSocketService,
   WhiteboardSelectionService,
-  WhiteboardUserService,
 } from './services/internal-services';
 import {
   EmbeddingNodeComponent,
@@ -14,6 +13,7 @@ import {
   SidebarComponent,
   TableNodeComponent,
   TestLinkComponent,
+  TopbarComponent,
 } from './components';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
@@ -26,7 +26,6 @@ import {
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
-import { GetWhiteboardUserByIdGQL } from './graphql';
 import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
@@ -57,6 +56,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
   ],
   declarations: [
     HostComponent,
+    TopbarComponent,
     SidebarComponent,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
@@ -73,9 +73,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     DragService,
     WebSocketService,
     WhiteboardSelectionService,
-    WhiteboardUserService,
     KeyboardService,
-    GetWhiteboardUserByIdGQL,
     {
       provide: TRANSLOCO_SCOPE,
       useValue: {

@@ -21,17 +21,13 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        lastUpdatedBy: TableOccurrence.lastUpdatedBy {
-          id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
+        lastUpdatedBy: TableOccurrence.lastUpdatedBy @normalize {
+          User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
         entity: TableOccurrence.entity {
+          id: Table.xid
           name: Table.name
           description: Table.description
         }
@@ -44,17 +40,16 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
-        lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy {
-          id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
+        author: UserQueryOccurrence.author @normalize {
+          User.xid
+        }
+        lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy @normalize {
+          User.xid
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
         entity: UserQueryOccurrence.entity {
+          id: UserQuery.xid
           code: UserQuery.code
         }
       }
@@ -67,16 +62,11 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        author: Embedding.author {
-          id: User.xid
+        author: Embedding.author @normalize {
+          User.xid
         }
-        lastUpdatedBy: Embedding.lastUpdatedBy {
-          id: User.xid
-          firstname: User.firstname
-          lastname: User.lastname
-          title: User.title
-          role: User.role
-          avatarUrl: User.avatarUrl
+        lastUpdatedBy: Embedding.lastUpdatedBy @normalize {
+          User.xid
         }
         lastUpdated: Embedding.lastUpdated
         created: Embedding.created

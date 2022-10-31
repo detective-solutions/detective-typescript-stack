@@ -1,7 +1,6 @@
 import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodeDeleteUpdate,
   IWhiteboardNodePositionUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
@@ -15,14 +14,11 @@ export const WhiteboardNodeAdded = createAction(
   props<{ addedNode: AnyWhiteboardNode; addedManually: boolean }>()
 );
 
-export const WhiteboardNodeDeleted = createAction(
-  `${actionPrefix} Node deleted`,
-  props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
-);
+export const WhiteboardNodeDeleted = createAction(`${actionPrefix} Node deleted`, props<{ deletedNodeId: string }>());
 
 export const WhiteboardNodeDeletedRemotely = createAction(
   `${actionPrefix} Node deleted remotely`,
-  props<{ deletedNode: IWhiteboardNodeDeleteUpdate }>()
+  props<{ deletedNodeId: string }>()
 );
 
 export const WhiteboardNodeUpdate = createAction(
@@ -48,6 +44,11 @@ export const WhiteboardNodeUnblocked = createAction(
 export const WhiteboardNodeBlockedRemotely = createAction(
   `${actionPrefix} Node un/blocked remotely`,
   props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
+);
+
+export const WhiteboardUnblockAllNodesOnUserLeft = createAction(
+  `${actionPrefix} Unblocking all nodes blocked by a user that left`,
+  props<{ updates: Update<IWhiteboardNodeBlockUpdate>[] }>()
 );
 
 export const WhiteboardNodesPositionUpdated = createAction(

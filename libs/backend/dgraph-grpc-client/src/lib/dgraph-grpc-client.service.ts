@@ -1,7 +1,6 @@
+import { DGRAPH_MODULE_OPTIONS, IDGraphGrpcClientOptions } from './models';
 import { DgraphClient, DgraphClientStub, Mutation } from 'dgraph-js';
 import { Inject, Injectable } from '@nestjs/common';
-import { DGRAPH_MODULE_OPTIONS } from './dgraph-grpc-client.constants';
-import { DGraphGrpcClientOptions } from './interfaces';
 
 @Injectable()
 export class DGraphGrpcClientService {
@@ -22,11 +21,11 @@ export class DGraphGrpcClientService {
     return null;
   }
 
-  constructor(@Inject(DGRAPH_MODULE_OPTIONS) options: DGraphGrpcClientOptions) {
-    this.createClient(options);
+  constructor(@Inject(DGRAPH_MODULE_OPTIONS) moduleOptions: IDGraphGrpcClientOptions) {
+    this.createClient(moduleOptions);
   }
 
-  createClient(options: DGraphGrpcClientOptions) {
+  createClient(options: IDGraphGrpcClientOptions) {
     if (!this._client) {
       this._stubs = options.stubs.map((stub) => {
         return new DgraphClientStub(stub.address, stub.credentials, stub.options);

@@ -20,7 +20,7 @@ export class BufferService {
       updates.push({
         id: node.id,
         // Round node position to reduce data
-        changes: { x: Math.round(node.x), y: Math.round(node.y), type: node.type },
+        changes: { x: Math.round(node.x), y: Math.round(node.y) },
       });
     });
     this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesPositionUpdated({ updates: updates }));

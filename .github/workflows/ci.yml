@@ -16,19 +16,19 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v2
+        uses: nrwl/nx-set-shas@v3.0.1
 
       - name: Install npm dependencies (without scripts)
         run: npm ci --ignore-scripts --no-audit --no-fund
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
@@ -73,10 +73,10 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
@@ -100,43 +100,32 @@ jobs:
           APP_VERSION=$(node --print "require('./package.json').version")
           if [[ $CURRENT_BRANCH == 'main' ]]; then
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
-            TARGET_TAGS="--tag=${BASE_TAG}"
+            TARGET_TAGS=${BASE_TAG}
           elif [[ $CURRENT_BRANCH == 'development' ]]; then
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}
-            TARGET_TAGS="--tag=${BASE_TAG} --tag=${IMAGE_NAME}:development"
+            TARGET_TAGS="${BASE_TAG},${IMAGE_NAME}:development"
           else
             # Sanitize branch name by replacing slashes with hyphens
             SANITIZED_BRANCH_NAME=${CURRENT_BRANCH//\//-}
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
-            TARGET_TAGS="--tag=${BASE_TAG}"
+            TARGET_TAGS=${BASE_TAG}
           fi
-          echo "::set-output name=image-name::${IMAGE_NAME}"
-          echo "::set-output name=base-tag::${BASE_TAG}"
           echo "::set-output name=target-tags::${TARGET_TAGS}"
 
-      - name: Build fat docker image
-        run: docker build -f ${{env.DOCKERFILE_PATH}} -t ${{steps.image-metadata.outputs.base-tag}} .
-
-      - name: Build & tag optimized docker images
-        run: |
-          curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
-          docker-slim build \
-            --http-probe-off \
-            --include-path /app \
-            --include-path /usr/share \
-            --include-path /etc/nginx \
-            --target ${{steps.image-metadata.outputs.base-tag}} \
-            ${{steps.image-metadata.outputs.target-tags}}
-
       - name: Login to quay.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v2.1.0
         with:
           registry: ${{env.DOCKER_REGISTRY}}
           username: ${{secrets.DOCKER_REGISTRY_USER}}
           password: ${{secrets.DOCKER_REGISTRY_TOKEN}}
 
-      - name: Push all docker available docker tags
-        run: docker push -a ${{steps.image-metadata.outputs.image-name}}
+      - name: Build and push docker image
+        uses: docker/build-push-action@v3.2.0
+        with:
+          file: apps/${{matrix.app}}/docker/Dockerfile
+          push: true
+          tags: ${{steps.image-metadata.outputs.target-tags}}
+          context: .
 
   Dependabot-Checks:
     runs-on: ubuntu-latest
@@ -145,7 +134,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       # PRs with event_name 'pull_request_target' always run in the PR target branch
       - name: Switch branch on PR
@@ -153,7 +142,7 @@ jobs:
         run: git checkout ${{github.event.pull_request.head.sha}}
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'

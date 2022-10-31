@@ -1,14 +1,7 @@
-import {
-  AnyWhiteboardNode,
-  IMessage,
-  IWhiteboardNodeDeleteUpdate,
-  KafkaTopic,
-} from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
-import { WhiteboardNodeDeleteUpdateDTO } from '../models';
-import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 export class WhiteboardNodeDeletedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeDeletedTransaction.name);
@@ -19,34 +12,25 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    if (!this.messageBody) {
-      throw new InternalServerErrorException(this.missingMessageBodyErrorText);
+    if (!this.messageContext.nodeId) {
+      throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
     }
 
-    const deletedNode = this.messageBody as IWhiteboardNodeDeleteUpdate;
     const casefileId = this.messageContext.casefileId;
+    const nodeId = this.messageContext.nodeId;
 
     try {
-      await validateDto(WhiteboardNodeDeleteUpdateDTO, this.messageBody as IWhiteboardNodeDeleteUpdate, this.logger);
       this.forwardMessageToOtherClients();
-
-      const response = await this.databaseService.deleteNodeInCasefile(deletedNode.id, deletedNode.type);
-      if (!response) {
-        this.handleError(casefileId, deletedNode.type);
-      }
-
+      await this.cacheService.deleteNode(casefileId, nodeId);
       this.logger.log(`${this.logContext} Transaction successful`);
-      this.logger.verbose(
-        `${deletedNode.type} node (${deletedNode.id}) was successfully deleted from casefile ${casefileId}`
-      );
     } catch (error) {
       this.logger.error(error);
-      this.handleError(casefileId, deletedNode.type);
+      this.handleError(casefileId, nodeId);
     }
   }
 
-  private handleError(casefileId: string, nodeType: string) {
+  private handleError(casefileId: string, nodeId: string) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not delete ${nodeType} node from casefile ${casefileId}`);
+    throw new InternalServerErrorException(`Could not delete node ${nodeId} from casefile ${casefileId}`);
   }
 }

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, catchError, filter, of, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, take, tap, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 

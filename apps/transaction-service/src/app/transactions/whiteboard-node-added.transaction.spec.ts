@@ -1,38 +1,29 @@
+import { CacheService, DatabaseService } from '../services';
 import {
-  AnyWhiteboardNode,
-  IEmbeddingWhiteboardNode,
   IMessage,
   ITable,
   ITableWhiteboardNode,
-  IUser,
-  IUserQuery,
-  IUserQueryWhiteboardNode,
   MessageEventType,
   UserRole,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
-import { DatabaseService } from '../services';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { TransactionProducer } from '../kafka';
+import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeAddedTransaction } from './whiteboard-node-added.transaction';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const insertTableOccurrenceMethodName = 'insertTableOccurrenceToCasefile';
-const insertUserQueryOccurrenceMethodName = 'insertUserQueryOccurrenceToCasefile';
-const insertEmbeddingMethodName = 'insertEmbeddingToCasefile';
-const databaseServiceMock = {
-  [insertTableOccurrenceMethodName]: jest.fn(),
-  [insertUserQueryOccurrenceMethodName]: jest.fn(),
-  [insertEmbeddingMethodName]: jest.fn(),
+const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const transactionEventProducerMock = {
+  [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+const addNodeMethodName = 'addNode';
+const cacheServiceMock = {
+  [addNodeMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -45,22 +36,49 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
+const testMessageBody: ITableWhiteboardNode = {
+  id: uuidv4(),
+  title: 'test',
+  x: 1,
+  y: 1,
+  width: 1,
+  height: 1,
+  locked: false,
+  lastUpdatedBy: uuidv4(),
+  lastUpdated: formatDate(new Date()),
+  created: formatDate(new Date()),
+  entity: { id: uuidv4() } as ITable,
+  type: WhiteboardNodeType.TABLE,
+};
+
+const testMessagePayload: IMessage<ITableWhiteboardNode> = {
+  context: testMessageContext,
+  body: testMessageBody,
+};
+
 describe('WhiteboardNodeAddedTransaction', () => {
+  let transactionEventProducer: TransactionEventProducer;
+  let cacheService: CacheService;
   let databaseService: DatabaseService;
-  let transactionProducer: TransactionProducer;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: TransactionProducer, useValue: transactionProducerMock },
+        { provide: TransactionEventProducer, useValue: transactionEventProducerMock },
+        { provide: CacheService, useValue: cacheServiceMock },
+        { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
+    transactionEventProducer = app.get<TransactionEventProducer>(TransactionEventProducer);
+    cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
-    transactionProducer = app.get<TransactionProducer>(TransactionProducer);
-    serviceRefs = { databaseService: databaseService, transactionProducer: transactionProducer };
+    serviceRefs = {
+      transactionEventProducer: transactionEventProducer,
+      cacheService: cacheService,
+      databaseService: databaseService,
+    };
   });
 
   afterEach(() => {
@@ -68,337 +86,41 @@ describe('WhiteboardNodeAddedTransaction', () => {
   });
 
   describe('execute', () => {
-    describe('TableOccurrence', () => {
-      const testTableWhiteboardNode: ITableWhiteboardNode = {
-        id: uuidv4(),
-        title: 'test',
-        x: 1,
-        y: 1,
-        width: 1,
-        height: 1,
-        locked: false,
-        lastUpdatedBy: { id: uuidv4() } as IUser,
-        lastUpdated: formatDate(new Date()),
-        created: formatDate(new Date()),
-        entity: { id: uuidv4() } as ITable,
-        type: WhiteboardNodeType.TABLE,
-      };
+    it('should correctly execute transaction', async () => {
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
-      const testMessagePayload: IMessage<ITableWhiteboardNode> = {
-        context: testMessageContext,
-        body: testTableWhiteboardNode,
-      };
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
-      it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      await transaction.execute();
 
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await transaction.execute();
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(1);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
-      });
-
-      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
-          context: testMessageContext,
-          body: { ...testTableWhiteboardNode, entity: undefined },
-        });
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
-      });
-
-      it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue(null);
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(1);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-      });
+      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
+      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
+      expect(addNodeSpy).toBeCalledTimes(1);
+      expect(addNodeSpy).toBeCalledWith(testMessagePayload.context.casefileId, testMessagePayload.body);
     });
 
-    describe('UserQueryOccurrence', () => {
-      const testUserQueryWhiteboardNode: IUserQueryWhiteboardNode = {
-        id: uuidv4(),
-        title: 'test',
-        x: 1,
-        y: 1,
-        width: 1,
-        height: 1,
-        locked: false,
-        author: { id: uuidv4() } as IUser,
-        editors: [{ id: uuidv4() }, { id: uuidv4() }] as IUser[],
-        lastUpdatedBy: { id: uuidv4() } as IUser,
-        lastUpdated: formatDate(new Date()),
-        created: formatDate(new Date()),
-        entity: { id: uuidv4() } as IUserQuery,
-        type: WhiteboardNodeType.USER_QUERY,
-      };
+    it('should throw an InternalServerErrorException if the given message is missing a body', async () => {
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
-      const testMessagePayload: IMessage<IUserQueryWhiteboardNode> = {
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
         context: testMessageContext,
-        body: testUserQueryWhiteboardNode,
-      };
-
-      it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await transaction.execute();
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(1);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
+        body: undefined,
       });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
-      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
-          context: testMessageContext,
-          body: { ...testUserQueryWhiteboardNode, entity: undefined },
-        });
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
-      });
-
-      it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue(null);
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(1);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-      });
-    });
-
-    describe('Embedding', () => {
-      const testEmbeddingWhiteboardNode: IEmbeddingWhiteboardNode = {
-        id: uuidv4(),
-        title: 'test',
-        href: 'detective.solutions',
-        x: 1,
-        y: 1,
-        width: 1,
-        height: 1,
-        locked: false,
-        author: { id: uuidv4() } as IUser,
-        editors: [{ id: uuidv4() }, { id: uuidv4() }] as IUser[],
-        lastUpdatedBy: { id: uuidv4() } as IUser,
-        lastUpdated: formatDate(new Date()),
-        created: formatDate(new Date()),
-        type: WhiteboardNodeType.EMBEDDING,
-      };
-
-      const testMessagePayload: IMessage<IEmbeddingWhiteboardNode> = {
-        context: testMessageContext,
-        body: testEmbeddingWhiteboardNode,
-      };
-
-      it('should correctly execute transaction', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await transaction.execute();
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(1);
-        expect(addEmbeddingToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
-      });
-
-      it('should throw an InternalServerErrorException if the given message body does not pass the DTO validation', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addEmbeddingToCasefileSpy = jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
-
-        const addTableOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertTableOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const addUserQueryOccurrenceToCasefileSpy = jest
-          .spyOn(databaseService, insertUserQueryOccurrenceMethodName)
-          .mockResolvedValue({});
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
-          context: testMessageContext,
-          body: { ...testEmbeddingWhiteboardNode, href: undefined },
-        });
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(0);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(0);
-        expect(addUserQueryOccurrenceToCasefileSpy).toBeCalledTimes(0);
-        expect(addTableOccurrenceToCasefileSpy).toBeCalledTimes(0);
-      });
-
-      it('should throw an InternalServerErrorException if the database response is invalid', async () => {
-        const sendKafkaMessageSpy = jest.spyOn(transactionProducer, sendKafkaMessageMethodName);
-
-        const addEmbeddingToCasefileSpy = jest
-          .spyOn(databaseService, insertEmbeddingMethodName)
-          .mockResolvedValue(null);
-
-        const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
-        transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-        await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-
-        expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-        expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
-        expect(addEmbeddingToCasefileSpy).toBeCalledTimes(1);
-        expect(addEmbeddingToCasefileSpy).toBeCalledWith(
-          testMessagePayload.context.casefileId,
-          testMessagePayload.body
-        );
-      });
+      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+      expect(addNodeSpy).toBeCalledTimes(0);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      const testWhiteboardNode: AnyWhiteboardNode = {
-        id: uuidv4(),
-        title: 'test',
-        x: 1,
-        y: 1,
-        width: 1,
-        height: 1,
-        locked: false,
-        lastUpdatedBy: { id: uuidv4() } as IUser,
-        lastUpdated: formatDate(new Date()),
-        created: formatDate(new Date()),
-        entity: { id: uuidv4() } as ITable,
-        type: WhiteboardNodeType.TABLE,
-      };
-
-      const testMessagePayload: IMessage<ITableWhiteboardNode> = {
-        context: testMessageContext,
-        body: testWhiteboardNode,
-      };
-
-      jest.spyOn(transactionProducer, sendKafkaMessageMethodName).mockImplementation(() => {
-        throw new Error('');
+      jest.spyOn(cacheService, addNodeMethodName).mockImplementation(() => {
+        throw new Error();
       });
-      jest.spyOn(databaseService, insertTableOccurrenceMethodName).mockResolvedValue({});
-      jest.spyOn(databaseService, insertUserQueryOccurrenceMethodName).mockResolvedValue({});
-      jest.spyOn(databaseService, insertEmbeddingMethodName).mockResolvedValue({});
 
       const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run

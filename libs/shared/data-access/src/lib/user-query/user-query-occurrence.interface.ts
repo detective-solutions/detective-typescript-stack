@@ -9,9 +9,9 @@ export interface IUserQueryOccurrence {
   width: number;
   height: number;
   locked: boolean;
-  author: IUser;
+  author: string;
   editors: IUser[];
-  lastUpdatedBy: IUser;
+  lastUpdatedBy: string;
   lastUpdated: string;
   created: string;
   entity: IUserQuery;

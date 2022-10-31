@@ -1,0 +1,31 @@
+<div id="topbar-wrapper" fxLayoutAlign="space-between" *transloco="let t; read: 'whiteboard.topbar'">
+  <div fxFlex="0 0 150px" fxLayoutAlign="center center" class="topbar-element topbar-logo">
+    <img src="assets/images/detective-logo.png" alt="Logo" /><span>detective</span>
+  </div>
+  <input
+    fxFlex="1 0 150px"
+    class="topbar-element"
+    placeholder="{{ t('titlePlaceholder') }}"
+    [value]="title$ | async"
+    [disabled]="isTitleFocusedByDifferentUser$ | async"
+    (keyup)="onTitleInputChange($event)"
+    (focus)="onTitleInputFocus()"
+    (blur)="onTitleInputBlur()"
+  />
+  <div fxFlex="1 1 125px" class="topbar-element active-users-wrapper">
+    <div *ngFor="let user of activeUsers$ | async" class="user-avatar">
+      <img
+        *ngIf="user.avatarUrl; else noAvatarUrl"
+        [src]="user.avatarUrl"
+        [matTooltip]="getUserFullName(user)"
+        alt="{{ t('userAvatarAltAttribute') }}"
+      />
+      <ng-template #noAvatarUrl
+        ><span [matTooltip]="getUserFullName(user)">{{ getUserInitialia(user) }}</span></ng-template
+      >
+    </div>
+  </div>
+  <div fxFlex="0 1 200px" fxLayoutAlign="center center" class="topbar-element topbar-invite-button-wrapper">
+    <button mat-raised-button color="accent">{{ t('inviteButtonText') }}</button>
+  </div>
+</div>

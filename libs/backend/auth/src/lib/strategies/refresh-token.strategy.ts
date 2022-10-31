@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AuthEnvironment } from '../interfaces/auth-environment.enum';
+import { AuthModuleEnvironment } from '../interfaces/auth-environment.enum';
 import { AuthStrategies } from './auth-strategies.enum';
 import { ConfigService } from '@nestjs/config';
 import { IJwtTokenPayload } from '@detective.solutions/shared/data-access';
@@ -12,7 +12,7 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, AuthStrateg
   constructor(readonly config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get<string>(AuthEnvironment.REFRESH_TOKEN_SECRET),
+      secretOrKey: config.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_SECRET),
     });
   }
 

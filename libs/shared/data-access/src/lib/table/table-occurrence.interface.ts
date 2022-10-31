@@ -1,5 +1,4 @@
 import { ITable } from './table.interface';
-import { IUser } from '../user';
 
 export interface ITableOccurrence {
   id: string;
@@ -9,7 +8,7 @@ export interface ITableOccurrence {
   width: number;
   height: number;
   locked: boolean;
-  lastUpdatedBy: Partial<IUser>;
+  lastUpdatedBy: string;
   lastUpdated: string;
   created: string;
   entity: Partial<ITable>;

@@ -1,0 +1,84 @@
+$topbar-height: 50px;
+$logo-size: 35px;
+$active-user-avatar-size: 32px;
+
+#topbar-wrapper {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: $topbar-height;
+  box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+
+  .topbar-element {
+    margin: 0 20px;
+  }
+
+  .topbar-logo {
+    color: white;
+
+    img {
+      width: $logo-size;
+      height: $logo-size;
+      padding-right: 8px;
+    }
+  }
+
+  input {
+    color: white;
+    background: none;
+    border: none;
+    text-overflow: ellipsis;
+
+    &:disabled {
+      color: gray;
+    }
+  }
+
+  .active-users-wrapper {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    height: inherit;
+
+    .user-avatar {
+      width: $active-user-avatar-size;
+      height: $active-user-avatar-size;
+      border-radius: 50%;
+      margin-left: -12px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+
+      &:hover:not(:last-of-type) {
+        transform: translate(-5px);
+      }
+
+      img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+      }
+
+      span {
+        width: inherit;
+        height: inherit;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: gray;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0, rgba(0, 0, 0, 0) 100%);
+        background-color: white;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: lightgray;
+        }
+      }
+    }
+  }
+
+  .topbar-invite-button-wrapper button {
+    width: 80%;
+  }
+}

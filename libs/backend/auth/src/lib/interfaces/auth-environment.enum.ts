@@ -1,4 +1,4 @@
-export enum AuthEnvironment {
+export enum AuthModuleEnvironment {
   ACCESS_TOKEN_SECRET = 'ACCESS_TOKEN_SECRET',
   ACCESS_TOKEN_EXPIRY = 'ACCESS_TOKEN_EXPIRY',
   REFRESH_TOKEN_SECRET = 'REFRESH_TOKEN_SECRET',

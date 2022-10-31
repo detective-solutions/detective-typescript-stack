@@ -1,9 +1,16 @@
-import { EventTypeTopicMapping, IWebSocketClient, WebSocketClientContext } from '../models';
-import { IJwtTokenPayload, IMessage, IMessageContext } from '@detective.solutions/shared/data-access';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { EventTypeTopicMapping, IPropagationMessage, IWebSocketClient, WebSocketClientContext } from '../models';
+import {
+  IJwtTokenPayload,
+  IMessage,
+  IMessageContext,
+  KafkaTopic,
+  MessageEventType,
+  UserRole,
+} from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import {
   MessageBody,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
@@ -12,25 +19,32 @@ import {
 } from '@nestjs/websockets';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
-import { AuthEnvironment } from '@detective.solutions/backend/auth';
+import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
+import { MessagePropagationService } from '../services';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket-info.type';
-import { WhiteboardProducer } from '../kafka/whiteboard.producer';
+import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
+import { broadcastWebSocketContext } from '../utils';
+import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @WebSocketGateway(7777)
-export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
+  static cursorPropagationChannel = 'ws_gateway_cursor_propagation';
+  static propagationSourceId = uuidv4();
+
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
   @WebSocketServer()
   server: Server<IWebSocketClient>;
 
   constructor(
-    private readonly whiteboardProducer: WhiteboardProducer,
+    private readonly whiteboardEventProducer: WhiteboardEventProducer,
+    private readonly messagePropagationService: MessagePropagationService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService
   ) {}
@@ -41,16 +55,40 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
       verifyClient: async (info: WebSocketInfo, cb: (boolean, number, string) => void) =>
         this.handleNewClientConnection(server, info, cb),
     };
-  }
 
-  handleConnection(client: any) {
-    console.log('NEW CONNECTION');
-    console.log('CLIENT', client.context);
+    // Subscribe to cursor message propagations from other websocket gateways
+    this.messagePropagationService.subscribeToChannel(
+      WhiteboardWebSocketGateway.cursorPropagationChannel,
+      (message: string) => {
+        const parsedMessage = JSON.parse(message) as IPropagationMessage;
+        if (parsedMessage.propagationSourceId !== WhiteboardWebSocketGateway.propagationSourceId) {
+          this.sendMessageByContext(parsedMessage, broadcastWebSocketContext);
+        }
+      }
+    );
   }
 
   handleDisconnect(client: any) {
-    console.log('DISCONNECTED');
-    console.log('CLIENT', client.context);
+    this.logger.log(`${buildLogContext(client._socket.context)} Client has disconnected`);
+
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
+      context: {
+        ...client._socket.context,
+        eventType: MessageEventType.WhiteboardUserLeft,
+        timestamp: new Date().getTime(),
+      },
+      body: null,
+    });
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
+  async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
+    // Propagate message to other websocket gateways that subscribed to the same channel
+    this.messagePropagationService.propagateMessage(WhiteboardWebSocketGateway.cursorPropagationChannel, {
+      ...message,
+      propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
+    });
+    this.sendMessageByContext(message, broadcastWebSocketContext);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.loadWhiteboardData.eventType)
@@ -61,7 +99,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.loadWhiteboardData.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeAdded.eventType)
@@ -72,7 +110,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.whiteboardNodeAdded.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeAdded.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeAdded.targetTopic, message);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeDeleted.eventType)
@@ -83,7 +121,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic, message);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeBlocked.eventType)
@@ -94,7 +132,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.whiteboardNodeBlocked.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeBlocked.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeBlocked.targetTopic, message);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeMoved.eventType)
@@ -105,7 +143,29 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.whiteboardNodeMoved.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeMoved.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeMoved.targetTopic, message);
+  }
+
+  @SubscribeMessage(EventTypeTopicMapping.whiteboardTitleFocused.eventType)
+  async onWhiteboardTitleFocused(@MessageBody() message: IMessage<boolean>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(
+      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
+        EventTypeTopicMapping.whiteboardTitleFocused.targetTopic
+      }`
+    );
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardTitleFocused.targetTopic, message);
+  }
+
+  @SubscribeMessage(EventTypeTopicMapping.whiteboardTitleUpdated.eventType)
+  async onWhiteboardTitleUpdated(@MessageBody() message: IMessage<string>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(
+      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
+        EventTypeTopicMapping.whiteboardTitleUpdated.targetTopic
+      }`
+    );
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardTitleUpdated.targetTopic, message);
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
@@ -116,7 +176,25 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
         EventTypeTopicMapping.queryTable.targetTopic
       }`
     );
-    this.whiteboardProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
+    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  saveActiveCasefiles() {
+    const activeClientContexts = new Set<WebSocketClientContext>();
+    this.server.clients.forEach((client: IWebSocketClient) => activeClientContexts.add(client._socket.context));
+
+    activeClientContexts.forEach((clientContext: WebSocketClientContext) => {
+      const message = {
+        context: {
+          ...clientContext,
+          timestamp: new Date().getTime(),
+          eventType: MessageEventType.SaveWhiteboard,
+        },
+        body: null,
+      };
+      this.whiteboardEventProducer.sendKafkaMessage(KafkaTopic.TransactionInput, message);
+    });
   }
 
   sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
@@ -160,6 +238,19 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
       this.logger.verbose(
         `Accepted connection for user ${clientContext.userId} as ${clientContext.userRole} on casefile ${clientContext.casefileId} on tenant ${clientContext.tenantId}`
       );
+
+      // Notify backend to start a WHITEBOARD_USER_JOINED transaction
+      const message = {
+        context: {
+          ...clientContext,
+          timestamp: new Date().getTime(),
+          eventType: MessageEventType.WhiteboardUserJoined,
+          userRole: clientContext.userRole as UserRole,
+        },
+        body: null,
+      };
+      this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, message);
+
       this.logger.log(`Currently handling ${server.clients.size + 1} simultaneous client connections`);
       cb(true, 200, 'Verified');
     } else {
@@ -172,7 +263,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
     try {
       // Verify if token is valid (algorithm & expiry)
       const tokenPayload = await this.jwtService.verifyAsync(accessToken, {
-        secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
+        secret: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_SECRET),
       });
       // Verify if token is valid for the requested tenantId
       const urlTenantId = this.extractUrlPathParameter(url, 'tenant');
@@ -204,7 +295,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayConne
             tenantId: tenantId,
             casefileId: casefileId,
             userId: tokenPayload.sub,
-            userRole: tokenPayload.role,
+            userRole: tokenPayload.role as UserRole,
           })
         : reject(null);
     });

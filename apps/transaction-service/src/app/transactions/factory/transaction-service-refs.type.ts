@@ -1,7 +1,9 @@
-import { DatabaseService } from '../../services';
-import { TransactionProducer } from '../../kafka';
+import { CacheService, DatabaseService } from '../../services';
+
+import { TransactionEventProducer } from '../../events';
 
 export type TransactionServiceRefs = {
-  transactionProducer: TransactionProducer;
+  transactionEventProducer: TransactionEventProducer;
+  cacheService: CacheService;
   databaseService: DatabaseService;
 };
