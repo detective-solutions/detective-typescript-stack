@@ -83,8 +83,8 @@ export class CacheService {
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
-      this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
-      this.deleteCasefile(casefileId);
+      await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
+      await this.deleteCasefile(casefileId);
       return 'OK';
     }
 
