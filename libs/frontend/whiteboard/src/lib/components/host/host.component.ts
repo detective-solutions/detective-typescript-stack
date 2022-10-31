@@ -269,8 +269,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               this.store.select(selectActiveUsers),
             ])
           ),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           filter(([messageData, context, _activeUsers]) => messageData.context.userId !== context.userId)
         )
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .subscribe(([messageData, _context, activeUsers]) =>
           this.handleIncomingCollaborationCursor(messageData, activeUsers)
         )
@@ -286,10 +288,11 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
             ])
           ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
         )
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) =>
+        .subscribe((messageData: IMessage<AnyWhiteboardNode>) =>
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeAdded({
               addedNode: messageData.body as AnyWhiteboardNode,
@@ -309,13 +312,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
             ])
           ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId)
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
         )
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .subscribe(([messageData, _context]) =>
+        .subscribe((messageData: IMessage<null>) =>
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
-              deletedNodeId: messageData.context.nodeId,
+              deletedNodeId: messageData.context.nodeId as string,
             })
           )
         )
@@ -411,16 +415,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             ])
           ),
           filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
         .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserLeft({ userId: messageData.context.userId }));
-
           // Remove collaboration cursor
           this.collaborationCursors = this.collaborationCursors.filter(
             (cursor: IWhiteboardCollaborationCursor) => cursor.userInfo.id !== messageData.context.userId
           );
-
           // Unblock all nodes that are still blocked by the user that left
           this.store
             .select(selectWhiteboardNodesBlockedByUserId(messageData.context.userId))
