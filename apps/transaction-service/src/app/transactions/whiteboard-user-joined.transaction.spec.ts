@@ -21,11 +21,11 @@ const transactionEventProducerMock = {
 
 const getCachedCasefileByIdMethodName = 'getCasefileById';
 const saveCasefileToCacheMethodName = 'saveCasefile';
-const addActiveWhiteboardUsersMethodName = 'insertActiveUsers';
+const insertActiveUsersMethodName = 'insertActiveUsers';
 const cacheServiceMock = {
   [getCachedCasefileByIdMethodName]: jest.fn(),
   [saveCasefileToCacheMethodName]: jest.fn(),
-  [addActiveWhiteboardUsersMethodName]: jest.fn(),
+  [insertActiveUsersMethodName]: jest.fn(),
 };
 
 const getCasefileByIdMethodName = 'getCachableCasefileById';
@@ -162,7 +162,7 @@ describe('WhiteboardUserJoinedTransaction', () => {
         .mockResolvedValue(getCasefileByIdResponse);
       const getDatabaseCasefileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName);
-      const addActiveWhiteboardUsersSpy = jest.spyOn(cacheService, addActiveWhiteboardUsersMethodName);
+      const addActiveWhiteboardUsersSpy = jest.spyOn(cacheService, insertActiveUsersMethodName);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
@@ -190,24 +190,25 @@ describe('WhiteboardUserJoinedTransaction', () => {
       });
     });
 
-    xit('should not add a new active user if the joined user is already cached', async () => {
+    it('should not add a new active user if the joined user is already cached', async () => {
       // Redefine object in every test case because it will be manipulated by the transaction
       const getCasefileByIdResponse: ICachableCasefileForWhiteboard = {
         id: uuidv4(),
         title: 'testCasefile',
         nodes: [],
         temporary: {
-          activeUsers: [],
+          activeUsers: [testUserForWhiteboard],
         },
       };
 
+      jest.spyOn(databaseService, getWhiteboardUserByIdMethodName).mockResolvedValue(testUserForWhiteboard);
       jest.spyOn(cacheService, getCachedCasefileByIdMethodName).mockResolvedValue(getCasefileByIdResponse);
-      const addActiveWhiteboardUserSpy = jest.spyOn(cacheService, addActiveWhiteboardUsersMethodName);
+      const insertActiveUsersSpy = jest.spyOn(cacheService, insertActiveUsersMethodName);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
 
-      expect(addActiveWhiteboardUserSpy).toBeCalledTimes(0);
+      expect(insertActiveUsersSpy).toBeCalledTimes(0);
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
       expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
