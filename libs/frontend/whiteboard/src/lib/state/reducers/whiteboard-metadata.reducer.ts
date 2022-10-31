@@ -1,7 +1,7 @@
+import { ICachableCasefileForWhiteboard, IUserForWhiteboard } from '@detective.solutions/shared/data-access';
 import { WhiteboardGeneralActions, WhiteboardMetadataActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
-import { ICachableCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
 import { IWhiteboardMetadataState } from '../interfaces';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -27,28 +27,25 @@ export const whiteboardMetadataReducer = createReducer(
         id: action.casefile.id,
         title: action.casefile.title,
         description: action.casefile.description,
-        activeUsers: action.casefile.temporary.activeUsers,
+        // Deep copy & sort active users by their ids
+        activeUsers: sortActiveUsers([...action.casefile.temporary.activeUsers]),
       };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserJoined,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      const activeUsers = [...state.activeUsers]; // deep-copy array
-      activeUsers.push(action.user);
-      // Sort users by their ids
-      return { ...state, activeUsers: activeUsers.sort((a, b) => a.id.localeCompare(b.id)) };
+      // Deep copy, enhance & sort active users by their ids
+      return { ...state, activeUsers: sortActiveUsers([...state.activeUsers, action.user]) };
     }
   ),
   on(
     WhiteboardMetadataActions.WhiteboardUserLeft,
     (state: IWhiteboardMetadataState, action: any): IWhiteboardMetadataState => {
-      // Filter & sort users by their ids
       return {
         ...state,
-        activeUsers: [...state.activeUsers] // deep-copy array
-          .filter((user) => user.id !== action.userId)
-          .sort((a, b) => a.id.localeCompare(b.id)),
+        // Deep copy, filter and sort active users by their ids
+        activeUsers: sortActiveUsers([...state.activeUsers].filter((user) => user.id !== action.userId)),
       };
     }
   ),
@@ -77,3 +74,7 @@ export const whiteboardMetadataReducer = createReducer(
     }
   )
 );
+
+function sortActiveUsers(activeUsers: IUserForWhiteboard[]) {
+  return activeUsers.sort((a, b) => a.id.localeCompare(b.id));
+}
