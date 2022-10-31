@@ -403,7 +403,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Listen to WHITEBOARD_USER_LEFT websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.WhiteboardUserLeft)))
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardUserLeft),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          map(([messageData, _context]) => messageData)
+        )
         .subscribe((messageData: IMessage<IUserForWhiteboard>) => {
           this.store.dispatch(WhiteboardMetadataActions.WhiteboardUserLeft({ userId: messageData.context.userId }));
 
