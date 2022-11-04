@@ -20,4 +20,6 @@ export const environment = {
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
   logLevel: LogLevel.Info,
+  productDoc: 'https://detective-solutions.github.io/',
+  productDocMasking: 'masking.html',
 };

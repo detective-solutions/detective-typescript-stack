@@ -7,15 +7,24 @@ import {
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
 import { ConnectionsService, MaskingService, SubscriptionService } from './services';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
+  CreateNewColumnMaskGQL,
+  CreateNewMaskingGQL,
+  CreateNewRowMaskGQL,
+  DeleteColumnMaskGQL,
+  DeleteMaskingGQL,
+  DeleteRowMaskGQL,
+  GetAllColumnsGQL,
   GetAllConnectionsGQL,
   GetAllMaskingsGQL,
   GetAllUserGroupsGQL,
   GetAllUsersGQL,
   GetConnectionByIdGQL,
+  GetConnectionByTableIdGQL,
   GetTablesBySourceConnectionIdGQL,
+  UpdateMaskingGQL,
 } from './graphql';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -66,13 +75,22 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
       },
     },
     ConnectionsService,
+    GetConnectionByTableIdGQL,
     GetConnectionByIdGQL,
+    GetAllColumnsGQL,
     GetAllConnectionsGQL,
     GetTablesBySourceConnectionIdGQL,
     MaskingService,
     GetAllMaskingsGQL,
+    UpdateMaskingGQL,
     GetMaskingByIdGQL,
+    DeleteMaskingGQL,
+    CreateNewColumnMaskGQL,
+    CreateNewRowMaskGQL,
+    DeleteColumnMaskGQL,
+    DeleteRowMaskGQL,
     GetAllUsersGQL,
+    CreateNewMaskingGQL,
     GetAllUserGroupsGQL,
     SubscriptionService,
   ],

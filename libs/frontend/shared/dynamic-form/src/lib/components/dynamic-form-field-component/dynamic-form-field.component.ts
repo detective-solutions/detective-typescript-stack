@@ -28,6 +28,8 @@ export class DynamicFormFieldComponent {
   constructor(private readonly formControlService: DynamicFormControlService) {}
 
   onSelectionChange() {
-    this.formControlService.selectionChanged$.next(true);
+    const value = String(this.form.controls[this.formFieldDefinition.key].value);
+    const response = { key: this.formFieldDefinition.key, value: value };
+    this.formControlService.selectionChanged$.next(response);
   }
 }

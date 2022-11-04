@@ -137,7 +137,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
               cellData: {
                 id: maskings.xid,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.groups.map((x) => x.name).join(', ')),
+                text: String(maskings.groups?.map((x) => x.name).join(', ')),
               },
             },
             lastUpdatedBy: {
@@ -145,7 +145,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
               cellData: {
                 id: maskings.xid,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.lastUpdatedBy.firstname) + ' ' + String(maskings.lastUpdatedBy.lastname),
+                text: String(maskings.lastUpdatedBy?.firstname) + ' ' + String(maskings.lastUpdatedBy?.lastname),
               },
             },
             lastUpdated: {

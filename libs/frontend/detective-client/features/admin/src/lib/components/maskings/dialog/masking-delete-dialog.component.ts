@@ -7,7 +7,7 @@ import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui
 
 import { MaskingService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IGetMaskingByIdResponse } from '../../../models/get-masking-by-id-response.interface';
+import { IMasking, Mask } from '@detective.solutions/shared/data-access';
 
 @Component({
   selector: 'masking-delete-dialog',
@@ -16,9 +16,10 @@ import { IGetMaskingByIdResponse } from '../../../models/get-masking-by-id-respo
 })
 export class MaskingDeleteDialogComponent {
   readonly maskingToBeDeleted$ = this.maskingService.getMaskingById(this.dialogInputData.xid);
-  readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IGetMaskingByIdResponse) => value.name));
+  readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IMasking) => value.name));
 
   isSubmitting = false;
+  selectedMasking$!: IMasking;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { xid: string },
@@ -28,11 +29,32 @@ export class MaskingDeleteDialogComponent {
     private readonly maskingService: MaskingService,
     private readonly dialogRef: MatDialogRef<MaskingDeleteDialogComponent>,
     private readonly logger: LogService
-  ) {}
+  ) {
+    this.maskingService.getMaskingById(this.dialogInputData.xid).subscribe((x) => {
+      this.selectedMasking$ = x;
+    });
+  }
+
+  getMaskIdsToDelete() {
+    const columns = this.selectedMasking$.columns ?? [];
+    const rows = this.selectedMasking$.rows ?? [];
+
+    return {
+      columns: columns.map((mask: Mask) => mask.xid ?? ''),
+      rows: rows.map((mask: Mask) => mask.xid ?? ''),
+    };
+  }
 
   deleteMasking() {
     this.isSubmitting = true;
-    // this.maskingService.deleteMasking(this.dialogInputData.id, 'test name');
+
+    const children = this.getMaskIdsToDelete();
+    this.maskingService.deleteMasking({
+      masking: this.dialogInputData.xid,
+      columns: children.columns,
+      rows: children.rows,
+    });
+
     this.dialogRef.close();
   }
 

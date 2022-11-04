@@ -6,4 +6,5 @@ export interface IConnectorPropertiesResponse {
   default: string | number | boolean;
   options: { key: string; value: string }[];
   required: boolean;
+  disabled?: boolean;
 }

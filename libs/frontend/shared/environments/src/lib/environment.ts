@@ -21,6 +21,8 @@ export const environment = {
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
+  productDoc: 'https://detective-solutions.github.io/',
+  productDocMasking: 'masking.html',
 };
 
 /*

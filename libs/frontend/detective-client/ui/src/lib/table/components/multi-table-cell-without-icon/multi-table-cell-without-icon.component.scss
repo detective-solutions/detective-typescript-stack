@@ -13,17 +13,17 @@
 
     .cell-wrapper {
       text-align: left;
-    }
 
-    .info-wrapper {
-      @include break-words();
+      .info-wrapper {
+        @include break-words();
 
-      h3 {
-        @include flex-ellipsis();
-      }
+        h3 {
+          @include flex-ellipsis();
+        }
 
-      p {
-        @include flex-ellipsis(3);
+        p {
+          @include flex-ellipsis(3);
+        }
       }
     }
   }

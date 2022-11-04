@@ -11,6 +11,12 @@ $row-height: 120px;
     height: 97%;
     overflow: auto;
 
+    mat-row {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.01);
+      }
+    }
+
     mat-cell {
       height: $row-height;
 
@@ -32,6 +38,10 @@ $row-height: 120px;
         display: block;
         border-bottom: 3px solid rgba(0, 0, 0, 0.12);
         margin-bottom: 25px;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.06);
+        }
 
         &::after {
           content: none;

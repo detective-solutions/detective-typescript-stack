@@ -16,6 +16,8 @@ import { QueryRef } from 'apollo-angular';
 import { StatusResponse } from '@detective.solutions/frontend/shared/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 @Injectable()
 export class SubscriptionService {
   private static provisioningBasePath = `${environment.baseApiPath}${environment.provisioningApiPathV1}`;

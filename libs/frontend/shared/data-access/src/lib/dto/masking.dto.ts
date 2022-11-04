@@ -1,4 +1,4 @@
-import { IMasking } from '@detective.solutions/shared/data-access';
+import { IMasking, IUserWithXid, Mask } from '@detective.solutions/shared/data-access';
 
 export class MaskingDTO implements IMasking {
   constructor(
@@ -6,19 +6,23 @@ export class MaskingDTO implements IMasking {
     public name: string,
     public description: string,
     public table: {
+      xid: string;
       name: string;
       dataSource: {
+        xid: string;
         name: string;
       };
     },
-    public groups: {
+    public columns?: Mask[],
+    public rows?: Mask[],
+    public groups?: {
+      xid: string;
       name: string;
     }[],
-    public lastUpdatedBy: {
-      firstname: string;
-      lastname: string;
-    },
-    public lastUpdated: string
+    public author?: IUserWithXid,
+    public created?: string,
+    public lastUpdatedBy?: IUserWithXid,
+    public lastUpdated?: string
   ) {}
 
   static Build(maskingInput: IMasking) {
@@ -27,7 +31,11 @@ export class MaskingDTO implements IMasking {
       maskingInput.name,
       maskingInput.description,
       maskingInput.table,
+      maskingInput.columns,
+      maskingInput.rows,
       maskingInput.groups,
+      maskingInput.author,
+      maskingInput.created,
       maskingInput.lastUpdatedBy,
       maskingInput.lastUpdated
     );
