@@ -21,7 +21,7 @@ import {
 } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConnectionsService, MaskingService } from '../../../services';
-import { IDropDownValues, IMasking, Mask } from '@detective.solutions/shared/data-access';
+import { IDropDownValues, IDropDownValuesBoolean, IMasking, Mask } from '@detective.solutions/shared/data-access';
 import { ConnectionTable } from '@detective.solutions/frontend/shared/data-access';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
@@ -90,14 +90,35 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
 
   ROW_MASK_NAME = 'row';
   COLUMN_MASK_NAME = 'column';
-  BINARY_ANSWER = ['yes', 'no'];
-  FILTER_TYPES = [this.COLUMN_MASK_NAME, this.ROW_MASK_NAME];
-  MASK_METHODS = ['column', 'row'];
+  BINARY_ANSWER = [
+    { key: 'subTable.true', value: 'true' },
+    { key: 'subTable.false', value: 'false' },
+  ];
+  FILTER_TYPES = [
+    { key: 'subTable.dimensionColumn', value: this.COLUMN_MASK_NAME },
+    { key: 'subTable.dimensionRow', value: this.ROW_MASK_NAME },
+  ];
+  MASK_METHODS = [
+    { value: 'full', key: 'subTable.maskingMethods.full' },
+    { value: 'full email', key: 'subTable.maskingMethods.fullEmail' },
+    { value: 'credit card', key: 'subTable.maskingMethods.creditCard' },
+    { value: 'provider email', key: 'subTable.maskingMethods.providerEmail' },
+    { value: 'phone number', key: 'subTable.maskingMethods.phoneNumber' },
+    { value: 'postal code', key: 'subTable.maskingMethods.postalCode' },
+    { value: 'singe name', key: 'subTable.maskingMethods.singleName' },
+    { value: 'first- and lastname', key: 'subTable.maskingMethods.firstAndLastname' },
+    { value: 'email', key: 'subTable.maskingMethods.email' },
+    { value: 'address streetname and number', key: 'subTable.maskingMethods.fullAddress' },
+    { value: 'full address', key: 'subTable.maskingMethods.addressStreetnameAndNumber' },
+    { value: 'decimal', key: 'subTable.maskingMethods.decimal' },
+    { value: 'number', key: 'subTable.maskingMethods.number' },
+    { value: 'custom', key: 'subTable.maskingMethods.custom' },
+  ];
 
   isSubmitting = false;
   dataSource: IMaskSubTableDataDef[] = [];
   showSubmitButton = false;
-  tableColumns$: string[] = [];
+  tableColumns$!: IDropDownValues[];
   selectedMasking$!: IMasking;
   isAddDialog = !this.dialogInputData?.xid;
   masksToDelete: MaskDelete = { columns: [], rows: [] };
@@ -111,6 +132,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     columnName: this.tableColumns$,
     visible: this.BINARY_ANSWER,
     filterType: this.FILTER_TYPES,
+    replaceType: this.MASK_METHODS,
   };
 
   readonly connectorTypeFormGroup = this.formBuilder.group({
@@ -204,6 +226,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       columnName: this.tableColumns$,
       visible: this.BINARY_ANSWER,
       filterType: this.FILTER_TYPES,
+      replaceType: this.MASK_METHODS,
     };
   }
 
@@ -401,9 +424,9 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
 
   updateAvailableColumns(id: string) {
     this.maskingService.getColumnsByTableId(id).subscribe((response) => {
-      const result: string[] = [];
+      const result: IDropDownValues[] = [];
       response.queryColumnDefinition.forEach((element) => {
-        result.push(element.columnName);
+        result.push({ value: element.columnName, key: element.columnName });
       });
       this.tableColumns$ = result;
     });

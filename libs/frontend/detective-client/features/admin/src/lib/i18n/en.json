@@ -65,8 +65,8 @@
         "ColumnTitleMethod": "Method",
         "ColumnTitleCustomReplaceType": "Custom Value",
         "ColumnTitleIsEdit": " ",
-        "binaryTrue": "Yes",
-        "binaryFalse": "No",
+        "true": "Yes",
+        "false": "No",
         "displayNameTable": "Table",
         "displayNameGroups": "User Group",
         "displayNameTitle": "Title",
@@ -74,7 +74,25 @@
         "editMaskButton": "Edit",
         "removeMaskButton": "Delete",
         "doneMaskButton": "Done",
-        "toolTipHelpCenter": "How to apply masks"
+        "toolTipHelpCenter": "How to apply masks",
+        "dimensionColumn": "Column",
+        "dimensionRow": "Row",
+        "maskingMethods": {
+          "full": "Sternchen",
+          "fullEmail": "Sternchen Email",
+          "creditCard": "Kreditkarte",
+          "providerEmail": "Nur Email Provider",
+          "phoneNumber": "Telefonnummer",
+          "postalCode": "Postleitzahl",
+          "singleName": "Einfacher Name",
+          "firstAndLastname": "Vor- und Nachnahme",
+          "email": "Email",
+          "fullAddress": "Ganze Adresse",
+          "addressStreetnameAndNumber": "Ganze Adresse mit Hausnummer",
+          "decimal": "Dezimalzahl",
+          "number": "Nummer",
+          "custom": "Eigener Wert"
+        }
       }
     }
   },

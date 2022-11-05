@@ -15,6 +15,7 @@ export const environment = {
   provisioningProductV1: '/product/info',
   provisioningAllProductListV1: '/subscription/config',
   provisioningChangePaymentV1: '/payment/change',
+  provisioningSendInviteV1: '/invite/user',
   webSocketHost: 'dev.detective.solutions',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',

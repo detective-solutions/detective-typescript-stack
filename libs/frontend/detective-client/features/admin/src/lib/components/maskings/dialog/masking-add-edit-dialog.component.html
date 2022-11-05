@@ -59,11 +59,20 @@
             <button mat-button (click)="element.isEdit = !element.isEdit">{{ t('subTable.doneMaskButton') }}</button>
           </div>
           <ng-container *ngSwitchCase="'select'">
-            <mat-select [(ngModel)]="element[col.key]">
-              <mat-option [value]="type" *ngFor="let type of getDropdownValues(col.key)">
-                {{ type }}
-              </mat-option>
-            </mat-select>
+            <ng-container *ngIf="col.key === 'columnName'">
+              <mat-select [(ngModel)]="element[col.key]">
+                <mat-option [value]="type.value" *ngFor="let type of getDropdownValues(col.key)">
+                  <span>{{ t(type.key) }}</span>
+                </mat-option>
+              </mat-select>
+            </ng-container>
+            <ng-container *ngIf="col.key !== 'columnName'">
+              <mat-select #translateSelect [(ngModel)]="element[col.key]">
+                <mat-option [value]="type.value" *ngFor="let type of getDropdownValues(col.key)">
+                  <span>{{ t(type.key) }}</span>
+                </mat-option>
+              </mat-select>
+            </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'text'">
             <input class="mat-input" [(ngModel)]="element[col.key]" />
