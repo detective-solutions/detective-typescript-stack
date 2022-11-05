@@ -55,7 +55,27 @@
       "maskingDescriptionLabel": "Short description",
       "sourceConnectionDropdownLabel": "Select a data source",
       "saveButtonText": "Save",
-      "cancelButtonText": "Cancel"
+      "cancelButtonText": "Cancel",
+      "subTable": {
+        "addMaskButton": "Add Mask",
+        "ColumnTitleFilter": "Dimension",
+        "ColumnTitleColumn": "Column",
+        "ColumnTitleHide": "Hide",
+        "ColumnTitleValueName": "Value",
+        "ColumnTitleMethod": "Method",
+        "ColumnTitleCustomReplaceType": "Custom Value",
+        "ColumnTitleIsEdit": " ",
+        "binaryTrue": "Yes",
+        "binaryFalse": "No",
+        "displayNameTable": "Table",
+        "displayNameGroups": "User Group",
+        "displayNameTitle": "Title",
+        "displayNameDescription": "Description",
+        "editMaskButton": "Edit",
+        "removeMaskButton": "Delete",
+        "doneMaskButton": "Done",
+        "toolTipHelpCenter": "How to apply masks"
+      }
     }
   },
   "subscriptions": {

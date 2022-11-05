@@ -29,43 +29,41 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 import { ProviderScope, TranslocoService, TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
-const USER_DATA: IMaskSubTableDataDef[] = [];
-
 const COLUMNS_SCHEMA = [
   {
     key: 'filterType',
     type: 'select',
-    label: 'Filter',
+    label: 'subTable.ColumnTitleFilter',
   },
   {
     key: 'columnName',
     type: 'select',
-    label: 'Column',
+    label: 'subTable.ColumnTitleColumn',
   },
   {
     key: 'visible',
     type: 'select',
-    label: 'Hide',
+    label: 'subTable.ColumnTitleHide',
   },
   {
     key: 'valueName',
     type: 'text',
-    label: 'Value',
+    label: 'subTable.ColumnTitleValueName',
   },
   {
     key: 'replaceType',
     type: 'select',
-    label: 'Method',
+    label: 'subTable.ColumnTitleMethod',
   },
   {
     key: 'customReplaceType',
     type: 'text',
-    label: 'custom replacement',
+    label: 'subTable.ColumnTitleCustomReplaceType',
   },
   {
     key: 'isEdit',
     type: 'isEdit',
-    label: '',
+    label: 'subTable.ColumnTitleIsEdit',
   },
 ];
 
@@ -97,7 +95,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   MASK_METHODS = ['column', 'row'];
 
   isSubmitting = false;
-  dataSource = USER_DATA;
+  dataSource: IMaskSubTableDataDef[] = [];
   showSubmitButton = false;
   tableColumns$: string[] = [];
   selectedMasking$!: IMasking;
@@ -209,13 +207,24 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     };
   }
 
+  getTranslation(path: string) {
+    let translatedWord = '';
+    this.translationService
+      .selectTranslate(path, {}, this.translationScope)
+      .pipe(take(1))
+      .subscribe((translation: string) => {
+        translatedWord = translation;
+      });
+    return translatedWord;
+  }
+
   generateTableProperties() {
     if (this.isAddDialog) {
       return {
         properties: [
           {
             propertyName: 'table',
-            displayName: 'Table',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameTable'),
             description: 'Which table is the masking for',
             default: '',
             options: this.connectorTables$,
@@ -224,7 +233,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           },
           {
             propertyName: 'groups',
-            displayName: 'User Group',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameGroups'),
             description: 'For which user groups',
             default: '',
             options: this.userGroups$,
@@ -233,7 +242,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           },
           {
             propertyName: 'name',
-            displayName: 'Title',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameTitle'),
             description: 'The name of the masking displayed later on',
             default: '',
             options: [{ key: '', value: '' }],
@@ -242,7 +251,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           },
           {
             propertyName: 'description',
-            displayName: 'Description',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameDescription'),
             description: 'When and and how this masking should be applied',
             default: '',
             options: [{ key: '', value: '' }],
@@ -256,7 +265,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         properties: [
           {
             propertyName: 'table',
-            displayName: 'Table',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameTable'),
             description: 'Which table is the masking for',
             default: this.selectedMasking$.table.name ?? '',
             options: [{ key: '', value: '' }],
@@ -266,7 +275,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           },
           {
             propertyName: 'groups',
-            displayName: 'User Group',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameGroups'),
             description: 'For which user groups',
             default: (this.selectedMasking$.groups ?? [])[0].name ?? '',
             options: [{ key: '', value: '' }],
@@ -277,7 +286,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           {
             propertyName: 'name',
             displayName: 'Title',
-            description: 'The name of the masking displayed later on',
+            description: this.getTranslation('maskings.addEditDialog.subTable.displayNameTitle'),
             default: this.selectedMasking$.name ?? '',
             options: [{ key: '', value: '' }],
             type: 'string',
@@ -286,7 +295,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           },
           {
             propertyName: 'description',
-            displayName: 'Description',
+            displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameDescription'),
             description: 'When and and how this masking should be applied',
             default: this.selectedMasking$.description ?? '',
             options: [{ key: '', value: '' }],

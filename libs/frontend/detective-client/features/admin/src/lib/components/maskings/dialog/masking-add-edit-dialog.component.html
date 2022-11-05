@@ -30,8 +30,8 @@
   </ng-template>
 
   <div mat-dialog-actions *ngIf="showSubmitButton" class="add-mask-button">
-    <button mat-raised-button (click)="addRow()">Add Mask</button>
-    <a matTooltip="How to apply masks" (click)="openMaskingDoc()" class="help-button">
+    <button mat-raised-button (click)="addRow()">{{ t('subTable.addMaskButton') }}</button>
+    <a matTooltip="{{ t('subTable.toolTipHelpCenter') }}" (click)="openMaskingDoc()" class="help-button">
       <span class="material-icons"> help_center </span>
     </a>
   </div>
@@ -39,13 +39,15 @@
   <table mat-table [dataSource]="dataSource" *ngIf="showSubmitButton">
     <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
       <th mat-header-cell *matHeaderCellDef>
-        {{ col.label }}
+        {{ t(col.label) }}
       </th>
       <td mat-cell *matCellDef="let element">
         <div [ngSwitch]="col.type" *ngIf="!element.isEdit">
           <div class="btn-edit" *ngSwitchCase="'isEdit'">
-            <button mat-button (click)="element.isEdit = !element.isEdit">Edit</button>
-            <button mat-button class="button-remove" (click)="removeRow(element.id)">Delete</button>
+            <button mat-button (click)="element.isEdit = !element.isEdit">{{ t('subTable.editMaskButton') }}</button>
+            <button mat-button class="button-remove" (click)="removeRow(element.id)">
+              {{ t('subTable.removeMaskButton') }}
+            </button>
           </div>
           <span *ngSwitchDefault>
             {{ element[col.key] }}
@@ -54,7 +56,7 @@
         <div [ngSwitch]="col.type" *ngIf="element.isEdit">
           <div *ngSwitchCase="'isSelected'"></div>
           <div class="btn-edit" *ngSwitchCase="'isEdit'">
-            <button mat-button (click)="element.isEdit = !element.isEdit">Done</button>
+            <button mat-button (click)="element.isEdit = !element.isEdit">{{ t('subTable.doneMaskButton') }}</button>
           </div>
           <ng-container *ngSwitchCase="'select'">
             <mat-select [(ngModel)]="element[col.key]">
