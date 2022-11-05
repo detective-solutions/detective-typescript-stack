@@ -1,5 +1,6 @@
 import { IAbstractTableDef, IColumnDef } from '@detective.solutions/frontend/detective-client/ui';
-import { IDropDownValues, IDropDownValuesBoolean } from '@detective.solutions/shared/data-access';
+
+import { IDropDownValues } from '@detective.solutions/shared/data-access';
 
 export interface IMaskingTableDef extends IAbstractTableDef {
   maskingInfo: IColumnDef;

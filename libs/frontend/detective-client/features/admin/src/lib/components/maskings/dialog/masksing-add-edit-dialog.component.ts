@@ -21,7 +21,7 @@ import {
 } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConnectionsService, MaskingService } from '../../../services';
-import { IDropDownValues, IDropDownValuesBoolean, IMasking, Mask } from '@detective.solutions/shared/data-access';
+import { IDropDownValues, IMasking, Mask } from '@detective.solutions/shared/data-access';
 import { ConnectionTable } from '@detective.solutions/frontend/shared/data-access';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
@@ -511,6 +511,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
 
   private handleError(errorType: DynamicFormError, error: Error) {
     let translationKey;
+    this.logger.error(String(error));
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
       translationKey = 'connections.toastMessages.formInitError';
       this.logger.error('Encountered an error while fetching the form data');

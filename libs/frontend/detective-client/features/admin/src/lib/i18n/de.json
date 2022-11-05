@@ -46,7 +46,11 @@
     "deleteDialog": {
       "deleteDialogHeader": "Maskierung entfernen",
       "deleteDialogText": "Sie sind dabei die Verbindung {{maskingName}} zu entfernen.",
-      "deleteButtonText": "Ich möchte diese Verbindung entfernen"
+      "deleteButtonText": "Ich möchte diese Verbindung entfernen",
+      "toastMessages": {
+        "actionSuccessful": "Maskierung wurde gelöscht",
+        "formSubmitError": "Die Maskierung konnte nicht gelöscht werden. Bitte kontaktieren Sie den Support"
+      }
     },
     "addEditDialog": {
       "addDialogHeader": "Neue Maskierung anlegen",
