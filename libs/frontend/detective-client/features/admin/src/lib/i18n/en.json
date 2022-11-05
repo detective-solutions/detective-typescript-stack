@@ -78,20 +78,20 @@
         "dimensionColumn": "Column",
         "dimensionRow": "Row",
         "maskingMethods": {
-          "full": "Sternchen",
-          "fullEmail": "Sternchen Email",
-          "creditCard": "Kreditkarte",
-          "providerEmail": "Nur Email Provider",
-          "phoneNumber": "Telefonnummer",
-          "postalCode": "Postleitzahl",
-          "singleName": "Einfacher Name",
-          "firstAndLastname": "Vor- und Nachnahme",
+          "full": "Full mask",
+          "fullEmail": "Full Mail",
+          "creditCard": "Credit Card",
+          "providerEmail": "Only Email Provider",
+          "phoneNumber": "Phone number",
+          "postalCode": "Postal Code",
+          "singleName": "Simple Name",
+          "firstAndLastname": "first- and last name",
           "email": "Email",
-          "fullAddress": "Ganze Adresse",
-          "addressStreetnameAndNumber": "Ganze Adresse mit Hausnummer",
-          "decimal": "Dezimalzahl",
-          "number": "Nummer",
-          "custom": "Eigener Wert"
+          "fullAddress": "Address",
+          "addressStreetnameAndNumber": "Full address",
+          "decimal": "Decimal",
+          "number": "Number",
+          "custom": "Custom value"
         }
       }
     }

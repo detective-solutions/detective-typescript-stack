@@ -332,6 +332,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   }
 
   submitForm(formGroup?: FormGroup) {
+    /*
     this.isSubmitting = true;
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
 
@@ -362,6 +363,8 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     }
 
     this.dataSource = [];
+    */
+    console.log(this.dataSource);
     this.dialogRef.close();
   }
 

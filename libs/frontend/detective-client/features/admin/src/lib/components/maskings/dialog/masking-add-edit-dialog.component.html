@@ -62,7 +62,7 @@
             <ng-container *ngIf="col.key === 'columnName'">
               <mat-select [(ngModel)]="element[col.key]">
                 <mat-option [value]="type.value" *ngFor="let type of getDropdownValues(col.key)">
-                  <span>{{ t(type.key) }}</span>
+                  <span>{{ type.key }}</span>
                 </mat-option>
               </mat-select>
             </ng-container>
