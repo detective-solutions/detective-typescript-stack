@@ -12,6 +12,7 @@ import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-ma
 import { IDropDownValues, IJwtTokenPayload, IMasking, Mask } from '@detective.solutions/shared/data-access';
 import { IGetAllMaskingsResponse, IMaskSubTableDataDef, MaskingCreate, MaskingDelete, MaskingUpdate } from '../models';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
+import { MutationResult, QueryRef } from 'apollo-angular';
 import { Observable, catchError, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
@@ -19,7 +20,6 @@ import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
 import { GetAllColumnsGQL } from '../graphql/get-all-columns-by-table-id.gql';
 import { IGetAllColumnsResponse } from '../models/get-all-columns-by-table-id-response.interface';
 import { Injectable } from '@angular/core';
-import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
@@ -130,7 +130,7 @@ export class MaskingService {
   }
 
   getBooleanFromString(stringBool: string): boolean {
-    if (stringBool == 'yes') {
+    if (stringBool == 'true') {
       return true;
     } else {
       return false;
@@ -246,10 +246,10 @@ export class MaskingService {
     if (toDelete.length > 0) {
       switch (maskType) {
         case this.COLUMN_MASK_NAME:
-          this.deleteColumnMaskGQL.mutate(filter).subscribe((x) => console.log(x));
+          this.deleteColumnMaskGQL.mutate(filter);
           break;
         case this.ROW_MASK_NAME:
-          this.deleteRowMaskGQL.mutate(filter).subscribe((x) => console.log(x));
+          this.deleteRowMaskGQL.mutate(filter);
           break;
         case '':
           break;
@@ -257,19 +257,17 @@ export class MaskingService {
     }
   }
 
-  deleteMasking(set: MaskingDelete) {
+  deleteMasking(set: MaskingDelete): Observable<MutationResult<Response>> {
     this.deleteColumnOrRowMask(set.rows, this.ROW_MASK_NAME);
     this.deleteColumnOrRowMask(set.columns, this.COLUMN_MASK_NAME);
 
-    this.deleteMaskingGQL
-      .mutate({
-        filter: {
-          xid: {
-            eq: set.masking,
-          },
+    return this.deleteMaskingGQL.mutate({
+      filter: {
+        xid: {
+          eq: set.masking,
         },
-      })
-      .subscribe((x) => console.log(x));
+      },
+    });
   }
 
   createMasksFromCurrentData(payload: MaskingCreate): boolean {

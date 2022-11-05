@@ -332,7 +332,6 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   }
 
   submitForm(formGroup?: FormGroup) {
-    /*
     this.isSubmitting = true;
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
 
@@ -363,8 +362,6 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     }
 
     this.dataSource = [];
-    */
-    console.log(this.dataSource);
     this.dialogRef.close();
   }
 
@@ -523,7 +520,6 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       translationKey = 'connections.toastMessages.formSubmitError';
       this.logger.error('Encountered an error while submitting the form data');
     }
-    console.error(error);
 
     if (translationKey) {
       this.translationService

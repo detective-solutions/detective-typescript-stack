@@ -46,7 +46,11 @@
     "deleteDialog": {
       "deleteDialogHeader": "Delete masking",
       "deleteDialogText": "You are about to delete {{maskingName}}.",
-      "deleteButtonText": "I want to delete this masking"
+      "deleteButtonText": "I want to delete this masking",
+      "toastMessages": {
+        "actionSuccessful": "Masking was deleted",
+        "formSubmitError": "Could not submit delete masking. Please contact support"
+      }
     },
     "addEditDialog": {
       "addDialogHeader": "Add a new masking",

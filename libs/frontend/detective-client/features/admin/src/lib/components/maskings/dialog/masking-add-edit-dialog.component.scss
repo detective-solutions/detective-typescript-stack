@@ -1,5 +1,20 @@
 /*TODO: replace color variables with config */
 
+.add-edit-dialog-wrapper {
+  .add-mask-button {
+    width: 90%;
+    justify-content: center;
+    float: right !important;
+
+    button {
+      float: right !important;
+    }
+    a {
+      float: right !important;
+    }
+  }
+}
+
 .mat-dialog-content {
   width: 90%;
 

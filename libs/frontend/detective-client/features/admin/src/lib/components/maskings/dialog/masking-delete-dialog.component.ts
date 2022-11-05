@@ -49,13 +49,21 @@ export class MaskingDeleteDialogComponent {
     this.isSubmitting = true;
 
     const children = this.getMaskIdsToDelete();
-    this.maskingService.deleteMasking({
-      masking: this.dialogInputData.xid,
-      columns: children.columns,
-      rows: children.rows,
-    });
-
-    this.dialogRef.close();
+    this.maskingService
+      .deleteMasking({
+        masking: this.dialogInputData.xid,
+        columns: children.columns,
+        rows: children.rows,
+      })
+      .subscribe(() => {
+        this.translationService
+          .selectTranslate('maskings.deleteDialog.toastMessages.actionSuccessful', {}, this.translationScope)
+          .pipe(take(1))
+          .subscribe((translation: string) => {
+            this.toastService.showToast(translation, 'Close', ToastType.INFO);
+          });
+        this.dialogRef.close();
+      });
   }
 
   private handleError(error: Error) {
