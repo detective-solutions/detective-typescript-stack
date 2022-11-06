@@ -2,6 +2,7 @@ import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
 
@@ -59,4 +60,14 @@ export const WhiteboardNodesPositionUpdated = createAction(
 export const WhiteboardNodesPositionUpdatedRemotely = createAction(
   `${actionPrefix} Node positions updated remotely`,
   props<{ updates: Update<AnyWhiteboardNode>[] }>()
+);
+
+export const WhiteboardNodeResized = createAction(
+  `${actionPrefix} Node resized`,
+  props<{ update: Update<IWhiteboardNodeSizeUpdate> }>()
+);
+
+export const WhiteboardNodeResizedRemotely = createAction(
+  `${actionPrefix} Node resized remotely`,
+  props<{ update: Update<IWhiteboardNodeSizeUpdate> }>()
 );

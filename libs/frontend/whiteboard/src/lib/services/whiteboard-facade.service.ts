@@ -35,6 +35,7 @@ export class WhiteboardFacadeService {
 
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
+    this.d3AdapterService.setScreenCTM((zoomContainerElement as any).getScreenCTM());
     this.webSocketService.establishWebsocketConnection();
   }
 
@@ -59,6 +60,10 @@ export class WhiteboardFacadeService {
     this.d3AdapterService.applyDragBehavior(component.elementRef.nativeElement, component.node, currentUserId);
   }
 
+  applyResizeBehaviorToComponent(component: NodeComponent) {
+    this.d3AdapterService.applyResizeBehavior(component.node);
+  }
+
   activateDragging() {
     this.dragService.activateDragging();
   }
@@ -76,7 +81,7 @@ export class WhiteboardFacadeService {
   }
 
   updateNodesFromBuffer() {
-    this.bufferService.updateNodesFromBuffer();
+    this.bufferService.updateNodesPositionFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

@@ -72,6 +72,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
         this.whiteboardFacade.applyDragBehaviorToComponent(this, this.currentUserId);
         this.customAfterViewInit();
       });
+    this.whiteboardFacade.applyResizeBehaviorToComponent(this);
   }
 
   ngOnDestroy() {

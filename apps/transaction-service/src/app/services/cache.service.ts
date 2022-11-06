@@ -3,6 +3,7 @@ import {
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
@@ -143,6 +144,34 @@ export class CacheService {
     await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
     // Only return position updates for nodes that are not blocked by other users
     return filteredPositionUpdates;
+  }
+
+  async updateNodeSize(
+    casefileId: string,
+    nodeId: string,
+    userId: string,
+    sizeUpdate: IWhiteboardNodeSizeUpdate
+  ): Promise<boolean> {
+    this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+
+    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
+    if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
+      return false;
+    }
+
+    cachedNodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === nodeId) {
+        node.width = sizeUpdate.width;
+        node.height = sizeUpdate.height;
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    // Only return position updates for nodes that are not blocked by other users
+    return true;
   }
 
   async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {

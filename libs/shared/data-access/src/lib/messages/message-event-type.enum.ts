@@ -7,6 +7,7 @@ export enum MessageEventType {
   WhiteboardNodeDeleted = 'WHITEBOARD_NODE_DELETED',
   WhiteboardNodeBlocked = 'WHITEBOARD_NODE_BLOCKED',
   WhiteboardNodeMoved = 'WHITEBOARD_NODE_MOVED',
+  WhiteboardNodeResized = 'WHITEBOARD_NODE_RESIZED',
   WhiteboardTitleFocused = 'WHITEBOARD_TITLE_FOCUSED',
   WhiteboardTitleUpdated = 'WHITEBOARD_TITLE_UPDATED',
   SaveWhiteboard = 'SAVE_WHITEBOARD',

@@ -1,5 +1,11 @@
 <svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
-  <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
+  <svg:g
+    *ngIf="selected$ | async"
+    node-selection-halo
+    [nodeId]="node.id"
+    [nodeWidth]="node.width"
+    [nodeHeight]="node.height"
+  ></svg:g>
   <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
     <div class="node-actions-wrapper table-actions">
       <div fxFlex fxLayout="column" fxLayoutAlign="center center">

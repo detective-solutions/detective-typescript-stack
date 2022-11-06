@@ -1,4 +1,5 @@
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IWhiteboardNodeSizeUpdate } from '@detective.solutions/shared/data-access';
+
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
@@ -14,7 +15,7 @@ export class BufferService {
     this.nodeUpdateBuffer.add(node);
   }
 
-  updateNodesFromBuffer() {
+  updateNodesPositionFromBuffer() {
     const updates: Update<AnyWhiteboardNode>[] = [];
     this.nodeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
       updates.push({
@@ -25,5 +26,21 @@ export class BufferService {
     });
     this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesPositionUpdated({ updates: updates }));
     this.nodeUpdateBuffer.clear();
+  }
+
+  updateNodeSizeFromBuffer() {
+    if (this.nodeUpdateBuffer.size === 1) {
+      this.nodeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
+        // Round node dimensions to reduce data
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeResized({
+            update: { id: node.id, changes: { width: Math.round(node.width), height: Math.round(node.height) } },
+          })
+        );
+      });
+      this.nodeUpdateBuffer.clear();
+    } else {
+      console.warn('Could not update node size from buffer, because buffer holds wrong data:', this.nodeUpdateBuffer);
+    }
   }
 }

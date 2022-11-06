@@ -1,0 +1,13 @@
+rect {
+  stroke: #fc1767;
+}
+
+circle {
+  fill: #fc1767;
+
+  &:hover {
+    r: 14;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+}

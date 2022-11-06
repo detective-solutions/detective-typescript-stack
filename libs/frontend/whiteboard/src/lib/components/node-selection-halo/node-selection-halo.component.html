@@ -1,23 +1,5 @@
 <svg:circle
-  [attr.fill]="haloColor"
-  [attr.cx]="0 - haloOffset"
-  [attr.cy]="0 - haloOffset"
-  [attr.r]="haloHandleRadius"
-></svg:circle>
-<svg:circle
-  [attr.fill]="haloColor"
-  [attr.cx]="nodeWidth + haloOffset"
-  [attr.cy]="0 - haloOffset"
-  [attr.r]="haloHandleRadius"
-></svg:circle>
-<svg:circle
-  [attr.fill]="haloColor"
-  [attr.cx]="0 - haloOffset"
-  [attr.cy]="nodeHeight + haloOffset"
-  [attr.r]="haloHandleRadius"
-></svg:circle>
-<svg:circle
-  [attr.fill]="haloColor"
+  id="drag-handle-{{ nodeId }}"
   [attr.cx]="nodeWidth + haloOffset"
   [attr.cy]="nodeHeight + haloOffset"
   [attr.r]="haloHandleRadius"
@@ -27,7 +9,6 @@
   [attr.y]="0 - haloOffset"
   [attr.width]="nodeWidth + haloOffset * 2"
   [attr.height]="nodeHeight + haloOffset * 2"
-  [attr.stroke]="haloColor"
   stroke-width="2"
   fill="none"
 ></svg:rect>
