@@ -7,6 +7,7 @@ import { GroupsComponent } from './components/groups/groups.component';
 import { MasksComponent } from './components/masks/masks.component';
 import { NgModule } from '@angular/core';
 import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
+import { UsersComponent } from './components/users/users.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: '/admin/connections', pathMatch: 'full' },
       { path: 'connections', component: ConnectionsComponent },
+      { path: 'users', component: UsersComponent },
       { path: 'groups', component: GroupsComponent },
       { path: 'masks', component: MasksComponent },
       { path: 'subscriptions', component: SubscriptionsComponent },

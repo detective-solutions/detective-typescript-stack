@@ -3,6 +3,7 @@
     "sidenavItems": {
       "connections": "Verbindungen",
       "groups": "Gruppen",
+      "users": "Nutzer",
       "masks": "Masken",
       "subscriptions": "Subscription"
     },

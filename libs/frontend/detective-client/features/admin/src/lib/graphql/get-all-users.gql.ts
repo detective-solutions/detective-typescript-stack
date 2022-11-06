@@ -9,18 +9,23 @@ export interface IGetUsersGQLResponse {
 }
 
 //TODO: Filter only for users related to current tenant
+// tenants(filter: { xid: { eq: "4091e594-3cb5-11ed-95e8-ebca79b0263f" } })
 @Injectable()
 export class GetAllUsersGQL extends Query<Response> {
   override document = gql`
-    query User {
-      queryUser @cascade {
+    query User($paginationOffset: Int, $pageSize: Int) {
+      queryUser(offset: $paginationOffset, first: $pageSize, order: { asc: firstname }) {
+        xid
         email
+        tenants {
+          xid
+        }
         role
         firstname
         lastname
-        tenantIds: tenants(filter: { xid: { eq: "4091e594-3cb5-11ed-95e8-ebca79b0263f" } }) {
-          xid
-        }
+        title
+        avatarUrl
+        lastUpdated
       }
       aggregateUser {
         count

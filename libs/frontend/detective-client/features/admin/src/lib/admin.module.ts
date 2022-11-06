@@ -4,11 +4,18 @@ import {
   GroupsComponent,
   MasksComponent,
   SubscriptionsComponent,
+  UsersComponent,
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { ConnectionsService, MaskingsService, SubscriptionService } from './services';
+import { ConnectionsService, MaskingsService, SubscriptionService, UsersService } from './services';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GetAllConnectionsGQL, GetAllMaskingsGQL, GetAllUsersGQL, GetConnectionByIdGQL } from './graphql';
+import {
+  GetAllConnectionsGQL,
+  GetAllMaskingsGQL,
+  GetAllUserGroupsGQL,
+  GetAllUsersGQL,
+  GetConnectionByIdGQL,
+} from './graphql';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
   SubscriptionCancelDialogComponent,
@@ -31,6 +38,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsDeleteDialogComponent,
     SubscriptionCancelDialogComponent,
     SubscriptionUpgradeDialogComponent,
+    UsersComponent,
     GroupsComponent,
     MasksComponent,
     SubscriptionsComponent,
@@ -59,8 +67,10 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     GetAllConnectionsGQL,
     MaskingsService,
     GetAllMaskingsGQL,
+    GetAllUserGroupsGQL,
     GetAllUsersGQL,
     SubscriptionService,
+    UsersService,
   ],
 })
 export class AdminModule {}

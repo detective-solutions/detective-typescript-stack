@@ -3,6 +3,7 @@
     "sidenavItems": {
       "connections": "Connections",
       "groups": "Groups",
+      "users": "Users",
       "masks": "Masks",
       "subscriptions": "Subscription"
     },

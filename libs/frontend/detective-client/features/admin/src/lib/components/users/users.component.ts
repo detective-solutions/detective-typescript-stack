@@ -4,17 +4,16 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { IGroupTableDef } from '../../models/groups-table.interface';
 import { UsersService } from '../../services';
-import { IGetAllUserGroupsResponse } from '../../models/get-all-user-groups-response.interface';
-import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { IUser } from '@detective.solutions/shared/data-access';
+import { IGetAllUsersResponse, IUserTableDef } from '../../models';
 
 @Component({
-  selector: 'groups',
-  templateUrl: './groups.component.html',
-  styleUrls: ['./groups.component.scss'],
+  selector: 'users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.scss'],
 })
-export class GroupsComponent implements OnDestroy, OnInit {
+export class UsersComponent implements OnDestroy, OnInit {
   readonly pageSize = 10;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
@@ -48,11 +47,11 @@ export class GroupsComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.userService.getAllUserGroups(this.initialPageOffset, this.pageSize).pipe(
-      map((userGroups: IGetAllUserGroupsResponse) => {
+    this.tableItems$ = this.userService.getAllUsers(this.initialPageOffset, this.pageSize).pipe(
+      map((users: IGetAllUsersResponse) => {
         return {
-          tableItems: this.transformToTableStructure(userGroups.userGroups),
-          totalElementsCount: userGroups.totalElementsCount,
+          tableItems: this.transformToTableStructure(users.users),
+          totalElementsCount: users.totalElementsCount,
         };
       })
     );
@@ -60,7 +59,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
       this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.userService.getAllUserGroupsNextPage(pageOffset, this.pageSize)
+        this.userService.getAllUsersNextPage(pageOffset, this.pageSize)
       )
     );
   }
@@ -70,43 +69,44 @@ export class GroupsComponent implements OnDestroy, OnInit {
   }
 
   // TODO: add translations when DET-927 is merged
-  private transformToTableStructure(originalMasking: IUserGroup[]): IGroupTableDef[] {
-    const tempTableItems = [] as IGroupTableDef[];
+  private transformToTableStructure(originalMasking: IUser[]): IUserTableDef[] {
+    const tempTableItems = [] as IUserTableDef[];
     this.translationService
       .selectTranslateObject(`${this.translationScope.scope}.masks.columnNames`)
       .pipe(take(1))
       .subscribe((translation: { [key: string]: string }) => {
-        originalMasking.forEach((groups: IUserGroup) => {
+        originalMasking.forEach((user: IUser) => {
           tempTableItems.push({
-            groupName: {
+            userName: {
               columnName: '',
               cellData: {
-                id: groups.xid,
+                id: user.id,
                 type: TableCellTypes.MULTI_TABLE_CELL,
-                name: groups.name,
-                description: groups.description,
+                name: String(user.firstname) + ' ' + String(user.lastname),
+                description: user.email,
+                thumbnail: user.avatarUrl ?? 'assets/images/mocks/avatars/no-image.png',
               },
             },
-            members: {
-              columnName: 'Members', // translation['lastUpdatedColumn'],
+            role: {
+              columnName: 'Role', // translation['lastUpdatedColumn'],
               cellData: {
-                id: groups.xid,
+                id: user.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(groups.members?.count),
+                text: String(user.role),
               },
             },
             lastUpdated: {
-              columnName: 'Last Updated By', // translation['lastUpdatedColumn'],
+              columnName: 'Last Updated', // translation['lastUpdatedColumn'],
               cellData: {
-                id: groups.xid,
+                id: user.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
-                date: String(groups.lastUpdated),
+                date: String(user.lastUpdated ?? '2022-01-01'),
               },
             },
             actions: {
               columnName: '',
               cellData: {
-                id: groups.xid,
+                id: user.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
                   { icon: 'edit', clickEventKey: '' }, //ConnectionsClickEvent.EDIT_CONNECTION },
@@ -114,7 +114,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
                 ],
               },
             },
-          } as IGroupTableDef);
+          } as IUserTableDef);
         });
       });
     return tempTableItems;

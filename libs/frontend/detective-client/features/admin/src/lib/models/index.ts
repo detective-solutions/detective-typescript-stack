@@ -19,3 +19,6 @@ export * from './subscription-table.interface';
 export * from './subscription-dialog-components.type';
 export * from './subscription-payment-response.interface';
 export * from './subscription-product-info-response.interface';
+export * from './get-all-user-groups-response.interface';
+export * from './groups-table.interface';
+export * from './users-table.interface';

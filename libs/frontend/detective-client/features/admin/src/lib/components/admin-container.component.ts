@@ -19,6 +19,12 @@ export class AdminContainerComponent {
       title: '',
     },
     {
+      icon: 'manage_accounts',
+      translationKey: 'admin.navigation.sidenavItems.users',
+      route: '/admin/users',
+      title: '',
+    },
+    {
       icon: 'groups',
       translationKey: 'admin.navigation.sidenavItems.groups',
       route: '/admin/groups',
