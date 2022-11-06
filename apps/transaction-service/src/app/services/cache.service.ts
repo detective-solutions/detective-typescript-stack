@@ -152,13 +152,13 @@ export class CacheService {
     userId: string,
     sizeUpdate: IWhiteboardNodeSizeUpdate
   ): Promise<boolean> {
-    this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
+    this.logger.log(`Updating size of whiteboard node in casefile "${casefileId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
-      return false;
-    }
+    // if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
+    //   return false;
+    // }
 
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === nodeId) {
@@ -170,7 +170,6 @@ export class CacheService {
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    // Only return position updates for nodes that are not blocked by other users
     return true;
   }
 
