@@ -30,7 +30,7 @@ export class D3AdapterService {
     return new ForceDirectedGraph(options);
   }
 
-  applyZoomBehavior(elementToZoomOn: Element, containerElement: Element) {
+  applyZoomBehavior(elementToZoomOn: Element, containerElement: SVGGraphicsElement) {
     const onZoom = (event: D3ZoomEvent<HTMLElement, any>) =>
       d3Select(containerElement).attr('transform', event.transform.toString());
 

@@ -33,9 +33,9 @@ export class WhiteboardFacadeService {
   readonly isDragging$ = this.dragService.isDragging$;
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
 
-  initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
+  initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: SVGGraphicsElement) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
-    this.d3AdapterService.setScreenCTM((zoomContainerElement as any).getScreenCTM());
+    this.d3AdapterService.setScreenCTM(zoomContainerElement.getScreenCTM());
     this.webSocketService.establishWebsocketConnection();
   }
 
