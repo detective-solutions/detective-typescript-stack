@@ -35,6 +35,7 @@ const testMessageBody = {
   width: 1,
   height: 1,
 };
+
 const testMessagePayload: IMessage<IWhiteboardNodeSizeUpdate> = {
   context: testMessageContext,
   body: testMessageBody,
