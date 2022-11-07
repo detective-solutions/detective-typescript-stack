@@ -1,11 +1,9 @@
 import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
-  ITable,
-  ITableWhiteboardNode,
+  IWhiteboardNodePositionUpdate,
   MessageEventType,
   UserRole,
-  WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
@@ -13,7 +11,6 @@ import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeMovedTransaction } from './whiteboard-node-moved.transaction';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
@@ -25,7 +22,7 @@ const updateNodePositionsMethodName = 'updateNodePositions';
 const cacheServiceMock = { [updateNodePositionsMethodName]: jest.fn() };
 
 const testMessageContext = {
-  eventType: MessageEventType.WhiteboardNodeAdded,
+  eventType: MessageEventType.WhiteboardNodeMoved,
   tenantId: uuidv4(),
   casefileId: uuidv4(),
   userId: uuidv4(),
@@ -37,49 +34,22 @@ const testMessageContext = {
 const testMessageBody = [
   {
     id: uuidv4(),
-    title: 'test1',
     x: 1,
     y: 1,
-    width: 1,
-    height: 1,
-    locked: false,
-    lastUpdatedBy: uuidv4(),
-    lastUpdated: formatDate(new Date()),
-    created: formatDate(new Date()),
-    entity: { id: uuidv4() } as ITable,
-    type: WhiteboardNodeType.TABLE,
   },
   {
     id: uuidv4(),
-    title: 'test2',
     x: 2,
     y: 2,
-    width: 2,
-    height: 2,
-    locked: true,
-    lastUpdatedBy: uuidv4(),
-    lastUpdated: formatDate(new Date()),
-    created: formatDate(new Date()),
-    entity: { id: uuidv4() } as ITable,
-    type: WhiteboardNodeType.TABLE,
   },
   {
     id: uuidv4(),
-    title: 'test3',
     x: 3,
     y: 3,
-    width: 3,
-    height: 3,
-    locked: false,
-    lastUpdatedBy: uuidv4(),
-    lastUpdated: formatDate(new Date()),
-    created: formatDate(new Date()),
-    entity: { id: uuidv4() } as ITable,
-    type: WhiteboardNodeType.TABLE,
   },
 ];
 
-const testMessagePayload: IMessage<ITableWhiteboardNode[]> = {
+const testMessagePayload: IMessage<IWhiteboardNodePositionUpdate[]> = {
   context: testMessageContext,
   body: testMessageBody,
 };
