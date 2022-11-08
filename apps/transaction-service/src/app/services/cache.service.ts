@@ -159,6 +159,7 @@ export class CacheService {
     if (
       cachedNodes.some((node: AnyWhiteboardNode) => node.id === updatedNodeId && node?.temporary?.blockedBy === userId)
     ) {
+      console.log('BLOCKED BY OTHER USER. CANCELLING RESIZE!');
       return false;
     }
 
@@ -168,6 +169,8 @@ export class CacheService {
         node.height = sizeUpdate.height;
       }
     });
+    console.log('CACHED NODES');
+    console.log(cachedNodes);
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
