@@ -16,6 +16,7 @@ import {
   IUserForWhiteboard,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodeSizeUpdate,
   MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
@@ -373,10 +374,37 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           });
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely({
-              updates: updates as Update<AnyWhiteboardNode>[],
+              updates: updates as Update<IWhiteboardNodePositionUpdate>[],
             })
           );
         })
+    );
+
+    // Listen to WHITEBOARD_NODE_RESIZED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeResized),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IWhiteboardNodeSizeUpdate>) =>
+          // Convert incoming message to ngRx Update type
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeResizedRemotely({
+              update: {
+                id: messageData.context.nodeId,
+                changes: messageData.body,
+              } as Update<IWhiteboardNodeSizeUpdate>,
+            })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_USER_JOINED websocket message event

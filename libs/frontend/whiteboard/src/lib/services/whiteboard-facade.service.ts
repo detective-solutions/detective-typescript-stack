@@ -35,7 +35,6 @@ export class WhiteboardFacadeService {
 
   initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: SVGGraphicsElement) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
-    this.d3AdapterService.setScreenCTM(zoomContainerElement.getScreenCTM());
     this.webSocketService.establishWebsocketConnection();
   }
 
@@ -77,11 +76,11 @@ export class WhiteboardFacadeService {
   }
 
   addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
-    this.bufferService.addToNodeUpdateBuffer(node);
+    this.bufferService.addToNodeResizeUpdateBuffer(node);
   }
 
   updateNodesFromBuffer() {
-    this.bufferService.updateNodesPositionFromBuffer();
+    this.bufferService.updateNodePositionsFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

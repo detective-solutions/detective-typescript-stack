@@ -18,13 +18,7 @@ export class D3AdapterService {
   private static NODE_RESIZE_MIN_WIDTH = 250;
   private static NODE_RESIZE_MIN_HEIGHT = 150;
 
-  screenCTM!: any;
-
   constructor(private readonly dragService: DragService, private readonly bufferService: BufferService) {}
-
-  setScreenCTM(screenCTM: any) {
-    this.screenCTM = screenCTM;
-  }
 
   getForceDirectedGraph(options: WhiteboardOptions) {
     return new ForceDirectedGraph(options);
@@ -112,8 +106,8 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          bufferServiceRef.addToNodeUpdateBuffer(nodeToUpdate);
-          bufferServiceRef.updateNodesPositionFromBuffer();
+          bufferServiceRef.addToNodePositionBuffer(nodeToUpdate);
+          bufferServiceRef.updateNodePositionsFromBuffer();
         }
       }
     }
@@ -124,21 +118,19 @@ export class D3AdapterService {
   }
 
   applyResizeBehavior(nodeToResize: AnyWhiteboardNode) {
-    if (!this.screenCTM) {
-      throw new Error('Could not get screen CTM for the SVG zoom group while transforming DOM to SVG coordinates');
-    }
-    const inverseScreenCTM = this.screenCTM.inverse();
     const bufferService = this.bufferService;
+    const dragService = this.dragService;
 
     function resize(event: D3DragEvent<SVGElement, any, SubjectPosition>) {
-      const convertedPoints = new DOMPoint(event.x, event.y).matrixTransform(inverseScreenCTM);
-      nodeToResize.width = Math.max(convertedPoints.x, D3AdapterService.NODE_RESIZE_MIN_WIDTH);
-      nodeToResize.height = Math.max(convertedPoints.y, D3AdapterService.NODE_RESIZE_MIN_HEIGHT);
-      bufferService.addToNodeUpdateBuffer(nodeToResize);
+      nodeToResize.width = Math.max(event.x, D3AdapterService.NODE_RESIZE_MIN_WIDTH);
+      nodeToResize.height = Math.max(event.y, D3AdapterService.NODE_RESIZE_MIN_HEIGHT);
+      dragService.isResizing = true;
     }
 
     function onResizeEnd() {
+      bufferService.addToNodeResizeUpdateBuffer(nodeToResize);
       bufferService.updateNodeSizeFromBuffer();
+      dragService.isResizing = false;
     }
 
     (d3SelectAll(`#drag-handle-${nodeToResize.id}`) as Selection<Element, any, any, any>).call(
