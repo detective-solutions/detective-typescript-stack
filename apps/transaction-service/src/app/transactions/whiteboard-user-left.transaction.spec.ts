@@ -71,7 +71,7 @@ describe('WhiteboardUserLeftTransaction', () => {
     expect(whiteboardUserLeftTransaction).toBeDefined();
   });
 
-  describe('execute', () => {
+  xdescribe('execute', () => {
     it('should correctly load casefile data from database if no cache exists', async () => {
       const removeActiveWhiteboardUserSpy = jest.spyOn(cacheService, removeActiveWhiteboardUserMethodName);
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
