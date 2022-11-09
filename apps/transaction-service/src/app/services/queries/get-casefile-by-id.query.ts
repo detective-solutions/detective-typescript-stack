@@ -53,7 +53,7 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
-      embeddings: Casefile.embeddings {
+      embeddings: Casefile.embeddings @normalize {
         id: Embedding.xid
         title: Embedding.title
         href: Embedding.href
@@ -62,10 +62,10 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        author: Embedding.author @normalize {
+        author: Embedding.author {
           User.xid
         }
-        lastUpdatedBy: Embedding.lastUpdatedBy @normalize {
+        lastUpdatedBy: Embedding.lastUpdatedBy {
           User.xid
         }
         lastUpdated: Embedding.lastUpdated
