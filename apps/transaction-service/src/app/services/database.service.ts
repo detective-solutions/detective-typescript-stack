@@ -258,9 +258,6 @@ export class DatabaseService {
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode,
     index: number
   ): Promise<Record<string, any> | null> {
-    // TODO: Remove me!
-    console.log('TEST');
-    console.log(embeddingWhiteboardNode);
     const uid = await this.getUidByType(embeddingWhiteboardNode.id, 'Embedding');
     const basicMutationJson = await this.createBasicNodeInsertMutation(embeddingWhiteboardNode);
     return {
