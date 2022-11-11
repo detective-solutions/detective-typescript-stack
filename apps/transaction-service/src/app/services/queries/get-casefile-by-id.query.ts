@@ -13,7 +13,7 @@ export const getCasefileByIdQuery = `
       id: Casefile.xid
       title: Casefile.title
       description: Casefile.description
-      tables: Casefile.tables {
+      tables: Casefile.tables @normalize {
         id: TableOccurrence.xid
         title: TableOccurrence.title
         x: TableOccurrence.x
@@ -21,8 +21,8 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        lastUpdatedBy: TableOccurrence.lastUpdatedBy @normalize {
-          User.xid
+        TableOccurrence.lastUpdatedBy @normalize {
+          lastUpdateBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
@@ -32,7 +32,7 @@ export const getCasefileByIdQuery = `
           description: Table.description
         }
       }
-      queries: Casefile.queries {
+      queries: Casefile.queries @normalize {
         id: UserQueryOccurrence.xid
         name: UserQueryOccurrence.name
         x: UserQueryOccurrence.x
@@ -41,10 +41,10 @@ export const getCasefileByIdQuery = `
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
         author: UserQueryOccurrence.author @normalize {
-          User.xid
+          author: User.xid
         }
-        lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy @normalize {
-          User.xid
+        UserQueryOccurrence.lastUpdatedBy @normalize {
+          lastUpdatedBy: User.xid
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
