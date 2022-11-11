@@ -182,7 +182,11 @@ export class CacheService {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
+    if (
+      !cachedNodes ||
+      cachedNodes.length === 0 ||
+      cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)
+    ) {
       return false;
     }
 
