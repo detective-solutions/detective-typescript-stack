@@ -3,6 +3,12 @@ import { Mutation, gql } from 'apollo-angular';
 
 import { Injectable } from '@angular/core';
 
+export interface IDeleteMaskingGQLResponse {
+  deleteMasking: {
+    message: string;
+  };
+}
+
 @Injectable()
 export class DeleteMaskingGQL extends Mutation<Response> {
   override document = gql`

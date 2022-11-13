@@ -16,58 +16,20 @@ import {
   IMaskSubTableDataDef,
   IMaskSubTableDataDropdown,
   IMaskSubTableDef,
-  MaskDelete,
-  TableColumns,
+  IMaskDeleteInput,
+  ITableColumns,
 } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConnectionsService, MaskingService } from '../../../services';
-import { IDropDownValues, IMasking, Mask } from '@detective.solutions/shared/data-access';
-import { ConnectionTable } from '@detective.solutions/frontend/shared/data-access';
+import { IDropDownValues, IMasking, IMask } from '@detective.solutions/shared/data-access';
+import { IConnectionTable } from '@detective.solutions/frontend/shared/data-access';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { ProviderScope, TranslocoService, TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { environment } from '@detective.solutions/frontend/shared/environments';
+import { ICreateNewMaskingGQLResponse, IUpdateMaskingGQLResponse } from '../../../graphql';
 
-const COLUMNS_SCHEMA = [
-  {
-    key: 'filterType',
-    type: 'select',
-    label: 'subTable.ColumnTitleFilter',
-  },
-  {
-    key: 'columnName',
-    type: 'select',
-    label: 'subTable.ColumnTitleColumn',
-  },
-  {
-    key: 'visible',
-    type: 'select',
-    label: 'subTable.ColumnTitleHide',
-  },
-  {
-    key: 'valueName',
-    type: 'text',
-    label: 'subTable.ColumnTitleValueName',
-  },
-  {
-    key: 'replaceType',
-    type: 'select',
-    label: 'subTable.ColumnTitleMethod',
-  },
-  {
-    key: 'customReplaceType',
-    type: 'text',
-    label: 'subTable.ColumnTitleCustomReplaceType',
-  },
-  {
-    key: 'isEdit',
-    type: 'isEdit',
-    label: 'subTable.ColumnTitleIsEdit',
-  },
-];
-
-/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
@@ -76,29 +38,52 @@ const COLUMNS_SCHEMA = [
   templateUrl: 'masking-add-edit-dialog.component.html',
 })
 export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestroy {
-  @ViewChild(COLUMNS_SCHEMA[0].key) input: string | undefined;
-
-  private static readonly connectorFormFieldName = 'connector';
-
-  private connector!: string;
-  private readonly subscriptions = new Subscription();
-  readonly defaultDropDownValues = [{ key: '', value: '' }];
-  readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.connectionsService.getAllConnections(
-    0,
-    500
-  );
-
-  ROW_MASK_NAME = 'row';
-  COLUMN_MASK_NAME = 'column';
-  BINARY_ANSWER = [
+  private static COLUMNS_SCHEMA = [
+    {
+      key: 'filterType',
+      type: 'select',
+      label: 'subTable.ColumnTitleFilter',
+    },
+    {
+      key: 'columnName',
+      type: 'select',
+      label: 'subTable.ColumnTitleColumn',
+    },
+    {
+      key: 'visible',
+      type: 'select',
+      label: 'subTable.ColumnTitleHide',
+    },
+    {
+      key: 'valueName',
+      type: 'text',
+      label: 'subTable.ColumnTitleValueName',
+    },
+    {
+      key: 'replaceType',
+      type: 'select',
+      label: 'subTable.ColumnTitleMethod',
+    },
+    {
+      key: 'customReplaceType',
+      type: 'text',
+      label: 'subTable.ColumnTitleCustomReplaceType',
+    },
+    {
+      key: 'isEdit',
+      type: 'isEdit',
+      label: 'subTable.ColumnTitleIsEdit',
+    },
+  ];
+  private static BINARY_ANSWER = [
     { key: 'subTable.true', value: 'true' },
     { key: 'subTable.false', value: 'false' },
   ];
-  FILTER_TYPES = [
-    { key: 'subTable.dimensionColumn', value: this.COLUMN_MASK_NAME },
-    { key: 'subTable.dimensionRow', value: this.ROW_MASK_NAME },
+  private static FILTER_TYPES = [
+    { key: 'subTable.dimensionColumn', value: MaskingService.COLUMN_MASK_NAME },
+    { key: 'subTable.dimensionRow', value: MaskingService.ROW_MASK_NAME },
   ];
-  MASK_METHODS = [
+  private static MASK_METHODS = [
     { value: 'full', key: 'subTable.maskingMethods.full' },
     { value: 'full email', key: 'subTable.maskingMethods.fullEmail' },
     { value: 'credit card', key: 'subTable.maskingMethods.creditCard' },
@@ -114,33 +99,36 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     { value: 'number', key: 'subTable.maskingMethods.number' },
     { value: 'custom', key: 'subTable.maskingMethods.custom' },
   ];
+  private static readonly connectorFormFieldName = 'connector';
 
+  @ViewChild(MaskingAddEditDialogComponent.COLUMNS_SCHEMA[0].key) input: string | undefined;
   isSubmitting = false;
   dataSource: IMaskSubTableDataDef[] = [];
   showSubmitButton = false;
   tableColumns$!: IDropDownValues[];
   selectedMasking$!: IMasking;
   isAddDialog = !this.dialogInputData?.xid;
-  masksToDelete: MaskDelete = { columns: [], rows: [] };
+  masksToDelete: IMaskDeleteInput = { columns: [], rows: [] };
+  readonly defaultDropDownValues = [{ key: '', value: '' }];
+  readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.connectionsService.getAllConnections(
+    0,
+    500
+  );
   userGroups$: IDropDownValues[] = this.defaultDropDownValues;
   connectorTables$: IDropDownValues[] = this.defaultDropDownValues;
-  displayedColumns: string[] = COLUMNS_SCHEMA.map((col) => col.key);
-  availableColumns$: TableColumns[] = [{ table: '', columns: [{ xid: '', columnName: '' }] }];
-
-  columnsSchema: IMaskSubTableDef[] = COLUMNS_SCHEMA;
+  displayedColumns: string[] = MaskingAddEditDialogComponent.COLUMNS_SCHEMA.map((col) => col.key);
+  availableColumns$: ITableColumns[] = [{ table: '', columns: [{ xid: '', columnName: '' }] }];
+  columnsSchema: IMaskSubTableDef[] = MaskingAddEditDialogComponent.COLUMNS_SCHEMA;
   dropDownValues: IMaskSubTableDataDropdown = {
     columnName: this.tableColumns$,
-    visible: this.BINARY_ANSWER,
-    filterType: this.FILTER_TYPES,
-    replaceType: this.MASK_METHODS,
+    visible: MaskingAddEditDialogComponent.BINARY_ANSWER,
+    filterType: MaskingAddEditDialogComponent.FILTER_TYPES,
+    replaceType: MaskingAddEditDialogComponent.MASK_METHODS,
   };
-
   readonly connectorTypeFormGroup = this.formBuilder.group({
     connector: MaskingAddEditDialogComponent.connectorFormFieldName,
   });
-
   existingFormFieldData$!: Observable<BaseFormField<string | boolean>[]>;
-
   readonly formFieldDefinitions$ = this.connectorTypeFormGroup
     .get(MaskingAddEditDialogComponent.connectorFormFieldName)
     ?.valueChanges.pipe(
@@ -150,12 +138,9 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         this.isSubmitting = true;
       }),
       delay(700),
-      map(() => {
-        return this.generateTableProperties();
-      }),
+      map(() => this.generateTableProperties()),
       pluck('properties'),
       map(this.getFormFieldByType),
-
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
       catchError((error) => {
@@ -163,6 +148,9 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         return EMPTY;
       })
     );
+
+  private connector!: string;
+  private readonly subscriptions = new Subscription();
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { xid: string },
@@ -180,11 +168,11 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
     );
 
-    this.maskingService.getAvailableUserGroups().subscribe((x) => {
-      this.userGroups$ = x;
+    this.maskingService.getAvailableUserGroups().subscribe((groups: IDropDownValues[]) => {
+      this.userGroups$ = groups;
     });
 
-    this.dynamicFormControlService.selectionChanged$.subscribe((event) => {
+    this.dynamicFormControlService.selectionChanged$.subscribe((event: IDropDownValues) => {
       if (event.key === 'table') {
         const xid: string = String(event.value) || '';
         this.updateAvailableColumns(xid);
@@ -198,13 +186,10 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         this.isSubmitting = true;
         this.dataSource = [];
         this.updateAvailableColumns(response.table.xid);
-
-        this.createMasksFromFetch(response.rows ?? [], this.ROW_MASK_NAME);
-        this.createMasksFromFetch(response.columns ?? [], this.COLUMN_MASK_NAME);
+        this.createMasksFromFetch(response.rows ?? [], MaskingService.ROW_MASK_NAME);
+        this.createMasksFromFetch(response.columns ?? [], MaskingService.COLUMN_MASK_NAME);
       }),
-      map(() => {
-        return this.generateTableProperties();
-      }),
+      map(() => this.generateTableProperties()),
       pluck('properties'),
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
@@ -224,9 +209,9 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   ngAfterViewChecked() {
     this.dropDownValues = {
       columnName: this.tableColumns$,
-      visible: this.BINARY_ANSWER,
-      filterType: this.FILTER_TYPES,
-      replaceType: this.MASK_METHODS,
+      visible: MaskingAddEditDialogComponent.BINARY_ANSWER,
+      filterType: MaskingAddEditDialogComponent.FILTER_TYPES,
+      replaceType: MaskingAddEditDialogComponent.MASK_METHODS,
     };
   }
 
@@ -343,10 +328,21 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         description: formGroup.value.description,
       };
 
-      this.maskingService.createMasksFromCurrentData({
-        masking: masking,
-        masks: this.dataSource,
-      });
+      this.maskingService
+        .createMasksFromCurrentData({
+          masking: masking,
+          masks: this.dataSource,
+        })
+        .pipe(
+          take(1),
+          catchError((error: Error) => {
+            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
+            return EMPTY;
+          })
+        )
+        .subscribe((response: ICreateNewMaskingGQLResponse) => {
+          this.handleResponse(response);
+        });
     } else if (formGroup.valid && this.isAddDialog === false) {
       const set = {
         masking: {
@@ -358,11 +354,21 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         toDelete: this.masksToDelete,
       };
 
-      this.isSubmitting = !this.maskingService.updateMasking(set);
+      this.maskingService
+        .updateMasking(set)
+        .pipe(
+          take(1),
+          catchError((error: Error) => {
+            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
+            return EMPTY;
+          })
+        )
+        .subscribe((response: IUpdateMaskingGQLResponse) => {
+          this.handleResponse(response);
+        });
     }
 
     this.dataSource = [];
-    this.dialogRef.close();
   }
 
   addRow() {
@@ -377,28 +383,28 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       isNew: true,
       isEdit: true,
     };
-    this.dataSource = [newRow, ...this.dataSource];
+    this.dataSource = [...this.dataSource, newRow];
   }
 
   removeRow(id: string) {
-    const maskToDelete = this.dataSource.filter((u) => u.id === id)[0];
+    const maskToDelete = this.dataSource.filter((mask) => mask.id === id)[0];
     if (!maskToDelete.isNew) {
       switch (maskToDelete.filterType) {
-        case this.COLUMN_MASK_NAME:
+        case MaskingService.COLUMN_MASK_NAME:
           this.masksToDelete.columns.push({ xid: maskToDelete.id });
           break;
-        case this.ROW_MASK_NAME:
+        case MaskingService.ROW_MASK_NAME:
           this.masksToDelete.rows.push({ xid: maskToDelete.id });
           break;
-        case '':
+        default:
           break;
       }
     }
-    this.dataSource = this.dataSource.filter((u) => u.id !== id);
+    this.dataSource = this.dataSource.filter((mask) => mask.id !== id);
   }
 
-  createMasksFromFetch(data: Mask[], maskType: string = this.ROW_MASK_NAME) {
-    data.forEach((mask: Mask) => {
+  createMasksFromFetch(data: IMask[], maskType: string = MaskingService.ROW_MASK_NAME) {
+    data.forEach((mask: IMask) => {
       this.dataSource.push({
         filterType: maskType,
         id: mask.xid ?? '',
@@ -415,7 +421,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   updateAvailableTables() {
     this.connectionsService.getTablesOfConnection(this.connector).subscribe((x) => {
       const tables: IDropDownValues[] = [];
-      x.connectedTables.forEach((data: ConnectionTable) => {
+      x.connectedTables.forEach((data: IConnectionTable) => {
         tables.push({ key: data.xid, value: data.name });
       });
       this.connectorTables$ = tables;
@@ -438,7 +444,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     return this.dropDownValues[dropDownKey];
   }
 
-  openMaskingDoc() {
+  openMaskingDocumentation() {
     window.open(`${environment.productDoc}${environment.productDocMasking}`, '_blank');
   }
 
@@ -509,16 +515,36 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     return formFields;
   }
 
+  private handleResponse(response: IUpdateMaskingGQLResponse | ICreateNewMaskingGQLResponse) {
+    this.isSubmitting = false;
+    if (!Object.keys(response).includes('error')) {
+      this.translationService
+        .selectTranslate('maskings.toastMessages.actionSuccessful', {}, this.translationScope)
+        .pipe(take(1))
+        .subscribe((translation: string) => {
+          this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
+          this.dialogRef.close();
+        });
+      this.maskingService.refreshMaskings();
+    } else {
+      this.logger.error('Masking could not be edited');
+      this.translationService
+        .selectTranslate('maskings.toastMessages.actionFailed', {}, this.translationScope)
+        .pipe(take(1))
+        .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+    }
+  }
+
   private handleError(errorType: DynamicFormError, error: Error) {
     let translationKey;
     this.logger.error(String(error));
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
-      translationKey = 'connections.toastMessages.formInitError';
+      translationKey = 'maskings.toastMessages.formInitError';
       this.logger.error('Encountered an error while fetching the form data');
     }
     if (errorType === DynamicFormError.FORM_SUBMIT_ERROR) {
       this.isSubmitting = false;
-      translationKey = 'connections.toastMessages.formSubmitError';
+      translationKey = 'maskings.toastMessages.formSubmitError';
       this.logger.error('Encountered an error while submitting the form data');
     }
 

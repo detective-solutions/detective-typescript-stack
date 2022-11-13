@@ -27,10 +27,10 @@ export class NavigationComponent {
   @Input()
   showSearchInput = true;
 
+  email!: string;
   searchValue = '';
   logoutErrorToastMessage!: string;
   logoutErrorToastAction!: string;
-
   showTableView$: Observable<boolean>;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
@@ -38,7 +38,6 @@ export class NavigationComponent {
   );
 
   private cdkOverlay: HTMLElement;
-  email!: string;
 
   constructor(
     private readonly authService: AuthService,

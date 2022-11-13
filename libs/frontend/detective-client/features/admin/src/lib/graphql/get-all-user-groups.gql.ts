@@ -1,10 +1,10 @@
 /* eslint-disable sort-imports */
 import { Query, gql } from 'apollo-angular';
 import { Injectable } from '@angular/core';
-import { DropDownValuesDTO } from '@detective.solutions/frontend/shared/data-access';
+import { IDropDownValues } from '@detective.solutions/shared/data-access';
 
 export interface IGetUserGroupsGQLResponse {
-  queryUserGroup: DropDownValuesDTO[];
+  queryUserGroup: IDropDownValues[];
 }
 
 @Injectable()

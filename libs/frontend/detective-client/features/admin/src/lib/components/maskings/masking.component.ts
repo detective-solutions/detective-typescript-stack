@@ -46,7 +46,6 @@ export class MaskingsComponent implements OnDestroy, OnInit {
 
   private readonly subscriptions = new Subscription();
   private readonly initialPageOffset = 0;
-
   private readonly dialogDefaultConfig = {
     width: '60%',
     minWidth: '400px',
@@ -137,7 +136,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
               cellData: {
                 id: maskings.xid,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.groups?.map((x) => x.name).join(', ')),
+                text: String(maskings.groups?.map((group) => group.name).join(', ')),
               },
             },
             lastUpdatedBy: {
@@ -145,7 +144,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
               cellData: {
                 id: maskings.xid,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.lastUpdatedBy?.firstname) + ' ' + String(maskings.lastUpdatedBy?.lastname),
+                text: `${maskings.lastUpdatedBy?.firstname} ${maskings.lastUpdatedBy?.lastname}`,
               },
             },
             lastUpdated: {

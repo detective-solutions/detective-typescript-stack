@@ -1,19 +1,18 @@
 <div class="invite-dialog-wrapper" *transloco="let t; read: 'navigation.inviteModal'">
-  <h1 mat-dialog-title align="center">{{ t('InviteDialogHeader') }}</h1>
+  <h1 mat-dialog-title align="center">{{ t('inviteDialogHeader') }}</h1>
   <div mat-dialog-content align="center">
-    <p>{{ t('InviteDialogText') }}</p>
+    <p>{{ t('inviteDialogText') }}</p>
   </div>
   <mat-form-field appearance="legacy">
     <mat-label>Email</mat-label>
     <input matInput [(ngModel)]="data.email" />
   </mat-form-field>
   <div mat-dialog-actions align="center">
-    <button mat-raised-button (click)="cancelInviteModal()">
-      {{ t('InviteCancelButtonText') }}
+    <button mat-raised-button (click)="closeModal()">
+      {{ t('inviteCancelButtonText') }}
     </button>
-    <button mat-raised-button color="accent" (click)="sendInvite(data.email)">
-      {{ t('InviteExecuteButtonText') }}
+    <button mat-raised-button color="accent" (click)="sendInvite({ email: data.email, username: 'detective' })">
+      {{ t('inviteExecuteButtonText') }}
     </button>
   </div>
 </div>
-<!-- <mat-progress-bar color="accent"></mat-progress-bar> -->

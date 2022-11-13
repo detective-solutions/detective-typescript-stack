@@ -98,6 +98,12 @@
           "custom": "Eigener Wert"
         }
       }
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Maskierungen konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Maskierungen konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
   "subscriptions": {

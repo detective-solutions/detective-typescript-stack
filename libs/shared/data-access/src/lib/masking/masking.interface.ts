@@ -1,8 +1,8 @@
 import { IUserWithXid } from '../user/user.interface';
-export interface UserGroupColumn {
+export interface IUserGroupColumn {
   name: string;
 }
-export interface Mask {
+export interface IMask {
   xid?: string;
   columnName?: string;
   valueName?: string;
@@ -28,8 +28,8 @@ export interface IMasking {
       name: string;
     };
   };
-  columns?: Mask[];
-  rows?: Mask[];
+  columns?: IMask[];
+  rows?: IMask[];
   groups?: { xid: string; name: string }[];
   author?: IUserWithXid;
   editors?: [IUserWithXid];

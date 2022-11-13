@@ -8,6 +8,7 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 import { environment } from '@detective.solutions/frontend/shared/environments';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
+import { ISendInviteInput } from '../../interfaces';
 
 export interface DialogData {
   email: string;
@@ -32,24 +33,23 @@ export class InviteDialogComponent {
     private readonly logger: LogService
   ) {}
 
-  cancelInviteModal() {
+  closeModal() {
     this.dialogRef.close();
   }
 
-  sendInvite(email: string, username: string = 'Theodor Test'): void {
+  sendInvite(inviteInput: ISendInviteInput): void {
     const token: string = this.authService.getAccessToken();
     const headers = new HttpHeaders().set('Authentication', token);
     headers.set('Access-Control-Allow-Origin', '*');
+
     this.httpClient
       .post<StatusResponse>(
-        'http://localhost:3004' + environment.provisioningApiPathV1 + environment.provisioningSendInviteV1,
-        { email: email, name: username },
+        `${environment.devApiHost}${environment.provisioningApiPathV1}${environment.provisioningSendInviteV1}`,
+        { email: inviteInput.email, name: inviteInput.username },
         { headers: headers }
       )
       .pipe(take(1))
-      .subscribe((subscriptionState: StatusResponse) => {
-        this.handleResponse('update subscription', subscriptionState);
-      });
+      .subscribe((subscriptionState: StatusResponse) => this.handleResponse('update subscription', subscriptionState));
     this.dialogRef.close();
   }
 

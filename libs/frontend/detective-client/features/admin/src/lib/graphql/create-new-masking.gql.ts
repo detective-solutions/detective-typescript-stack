@@ -2,6 +2,13 @@
 import { Mutation, gql } from 'apollo-angular';
 
 import { Injectable } from '@angular/core';
+import { IMasking } from '@detective.solutions/shared/data-access';
+
+export interface ICreateNewMaskingGQLResponse {
+  addMasking: {
+    masking: IMasking;
+  };
+}
 
 @Injectable()
 export class CreateNewMaskingGQL extends Mutation<Response> {

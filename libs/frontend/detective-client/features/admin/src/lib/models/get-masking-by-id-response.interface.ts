@@ -1,4 +1,4 @@
-import { ColumnMask, RowMask } from '@detective.solutions/shared/data-access';
+import { IMask } from '@detective.solutions/shared/data-access';
 
 export interface IGetMaskingByIdResponse {
   xid: string;
@@ -6,6 +6,6 @@ export interface IGetMaskingByIdResponse {
   description: string;
   groups: { xid: string; name: string }[];
   table: { xid: string; name: string };
-  columns?: ColumnMask[];
-  rows?: RowMask[];
+  columns?: IMask[];
+  rows?: IMask[];
 }

@@ -1,16 +1,16 @@
 import { IMaskSubTableDataDef } from './maskings-table.interface';
 
-export interface MaskDelete {
+export interface IMaskDeleteInput {
   columns: { xid: string }[];
   rows: { xid: string }[];
 }
 
-export interface MaskingUpdate {
+export interface IMaskingUpdateInput {
   masking: {
     xid: string;
     name: string;
     description: string;
   };
   masks: IMaskSubTableDataDef[];
-  toDelete: MaskDelete;
+  toDelete: IMaskDeleteInput;
 }

@@ -1,4 +1,4 @@
-import { IMasking, IUserWithXid, Mask } from '@detective.solutions/shared/data-access';
+import { IMask, IMasking, IUserWithXid } from '@detective.solutions/shared/data-access';
 
 export class MaskingDTO implements IMasking {
   constructor(
@@ -13,8 +13,8 @@ export class MaskingDTO implements IMasking {
         name: string;
       };
     },
-    public columns?: Mask[],
-    public rows?: Mask[],
+    public columns?: IMask[],
+    public rows?: IMask[],
     public groups?: {
       xid: string;
       name: string;

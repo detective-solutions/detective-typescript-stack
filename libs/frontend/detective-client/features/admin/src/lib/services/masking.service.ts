@@ -3,16 +3,23 @@ import {
   DeleteMaskingGQL,
   DeleteRowMaskGQL,
   GetAllMaskingsGQL,
+  ICreateNewMaskingGQLResponse,
+  IDeleteMaskingGQLResponse,
   IGetAllMaskingsGQLResponse,
+  IUpdateMaskingGQLResponse,
   UpdateMaskingGQL,
 } from '../graphql';
-import { DropDownValuesDTO, MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { GetAllUserGroupsGQL, IGetUserGroupsGQLResponse } from '../graphql/get-all-user-groups.gql';
 import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-masking-by-id.gql';
-import { IDropDownValues, IJwtTokenPayload, IMasking, Mask } from '@detective.solutions/shared/data-access';
-import { IGetAllMaskingsResponse, IMaskSubTableDataDef, MaskingCreate, MaskingDelete, MaskingUpdate } from '../models';
+import { IDropDownValues, IJwtTokenPayload, IMask, IMasking } from '@detective.solutions/shared/data-access';
+import {
+  IGetAllMaskingsResponse,
+  IMaskSubTableDataDef,
+  IMaskingCreateInput,
+  IMaskingDeleteInput,
+  IMaskingUpdateInput,
+} from '../models';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
-import { MutationResult, QueryRef } from 'apollo-angular';
 import { Observable, catchError, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
@@ -20,6 +27,8 @@ import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
 import { GetAllColumnsGQL } from '../graphql/get-all-columns-by-table-id.gql';
 import { IGetAllColumnsResponse } from '../models/get-all-columns-by-table-id-response.interface';
 import { Injectable } from '@angular/core';
+import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
+import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,13 +37,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MaskingService {
+  public static ROW_MASK_NAME = 'row';
+  public static COLUMN_MASK_NAME = 'column';
+
   private getMaskingByIdWatchQuery!: QueryRef<Response>;
   private getAllMaskingWatchQuery!: QueryRef<Response>;
   private getUserGroupsWatchQuery!: QueryRef<Response>;
   private getColumnsByTableIdWatchQuery!: QueryRef<Response>;
-
-  ROW_MASK_NAME = 'row';
-  COLUMN_MASK_NAME = 'column';
 
   constructor(
     private readonly getMaskingByIdGQL: GetMaskingByIdGQL,
@@ -66,7 +75,7 @@ export class MaskingService {
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
-        { pollInterval: 10000 }
+        { pollInterval: 1000 }
       );
     }
 
@@ -95,17 +104,15 @@ export class MaskingService {
       this.getUserGroupsWatchQuery = this.getUserGroupsGQL.watch(
         {
           paginationOffset: 0,
-          pageSize: 10000,
+          pageSize: 1000,
         },
-        { pollInterval: 10000 }
+        { pollInterval: 1000 }
       );
     }
 
     return this.getUserGroupsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
-      map((response: IGetUserGroupsGQLResponse) => {
-        return response.queryUserGroup.map(DropDownValuesDTO.Build);
-      }),
+      map((response: IGetUserGroupsGQLResponse) => response.queryUserGroup),
       catchError((error) => this.handleError(error))
     );
   }
@@ -130,17 +137,12 @@ export class MaskingService {
   }
 
   getBooleanFromString(stringBool: string): boolean {
-    if (stringBool == 'true') {
-      return true;
-    } else {
-      return false;
-    }
+    return stringBool === 'true' ? true : false;
   }
 
   getMaskAuthor(): string {
-    const stringToken: string = this.authService.getAccessToken();
-    const objectToken: IJwtTokenPayload = jwtDecode(stringToken);
-    return objectToken.sub;
+    const accessTokenPayload = jwtDecode(this.authService.getAccessToken()) as IJwtTokenPayload;
+    return accessTokenPayload.sub;
   }
 
   getRowMaskObject(mask: any, user: string, date: string) {
@@ -154,8 +156,6 @@ export class MaskingService {
       author: { xid: user },
       lastUpdatedBy: { xid: user },
       lastUpdated: date,
-
-      // TODO: check if required
       created: date,
     };
   }
@@ -173,23 +173,22 @@ export class MaskingService {
     };
   }
 
-  updateMasking(update: MaskingUpdate): boolean {
-    let isDone = false;
+  updateMasking(update: IMaskingUpdateInput): Observable<IUpdateMaskingGQLResponse> {
     const user = this.getMaskAuthor();
     const date = new Date().toISOString();
 
-    const filteredColumns = update.masks.filter((u) => u.filterType === this.COLUMN_MASK_NAME);
-    const filteredRows = update.masks.filter((u) => u.filterType === this.ROW_MASK_NAME);
+    const filteredColumns = update.masks.filter((mask) => mask.filterType === MaskingService.COLUMN_MASK_NAME);
+    const filteredRows = update.masks.filter((mask) => mask.filterType === MaskingService.ROW_MASK_NAME);
 
-    const columns = filteredColumns.map((x: any) => {
-      return this.getColumnMaskObject(x, user, date);
+    const columns = filteredColumns.map((mask: IMask) => {
+      return this.getColumnMaskObject(mask, user, date);
     });
 
-    const rows = filteredRows.map((x: any) => {
-      return this.getRowMaskObject(x, user, date);
+    const rows = filteredRows.map((mask: IMask) => {
+      return this.getRowMaskObject(mask, user, date);
     });
 
-    this.updateMaskingGQL
+    return this.updateMaskingGQL
       .mutate(
         {
           patch: {
@@ -221,68 +220,77 @@ export class MaskingService {
           ],
         }
       )
-      .subscribe(() => {
-        const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.xid);
-        this.deleteColumnOrRowMask(columnMaskIDToDelete, this.COLUMN_MASK_NAME);
+      .pipe(
+        map((response: any) => response.data),
+        map((response: IUpdateMaskingGQLResponse) => {
+          if (!Object.keys(response).includes('error')) {
+            const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.xid);
+            this.deleteColumnOrRowMask(columnMaskIDToDelete, MaskingService.COLUMN_MASK_NAME);
 
-        const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.xid);
-        this.deleteColumnOrRowMask(rowMaskIDToDelete, this.ROW_MASK_NAME);
-
-        isDone = true;
-      });
-
-    return isDone;
+            const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.xid);
+            this.deleteColumnOrRowMask(rowMaskIDToDelete, MaskingService.ROW_MASK_NAME);
+          }
+          return response;
+        })
+      );
   }
 
-  deleteColumnOrRowMask(toDelete: string[], maskType: string = this.COLUMN_MASK_NAME) {
+  deleteColumnOrRowMask(MasksToDelete: string[], maskType: string = MaskingService.COLUMN_MASK_NAME) {
     const filter = {
       filter: {
         xid: {
-          in: toDelete,
+          in: MasksToDelete,
         },
       },
     };
 
-    if (toDelete.length > 0) {
+    if (MasksToDelete.length > 0) {
       switch (maskType) {
-        case this.COLUMN_MASK_NAME:
+        case MaskingService.COLUMN_MASK_NAME:
           this.deleteColumnMaskGQL.mutate(filter);
           break;
-        case this.ROW_MASK_NAME:
+        case MaskingService.ROW_MASK_NAME:
           this.deleteRowMaskGQL.mutate(filter);
           break;
-        case '':
+        default:
           break;
       }
     }
   }
 
-  deleteMasking(set: MaskingDelete): Observable<MutationResult<Response>> {
-    this.deleteColumnOrRowMask(set.rows, this.ROW_MASK_NAME);
-    this.deleteColumnOrRowMask(set.columns, this.COLUMN_MASK_NAME);
-
-    return this.deleteMaskingGQL.mutate({
-      filter: {
-        xid: {
-          eq: set.masking,
+  deleteMasking(set: IMaskingDeleteInput): Observable<IDeleteMaskingGQLResponse> {
+    return this.deleteMaskingGQL
+      .mutate({
+        filter: {
+          xid: {
+            eq: set.masking,
+          },
         },
-      },
-    });
+      })
+      .pipe(
+        map((response: any) => response.data),
+        map((response: IDeleteMaskingGQLResponse) => {
+          if (!Object.keys(response).includes('error')) {
+            this.deleteColumnOrRowMask(set.rows, MaskingService.ROW_MASK_NAME);
+            this.deleteColumnOrRowMask(set.columns, MaskingService.COLUMN_MASK_NAME);
+          }
+          return response;
+        })
+      );
   }
 
-  createMasksFromCurrentData(payload: MaskingCreate): boolean {
-    let isDone = false;
-    const columnMasks: Mask[] = [];
-    const rowMasks: Mask[] = [];
+  createMasksFromCurrentData(payload: IMaskingCreateInput): Observable<ICreateNewMaskingGQLResponse> {
+    const columnMasks: IMask[] = [];
+    const rowMasks: IMask[] = [];
     const user = this.getMaskAuthor();
     const date = new Date().toISOString();
 
     payload.masks.forEach((obj: IMaskSubTableDataDef) => {
       switch (obj.filterType) {
-        case this.ROW_MASK_NAME:
+        case MaskingService.ROW_MASK_NAME:
           rowMasks.push(this.getRowMaskObject(obj, user, date));
           break;
-        case this.COLUMN_MASK_NAME:
+        case MaskingService.COLUMN_MASK_NAME:
           columnMasks.push(this.getColumnMaskObject(obj, user, date));
           break;
         case '':
@@ -301,13 +309,14 @@ export class MaskingService {
     masking.columns = columnMasks;
     masking.rows = rowMasks;
 
-    this.createNewMaskingGQL
+    return this.createNewMaskingGQL
       .mutate({
         masking: masking,
       })
-      .subscribe(() => (isDone = true));
-
-    return isDone;
+      .pipe(
+        map((response: any) => response.data),
+        map((response: ICreateNewMaskingGQLResponse) => response)
+      );
   }
 
   private handleError(error: string) {

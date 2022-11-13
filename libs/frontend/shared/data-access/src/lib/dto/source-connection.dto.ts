@@ -86,7 +86,7 @@ export class SourceConnectionDTO implements ISourceConnection {
   }
 }
 
-export interface ConnectionTable {
+export interface IConnectionTable {
   xid: string;
   name: string;
   columns: {
@@ -96,13 +96,5 @@ export interface ConnectionTable {
 }
 
 export interface ISourceConnectionTables {
-  connectedTables: ConnectionTable[];
-}
-
-export class SourceConnectionTableDTO implements ISourceConnectionTables {
-  constructor(public connectedTables: ConnectionTable[]) {}
-
-  static Build(tables: ISourceConnectionTables) {
-    return new SourceConnectionTableDTO(tables.connectedTables);
-  }
+  connectedTables: IConnectionTable[];
 }

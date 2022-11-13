@@ -12,7 +12,7 @@ export * from './get-connection-by-id-response.interface';
 export * from './get-all-maskings-response.interface';
 export * from './get-all-users-response.interface';
 export * from './get-all-user-groups-response.interface';
-export * from './create-masking.interface';
+export * from './masking-create.interface';
 export * from './delete-masking-response.interface';
 export * from './maskings-table.interface';
 export * from './masking-delete.interface';

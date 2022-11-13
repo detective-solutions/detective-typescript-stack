@@ -1,7 +1,7 @@
+import { IMask } from '@detective.solutions/shared/data-access';
 import { IMaskSubTableDataDef } from './maskings-table.interface';
-import { Mask } from '@detective.solutions/shared/data-access';
 
-export interface MaskingCreate {
+export interface IMaskingCreateInput {
   masking: {
     table: { xid: string };
     groups: { xid: string }[];
@@ -12,8 +12,8 @@ export interface MaskingCreate {
     lastUpdated?: string;
     lastUpdatedBy?: { xid: string };
     created?: string;
-    columns?: Mask[];
-    rows?: Mask[];
+    columns?: IMask[];
+    rows?: IMask[];
   };
   masks: IMaskSubTableDataDef[];
 }

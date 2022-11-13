@@ -98,6 +98,12 @@
           "custom": "Custom value"
         }
       }
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch masking data. Please contact support",
+      "formSubmitError": "Could not submit masking data. Please contact support"
     }
   },
   "subscriptions": {

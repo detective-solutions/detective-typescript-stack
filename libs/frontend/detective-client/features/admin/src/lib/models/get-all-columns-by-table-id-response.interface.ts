@@ -1,5 +1,5 @@
-import { ColumnDTO } from '@detective.solutions/frontend/shared/data-access';
+import { IColumn } from '@detective.solutions/shared/data-access';
 
 export interface IGetAllColumnsResponse {
-  queryColumnDefinition: ColumnDTO[];
+  queryColumnDefinition: IColumn[];
 }
