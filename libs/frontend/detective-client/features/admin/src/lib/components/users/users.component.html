@@ -1,9 +1,14 @@
-<div class="user-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.masks'">
-  <div class="add-group-button-wrapper">
-    <button mat-stroked-button>
-      <mat-icon>add</mat-icon>
-      {{ t('addMaskingButtonText') }}
-    </button>
+<div class="user-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.users'">
+  <div class="user-limit-wrapper">
+    <!--<p>{{ activeUsers$ | async }} {{ t('of') }} {{ productInfo.userLimit }} {{ t('users') }}</p>
+    <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}"></mat-progress-bar> -->
+    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+      <p>
+        {{ activeUsers$ | async }} {{ t('utils.of') }} {{ (this.productInfo$ | async)?.userLimit }}
+        {{ t('utils.users') }}
+      </p>
+      <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}" id="user-limit"></mat-progress-bar>
+    </div>
   </div>
   <table-view
     [tableRows$]="tableItems$"

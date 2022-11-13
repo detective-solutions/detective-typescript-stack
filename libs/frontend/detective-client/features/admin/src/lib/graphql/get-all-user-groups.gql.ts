@@ -17,7 +17,7 @@ export class GetAllUserGroupsGQL extends Query<Response> {
         xid
         name
         description
-        members: membersAggregate {
+        memberCount: membersAggregate {
           count
         }
         lastUpdated

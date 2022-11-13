@@ -34,6 +34,65 @@
       "formSubmitError": "Could not submit connection data. Please contact support"
     }
   },
+  "users": {
+    "columnNames": {
+      "roleColumn": "Role",
+      "lastUpdatedColumn": "Last Updated"
+    },
+    "editDialog": {
+      "editDialogHeader": "Edit user",
+      "saveButtonText": "Save"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Remove user",
+      "deleteDialogTextStart": "You are about to remove",
+      "deleteDialogTextHighlight": "{{userName}}",
+      "deleteDialogTextEnd": "from detective.",
+      "deleteButtonText": "Yes I want to remove this user"
+    },
+    "utils": {
+      "of": "of",
+      "users": "Users"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch user data. Please contact support",
+      "formSubmitError": "Could not submit user data. Please contact support"
+    }
+  },
+  "groups": {
+    "addGroupButtonText": "New Group",
+    "columnNames": {
+      "memberCountColumn": "Group members",
+      "lastUpdatedColumn": "Last updated"
+    },
+    "addEditDialog": {
+      "addUserLabel": "Add Person",
+      "addDialogHeader": "Add group",
+      "editDialogHeader": "Edit group",
+      "saveButtonText": "Save",
+      "optionalFieldsPanelName": "Advanced settings",
+      "subTable": {
+        "username": "Members",
+        "id": " ",
+        "displayNameTitle": "Name",
+        "displayNameDescription": "Description",
+        "RemoveUserButton": "Remove"
+      }
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Remove Group",
+      "deleteDialogText": "You are about to delete {{groupName}} and the following maskings.",
+      "deleteButtonText": "Yes I want to remove this user group and its related maskings"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch group data. Please contact support",
+      "formSubmitError": "Could not submit group data. Please contact support"
+    }
+  },
   "masks": {
     "addMaskingButtonText": "New Masking",
     "columnNames": {

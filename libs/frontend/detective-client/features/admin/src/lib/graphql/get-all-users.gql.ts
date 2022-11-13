@@ -15,7 +15,7 @@ export class GetAllUsersGQL extends Query<Response> {
   override document = gql`
     query User($paginationOffset: Int, $pageSize: Int) {
       queryUser(offset: $paginationOffset, first: $pageSize, order: { asc: firstname }) {
-        xid
+        id: xid
         email
         tenants {
           xid

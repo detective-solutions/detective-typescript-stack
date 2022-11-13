@@ -8,14 +8,23 @@ import {
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
 import { ConnectionsService, MaskingsService, SubscriptionService, UsersService } from './services';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
+  CreateUserGroupGQL,
+  DeleteUserGQL,
+  DeleteUserGroupGQL,
   GetAllConnectionsGQL,
   GetAllMaskingsGQL,
   GetAllUserGroupsGQL,
   GetAllUsersGQL,
   GetConnectionByIdGQL,
+  GetMaskingByUserGroupIdGQL,
+  GetUserByIdGQL,
+  GetUserGroupByIdGQL,
+  UpdateUserGroupGQL,
+  UpdateUserRoleGQL,
 } from './graphql';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/groups/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
   SubscriptionCancelDialogComponent,
@@ -28,6 +37,8 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { CommonModule } from '@angular/common';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { NgModule } from '@angular/core';
+import { UserEditDialogComponent } from './components/users/dialog/users-edit-dialog.component';
+import { UsersDeleteDialogComponent } from './components/users/dialog';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
@@ -39,7 +50,11 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     SubscriptionCancelDialogComponent,
     SubscriptionUpgradeDialogComponent,
     UsersComponent,
+    UsersDeleteDialogComponent,
+    UserEditDialogComponent,
     GroupsComponent,
+    GroupsDeleteComponent,
+    GroupsAddEditDialogComponent,
     MasksComponent,
     SubscriptionsComponent,
   ],
@@ -67,10 +82,18 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     GetAllConnectionsGQL,
     MaskingsService,
     GetAllMaskingsGQL,
+    DeleteUserGQL,
+    DeleteUserGroupGQL,
+    UpdateUserGroupGQL,
+    CreateUserGroupGQL,
     GetAllUserGroupsGQL,
     GetAllUsersGQL,
+    GetUserByIdGQL,
+    UpdateUserRoleGQL,
     SubscriptionService,
     UsersService,
+    GetUserGroupByIdGQL,
+    GetMaskingByUserGroupIdGQL,
   ],
 })
 export class AdminModule {}

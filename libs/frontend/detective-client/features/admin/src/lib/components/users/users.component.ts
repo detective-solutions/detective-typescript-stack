@@ -1,12 +1,21 @@
 /* eslint-disable sort-imports */
-import { ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
+import {
+  ITableCellEvent,
+  ITableInput,
+  TableCellEventService,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
+import { Observable, Subject, Subscription, map, shareReplay, take, filter, combineLatest } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { UsersService } from '../../services';
+import { SubscriptionService, UsersService } from '../../services';
 import { IUser } from '@detective.solutions/shared/data-access';
-import { IGetAllUsersResponse, IUserTableDef } from '../../models';
+import { IGetAllUsersResponse, IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { UsersDeleteDialogComponent } from './dialog';
+import { ComponentType } from '@angular/cdk/portal';
+import { UserEditDialogComponent } from './dialog/users-edit-dialog.component';
 
 @Component({
   selector: 'users',
@@ -17,6 +26,20 @@ export class UsersComponent implements OnDestroy, OnInit {
   readonly pageSize = 10;
   readonly fetchMoreDataByOffset$ = new Subject<number>();
 
+  readonly deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === UsersClickEvent.DELETE_USER),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
+
+  readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === UsersClickEvent.EDIT_USER),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
+
+  readonly activeUsers$: Observable<number> = this.subscriptionService
+    .getAllUsers()
+    .pipe(map((response: IGetAllUsersResponse) => response.totalElementsCount));
+
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
@@ -26,22 +49,23 @@ export class UsersComponent implements OnDestroy, OnInit {
 
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
+  productInfo$!: Observable<{ userLimit: number }>;
+  userRatio$!: Observable<number>;
 
   private readonly subscriptions = new Subscription();
   private readonly initialPageOffset = 0;
 
-  // TODO: use again when masking modal is configured
-  // private readonly dialogDefaultConfig = {
-  //   width: '650px',
-  //   minWidth: '400px',
-  // };
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
     private readonly userService: UsersService,
-    // TODO: use again when masking modal is configured
-    // private readonly tableCellEventService: TableCellEventService,
-    // private readonly matDialog: MatDialog,
+    private readonly subscriptionService: SubscriptionService,
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly matDialog: MatDialog,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
@@ -62,20 +86,59 @@ export class UsersComponent implements OnDestroy, OnInit {
         this.userService.getAllUsersNextPage(pageOffset, this.pageSize)
       )
     );
+
+    this.subscriptions.add(
+      this.deleteButtonClicks$.subscribe((userId: string) =>
+        this.openUserDialog(UsersDeleteDialogComponent, {
+          data: { id: userId },
+          width: '500px',
+        })
+      )
+    );
+
+    this.subscriptions.add(
+      this.editButtonClicks$.subscribe((userId: string) =>
+        this.openUserDialog(UserEditDialogComponent, {
+          data: { id: userId },
+          width: '500px',
+        })
+      )
+    );
+
+    this.productInfo$ = this.subscriptionService.getProductDescription().pipe(
+      map((product: { userLimit: number }) => {
+        return {
+          userLimit: product.userLimit || 0,
+        };
+      })
+    );
+
+    this.userRatio$ = combineLatest(
+      [this.activeUsers$, this.productInfo$],
+      (active: number, limit: { userLimit: number }) => {
+        return (active / limit.userLimit) * 100;
+      }
+    );
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
 
-  // TODO: add translations when DET-927 is merged
-  private transformToTableStructure(originalMasking: IUser[]): IUserTableDef[] {
+  openUserDialog(componentToOpen?: ComponentType<UsersDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? UserEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
+  }
+
+  private transformToTableStructure(originalUsers: IUser[]): IUserTableDef[] {
     const tempTableItems = [] as IUserTableDef[];
     this.translationService
-      .selectTranslateObject(`${this.translationScope.scope}.masks.columnNames`)
+      .selectTranslateObject(`${this.translationScope.scope}.users.columnNames`)
       .pipe(take(1))
       .subscribe((translation: { [key: string]: string }) => {
-        originalMasking.forEach((user: IUser) => {
+        originalUsers.forEach((user: IUser) => {
           tempTableItems.push({
             userName: {
               columnName: '',
@@ -83,12 +146,12 @@ export class UsersComponent implements OnDestroy, OnInit {
                 id: user.id,
                 type: TableCellTypes.MULTI_TABLE_CELL,
                 name: String(user.firstname) + ' ' + String(user.lastname),
-                description: user.email,
+                description: String(user.email),
                 thumbnail: user.avatarUrl ?? 'assets/images/mocks/avatars/no-image.png',
               },
             },
             role: {
-              columnName: 'Role', // translation['lastUpdatedColumn'],
+              columnName: translation['roleColumn'],
               cellData: {
                 id: user.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
@@ -96,7 +159,7 @@ export class UsersComponent implements OnDestroy, OnInit {
               },
             },
             lastUpdated: {
-              columnName: 'Last Updated', // translation['lastUpdatedColumn'],
+              columnName: translation['lastUpdatedColumn'],
               cellData: {
                 id: user.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
@@ -109,8 +172,8 @@ export class UsersComponent implements OnDestroy, OnInit {
                 id: user.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
-                  { icon: 'edit', clickEventKey: '' }, //ConnectionsClickEvent.EDIT_CONNECTION },
-                  { icon: 'delete', clickEventKey: '' }, // ConnectionsClickEvent.DELETE_CONNECTION },
+                  { icon: 'edit', clickEventKey: UsersClickEvent.EDIT_USER },
+                  { icon: 'delete', clickEventKey: UsersClickEvent.DELETE_USER },
                 ],
               },
             },

@@ -34,6 +34,66 @@
       "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
+  "users": {
+    "columnNames": {
+      "roleColumn": "Rolle",
+      "lastUpdatedColumn": "Zuletzt aktualisiert"
+    },
+    "editDialog": {
+      "editDialogHeader": "Nutzer bearbeiten",
+      "saveButtonText": "Speichern"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Person entfernen",
+      "deleteButtonText": "Ich möchte diese Person entfernen",
+      "deleteDialogTextStart": "Sie sind dabei",
+      "deleteDialogTextHighlight": "{{userName}}",
+      "deleteDialogTextEnd": "aus detective zu entfernen.",
+      "deleteButtonText": "Yes I want to remove this user"
+    },
+    "utils": {
+      "of": "von",
+      "users": "Nutzern"
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Nutzer konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Nutzer konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
+    }
+  },
+  "groups": {
+    "addGroupButtonText": "Neue Gruppe",
+    "columnNames": {
+      "memberCountColumn": "Anzahl der Gruppenmitglieder",
+      "lastUpdatedColumn": "Zuletzt aktualisiert"
+    },
+    "addEditDialog": {
+      "addUserLabel": "Person hinzufügen",
+      "addDialogHeader": "Neue Gruppe anlegen",
+      "editDialogHeader": "Gruppe bearbeiten",
+      "saveButtonText": "Speichern",
+      "optionalFieldsPanelName": "Erweiterte Einstellungen",
+      "subTable": {
+        "username": "Gruppenmitglied",
+        "id": " ",
+        "displayNameTitle": "Name",
+        "displayNameDescription": "Beschreibung",
+        "RemoveUserButton": "Entfernen"
+      }
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Gruppe entfernen",
+      "deleteButtonText": "Ich möchte diese Gruppe und alle damit verbundenen Maskierungen entfernen",
+      "deleteDialogText": "Sie sind dabei die Gruppe {{groupName}} und die folgenden Maskierungen zu entfernen."
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Gruppendaten konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Gruppendaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
+    }
+  },
   "masks": {
     "addMaskingButtonText": "Neue Maskierung anlegen",
     "columnNames": {

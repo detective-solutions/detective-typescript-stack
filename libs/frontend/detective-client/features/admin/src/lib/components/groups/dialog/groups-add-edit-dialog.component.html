@@ -1,0 +1,76 @@
+<div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.groups.addEditDialog'">
+  <h1 mat-dialog-title *ngIf="isAddDialog">{{ t('addDialogHeader') }}</h1>
+  <h1 mat-dialog-title *ngIf="!isAddDialog">{{ t('editDialogHeader') }}</h1>
+
+  <div *ngIf="isAddDialog; else editDialog" mat-dialog-content>
+    <ng-container *ngIf="newFormFiledData$ as formFieldDefinitions">
+      <dynamic-form
+        [formFieldDefinitions]="formFieldDefinitions"
+        [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
+      ></dynamic-form>
+    </ng-container>
+  </div>
+  <ng-template #editDialog>
+    <div mat-dialog-content>
+      <ng-container *ngIf="existingFormFieldData$ | async as formFieldDefinitions">
+        <dynamic-form
+          [formFieldDefinitions]="formFieldDefinitions"
+          [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
+        ></dynamic-form>
+      </ng-container>
+    </div>
+  </ng-template>
+  <mat-form-field class="add-member-input" appearance="outline">
+    <mat-icon matPrefix>person_add</mat-icon>
+    <input
+      type="text"
+      placeholder="Name"
+      aria-label="Number"
+      matInput
+      [formControl]="searchBox"
+      [matAutocomplete]="auto"
+    />
+    <mat-label>{{ t('addUserLabel') }}</mat-label>
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayNull">
+      <mat-option
+        class="auto-complete-option"
+        *ngFor="let option of this.filteredOptions | async"
+        (click)="addRow(option.xid, option.name)"
+      >
+        {{ option.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="dataSource">
+      <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ t(col.label) }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <div [ngSwitch]="col.type">
+            <ng-container *ngSwitchCase="'isEdit'">
+              <div class="btn-edit">
+                <button mat-button class="button-remove" (click)="removeRow(element.id)">
+                  {{ t('subTable.RemoveUserButton') }}
+                </button>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'text'">
+              <span>
+                {{ element[col.key] }}
+              </span>
+            </ng-container>
+            <span *ngSwitchDefault> </span>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

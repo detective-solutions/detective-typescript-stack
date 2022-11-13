@@ -1,13 +1,22 @@
 /* eslint-disable sort-imports */
-import { ITableInput, TableCellTypes } from '@detective.solutions/frontend/detective-client/ui';
+import {
+  ITableCellEvent,
+  ITableInput,
+  TableCellEventService,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, map, shareReplay, take } from 'rxjs';
+import { Observable, Subject, Subscription, map, shareReplay, take, filter } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IGroupTableDef } from '../../models/groups-table.interface';
 import { UsersService } from '../../services';
 import { IGetAllUserGroupsResponse } from '../../models/get-all-user-groups-response.interface';
 import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { GroupsClickEvent, GroupsDialogComponent } from '../../models';
+import { ComponentType } from '@angular/cdk/portal';
 
 @Component({
   selector: 'groups',
@@ -31,18 +40,26 @@ export class GroupsComponent implements OnDestroy, OnInit {
   private readonly subscriptions = new Subscription();
   private readonly initialPageOffset = 0;
 
-  // TODO: use again when masking modal is configured
-  // private readonly dialogDefaultConfig = {
-  //   width: '650px',
-  //   minWidth: '400px',
-  // };
+  private readonly dialogDefaultConfig = {
+    width: '650px',
+    minWidth: '400px',
+  };
+
+  readonly deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === GroupsClickEvent.DELETE_GROUP),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
+
+  readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === GroupsClickEvent.EDIT_GROUP),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
     private readonly userService: UsersService,
-    // TODO: use again when masking modal is configured
-    // private readonly tableCellEventService: TableCellEventService,
-    // private readonly matDialog: MatDialog,
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly matDialog: MatDialog,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
@@ -63,17 +80,41 @@ export class GroupsComponent implements OnDestroy, OnInit {
         this.userService.getAllUserGroupsNextPage(pageOffset, this.pageSize)
       )
     );
+
+    this.subscriptions.add(
+      this.editButtonClicks$.subscribe((userGroupId: string) =>
+        this.openUserGroupDialog(GroupsAddEditDialogComponent, {
+          data: { id: userGroupId },
+        })
+      )
+    );
+
+    this.subscriptions.add(
+      this.deleteButtonClicks$.subscribe((userGroupId: string) =>
+        this.openUserGroupDialog(GroupsDeleteComponent, {
+          data: { id: userGroupId },
+          width: '500px',
+        })
+      )
+    );
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
 
-  // TODO: add translations when DET-927 is merged
+  openUserGroupDialog(componentToOpen?: ComponentType<GroupsDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? GroupsAddEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
+  }
+
+  // TODO: replace MULTI_TABLE_CELL with MULTI_TABLE_CELL_WITHOUT_ICON when DET-927 is merged
   private transformToTableStructure(originalMasking: IUserGroup[]): IGroupTableDef[] {
     const tempTableItems = [] as IGroupTableDef[];
     this.translationService
-      .selectTranslateObject(`${this.translationScope.scope}.masks.columnNames`)
+      .selectTranslateObject(`${this.translationScope.scope}.groups.columnNames`)
       .pipe(take(1))
       .subscribe((translation: { [key: string]: string }) => {
         originalMasking.forEach((groups: IUserGroup) => {
@@ -88,15 +129,15 @@ export class GroupsComponent implements OnDestroy, OnInit {
               },
             },
             members: {
-              columnName: 'Members', // translation['lastUpdatedColumn'],
+              columnName: translation['roleColumn'],
               cellData: {
                 id: groups.xid,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(groups.members?.count),
+                text: String(groups.memberCount?.count),
               },
             },
             lastUpdated: {
-              columnName: 'Last Updated By', // translation['lastUpdatedColumn'],
+              columnName: translation['lastUpdatedColumn'],
               cellData: {
                 id: groups.xid,
                 type: TableCellTypes.DATE_TABLE_CELL,
@@ -109,8 +150,8 @@ export class GroupsComponent implements OnDestroy, OnInit {
                 id: groups.xid,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
-                  { icon: 'edit', clickEventKey: '' }, //ConnectionsClickEvent.EDIT_CONNECTION },
-                  { icon: 'delete', clickEventKey: '' }, // ConnectionsClickEvent.DELETE_CONNECTION },
+                  { icon: 'edit', clickEventKey: GroupsClickEvent.EDIT_GROUP },
+                  { icon: 'delete', clickEventKey: GroupsClickEvent.DELETE_GROUP },
                 ],
               },
             },

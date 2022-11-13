@@ -4,6 +4,11 @@ export interface IUserGroup {
   name?: string;
   description?: string;
   members?: {
+    xid: string;
+    firstname: string;
+    lastname: string;
+  }[];
+  memberCount?: {
     count: number;
   };
   lastUpdated?: string;

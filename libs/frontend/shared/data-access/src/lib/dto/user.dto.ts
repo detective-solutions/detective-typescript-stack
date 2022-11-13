@@ -22,7 +22,7 @@ export class UserDTO implements IUser {
       userInput.id,
       userInput.email,
       userInput.tenantIds as ITenant[],
-      UserRole.BASIC,
+      userInput.role,
       userInput.firstname,
       userInput.lastname,
       userInput.title,

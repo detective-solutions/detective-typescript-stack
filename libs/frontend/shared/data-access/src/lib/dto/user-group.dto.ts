@@ -5,9 +5,16 @@ export class UserGroupDTO implements IUserGroup {
     public xid = '',
     public name = '',
     public description = '',
-    public members = {
+    public memberCount = {
       count: 0,
     },
+    public memebers = [
+      {
+        xid: '',
+        firstname: '',
+        lastname: '',
+      },
+    ],
     public lastUpdated = '',
     public tenant = { xid: '' }
   ) {}
@@ -20,6 +27,7 @@ export class UserGroupDTO implements IUserGroup {
       userGroupInput.xid,
       userGroupInput.name,
       userGroupInput.description,
+      userGroupInput.memberCount,
       userGroupInput.members,
       userGroupInput.lastUpdated,
       userGroupInput.tenant
