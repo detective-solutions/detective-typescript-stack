@@ -3,7 +3,7 @@
     "sidenavItems": {
       "connections": "Verbindungen",
       "groups": "Gruppen",
-      "masks": "Masken",
+      "maskings": "Masken",
       "subscriptions": "Subscription"
     },
     "sidenavBottomItem": "Home"
@@ -33,11 +33,77 @@
       "formSubmitError": "Verbindungsdaten konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
-  "masks": {
+  "maskings": {
     "addMaskingButtonText": "Neue Maskierung anlegen",
     "columnNames": {
+      "maskNameColumn": "Name",
+      "maskingDataSource": "Datenquelle",
+      "userGroupsColumn": "Nutzergruppen",
       "lastUpdatedColumn": "Zuletzt aktualisiert",
-      "table": "Maskierte Tabelle"
+      "lastUpdatedByColumn": "Zuletzt geändert von",
+      "tableNameColumn": "Maskierte Tabelle"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Maskierung entfernen",
+      "deleteDialogText": "Sie sind dabei die Verbindung {{maskingName}} zu entfernen.",
+      "deleteButtonText": "Ich möchte diese Verbindung entfernen",
+      "toastMessages": {
+        "actionSuccessful": "Maskierung wurde gelöscht",
+        "formSubmitError": "Die Maskierung konnte nicht gelöscht werden. Bitte kontaktieren Sie den Support"
+      }
+    },
+    "addEditDialog": {
+      "addDialogHeader": "Neue Maskierung anlegen",
+      "editDialogHeader": "Verbindung bearbeiten",
+      "maskingNameLabel": "Name der Maskierung",
+      "maskingDescriptionLabel": "Kurze Beschreibung",
+      "sourceConnectionDropdownLabel": "Wählen Sie eine Datenquelle aus",
+      "saveButtonText": "Speichern",
+      "cancelButtonText": "Abbrechen",
+      "subTable": {
+        "addMaskButton": "Maskierung hinzufügen",
+        "ColumnTitleFilter": "Dimension",
+        "ColumnTitleColumn": "Spalte",
+        "ColumnTitleHide": "Verbergen",
+        "ColumnTitleValueName": "gezielter Wert",
+        "ColumnTitleMethod": "Methode",
+        "ColumnTitleCustomReplaceType": "Eigener Wert",
+        "ColumnTitleIsEdit": " ",
+        "binaryTrue": "Ja",
+        "binaryFalse": "Nein",
+        "displayNameTable": "Tabelle",
+        "displayNameGroups": "Nutzergruppe",
+        "displayNameTitle": "Name",
+        "displayNameDescription": "Beschreibung",
+        "editMaskButton": "Anpassen",
+        "removeMaskButton": "Löschen",
+        "doneMaskButton": "Übernehmen",
+        "toolTipHelpCenter": "Lerne Masken richtig anzuwenden",
+        "dimensionColumn": "Spalte",
+        "dimensionRow": "Zeile",
+        "maskingMethods": {
+          "full": "Sternchen",
+          "full email": "Sternchen Email",
+          "credit card": "Kreditkarte",
+          "provider email": "Nur Email Provider",
+          "phone number": "Telefonnummer",
+          "postal code": "Postleitzahl",
+          "single name": "Einfacher Name",
+          "first- and lastname": "Vor- und Nachnahme",
+          "email": "Email",
+          "full address": "Ganze Adresse",
+          "address streetname and number": "Ganze Adresse mit Hausnummer",
+          "decimal": "Dezimalzahl",
+          "number": "Nummer",
+          "custom": "Eigener Wert"
+        }
+      }
+    },
+    "toastMessages": {
+      "actionSuccessful": "Aktion erfolgreich ausgeführt",
+      "actionFailed": "Aktion konnte nicht ausgeführt werden",
+      "formInitError": "Maskierungen konnten nicht geladen werden. Bitte kontaktieren Sie den Support",
+      "formSubmitError": "Maskierungen konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
   "subscriptions": {

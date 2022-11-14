@@ -4,30 +4,30 @@ import { MockModule, MockService, ngMocks } from 'ng-mocks';
 
 import { Apollo } from 'apollo-angular';
 import { GetAllMaskingsGQL } from '../../graphql';
-import { MaskingsService } from '../../services';
-import { MasksComponent } from './masks.component';
+import { MaskingService } from '../../services';
+import { MaskingsComponent } from './masking.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TableModule } from '@detective.solutions/frontend/detective-client/ui';
 
 const materialModules = [MatButtonModule, MatIconModule];
 
-xdescribe('MasksComponent', () => {
-  let component: MasksComponent;
-  let fixture: ComponentFixture<MasksComponent>;
+xdescribe('MaskingsComponent', () => {
+  let component: MaskingsComponent;
+  let fixture: ComponentFixture<MaskingsComponent>;
 
   ngMocks.faster();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MockModule(TableModule), materialModules],
-      declarations: [MasksComponent],
-      providers: [MockService(MaskingsService), GetAllMaskingsGQL, Apollo],
+      declarations: [MaskingsComponent],
+      providers: [MockService(MaskingService), GetAllMaskingsGQL, Apollo],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MasksComponent);
+    fixture = TestBed.createComponent(MaskingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -4,5 +4,7 @@ export interface IConnectorPropertiesResponse {
   type: string;
   description: string;
   default: string | number | boolean;
+  options: { key: string; value: string }[];
   required: boolean;
+  disabled?: boolean;
 }

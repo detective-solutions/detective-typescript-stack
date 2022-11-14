@@ -14,8 +14,19 @@ export class GetAllMaskingsGQL extends Query<Response> {
       queryMasking(offset: $paginationOffset, first: $pageSize, order: { asc: name }) {
         xid
         name
+        description
         table {
           name
+          dataSource {
+            name
+          }
+        }
+        groups {
+          name
+        }
+        lastUpdatedBy {
+          firstname
+          lastname
         }
         lastUpdated
       }

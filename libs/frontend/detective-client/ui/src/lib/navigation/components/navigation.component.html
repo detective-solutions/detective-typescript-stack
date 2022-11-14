@@ -78,7 +78,7 @@
       <ng-template #noSearchInput><span fxFlex></span></ng-template>
 
       <span fxLayoutAlign="center center" fxHide.sm fxHide.xs>
-        <button mat-raised-button color="accent" class="invite-button">
+        <button mat-raised-button color="accent" class="invite-button" (click)="openInviteDialog()">
           {{ t('inviteButtonText') }}
         </button>
       </span>

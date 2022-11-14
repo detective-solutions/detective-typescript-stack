@@ -2,6 +2,12 @@
   "navigation": {
     "searchbarPlaceholder": "Nach Casefiles suchen",
     "inviteButtonText": "Einladen",
+    "inviteModal": {
+      "inviteDialogHeader": "Einladen",
+      "inviteDialogText": "Sende eine Einladung per Email and Freunde, Kollegen und Spürnasen",
+      "inviteExecuteButtonText": "Senden",
+      "inviteCancelButtonText": "Abbrechen"
+    },
     "userMenu": {
       "account": { "buttonText": "Konto verwalten" },
       "documentation": { "buttonText": "API & Dokumentation" },

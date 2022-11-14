@@ -1,6 +1,6 @@
-<div class="masking-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.masks'">
+<div class="masking-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.maskings'">
   <div class="add-masking-button-wrapper">
-    <button mat-stroked-button>
+    <button mat-stroked-button (click)="openMaskingDialog()">
       <mat-icon>add</mat-icon>
       {{ t('addMaskingButtonText') }}
     </button>

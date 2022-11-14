@@ -3,7 +3,7 @@
     "sidenavItems": {
       "connections": "Connections",
       "groups": "Groups",
-      "masks": "Masks",
+      "maskings": "Maskings",
       "subscriptions": "Subscription"
     },
     "sidenavBottomItem": "Home"
@@ -33,11 +33,77 @@
       "formSubmitError": "Could not submit connection data. Please contact support"
     }
   },
-  "masks": {
+  "maskings": {
     "addMaskingButtonText": "New Masking",
     "columnNames": {
+      "maskName": "Name",
+      "maskingDataSource": "Data source",
+      "userGroupsColumn": "User groups",
       "lastUpdatedColumn": "Last Updated",
-      "table": "Masked Table"
+      "lastUpdatedByColumn": "Last Updated by",
+      "tableNameColumn": "Masked Table"
+    },
+    "deleteDialog": {
+      "deleteDialogHeader": "Delete masking",
+      "deleteDialogText": "You are about to delete {{maskingName}}.",
+      "deleteButtonText": "I want to delete this masking",
+      "toastMessages": {
+        "actionSuccessful": "Masking was deleted",
+        "formSubmitError": "Could not submit delete masking. Please contact support"
+      }
+    },
+    "addEditDialog": {
+      "addDialogHeader": "Add a new masking",
+      "editDialogHeader": "Edit a masking",
+      "maskingNameLabel": "Name of new masking",
+      "maskingDescriptionLabel": "Short description",
+      "sourceConnectionDropdownLabel": "Select a data source",
+      "saveButtonText": "Save",
+      "cancelButtonText": "Cancel",
+      "subTable": {
+        "addMaskButton": "Add Mask",
+        "ColumnTitleFilter": "Dimension",
+        "ColumnTitleColumn": "Column",
+        "ColumnTitleHide": "Hide",
+        "ColumnTitleValueName": "Value",
+        "ColumnTitleMethod": "Method",
+        "ColumnTitleCustomReplaceType": "Custom Value",
+        "ColumnTitleIsEdit": " ",
+        "true": "Yes",
+        "false": "No",
+        "displayNameTable": "Table",
+        "displayNameGroups": "User Group",
+        "displayNameTitle": "Title",
+        "displayNameDescription": "Description",
+        "editMaskButton": "Edit",
+        "removeMaskButton": "Delete",
+        "doneMaskButton": "Done",
+        "toolTipHelpCenter": "How to apply masks",
+        "dimensionColumn": "Column",
+        "dimensionRow": "Row",
+        "maskingMethods": {
+          "full": "Full mask",
+          "fullEmail": "Full Mail",
+          "creditCard": "Credit Card",
+          "providerEmail": "Only Email Provider",
+          "phoneNumber": "Phone number",
+          "postalCode": "Postal Code",
+          "singleName": "Simple Name",
+          "firstAndLastname": "first- and last name",
+          "email": "Email",
+          "fullAddress": "Address",
+          "addressStreetnameAndNumber": "Full address",
+          "decimal": "Decimal",
+          "number": "Number",
+          "custom": "Custom value"
+        }
+      }
+    },
+    "toastMessages": {
+      "actionSuccessful": "Action performed successfully",
+      "actionFailed": "Action could not be performed",
+      "formInitError": "Could not fetch masking data. Please contact support",
+      "formSubmitError": "Could not submit masking data. Please contact support"
     }
   },
   "subscriptions": {

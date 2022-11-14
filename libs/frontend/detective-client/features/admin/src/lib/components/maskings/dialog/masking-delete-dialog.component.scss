@@ -1,0 +1,18 @@
+.delete-dialog-wrapper {
+  padding: 10px 0;
+
+  .mat-dialog-content {
+    margin: 15px 0;
+  }
+
+  .mat-dialog-actions {
+    padding-bottom: 20px;
+  }
+}
+
+.mat-progress-bar {
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+}
