@@ -34,7 +34,7 @@
     </div>
   </ng-template>
 
-  <div *ngIf="showSubmitButton" class="add-mask-button">
+  <div fxLayout="row" fxLayoutAlign="end center" *ngIf="showSubmitButton" class="add-mask-button">
     <button mat-raised-button (click)="addRow()">{{ t('subTable.addMaskButton') }}</button>
     <a matTooltip="{{ t('subTable.toolTipHelpCenter') }}" (click)="openMaskingDocumentation()" class="help-button">
       <span class="material-icons"> help_center </span>
@@ -81,7 +81,7 @@
           </ng-container>
           <ng-container *ngSwitchCase="'text'">
             <input class="mat-input" [(ngModel)]="element[col.key]" />
-            <span class="bar"></span>
+            <span class="row-divider"></span>
           </ng-container>
         </div>
       </td>

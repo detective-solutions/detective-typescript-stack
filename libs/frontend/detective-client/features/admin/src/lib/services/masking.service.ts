@@ -177,8 +177,12 @@ export class MaskingService {
     const user = this.getMaskAuthor();
     const date = new Date().toISOString();
 
-    const filteredColumns = update.masks.filter((mask) => mask.filterType === MaskingService.COLUMN_MASK_NAME);
-    const filteredRows = update.masks.filter((mask) => mask.filterType === MaskingService.ROW_MASK_NAME);
+    const filteredColumns = update.masks.filter(
+      (mask: IMaskSubTableDataDef) => mask.filterType === MaskingService.COLUMN_MASK_NAME
+    );
+    const filteredRows = update.masks.filter(
+      (mask: IMaskSubTableDataDef) => mask.filterType === MaskingService.ROW_MASK_NAME
+    );
 
     const columns = filteredColumns.map((mask: IMask) => {
       return this.getColumnMaskObject(mask, user, date);

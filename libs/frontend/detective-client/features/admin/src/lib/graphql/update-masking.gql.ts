@@ -9,6 +9,7 @@ export interface IUpdateMaskingGQLResponse {
     masking: IMasking[];
   };
 }
+
 @Injectable()
 export class UpdateMaskingGQL extends Mutation<Response> {
   override document = gql`

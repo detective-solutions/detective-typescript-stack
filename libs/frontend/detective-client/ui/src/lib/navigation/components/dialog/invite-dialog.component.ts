@@ -45,7 +45,7 @@ export class InviteDialogComponent {
     this.httpClient
       .post<StatusResponse>(
         `${environment.devApiHost}${environment.provisioningApiPathV1}${environment.provisioningSendInviteV1}`,
-        { email: inviteInput.email, name: inviteInput.username },
+        { email: inviteInput.email, name: 'detective' },
         { headers: headers }
       )
       .pipe(take(1))

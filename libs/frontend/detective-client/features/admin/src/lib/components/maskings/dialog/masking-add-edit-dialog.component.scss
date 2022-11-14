@@ -1,15 +1,6 @@
 .add-edit-dialog-wrapper {
   .add-mask-button {
     width: 90%;
-    justify-content: center;
-    float: right !important;
-
-    button {
-      float: right !important;
-    }
-    a {
-      float: right !important;
-    }
   }
 }
 
@@ -94,10 +85,11 @@
     }
   }
 
-  .bar {
+  .row-divider {
     position: relative;
     display: block;
     width: 100%;
+
     &:before {
       content: '';
       height: 1px;

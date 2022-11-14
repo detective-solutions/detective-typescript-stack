@@ -64,9 +64,7 @@ export class MaskingDeleteDialogComponent {
           return EMPTY;
         })
       )
-      .subscribe((response: IDeleteMaskingGQLResponse) => {
-        this.handleResponse(response);
-      });
+      .subscribe((response: IDeleteMaskingGQLResponse) => this.handleResponse(response));
   }
 
   private handleResponse(response: IDeleteMaskingGQLResponse) {
