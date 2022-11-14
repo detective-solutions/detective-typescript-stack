@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 export class DynamicFormControlService {
   formGroup!: FormGroup;
   formSubmit$ = new Subject<FormGroup>();
+  selectionChanged$ = new Subject<{ key: string; value: string }>();
 
   get currentFormGroup(): FormGroup {
     if (this.formGroup) {
@@ -23,11 +24,15 @@ export class DynamicFormControlService {
 
     inputFormFields.forEach((formField) => {
       group[formField.key] = formField.required
-        ? new FormControl(formField.value, Validators.required)
+        ? new FormControl({ value: formField.value, disabled: formField.disabled }, Validators.required)
         : new FormControl(formField.value);
     });
     this.formGroup = new FormGroup(group);
     return this.formGroup;
+  }
+
+  get(key: string) {
+    return this.formGroup.get(key);
   }
 
   submitForm() {

@@ -1,0 +1,27 @@
+<div class="cell-wrapper" fxLayout="row" fxLayoutAlign="center center" *transloco="let t; read: 'table.multiTableCell'">
+  <div class="info-wrapper">
+    <h3
+      *ngIf="cellData.name; else noName"
+      #nameRef
+      [matTooltip]="cellData.name"
+      [matTooltipDisabled]="(truncateName$ | async) === false"
+    >
+      {{ cellData.name }}
+    </h3>
+    <ng-template #noName>
+      <h3>{{ t('noName') }}</h3>
+    </ng-template>
+    <p
+      *ngIf="cellData.description; else noDescription"
+      #descriptionRef
+      [matTooltip]="cellData.description"
+      [matTooltipDisabled]="(truncateDescription$ | async) === false"
+      [matTooltipShowDelay]="tooltipDelay"
+    >
+      {{ cellData.description }}
+    </p>
+    <ng-template #noDescription>
+      <p>{{ t('noDescription') }}</p></ng-template
+    >
+  </div>
+</div>

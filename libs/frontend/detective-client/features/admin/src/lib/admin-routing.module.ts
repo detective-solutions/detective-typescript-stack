@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminContainerComponent } from './components/admin-container.component';
 import { ConnectionsComponent } from './components/connections/connections.component';
 import { GroupsComponent } from './components/groups/groups.component';
-import { MasksComponent } from './components/masks/masks.component';
+import { MaskingsComponent } from './components/maskings/masking.component';
 import { NgModule } from '@angular/core';
 import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
 import { UsersComponent } from './components/users/users.component';
@@ -18,7 +18,7 @@ const routes: Routes = [
       { path: 'connections', component: ConnectionsComponent },
       { path: 'users', component: UsersComponent },
       { path: 'groups', component: GroupsComponent },
-      { path: 'masks', component: MasksComponent },
+      { path: 'maskings', component: MaskingsComponent },
       { path: 'subscriptions', component: SubscriptionsComponent },
     ],
   },

@@ -5,6 +5,7 @@ import {
   IconButtonTableCellComponent,
   LinkTableCellComponent,
   MultiTableCellComponent,
+  MultiTableCellWithoutIconComponent,
   StatusTableCellComponent,
   TextTableCellComponent,
   UserAvatarListTableCellComponent,
@@ -53,6 +54,9 @@ export class DynamicTableCellDirective implements OnInit {
       }
       case TableCellTypes.MULTI_TABLE_CELL: {
         return this.viewContainerRef.createComponent(MultiTableCellComponent);
+      }
+      case TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL: {
+        return this.viewContainerRef.createComponent(MultiTableCellWithoutIconComponent);
       }
       case TableCellTypes.TEXT_TABLE_CELL: {
         return this.viewContainerRef.createComponent(TextTableCellComponent);

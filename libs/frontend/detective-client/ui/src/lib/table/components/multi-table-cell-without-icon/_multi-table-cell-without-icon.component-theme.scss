@@ -1,0 +1,17 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin multi-table-cell-without-icon-component-theme($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $primary-palette: map.get($color-config, 'primary');
+  $primary-contrast: mat.get-color-from-palette($primary-palette, '50-contrast');
+
+  multi-table-cell {
+    .info-wrapper {
+      p {
+        color: lighten($primary-contrast, 60%);
+      }
+    }
+  }
+}

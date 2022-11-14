@@ -121,7 +121,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
             dataSourceInfo: {
               columnName: '',
               cellData: {
-                id: connection.id,
+                id: connection.xid,
                 type: TableCellTypes.MULTI_TABLE_CELL,
                 thumbnail: connection.iconSrc,
                 name: connection.name,
@@ -131,7 +131,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
             status: {
               columnName: translation['statusColumn'],
               cellData: {
-                id: connection.id,
+                id: connection.xid,
                 type: TableCellTypes.STATUS_TABLE_CELL,
                 status: connection.status,
                 message: 'An error occurred while initializing', // TODO: Get this value from database
@@ -140,7 +140,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: connection.id,
+                id: connection.xid,
                 type: TableCellTypes.DATE_TABLE_CELL,
                 date: String(connection.lastUpdated),
               },
@@ -148,7 +148,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
             actions: {
               columnName: '',
               cellData: {
-                id: connection.id,
+                id: connection.xid,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
                   { icon: 'edit', clickEventKey: ConnectionsClickEvent.EDIT_CONNECTION },

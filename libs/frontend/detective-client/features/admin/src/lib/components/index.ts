@@ -1,6 +1,6 @@
 export * from './connections';
 export * from './groups';
 export * from './users';
-export * from './masks';
+export * from './maskings';
 export * from './subscriptions';
 export * from './admin-container.component';

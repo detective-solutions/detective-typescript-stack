@@ -17,9 +17,12 @@ export const environment = {
   provisioningProductV1: '/product/info',
   provisioningAllProductListV1: '/subscription/config',
   provisioningChangePaymentV1: '/payment/change',
+  provisioningSendInviteV1: '/invite/user',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency
+  productDoc: 'https://detective-solutions.github.io/',
+  productDocMasking: 'masking.html',
 };
 
 /*

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { BaseFormField } from '../../models';
+import { DynamicFormControlService } from '../../services';
 import { FormGroup } from '@angular/forms';
 
 @Component({
@@ -22,5 +23,13 @@ export class DynamicFormFieldComponent {
 
   get errorMessage() {
     return `${this.formFieldDefinition.label} is required`;
+  }
+
+  constructor(private readonly formControlService: DynamicFormControlService) {}
+
+  onSelectionChange() {
+    const key = this.formFieldDefinition.key;
+    const value = String(this.form.controls[this.formFieldDefinition.key].value);
+    this.formControlService.selectionChanged$.next({ key, value });
   }
 }

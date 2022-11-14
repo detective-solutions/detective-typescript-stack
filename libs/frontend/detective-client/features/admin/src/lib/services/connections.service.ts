@@ -1,8 +1,11 @@
 import {
   GetAllConnectionsGQL,
   GetConnectionByIdGQL,
+  GetConnectionByTableIdGQL,
+  GetTablesBySourceConnectionIdGQL,
   IGetAllConnectionsGQLResponse,
   IGetConnectionByIdGQLResponse,
+  IGetTablesBySourceConnectionIdGQLResponse,
 } from '../graphql';
 import {
   IConnectionsAddEditResponse,
@@ -13,13 +16,13 @@ import {
   IGetAllConnectionsResponse,
   IGetConnectionByIdResponse,
 } from '../models';
+import { ISourceConnectionTables, SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
 import { Observable, catchError, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
-import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
@@ -31,10 +34,14 @@ export class ConnectionsService {
 
   private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
+  private getAllTablesWatchQuery!: QueryRef<Response>;
+  private getConnectionByTableIdWatchQuery!: QueryRef<Response>;
 
   constructor(
     private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
+    private readonly getConnectionByTableIdGQL: GetConnectionByTableIdGQL,
+    private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly httpClient: HttpClient,
     private readonly tableCellEventService: TableCellEventService,
     private readonly logger: LogService
@@ -45,6 +52,14 @@ export class ConnectionsService {
     return this.getConnectionByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetConnectionByIdGQLResponse) => response.getSourceConnection)
+    );
+  }
+
+  getTablesOfConnection(id: string): Observable<ISourceConnectionTables> {
+    this.getAllTablesWatchQuery = this.getTablesBySourceConnectionIdGQL.watch({ id: id });
+    return this.getAllTablesWatchQuery.valueChanges.pipe(
+      map((response: any) => response.data),
+      map((response: IGetTablesBySourceConnectionIdGQLResponse) => response.getSourceConnection)
     );
   }
 

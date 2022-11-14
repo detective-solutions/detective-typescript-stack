@@ -33,7 +33,7 @@ export class SourceConnectionDTO implements ISourceConnection {
   static readonly defaultThumbnail = SourceConnectionDTO.iconBasePath + 'default.svg';
 
   constructor(
-    public id: string,
+    public xid: string,
     public name: string,
     public connectorName: string,
     public description: string,
@@ -44,7 +44,7 @@ export class SourceConnectionDTO implements ISourceConnection {
 
   static Build(sourceConnectionInput: ISourceConnection) {
     return new SourceConnectionDTO(
-      sourceConnectionInput.id,
+      sourceConnectionInput.xid,
       sourceConnectionInput.name,
       sourceConnectionInput.connectorName,
       sourceConnectionInput.description ?? '',
@@ -84,4 +84,17 @@ export class SourceConnectionDTO implements ISourceConnection {
         return SourceConnectionDTO.defaultThumbnail;
     }
   }
+}
+
+export interface IConnectionTable {
+  xid: string;
+  name: string;
+  columns: {
+    xid: string;
+    columnName: string;
+  }[];
+}
+
+export interface ISourceConnectionTables {
+  connectedTables: IConnectionTable[];
 }

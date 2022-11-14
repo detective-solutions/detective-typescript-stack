@@ -77,7 +77,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
             dataSourceInfo: {
               columnName: '',
               cellData: {
-                id: dataSource.id,
+                id: dataSource.xid,
                 type: TableCellTypes.MULTI_TABLE_CELL,
                 thumbnail: dataSource.iconSrc,
                 name: dataSource.name,
@@ -87,7 +87,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
             access: {
               columnName: translation['accessColumn'],
               cellData: {
-                id: dataSource.id,
+                id: dataSource.xid,
                 type: TableCellTypes.ACCESS_TABLE_CELL,
                 accessState: AccessState.NO_ACCESS,
               },
@@ -95,7 +95,7 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: dataSource.id,
+                id: dataSource.xid,
                 type: TableCellTypes.DATE_TABLE_CELL,
                 date: String(dataSource.lastUpdated),
               },

@@ -11,3 +11,4 @@ export * from './lib/user-group';
 export * from './lib/user-query';
 export * from './lib/whiteboard';
 export * from './lib/subscription';
+export * from './lib/dropdown';

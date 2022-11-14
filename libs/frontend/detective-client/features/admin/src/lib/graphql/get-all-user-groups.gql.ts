@@ -1,11 +1,16 @@
 /* eslint-disable sort-imports */
 import { Query, gql } from 'apollo-angular';
 import { Injectable } from '@angular/core';
+import { IDropDownValues } from '@detective.solutions/shared/data-access';
 import { IUserGroup } from '@detective.solutions/shared/data-access';
 
 export interface IGetUserGroupsGQLResponse {
   queryUserGroup: IUserGroup[];
   aggregateUserGroup: { count: number };
+}
+
+export interface IGetUserGroupsAsDropDownValuesGQLResponse {
+  queryUserGroup: IDropDownValues[];
 }
 
 //TODO: Filter only for users related to current tenant
@@ -27,6 +32,18 @@ export class GetAllUserGroupsGQL extends Query<Response> {
       }
       aggregateUserGroup {
         count
+      }
+    }
+  `;
+}
+
+@Injectable()
+export class GetAllUserGroupsAsDropDownValuesGQL extends Query<Response> {
+  override document = gql`
+    query UserGroup {
+      queryUserGroup {
+        key: xid
+        value: name
       }
     }
   `;

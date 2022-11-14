@@ -1,0 +1,97 @@
+<div
+  class="add-edit-dialog-wrapper"
+  fxLayout="column"
+  fxLayoutAlign="center center"
+  *transloco="let t; read: 'admin.maskings.addEditDialog'"
+>
+  <h1 mat-dialog-title *ngIf="isAddDialog">{{ t('addDialogHeader') }}</h1>
+  <h1 mat-dialog-title *ngIf="!isAddDialog">{{ t('editDialogHeader') }}</h1>
+
+  <div *ngIf="isAddDialog; else editDialog" mat-dialog-content>
+    <form [formGroup]="connectorTypeFormGroup" fxLayoutAlign="center center">
+      <mat-form-field>
+        <mat-label>{{ t('sourceConnectionDropdownLabel') }}</mat-label>
+        <mat-select formControlName="connector">
+          <mat-option
+            *ngFor="let connection of (availableConnections$ | async)!.connections"
+            [value]="connection.xid"
+            >{{ connection.name }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <ng-container *ngIf="formFieldDefinitions$ | async as formFieldDefinitions">
+      <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
+    </ng-container>
+  </div>
+
+  <ng-template #editDialog>
+    <div mat-dialog-content>
+      <ng-container *ngIf="existingFormFieldData$ | async as formFieldDefinitions">
+        <dynamic-form [formFieldDefinitions]="formFieldDefinitions"></dynamic-form>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <div fxLayout="row" fxLayoutAlign="end center" *ngIf="showSubmitButton" class="add-mask-button">
+    <button mat-raised-button (click)="addRow()">{{ t('subTable.addMaskButton') }}</button>
+    <a matTooltip="{{ t('subTable.toolTipHelpCenter') }}" (click)="openMaskingDocumentation()" class="help-button">
+      <span class="material-icons"> help_center </span>
+    </a>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" *ngIf="showSubmitButton">
+    <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ t(col.label) }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <div [ngSwitch]="col.type" *ngIf="!element.isEdit">
+          <div class="btn-edit" *ngSwitchCase="'isEdit'">
+            <button mat-button (click)="element.isEdit = !element.isEdit">{{ t('subTable.editMaskButton') }}</button>
+            <button mat-button class="button-remove" (click)="removeRow(element.id)">
+              {{ t('subTable.removeMaskButton') }}
+            </button>
+          </div>
+          <span *ngSwitchDefault>
+            {{ element[col.key] }}
+          </span>
+        </div>
+        <div [ngSwitch]="col.type" *ngIf="element.isEdit">
+          <div *ngSwitchCase="'isSelected'"></div>
+          <div class="btn-edit" *ngSwitchCase="'isEdit'">
+            <button mat-button (click)="element.isEdit = !element.isEdit">{{ t('subTable.doneMaskButton') }}</button>
+          </div>
+          <ng-container *ngSwitchCase="'select'">
+            <ng-container *ngIf="col.key === 'columnName'">
+              <mat-select [(ngModel)]="element[col.key]">
+                <mat-option [value]="type.value" *ngFor="let type of getDropdownValues(col.key)">
+                  <span>{{ type.key }}</span>
+                </mat-option>
+              </mat-select>
+            </ng-container>
+            <ng-container *ngIf="col.key !== 'columnName'">
+              <mat-select #translateSelect [(ngModel)]="element[col.key]">
+                <mat-option [value]="type.value" *ngFor="let type of getDropdownValues(col.key)">
+                  <span>{{ t(type.key) }}</span>
+                </mat-option>
+              </mat-select>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="'text'">
+            <input class="mat-input" [(ngModel)]="element[col.key]" />
+            <span class="row-divider"></span>
+          </ng-container>
+        </div>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <div mat-dialog-actions *ngIf="showSubmitButton" align="center">
+    <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

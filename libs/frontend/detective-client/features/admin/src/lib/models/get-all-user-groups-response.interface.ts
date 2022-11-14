@@ -1,6 +1,6 @@
-import { UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
+import { IUserGroup } from '@detective.solutions/shared/data-access';
 
 export interface IGetAllUserGroupsResponse {
-  userGroups: UserGroupDTO[];
+  userGroup: IUserGroup[];
   totalElementsCount: number;
 }

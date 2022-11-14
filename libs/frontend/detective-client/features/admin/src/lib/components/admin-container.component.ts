@@ -32,8 +32,8 @@ export class AdminContainerComponent {
     },
     {
       icon: 'gradient',
-      translationKey: 'admin.navigation.sidenavItems.masks',
-      route: '/admin/masks',
+      translationKey: 'admin.navigation.sidenavItems.maskings',
+      route: '/admin/maskings',
       title: '',
     },
     {
