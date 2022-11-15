@@ -13,11 +13,11 @@ export interface IGetUsersGQLResponse {
 @Injectable()
 export class GetAllUsersGQL extends Query<Response> {
   override document = gql`
-    query User($paginationOffset: Int, $pageSize: Int) {
+    query User($xid: String, $paginationOffset: Int, $pageSize: Int) {
       queryUser(offset: $paginationOffset, first: $pageSize, order: { asc: firstname }) {
         id: xid
         email
-        tenants {
+        tenants(filter: { xid: { eq: $xid } }) {
           xid
         }
         role

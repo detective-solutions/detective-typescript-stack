@@ -1,8 +1,7 @@
 /* eslint-disable sort-imports */
 import { Query, gql } from 'apollo-angular';
 import { Injectable } from '@angular/core';
-import { IDropDownValues } from '@detective.solutions/shared/data-access';
-import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { IDropDownValues, IUserGroup } from '@detective.solutions/shared/data-access';
 
 export interface IGetUserGroupsGQLResponse {
   queryUserGroup: IUserGroup[];
@@ -17,7 +16,7 @@ export interface IGetUserGroupsAsDropDownValuesGQLResponse {
 @Injectable()
 export class GetAllUserGroupsGQL extends Query<Response> {
   override document = gql`
-    query UserGroup($paginationOffset: Int, $pageSize: Int) {
+    query UserGroup($xid: String, $paginationOffset: Int, $pageSize: Int) {
       queryUserGroup(offset: $paginationOffset, first: $pageSize, order: { asc: name }) @cascade(fields: ["tenant"]) {
         xid
         name
@@ -26,7 +25,7 @@ export class GetAllUserGroupsGQL extends Query<Response> {
           count
         }
         lastUpdated
-        tenant(filter: { xid: { eq: "8d735a62-dcc7-11ec-b37f-287fcf6e439d" } }) {
+        tenant(filter: { xid: { eq: $xid } }) {
           xid
         }
       }

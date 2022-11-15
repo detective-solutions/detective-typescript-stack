@@ -23,7 +23,7 @@ import {
 import { IGetAllUsersResponse, UserGroupCreateInput, UserGroupEditInput } from '../models';
 import { IJwtTokenPayload, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
-import { MaskingDTO, UserDTO, UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
+import { MaskingDTO, UserDTO } from '@detective.solutions/frontend/shared/data-access';
 import { Observable, catchError, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
@@ -59,7 +59,6 @@ export class UsersService {
     private readonly logger: LogService
   ) {}
 
-  // TODO: replace getMaskingAuthor in MaskingService once DET-927 is merged with this function
   getAuthor(): string {
     const stringToken: string = this.authService.getAccessToken();
     const objectToken: IJwtTokenPayload = jwtDecode(stringToken);
@@ -76,6 +75,7 @@ export class UsersService {
     if (!this.getAllUsersWatchQuery) {
       this.getAllUsersWatchQuery = this.getAllUsersGQL.watch(
         {
+          xid: this.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -150,7 +150,11 @@ export class UsersService {
     const currentResult = this.getAllUsersWatchQuery.getCurrentResult()?.data as any;
     const alreadyLoadedUserCount = (currentResult as IGetUsersGQLResponse)?.queryUser?.length;
     if (alreadyLoadedUserCount) {
-      this.getAllUsersWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedUserCount });
+      this.getAllUsersWatchQuery.refetch({
+        xid: this.getTenant(),
+        paginationOffset: 0,
+        pageSize: alreadyLoadedUserCount,
+      });
     } else {
       this.logger.error('Could not determine currently loaded masking count. Reusing values of last query...');
       this.getAllUsersWatchQuery.refetch();
@@ -169,6 +173,7 @@ export class UsersService {
     if (!this.getAllUserGroupsWatchQuery) {
       this.getAllUserGroupsWatchQuery = this.getAllUserGroupsGQL.watch(
         {
+          xid: this.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -180,7 +185,7 @@ export class UsersService {
       map((response: any) => response.data),
       map((response: IGetUserGroupsGQLResponse) => {
         return {
-          userGroups: response.queryUserGroup.map(UserGroupDTO.Build),
+          userGroup: response.queryUserGroup,
           totalElementsCount: response.aggregateUserGroup.count,
         };
       }),
@@ -253,6 +258,7 @@ export class UsersService {
         },
         {
           refetchQueries: [
+            { query: this.getUserGroupByIdGQL.document, variables: { xid: update.xid } },
             { query: this.getAllUserGroupsGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
           ],
         }
@@ -306,7 +312,11 @@ export class UsersService {
     const currentResult = this.getAllUserGroupsWatchQuery.getCurrentResult()?.data as any;
     const alreadyLoadedUserGroupCount = (currentResult as IGetUserGroupsGQLResponse)?.queryUserGroup?.length;
     if (alreadyLoadedUserGroupCount) {
-      this.getAllUserGroupsWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedUserGroupCount });
+      this.getAllUserGroupsWatchQuery.refetch({
+        xid: this.getTenant(),
+        paginationOffset: 0,
+        pageSize: alreadyLoadedUserGroupCount,
+      });
     } else {
       this.logger.error('Could not determine currently loaded masking count. Reusing values of last query...');
       this.getAllUserGroupsWatchQuery.refetch();

@@ -68,7 +68,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
     this.tableItems$ = this.userService.getAllUserGroups(this.initialPageOffset, this.pageSize).pipe(
       map((userGroups: IGetAllUserGroupsResponse) => {
         return {
-          tableItems: this.transformToTableStructure(userGroups.userGroups),
+          tableItems: this.transformToTableStructure(userGroups.userGroup),
           totalElementsCount: userGroups.totalElementsCount,
         };
       })
@@ -110,7 +110,6 @@ export class GroupsComponent implements OnDestroy, OnInit {
     });
   }
 
-  // TODO: replace MULTI_TABLE_CELL with MULTI_TABLE_CELL_WITHOUT_ICON when DET-927 is merged
   private transformToTableStructure(originalMasking: IUserGroup[]): IGroupTableDef[] {
     const tempTableItems = [] as IGroupTableDef[];
     this.translationService
@@ -123,9 +122,9 @@ export class GroupsComponent implements OnDestroy, OnInit {
               columnName: '',
               cellData: {
                 id: groups.xid,
-                type: TableCellTypes.MULTI_TABLE_CELL,
+                type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
                 name: groups.name,
-                description: groups.description,
+                description: String(groups.description),
               },
             },
             members: {

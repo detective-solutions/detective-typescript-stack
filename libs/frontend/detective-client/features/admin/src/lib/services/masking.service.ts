@@ -3,15 +3,16 @@ import {
   DeleteMaskingGQL,
   DeleteRowMaskGQL,
   GetAllMaskingsGQL,
+  GetAllUserGroupsAsDropDownValuesGQL,
   ICreateNewMaskingGQLResponse,
   IDeleteMaskingGQLResponse,
   IGetAllMaskingsGQLResponse,
+  IGetUserGroupsAsDropDownValuesGQLResponse,
   IUpdateMaskingGQLResponse,
   UpdateMaskingGQL,
 } from '../graphql';
-import { GetAllUserGroupsGQL, IGetUserGroupsGQLResponse } from '../graphql/get-all-user-groups.gql';
 import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-masking-by-id.gql';
-import { IDropDownValues, IJwtTokenPayload, IMask, IMasking } from '@detective.solutions/shared/data-access';
+import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/data-access';
 import {
   IGetAllMaskingsResponse,
   IMaskSubTableDataDef,
@@ -30,7 +31,7 @@ import { Injectable } from '@angular/core';
 import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
-import jwtDecode from 'jwt-decode';
+import { UsersService } from './user.service';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -52,11 +53,12 @@ export class MaskingService {
     private readonly deleteRowMaskGQL: DeleteRowMaskGQL,
     private readonly deleteColumnMaskGQL: DeleteColumnMaskGQL,
     private readonly getAllMaskingGQL: GetAllMaskingsGQL,
-    private readonly getUserGroupsGQL: GetAllUserGroupsGQL,
+    private readonly getUserGroupsGQL: GetAllUserGroupsAsDropDownValuesGQL,
     private readonly getColumnsByTableIdGQL: GetAllColumnsGQL,
     private readonly createNewMaskingGQL: CreateNewMaskingGQL,
     private readonly tableCellEventService: TableCellEventService,
     private readonly authService: AuthService,
+    private readonly userService: UsersService,
     private readonly logger: LogService
   ) {}
 
@@ -112,7 +114,7 @@ export class MaskingService {
 
     return this.getUserGroupsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
-      map((response: IGetUserGroupsGQLResponse) => response.queryUserGroup),
+      map((response: IGetUserGroupsAsDropDownValuesGQLResponse) => response.queryUserGroup),
       catchError((error) => this.handleError(error))
     );
   }
@@ -138,11 +140,6 @@ export class MaskingService {
 
   getBooleanFromString(stringBool: string): boolean {
     return stringBool === 'true' ? true : false;
-  }
-
-  getMaskAuthor(): string {
-    const accessTokenPayload = jwtDecode(this.authService.getAccessToken()) as IJwtTokenPayload;
-    return accessTokenPayload.sub;
   }
 
   getRowMaskObject(mask: any, user: string, date: string) {
@@ -174,7 +171,7 @@ export class MaskingService {
   }
 
   updateMasking(update: IMaskingUpdateInput): Observable<IUpdateMaskingGQLResponse> {
-    const user = this.getMaskAuthor();
+    const user = this.userService.getAuthor();
     const date = new Date().toISOString();
 
     const filteredColumns = update.masks.filter(
@@ -264,13 +261,20 @@ export class MaskingService {
 
   deleteMasking(set: IMaskingDeleteInput): Observable<IDeleteMaskingGQLResponse> {
     return this.deleteMaskingGQL
-      .mutate({
-        filter: {
-          xid: {
-            eq: set.masking,
+      .mutate(
+        {
+          filter: {
+            xid: {
+              eq: set.masking,
+            },
           },
         },
-      })
+        {
+          refetchQueries: [
+            { query: this.getAllMaskingGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
+          ],
+        }
+      )
       .pipe(
         map((response: any) => response.data),
         map((response: IDeleteMaskingGQLResponse) => {
@@ -286,7 +290,7 @@ export class MaskingService {
   createMasksFromCurrentData(payload: IMaskingCreateInput): Observable<ICreateNewMaskingGQLResponse> {
     const columnMasks: IMask[] = [];
     const rowMasks: IMask[] = [];
-    const user = this.getMaskAuthor();
+    const user = this.userService.getAuthor();
     const date = new Date().toISOString();
 
     payload.masks.forEach((obj: IMaskSubTableDataDef) => {
@@ -314,9 +318,16 @@ export class MaskingService {
     masking.rows = rowMasks;
 
     return this.createNewMaskingGQL
-      .mutate({
-        masking: masking,
-      })
+      .mutate(
+        {
+          masking: masking,
+        },
+        {
+          refetchQueries: [
+            { query: this.getAllMaskingGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
+          ],
+        }
+      )
       .pipe(
         map((response: any) => response.data),
         map((response: ICreateNewMaskingGQLResponse) => response)
