@@ -21,9 +21,8 @@ import {
   UpdateUserRoleGQL,
 } from '../graphql';
 import { IGetAllUsersResponse, UserGroupCreateInput, UserGroupEditInput } from '../models';
-import { IJwtTokenPayload, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, IMasking, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
-import { MaskingDTO, UserDTO } from '@detective.solutions/frontend/shared/data-access';
 import { Observable, catchError, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
@@ -31,6 +30,7 @@ import { IGetAllUserGroupsResponse } from '../models/get-all-user-groups-respons
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
+import { UserDTO } from '@detective.solutions/frontend/shared/data-access';
 import jwtDecode from 'jwt-decode';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -300,7 +300,7 @@ export class UsersService {
       );
   }
 
-  getMaskingsOfUserGroup(xid: string): Observable<MaskingDTO> {
+  getMaskingsOfUserGroup(xid: string): Observable<IMasking> {
     this.getMaskingsOfUserGroupWatchQuery = this.getMaskingsOfUserGroupById.watch({ xid: xid });
     return this.getMaskingsOfUserGroupWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),

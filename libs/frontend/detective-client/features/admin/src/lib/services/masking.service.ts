@@ -5,7 +5,9 @@ import {
   GetAllMaskingsGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
   ICreateNewMaskingGQLResponse,
+  IDeleteColumnMaskGQLResponse,
   IDeleteMaskingGQLResponse,
+  IDeleteRowMaskGQLResponse,
   IGetAllMaskingsGQLResponse,
   IGetUserGroupsAsDropDownValuesGQLResponse,
   IUpdateMaskingGQLResponse,
@@ -32,6 +34,7 @@ import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { UsersService } from './user.service';
+import { responsePathAsArray } from 'graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -57,13 +60,12 @@ export class MaskingService {
     private readonly getColumnsByTableIdGQL: GetAllColumnsGQL,
     private readonly createNewMaskingGQL: CreateNewMaskingGQL,
     private readonly tableCellEventService: TableCellEventService,
-    private readonly authService: AuthService,
     private readonly userService: UsersService,
     private readonly logger: LogService
   ) {}
 
   getMaskingById(xid: string): Observable<IMasking> {
-    this.getMaskingByIdWatchQuery = this.getMaskingByIdGQL.watch({ xid: xid });
+    this.getMaskingByIdWatchQuery = this.getMaskingByIdGQL.watch({ xid: xid }, { fetchPolicy: 'network-only' });
     return this.getMaskingByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetMaskingByIdGQLResponse) => response.getMasking)
@@ -74,6 +76,7 @@ export class MaskingService {
     if (!this.getAllMaskingWatchQuery) {
       this.getAllMaskingWatchQuery = this.getAllMaskingGQL.watch(
         {
+          xid: this.userService.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -105,6 +108,7 @@ export class MaskingService {
     if (!this.getUserGroupsWatchQuery) {
       this.getUserGroupsWatchQuery = this.getUserGroupsGQL.watch(
         {
+          xid: this.userService.getTenant(),
           paginationOffset: 0,
           pageSize: 1000,
         },
@@ -123,7 +127,11 @@ export class MaskingService {
     const currentResult = this.getAllMaskingWatchQuery.getCurrentResult()?.data as any;
     const alreadyLoadedMaskingCount = (currentResult as IGetAllMaskingsGQLResponse)?.queryMasking?.length;
     if (alreadyLoadedMaskingCount) {
-      this.getAllMaskingWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedMaskingCount });
+      this.getAllMaskingWatchQuery.refetch({
+        xid: this.userService.getTenant(),
+        paginationOffset: 0,
+        pageSize: alreadyLoadedMaskingCount,
+      });
     } else {
       this.logger.error('Could not determine currently loaded masking count. Reusing values of last query...');
       this.getAllMaskingWatchQuery.refetch();
@@ -230,6 +238,8 @@ export class MaskingService {
 
             const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.xid);
             this.deleteColumnOrRowMask(rowMaskIDToDelete, MaskingService.ROW_MASK_NAME);
+          } else {
+            console.log('no deletion on mask level', Object.keys(response));
           }
           return response;
         })
@@ -248,10 +258,28 @@ export class MaskingService {
     if (MasksToDelete.length > 0) {
       switch (maskType) {
         case MaskingService.COLUMN_MASK_NAME:
-          this.deleteColumnMaskGQL.mutate(filter);
+          this.deleteColumnMaskGQL.mutate(filter).pipe(
+            map((response: any) => response.data),
+            map((response: IDeleteColumnMaskGQLResponse) => {
+              if (!Object.keys(response).includes('error')) {
+                this.logger.error(`deletion for column masks ${MasksToDelete} completed`);
+              } else {
+                this.logger.error(`error for column mask deletion ${MasksToDelete}`);
+              }
+            })
+          );
           break;
         case MaskingService.ROW_MASK_NAME:
-          this.deleteRowMaskGQL.mutate(filter);
+          this.deleteRowMaskGQL.mutate(filter).pipe(
+            map((response: any) => response.data),
+            map((response: IDeleteRowMaskGQLResponse) => {
+              if (!Object.keys(response).includes('error')) {
+                this.logger.error(`deletion for row masks ${MasksToDelete} completed`);
+              } else {
+                this.logger.error(`error for row mask deletion ${MasksToDelete}`);
+              }
+            })
+          );
           break;
         default:
           break;

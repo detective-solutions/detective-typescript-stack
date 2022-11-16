@@ -3,7 +3,7 @@
   <h1 mat-dialog-title *ngIf="!isAddDialog">{{ t('editDialogHeader') }}</h1>
 
   <div *ngIf="isAddDialog; else editDialog" mat-dialog-content>
-    <ng-container *ngIf="newFormFiledData$ as formFieldDefinitions">
+    <ng-container *ngIf="newFormFiledData as formFieldDefinitions">
       <dynamic-form
         [formFieldDefinitions]="formFieldDefinitions"
         [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
@@ -31,7 +31,7 @@
       [matAutocomplete]="auto"
     />
     <mat-label>{{ t('addUserLabel') }}</mat-label>
-    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayNull">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayEmptyString">
       <mat-option
         class="auto-complete-option"
         *ngFor="let option of this.filteredOptions | async"
@@ -43,7 +43,7 @@
   </mat-form-field>
   <div class="table-wrapper">
     <table mat-table [dataSource]="dataSource">
-      <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
+      <ng-container *ngFor="let col of columnsSchema" [matColumnDef]="col.key">
         <th mat-header-cell *matHeaderCellDef>
           {{ t(col.label) }}
         </th>

@@ -13,6 +13,12 @@ export class GetMaskingByUserGroupIdGQL extends Query<Response> {
       queryMasking @cascade {
         xid
         name
+        rows {
+          xid
+        }
+        columns {
+          xid
+        }
         groups(filter: { xid: { eq: $xid } }) {
           xid
         }

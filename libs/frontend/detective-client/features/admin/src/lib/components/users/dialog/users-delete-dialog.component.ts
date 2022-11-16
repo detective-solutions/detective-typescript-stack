@@ -18,7 +18,7 @@ import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-f
 })
 export class UsersDeleteDialogComponent {
   readonly userToBeDeleted$ = this.userService.getUserById(this.dialogInputData.id);
-  readonly userName$ = this.userToBeDeleted$.pipe(map((value: IUser) => value.firstname + ' ' + value.lastname));
+  readonly userName$ = this.userToBeDeleted$.pipe(map((value: IUser) => `${value.firstname} ${value.lastname}`));
   isSubmitting = false;
 
   constructor(

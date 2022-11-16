@@ -20,7 +20,7 @@ import {
   ITableColumns,
 } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ConnectionsService, MaskingService } from '../../../services';
+import { ConnectionsService, MaskingService, UsersService } from '../../../services';
 import { IDropDownValues, IMasking, IMask } from '@detective.solutions/shared/data-access';
 import { IConnectionTable } from '@detective.solutions/frontend/shared/data-access';
 import { v4 as uuidv4 } from 'uuid';
@@ -157,6 +157,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly maskingService: MaskingService,
+    private readonly userService: UsersService,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly connectionsService: ConnectionsService,
     private readonly formBuilder: FormBuilder,
@@ -325,6 +326,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         table: { xid: formGroup.value.table },
         groups: [{ xid: formGroup.value.groups }],
         name: formGroup.value.name,
+        tenant: { xid: this.userService.getTenant() },
         description: formGroup.value.description,
       };
 

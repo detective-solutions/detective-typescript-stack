@@ -1,7 +1,7 @@
 /* eslint-disable sort-imports */
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit } from '@angular/core';
-import { EMPTY, Subscription, catchError, take } from 'rxjs';
+import { EMPTY, catchError, take } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
@@ -9,8 +9,9 @@ import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui
 
 import { UsersService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IUser } from '@detective.solutions/shared/data-access';
+import { IUser, UserRole } from '@detective.solutions/shared/data-access';
 import { IUpdateUserRoleGQLResponse } from '../../../graphql';
+import { UserRoleInterface } from '../../../models';
 
 @Component({
   selector: 'users-edit-dialog',
@@ -18,19 +19,16 @@ import { IUpdateUserRoleGQLResponse } from '../../../graphql';
   templateUrl: 'users-edit-dialog.component.html',
 })
 export class UserEditDialogComponent implements OnInit {
-  currentUser$!: IUser;
-  isAddDialog = !this.dialogInputData?.id;
+  currentUser!: IUser;
   isSubmitting = false;
   isLoaded = false;
+  userRoleForm!: FormGroup;
+  currentRole!: { roleId: number; name: string };
 
-  private readonly subscriptions = new Subscription();
-
-  userRole!: FormGroup;
-
-  currentRole$!: { roleId: number; name: string };
-  roles = [
-    { roleId: 1, name: 'basic' },
-    { roleId: 2, name: 'admin' },
+  readonly isAddDialog = !this.dialogInputData?.id;
+  readonly roles = [
+    { roleId: 1, name: UserRole.BASIC },
+    { roleId: 2, name: UserRole.ADMIN },
   ];
 
   constructor(
@@ -45,26 +43,26 @@ export class UserEditDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userService.getUserById(this.dialogInputData.id).subscribe((x: IUser) => {
-      this.currentUser$ = x;
-      this.currentRole$ = this.roles.filter((value) => value.name === this.currentUser$.role)[0];
+    this.userService.getUserById(this.dialogInputData.id).subscribe((user: IUser) => {
+      this.currentUser = user;
+      this.currentRole = this.roles.filter((value) => value.name === this.currentUser.role)[0];
       this.isLoaded = true;
 
-      this.userRole = this.formBuilder.group({
-        role: [this.currentRole$.roleId, Validators.required],
+      this.userRoleForm = this.formBuilder.group({
+        role: [this.currentRole.roleId, Validators.required],
       });
     });
   }
 
   submitForm() {
     this.isSubmitting = true;
-    const date = new Date().toISOString();
+    const now = new Date().toISOString();
     const updateData = {
-      role: this.roles.filter((value) => value.roleId === this.userRole.value.role)[0].name,
-      lastUpdated: date,
+      role: this.roles.filter((role: UserRoleInterface) => role.roleId === this.userRoleForm.value.role)[0].name,
+      lastUpdated: now,
     };
     this.userService
-      .updateUserRole(this.currentUser$.id, updateData)
+      .updateUserRole(this.currentUser.id, updateData)
       .pipe(
         take(1),
         catchError((error: Error) => {

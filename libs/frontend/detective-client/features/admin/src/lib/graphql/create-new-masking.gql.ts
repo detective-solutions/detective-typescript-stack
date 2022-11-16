@@ -18,6 +18,9 @@ export class CreateNewMaskingGQL extends Mutation<Response> {
         masking {
           xid
           name
+          tenant {
+            xid
+          }
           description
           author {
             xid

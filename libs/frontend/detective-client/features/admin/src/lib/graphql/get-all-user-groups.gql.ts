@@ -11,8 +11,6 @@ export interface IGetUserGroupsGQLResponse {
 export interface IGetUserGroupsAsDropDownValuesGQLResponse {
   queryUserGroup: IDropDownValues[];
 }
-
-//TODO: Filter only for users related to current tenant
 @Injectable()
 export class GetAllUserGroupsGQL extends Query<Response> {
   override document = gql`
@@ -39,10 +37,13 @@ export class GetAllUserGroupsGQL extends Query<Response> {
 @Injectable()
 export class GetAllUserGroupsAsDropDownValuesGQL extends Query<Response> {
   override document = gql`
-    query UserGroup {
+    query UserGroup($xid: String) {
       queryUserGroup {
         key: xid
         value: name
+        tenant(filter: { xid: { eq: $xid } }) {
+          xid
+        }
       }
     }
   `;

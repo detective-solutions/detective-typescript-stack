@@ -145,8 +145,8 @@ export class UsersComponent implements OnDestroy, OnInit {
               cellData: {
                 id: user.id,
                 type: TableCellTypes.MULTI_TABLE_CELL,
-                name: String(user.firstname) + ' ' + String(user.lastname),
-                description: String(user.email),
+                name: `${user.firstname ?? ''} ${user.lastname ?? ''}`,
+                description: user.email ?? '',
                 thumbnail: user.avatarUrl ?? 'assets/images/mocks/avatars/no-image.png',
               },
             },
@@ -155,7 +155,7 @@ export class UsersComponent implements OnDestroy, OnInit {
               cellData: {
                 id: user.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(user.role),
+                text: user.role ?? '',
               },
             },
             lastUpdated: {
@@ -163,7 +163,7 @@ export class UsersComponent implements OnDestroy, OnInit {
               cellData: {
                 id: user.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
-                date: String(user.lastUpdated ?? '2022-01-01'),
+                date: user.lastUpdated ?? '2022-01-01',
               },
             },
             actions: {

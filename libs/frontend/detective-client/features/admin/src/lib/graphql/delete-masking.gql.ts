@@ -9,6 +9,18 @@ export interface IDeleteMaskingGQLResponse {
   };
 }
 
+export interface IDeleteColumnMaskGQLResponse {
+  deleteColumnMask: {
+    message: string;
+  };
+}
+
+export interface IDeleteRowMaskGQLResponse {
+  deleteRowMask: {
+    message: string;
+  };
+}
+
 @Injectable()
 export class DeleteMaskingGQL extends Mutation<Response> {
   override document = gql`

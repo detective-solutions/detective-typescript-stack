@@ -33,3 +33,8 @@ export interface IUserWithXid {
   lastUpdated?: string;
   created?: string;
 }
+
+export interface IDropDownUser {
+  xid: string;
+  name: string;
+}

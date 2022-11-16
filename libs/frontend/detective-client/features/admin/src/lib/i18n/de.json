@@ -40,6 +40,7 @@
       "lastUpdatedColumn": "Zuletzt aktualisiert"
     },
     "editDialog": {
+      "roleSelection": "Rolle",
       "editDialogHeader": "Nutzer bearbeiten",
       "saveButtonText": "Speichern"
     },

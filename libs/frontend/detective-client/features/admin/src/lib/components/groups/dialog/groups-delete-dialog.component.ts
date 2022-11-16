@@ -7,8 +7,9 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { IDeleteUserGroupGQLResponse } from '../../../graphql';
-import { UsersService } from '../../../services';
-import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { MaskingService, UsersService } from '../../../services';
+import { IMask, IMasking, IUserGroup } from '@detective.solutions/shared/data-access';
+import { IMaskingDeleteInput } from '../../../models';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 @Component({
@@ -17,6 +18,7 @@ import { IUserGroup } from '@detective.solutions/shared/data-access';
   templateUrl: 'groups-delete-dialog.component.html',
 })
 export class GroupsDeleteComponent {
+  readonly maskingsToDelete!: IMaskingDeleteInput;
   readonly groupToBeDeleted$ = this.userService.getUserGroupById(this.dialogInputData.id);
   readonly groupName$ = this.groupToBeDeleted$.pipe(map((value: IUserGroup) => value.name));
 
@@ -24,18 +26,35 @@ export class GroupsDeleteComponent {
   readonly relatedMaskings$ = this.maskingsToBeDeleted$.pipe(map((value: any) => value));
 
   isSubmitting = false;
+  maskingsDeleteInput!: IMaskingDeleteInput[];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService,
+    private readonly maskingService: MaskingService,
     private readonly dialogRef: MatDialogRef<GroupsDeleteComponent>,
     private readonly userService: UsersService,
     private readonly logger: LogService
-  ) {}
+  ) {
+    this.relatedMaskings$.subscribe(
+      (maskings: IMasking[]) => (this.maskingsDeleteInput = this.generateMaskingDeleteInput(maskings))
+    );
+  }
 
-  // TODO: delete also maskings - when masking branch DET-927 is merged
+  generateMaskingDeleteInput(maskings: IMasking[]): IMaskingDeleteInput[] {
+    const maskingDeleteInput: IMaskingDeleteInput[] = [];
+    maskings.forEach((masking: IMasking) => {
+      maskingDeleteInput.push({
+        masking: masking.xid,
+        rows: masking.rows?.map((mask: IMask) => mask.xid ?? '') ?? [],
+        columns: masking.columns?.map((mask: IMask) => mask.xid ?? '') ?? [],
+      });
+    });
+    return maskingDeleteInput;
+  }
+
   deleteUserGroup() {
     this.isSubmitting = true;
     this.userService
@@ -48,6 +67,13 @@ export class GroupsDeleteComponent {
         })
       )
       .subscribe((response: IDeleteUserGroupGQLResponse) => {
+        if (!Object.keys(response).includes('error')) {
+          this.maskingsDeleteInput.forEach((maskingDeleteInput: IMaskingDeleteInput) =>
+            this.maskingService
+              .deleteMasking(maskingDeleteInput)
+              .subscribe((response: any) => console.log('mask delete: ', response))
+          );
+        }
         this.handleResponse(response);
       });
   }

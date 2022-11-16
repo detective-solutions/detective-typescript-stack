@@ -6,35 +6,17 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { EMPTY, Subscription, catchError, take, Observable, tap, map, pluck, startWith, combineLatest } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { EMPTY, Subscription, catchError, take, Observable, tap, map, pluck, combineLatest, debounceTime } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { UsersService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IUser, IUserGroup } from '@detective.solutions/shared/data-access';
-import { IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
+import { IDropDownUser, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
+import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
 import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
-
-const COLUMNS_SCHEMA = [
-  {
-    key: 'username',
-    type: 'text',
-    label: 'subTable.username',
-  },
-  {
-    key: 'isEdit',
-    type: 'isEdit',
-    label: 'subTable.id',
-  },
-];
-
-export interface FakeUser {
-  xid: string;
-  name: string;
-}
 
 @Component({
   selector: 'groups-add-edit-dialog',
@@ -42,37 +24,37 @@ export interface FakeUser {
   templateUrl: 'groups-add-edit-dialog.component.html',
 })
 export class GroupsAddEditDialogComponent implements OnInit {
-  @ViewChild(COLUMNS_SCHEMA[0].key) input: string | undefined;
+  private static COLUMNS_SCHEMA = [
+    {
+      key: 'username',
+      type: 'text',
+      label: 'subTable.username',
+    },
+    {
+      key: 'isEdit',
+      type: 'isEdit',
+      label: 'subTable.id',
+    },
+  ];
 
-  currentUserGroup$!: IUserGroup;
-  isAddDialog = !this.dialogInputData?.id;
   isSubmitting = false;
+  filteredOptions!: Observable<IDropDownUser[]>;
+  newFormFiledData!: BaseFormField<string | boolean>[];
+  dataSource: GroupMember[] = [];
+  columnsSchema: { key: string; type: string; label: string }[] = GroupsAddEditDialogComponent.COLUMNS_SCHEMA;
+  displayedColumns: string[] = GroupsAddEditDialogComponent.COLUMNS_SCHEMA.map((col) => col.key);
 
-  searchBox = new FormControl('');
-  userOptions$!: Observable<FakeUser[]>;
-  filteredOptions!: Observable<FakeUser[]>;
-  usersToDelete: { xid: string }[] = [];
-
-  columnsSchema: { key: string; type: string; label: string }[] = COLUMNS_SCHEMA;
-  dataSource: { id: string; username: string; isNew: boolean }[] = [];
-  displayedColumns: string[] = COLUMNS_SCHEMA.map((col) => col.key);
-
-  private readonly subscriptions = new Subscription();
-
-  newFormFiledData$!: BaseFormField<string | boolean>[];
-
+  readonly searchBox = new FormControl('');
+  readonly isAddDialog = !this.dialogInputData?.id;
   readonly existingFormFieldData$ = this.userService.getUserGroupById(this.dialogInputData?.id).pipe(
     map((response: IUserGroup) => {
-      this.currentUserGroup$ = response;
-      this.currentUserGroup$.members?.forEach((element) => {
-        this.addRow(element.xid, String(element.firstname + ' ' + element.lastname), false);
+      response.members?.forEach((element) => {
+        this.addRow(element.xid, `${element.firstname} ${element.lastname}`, false);
       });
       this.isSubmitting = true;
       return response;
     }),
-    map((response: IUserGroup) => {
-      return this.generateTableProperties(response.name ?? '', response.description ?? '');
-    }),
+    map((response: IUserGroup) => this.generateTableProperties(response.name ?? '', response.description ?? '')),
     pluck('properties'),
     map(this.getFormFieldByType),
     tap(() => (this.isSubmitting = false)),
@@ -82,6 +64,13 @@ export class GroupsAddEditDialogComponent implements OnInit {
     })
   );
 
+  @ViewChild(GroupsAddEditDialogComponent.COLUMNS_SCHEMA[0].key) input: string | undefined;
+
+  private userOptions$!: Observable<IDropDownUser[]>;
+  private readonly subscriptions = new Subscription();
+
+  private usersToDelete: { xid: string }[] = [];
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
@@ -90,7 +79,6 @@ export class GroupsAddEditDialogComponent implements OnInit {
     private readonly userService: UsersService,
     private readonly dialogRef: MatDialogRef<GroupsAddEditDialogComponent>,
     private readonly dynamicFormControlService: DynamicFormControlService,
-    private readonly formBuilder: FormBuilder,
     private readonly logger: LogService
   ) {
     this.subscriptions.add(
@@ -99,32 +87,28 @@ export class GroupsAddEditDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.newFormFiledData$ = this.generateAddForm();
+    this.newFormFiledData = this.generateAddForm();
 
     this.userOptions$ = this.userService.getAllUsers(0, 10000).pipe(
       map((users: IGetAllUsersResponse) => {
-        const data: FakeUser[] = [];
-        users.users.forEach((user: IUser) => {
-          data.push({ xid: user.id, name: String(user.firstname + ' ' + user.lastname) });
+        return users.users.map((user: IUser) => {
+          return { xid: user.id, name: `${user.firstname} ${user.lastname}` };
         });
-        return data;
       })
     );
 
     const searchValues$ = this.searchBox.valueChanges.pipe(
-      startWith(''),
-      map((val) => {
-        if (val !== undefined) {
-          return val.toLowerCase();
-        }
-      })
+      debounceTime(200),
+      map((searchValue: string) => searchValue.toLowerCase()),
+      catchError(() => EMPTY)
     );
 
     this.filteredOptions = combineLatest([this.userOptions$, searchValues$]).pipe(
       map(([list, searchVal]) => {
-        const currentGroupMemebers = this.dataSource.map((member) => member.username);
+        const currentGroupMemebers = this.dataSource.map((member: GroupMember) => member.username);
         return list.filter(
-          (item) => item.name.toLowerCase().includes(searchVal) && !currentGroupMemebers.includes(item.name)
+          (userItem: IDropDownUser) =>
+            userItem.name.toLowerCase().includes(searchVal) && !currentGroupMemebers.includes(userItem.name)
         );
       })
     );
@@ -134,9 +118,9 @@ export class GroupsAddEditDialogComponent implements OnInit {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
 
     const members = this.dataSource
-      .filter((x) => x.isNew === true)
-      .map((x) => {
-        return { xid: x.id };
+      .filter((member: GroupMember) => member.isNew)
+      .map((member: GroupMember) => {
+        return { xid: member.id };
       });
 
     if (formGroup.valid && this.isAddDialog) {
@@ -182,7 +166,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
     }
   }
 
-  displayNull() {
+  displayEmptyString() {
     return '';
   }
 
@@ -192,16 +176,16 @@ export class GroupsAddEditDialogComponent implements OnInit {
       username: username,
       isNew: isNew,
     };
-    this.dataSource = [newRow, ...this.dataSource];
+    this.dataSource = [...this.dataSource, newRow];
   }
 
   removeRow(id: string) {
-    const userToDelete = this.dataSource.filter((u) => u.id === id)[0];
+    const userToDelete = this.dataSource.filter((member: GroupMember) => member.id === id)[0];
     if (!userToDelete.isNew) {
       this.usersToDelete.push({ xid: userToDelete.id });
     }
 
-    this.dataSource = this.dataSource.filter((u) => u.id !== id);
+    this.dataSource = this.dataSource.filter((member: GroupMember) => member.id !== id);
   }
 
   getTranslation(path: string) {
