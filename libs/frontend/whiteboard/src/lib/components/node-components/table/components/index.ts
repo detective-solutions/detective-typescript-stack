@@ -1,1 +1,1 @@
-export * from './table-loading-overlay/table-loading-overlay.component';
+export * from './table-node-loading-overlay/table-node-loading-overlay.component';
