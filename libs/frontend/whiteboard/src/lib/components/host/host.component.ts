@@ -193,11 +193,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
           // TODO: Remove when data from dragged element is used
-          const href = 'google.com';
+          // const href = 'https://www.simplesite.com';
           const embeddingNode = EmbeddingWhiteboardNode.Build({
             id: uuidv4(),
-            title: href,
-            href: href,
+            title: '',
             x: convertedDOMPoint.x,
             y: convertedDOMPoint.y,
             width: 900,
