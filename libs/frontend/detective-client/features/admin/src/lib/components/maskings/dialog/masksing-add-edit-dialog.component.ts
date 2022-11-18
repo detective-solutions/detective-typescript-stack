@@ -186,9 +186,6 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         this.selectedMasking$ = response;
         this.isSubmitting = true;
         this.dataSource = [];
-        this.updateAvailableColumns(response.table.xid);
-        this.createMasksFromFetch(response.rows ?? [], MaskingService.ROW_MASK_NAME);
-        this.createMasksFromFetch(response.columns ?? [], MaskingService.COLUMN_MASK_NAME);
       }),
       map(() => this.generateTableProperties()),
       pluck('properties'),

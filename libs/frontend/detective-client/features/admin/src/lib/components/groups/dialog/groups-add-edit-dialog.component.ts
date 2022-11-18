@@ -14,7 +14,7 @@ import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui
 
 import { UsersService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IDropDownUser, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
+import { IDropDownUser, IMember, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
 import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
 
@@ -42,13 +42,15 @@ export class GroupsAddEditDialogComponent implements OnInit {
   newFormFiledData!: BaseFormField<string | boolean>[];
   dataSource: GroupMember[] = [];
   columnsSchema: { key: string; type: string; label: string }[] = GroupsAddEditDialogComponent.COLUMNS_SCHEMA;
-  displayedColumns: string[] = GroupsAddEditDialogComponent.COLUMNS_SCHEMA.map((col) => col.key);
+  displayedColumns: string[] = GroupsAddEditDialogComponent.COLUMNS_SCHEMA.map(
+    (col: { key: string; type: string; label: string }) => col.key
+  );
 
   readonly searchBox = new FormControl('');
   readonly isAddDialog = !this.dialogInputData?.id;
   readonly existingFormFieldData$ = this.userService.getUserGroupById(this.dialogInputData?.id).pipe(
     map((response: IUserGroup) => {
-      response.members?.forEach((element) => {
+      response.members?.forEach((element: IMember) => {
         this.addRow(element.xid, `${element.firstname} ${element.lastname}`, false);
       });
       this.isSubmitting = true;
@@ -68,7 +70,6 @@ export class GroupsAddEditDialogComponent implements OnInit {
 
   private userOptions$!: Observable<IDropDownUser[]>;
   private readonly subscriptions = new Subscription();
-
   private usersToDelete: { xid: string }[] = [];
 
   constructor(

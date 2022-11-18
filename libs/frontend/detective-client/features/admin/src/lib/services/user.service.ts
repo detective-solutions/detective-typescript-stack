@@ -300,7 +300,7 @@ export class UsersService {
       );
   }
 
-  getMaskingsOfUserGroup(xid: string): Observable<IMasking> {
+  getMaskingsOfUserGroup(xid: string): Observable<IMasking[]> {
     this.getMaskingsOfUserGroupWatchQuery = this.getMaskingsOfUserGroupById.watch({ xid: xid });
     return this.getMaskingsOfUserGroupWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),

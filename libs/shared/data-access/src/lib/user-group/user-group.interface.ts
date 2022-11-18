@@ -1,13 +1,18 @@
+import { IUser } from '../user/user.interface';
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+
+export interface IMember {
+  xid: string;
+  firstname: string;
+  lastname: string;
+}
+
 export interface IUserGroup {
   xid?: string;
   name?: string;
   description?: string;
-  members?: {
-    xid: string;
-    firstname: string;
-    lastname: string;
-  }[];
+  members?: IMember[];
   memberCount?: {
     count: number;
   };

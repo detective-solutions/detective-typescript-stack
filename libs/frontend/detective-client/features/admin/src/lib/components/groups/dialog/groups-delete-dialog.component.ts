@@ -20,10 +20,10 @@ import { IMaskingDeleteInput } from '../../../models';
 export class GroupsDeleteComponent {
   readonly maskingsToDelete!: IMaskingDeleteInput;
   readonly groupToBeDeleted$ = this.userService.getUserGroupById(this.dialogInputData.id);
-  readonly groupName$ = this.groupToBeDeleted$.pipe(map((value: IUserGroup) => value.name));
+  readonly groupName$ = this.groupToBeDeleted$.pipe(map((group: IUserGroup) => group.name));
 
   readonly maskingsToBeDeleted$ = this.userService.getMaskingsOfUserGroup(this.dialogInputData.id);
-  readonly relatedMaskings$ = this.maskingsToBeDeleted$.pipe(map((value: any) => value));
+  readonly relatedMaskings$ = this.maskingsToBeDeleted$.pipe(map((maskings: IMasking[]) => maskings));
 
   isSubmitting = false;
   maskingsDeleteInput!: IMaskingDeleteInput[];
@@ -68,11 +68,15 @@ export class GroupsDeleteComponent {
       )
       .subscribe((response: IDeleteUserGroupGQLResponse) => {
         if (!Object.keys(response).includes('error')) {
-          this.maskingsDeleteInput.forEach((maskingDeleteInput: IMaskingDeleteInput) =>
+          console.log('delete Group response ', response);
+          this.maskingsDeleteInput.forEach((maskingDeleteInput: IMaskingDeleteInput) => {
+            console.log('iteration: ', maskingDeleteInput);
             this.maskingService
               .deleteMasking(maskingDeleteInput)
-              .subscribe((response: any) => console.log('mask delete: ', response))
-          );
+              .subscribe((response: any) => console.log('mask delete: ', response));
+          });
+        } else {
+          console.log(Object.keys(response));
         }
         this.handleResponse(response);
       });

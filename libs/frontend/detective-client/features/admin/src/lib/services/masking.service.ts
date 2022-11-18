@@ -25,7 +25,6 @@ import {
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
 import { Observable, catchError, map } from 'rxjs';
 
-import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
 import { GetAllColumnsGQL } from '../graphql/get-all-columns-by-table-id.gql';
 import { IGetAllColumnsResponse } from '../models/get-all-columns-by-table-id-response.interface';
@@ -34,7 +33,6 @@ import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { UsersService } from './user.service';
-import { responsePathAsArray } from 'graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -296,6 +294,10 @@ export class MaskingService {
               eq: set.masking,
             },
           },
+          remove: {
+            columns: set.columns,
+            rows: set.rows,
+          },
         },
         {
           refetchQueries: [
@@ -305,13 +307,7 @@ export class MaskingService {
       )
       .pipe(
         map((response: any) => response.data),
-        map((response: IDeleteMaskingGQLResponse) => {
-          if (!Object.keys(response).includes('error')) {
-            this.deleteColumnOrRowMask(set.rows, MaskingService.ROW_MASK_NAME);
-            this.deleteColumnOrRowMask(set.columns, MaskingService.COLUMN_MASK_NAME);
-          }
-          return response;
-        })
+        map((response: IDeleteMaskingGQLResponse) => response)
       );
   }
 
