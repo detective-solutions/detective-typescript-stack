@@ -1,5 +1,3 @@
-import { IUser } from '../user/user.interface';
-
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 
 export interface IMember {
