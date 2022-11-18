@@ -4,6 +4,9 @@ export class MaskingDTO implements IMasking {
   constructor(
     public xid: string,
     public name: string,
+    public tenant: {
+      xid: string;
+    },
     public description: string,
     public table: {
       xid: string;
@@ -29,6 +32,7 @@ export class MaskingDTO implements IMasking {
     return new MaskingDTO(
       maskingInput.xid,
       maskingInput.name,
+      maskingInput.tenant,
       maskingInput.description,
       maskingInput.table,
       maskingInput.columns,

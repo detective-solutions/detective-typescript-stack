@@ -43,6 +43,9 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
                 keyFields: ['xid'],
                 fields: {
                   queryCasefile: offsetLimitPagination(),
+                  queryMasking: offsetLimitPagination(),
+                  queryUserGroup: offsetLimitPagination(),
+                  queryUser: offsetLimitPagination(),
                   querySourceConnection: offsetLimitPagination(),
                 },
               },

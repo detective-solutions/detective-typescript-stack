@@ -19,6 +19,9 @@ export interface IMask {
 export interface IMasking {
   xid: string;
   name: string;
+  tenant: {
+    xid: string;
+  };
   description: string;
   table: {
     xid: string;
@@ -28,9 +31,9 @@ export interface IMasking {
       name: string;
     };
   };
+  groups?: { xid: string; name: string }[];
   columns?: IMask[];
   rows?: IMask[];
-  groups?: { xid: string; name: string }[];
   author?: IUserWithXid;
   editors?: [IUserWithXid];
   lastUpdatedBy?: IUserWithXid;

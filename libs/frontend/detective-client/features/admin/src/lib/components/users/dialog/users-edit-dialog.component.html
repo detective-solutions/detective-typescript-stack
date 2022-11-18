@@ -1,0 +1,22 @@
+<div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.users.editDialog'">
+  <h1 mat-dialog-title>{{ t('editDialogHeader') }}</h1>
+  <div class="user-edit-wrapper" *ngIf="isLoaded">
+    <div class="user-name">
+      {{ this.currentUser.firstname }} {{ this.currentUser.lastname }}<br />
+      <small>{{ this.currentUser.email }}</small>
+    </div>
+    <form [formGroup]="userRoleForm">
+      <mat-form-field>
+        <mat-label>{{ t('roleSelection') }}</mat-label>
+        <mat-select id="role" formControlName="role">
+          <mat-option [value]="item.roleId" id="roleOptions" *ngFor="let item of roles">
+            {{ item.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
+  </div>
+</div>

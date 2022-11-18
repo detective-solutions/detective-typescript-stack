@@ -13,6 +13,9 @@ export class GetMaskingByIdGQL extends Query<Response> {
       getMasking(xid: $xid) {
         xid
         name
+        tenant {
+          xid
+        }
         description
         table {
           xid

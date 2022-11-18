@@ -1,0 +1,17 @@
+<div class="delete-dialog-wrapper" *transloco="let t; read: 'admin.groups.deleteDialog'">
+  <h1 mat-dialog-title align="center">{{ t('deleteDialogHeader') }}</h1>
+  <div mat-dialog-content align="center">
+    {{ t('deleteDialogText', { groupName: this.groupName$ | async }) }}
+    <ul>
+      <li *ngFor="let masking of this.relatedMaskings$ | async">
+        {{ masking.name }}
+      </li>
+    </ul>
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="deleteUserGroup()">
+      {{ t('deleteButtonText') }}
+    </button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>

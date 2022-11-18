@@ -1,0 +1,16 @@
+<div class="user-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.users'">
+  <div class="user-limit-wrapper">
+    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+      <p>
+        {{ activeUsers$ | async }} {{ t('utils.of') }} {{ (this.productInfo$ | async)?.userLimit }}
+        {{ t('utils.users') }}
+      </p>
+      <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}" id="user-limit"></mat-progress-bar>
+    </div>
+  </div>
+  <table-view
+    [tableRows$]="tableItems$"
+    [pageSize]="pageSize"
+    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+  ></table-view>
+</div>

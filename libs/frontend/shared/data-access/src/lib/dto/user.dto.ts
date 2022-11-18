@@ -10,7 +10,8 @@ export class UserDTO implements IUser {
     public lastname = '',
     public title = '',
     public avatarUrl = '',
-    public userGroups: IUserGroup[] = []
+    public userGroups: IUserGroup[] = [],
+    public lastUpdated = ''
   ) {}
 
   static Build(userInput: IUser) {
@@ -21,12 +22,13 @@ export class UserDTO implements IUser {
       userInput.id,
       userInput.email,
       userInput.tenantIds as ITenant[],
-      UserRole.BASIC,
+      userInput.role,
       userInput.firstname,
       userInput.lastname,
       userInput.title,
       userInput.avatarUrl,
-      userInput.userGroups as IUserGroup[]
+      userInput.userGroups as IUserGroup[],
+      userInput.lastUpdated
     );
   }
 

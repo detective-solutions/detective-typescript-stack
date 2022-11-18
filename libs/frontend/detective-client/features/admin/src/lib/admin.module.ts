@@ -4,27 +4,37 @@ import {
   GroupsComponent,
   MaskingsComponent,
   SubscriptionsComponent,
+  UsersComponent,
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { ConnectionsService, MaskingService, SubscriptionService } from './services';
+import { ConnectionsService, MaskingService, SubscriptionService, UsersService } from './services';
 import {
   CreateNewColumnMaskGQL,
   CreateNewMaskingGQL,
-  CreateNewRowMaskGQL,
+  CreateUserGroupGQL,
   DeleteColumnMaskGQL,
   DeleteMaskingGQL,
   DeleteRowMaskGQL,
+  DeleteUserGQL,
+  DeleteUserGroupGQL,
   GetAllColumnsGQL,
   GetAllConnectionsGQL,
   GetAllMaskingsGQL,
+  GetAllUserGroupsAsDropDownValuesGQL,
   GetAllUserGroupsGQL,
   GetAllUsersGQL,
   GetConnectionByIdGQL,
   GetConnectionByTableIdGQL,
+  GetMaskingByUserGroupIdGQL,
   GetTablesBySourceConnectionIdGQL,
+  GetUserByIdGQL,
+  GetUserGroupByIdGQL,
   UpdateMaskingGQL,
+  UpdateUserGroupGQL,
+  UpdateUserRoleGQL,
 } from './graphql';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/groups/dialog';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -39,6 +49,8 @@ import { CommonModule } from '@angular/common';
 import { DynamicFormModule } from '@detective.solutions/frontend/shared/dynamic-form';
 import { GetMaskingByIdGQL } from './graphql/get-masking-by-id.gql';
 import { NgModule } from '@angular/core';
+import { UserEditDialogComponent } from './components/users/dialog/users-edit-dialog.component';
+import { UsersDeleteDialogComponent } from './components/users/dialog';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
 
 @NgModule({
@@ -47,13 +59,18 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     ConnectionsComponent,
     ConnectionsAddEditDialogComponent,
     ConnectionsDeleteDialogComponent,
+    SubscriptionCancelDialogComponent,
+    SubscriptionUpgradeDialogComponent,
+    UsersComponent,
+    UsersDeleteDialogComponent,
+    UserEditDialogComponent,
     GroupsComponent,
+    GroupsDeleteComponent,
+    GroupsAddEditDialogComponent,
     MaskingsComponent,
     MaskingAddEditDialogComponent,
     MaskingDeleteDialogComponent,
     SubscriptionsComponent,
-    SubscriptionCancelDialogComponent,
-    SubscriptionUpgradeDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -75,24 +92,34 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
       },
     },
     ConnectionsService,
-    GetConnectionByTableIdGQL,
-    GetConnectionByIdGQL,
-    GetAllColumnsGQL,
-    GetAllConnectionsGQL,
-    GetTablesBySourceConnectionIdGQL,
     MaskingService,
-    GetAllMaskingsGQL,
-    UpdateMaskingGQL,
-    GetMaskingByIdGQL,
-    DeleteMaskingGQL,
+    SubscriptionService,
+    UsersService,
+    GetAllConnectionsGQL,
+    GetConnectionByTableIdGQL,
+    GetTablesBySourceConnectionIdGQL,
+    GetConnectionByIdGQL,
     CreateNewColumnMaskGQL,
-    CreateNewRowMaskGQL,
-    DeleteColumnMaskGQL,
+    GetMaskingByIdGQL,
+    UpdateMaskingGQL,
+    DeleteMaskingGQL,
+    DeleteMaskingGQL,
     DeleteRowMaskGQL,
-    GetAllUsersGQL,
+    DeleteColumnMaskGQL,
+    GetAllMaskingsGQL,
+    GetAllUserGroupsAsDropDownValuesGQL,
+    GetAllColumnsGQL,
     CreateNewMaskingGQL,
     GetAllUserGroupsGQL,
-    SubscriptionService,
+    GetUserGroupByIdGQL,
+    GetAllUsersGQL,
+    GetUserByIdGQL,
+    DeleteUserGQL,
+    CreateUserGroupGQL,
+    UpdateUserGroupGQL,
+    DeleteUserGroupGQL,
+    UpdateUserRoleGQL,
+    GetMaskingByUserGroupIdGQL,
   ],
 })
 export class AdminModule {}

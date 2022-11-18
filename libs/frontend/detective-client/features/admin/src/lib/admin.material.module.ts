@@ -1,10 +1,12 @@
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -17,11 +19,14 @@ const modules = [
   MatCheckboxModule,
   MatIconModule,
   MatDialogModule,
-  MatSelectModule,
+
   MatProgressBarModule,
   FlexLayoutModule,
   MatGridListModule,
   MatTableModule,
+  MatAutocompleteModule,
+  MatInputModule,
+  MatSelectModule,
   MatTooltipModule,
 ];
 

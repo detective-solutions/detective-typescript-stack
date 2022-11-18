@@ -1,0 +1,33 @@
+.mat-dialog-content {
+  width: 90%;
+
+  form,
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.mat-dialog-actions {
+  button {
+    margin: 15px 0;
+    width: 100px;
+  }
+}
+
+.mat-progress-bar {
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+}
+
+.user-edit-wrapper {
+  .user-name {
+    height: 20px;
+    margin-bottom: 40px;
+
+    small {
+      color: lighten(black, 60%);
+    }
+  }
+}

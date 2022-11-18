@@ -6,6 +6,7 @@ export interface IMaskingCreateInput {
     table: { xid: string };
     groups: { xid: string }[];
     name: string;
+    tenant: { xid: string };
     description: string;
     xid?: string;
     author?: { xid: string };

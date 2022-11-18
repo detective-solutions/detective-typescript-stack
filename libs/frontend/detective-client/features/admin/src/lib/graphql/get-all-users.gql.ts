@@ -7,20 +7,22 @@ export interface IGetUsersGQLResponse {
   queryUser: IUser[];
   aggregateUser: { count: number };
 }
-
-//TODO: Filter only for users related to current tenant
 @Injectable()
 export class GetAllUsersGQL extends Query<Response> {
   override document = gql`
-    query User {
-      queryUser @cascade {
+    query User($xid: String, $paginationOffset: Int, $pageSize: Int) {
+      queryUser(offset: $paginationOffset, first: $pageSize, order: { asc: firstname }) {
+        id: xid
         email
+        tenants(filter: { xid: { eq: $xid } }) {
+          xid
+        }
         role
         firstname
         lastname
-        tenantIds: tenants(filter: { xid: { eq: "4091e594-3cb5-11ed-95e8-ebca79b0263f" } }) {
-          xid
-        }
+        title
+        avatarUrl
+        lastUpdated
       }
       aggregateUser {
         count
