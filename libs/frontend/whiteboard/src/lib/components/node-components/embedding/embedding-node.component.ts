@@ -2,7 +2,6 @@ import { Component, DoCheck, ViewEncapsulation } from '@angular/core';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { IEmbeddingWhiteboardNode } from '@detective.solutions/shared/data-access';
-import { Subject } from 'rxjs';
 import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
@@ -18,7 +17,6 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
   headerTitleInputValue = '';
 
   readonly selectionBarMinHeight = 250;
-  readonly updatedTitle$ = new Subject<string>();
 
   private siblingEmbeddingElement!: SVGForeignObjectElement | null;
   private iFrameElement!: HTMLIFrameElement;
@@ -30,7 +28,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       this.initIFrame();
     }
     this.subscriptions.add(
-      this.updatedTitle$.subscribe((updatedTitle: string) => (this.headerTitleInputValue = updatedTitle))
+      this.nodeTitleUpdate$.subscribe((updatedTitle: string) => (this.headerTitleInputValue = updatedTitle))
     );
   }
 

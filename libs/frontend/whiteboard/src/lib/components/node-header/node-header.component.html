@@ -2,8 +2,9 @@
   <input
     placeholder="{{ t('titleInputPlaceholder') }}"
     [value]="title"
-    (keyup)="updatedTitleEventEmitter$.next($event)"
-    (keyup.enter)="enterKeyPressedEventEmitter$.next($event)"
+    (blur)="onTitleInputBlurEventEmitter$.next($event)"
+    (keyup)="onTitleInputKeyUpEventEmitter$.next($event)"
+    (keyup.enter)="onTitleInputEnterKeyPressedEventEmitter$.next($event)"
   />
   <mat-icon
     *ngIf="(blockInfo$ | async) === null; else blockedInfo"

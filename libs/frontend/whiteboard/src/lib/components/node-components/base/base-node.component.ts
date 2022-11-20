@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
 import { AnyWhiteboardNode, IGeneralWhiteboardNodeTemporaryData } from '@detective.solutions/shared/data-access';
-import { BehaviorSubject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
 import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../state';
 
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
@@ -37,6 +37,7 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     map(([_context, blockedBy]) => blockedBy)
   );
+  readonly nodeTitleUpdate$ = new Subject<string>();
 
   readonly nodeHeaderHeight = 50;
 

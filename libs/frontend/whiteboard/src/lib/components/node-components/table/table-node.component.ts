@@ -5,6 +5,7 @@ import {
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { WhiteboardNodeActions, selectWhiteboardNodeById } from '../../../state';
 import { filter, map, pluck, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
@@ -12,7 +13,6 @@ import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
 import { IQueryResponse as IQueryResponseBody } from './models';
 import { TableNodeActions } from './state';
-import { selectWhiteboardNodeById } from '../../../state';
 
 @Component({
   selector: '[tableNode]',
@@ -39,6 +39,16 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.subscriptions.add(
+      this.nodeTitleUpdate$.subscribe((updatedTitle: string) =>
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
+            update: { id: this.node.id, changes: { title: updatedTitle } },
+          })
+        )
+      )
+    );
+
     // Node update subscription needs to be defined here, otherwise this.id would be undefined
     this.subscriptions.add(
       this.store

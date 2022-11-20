@@ -29,15 +29,11 @@
     [attr.width]="node.width"
     [attr.height]="hasHref ? nodeHeaderHeight : node.height"
   >
-    <div
-      *ngIf="isDragging$ | async"
-      class="drag-overlay"
-      [ngStyle]="{ height: hasHref ? node.height : nodeHeaderHeight }"
-    ></div>
+    <div *ngIf="(isDragging$ | async) && hasHref" class="drag-overlay"></div>
     <node-header
       [title]="node.title"
       [isBlocked$]="isBlocked$"
-      (updatedTitle$)="updatedTitle$.next($event)"
+      (titleChangesOnKeyUp$)="nodeTitleUpdate$.next($event)"
       (enterKeyPressed$)="renderEmbedding($event)"
     ></node-header>
     <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-href-button">

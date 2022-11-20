@@ -16,15 +16,19 @@ export class NodeHeaderComponent implements OnInit {
   @Input() title!: string;
   @Input() isBlocked$!: Observable<string>;
 
-  updatedTitleEventEmitter$ = new EventEmitter<Event>();
-  @Output() updatedTitle$ = this.updatedTitleEventEmitter$.pipe(
+  onTitleInputBlurEventEmitter$ = new EventEmitter<Event>();
+  @Output() titleChangesOnBlur$ = this.onTitleInputBlurEventEmitter$.pipe(
+    map((event: Event) => (event.target as HTMLInputElement).value),
+    distinctUntilChanged()
+  );
+  onTitleInputKeyUpEventEmitter$ = new EventEmitter<Event>();
+  @Output() titleChangesOnKeyUp$ = this.onTitleInputKeyUpEventEmitter$.pipe(
     debounceTime(300),
     map((event: Event) => (event.target as HTMLInputElement).value),
     distinctUntilChanged()
   );
-
-  enterKeyPressedEventEmitter$ = new EventEmitter<Event>();
-  @Output() enterKeyPressed$ = this.enterKeyPressedEventEmitter$.pipe(
+  onTitleInputEnterKeyPressedEventEmitter$ = new EventEmitter<Event>();
+  @Output() enterKeyPressed$ = this.onTitleInputEnterKeyPressedEventEmitter$.pipe(
     map((event: Event) => (event.target as HTMLInputElement).value)
   );
 
