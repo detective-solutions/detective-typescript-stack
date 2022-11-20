@@ -193,6 +193,29 @@ describe('WhiteboardWebsocketGateway', () => {
     });
   });
 
+  describe('onWhiteboardNodeResizedEvent', () => {
+    it('should forward WHITEBOARD_NODE_RESIZED events to the correct target topic', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const testMessage = { context: _createContext(MessageEventType.WhiteboardNodeResized), body: testMessageBody };
+
+      await webSocketGateway.onWhiteboardNodeResized(testMessage);
+
+      expect(producerMock).toBeCalledTimes(1);
+      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.whiteboardNodeResized.targetTopic, testMessage);
+    });
+
+    it('should throw an InternalServerErrorException if the message context validation fails', async () => {
+      const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
+      const context = _createContext(MessageEventType.WhiteboardNodeTitleUpdated);
+      delete context['tenantId']; // tenantId is required in the MessageContextDTO
+
+      expect(webSocketGateway.onWhiteboardNodeResized({ context: context, body: {} })).rejects.toThrow(
+        InternalServerErrorException
+      );
+      expect(producerMock).toBeCalledTimes(0);
+    });
+  });
+
   describe('onWhiteboardTitleUpdatedEvent', () => {
     it('should forward WHITEBOARD_TITLE_UPDATED events to the correct target topic', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
