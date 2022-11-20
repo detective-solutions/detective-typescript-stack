@@ -177,6 +177,27 @@ export class CacheService {
     return true;
   }
 
+  async updateNodeProperty(
+    casefileId: string,
+    updatedNodeId: string,
+    propertyToUpdate: string,
+    updateValue: string | number | boolean
+  ): Promise<boolean> {
+    this.logger.log(`Updating ${propertyToUpdate} property of whiteboard node in casefile "${casefileId}"`);
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+
+    cachedNodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === updatedNodeId) {
+        node[propertyToUpdate] = updateValue;
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    return true;
+  }
+
   async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
     this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
