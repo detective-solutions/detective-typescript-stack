@@ -24,7 +24,7 @@ export class WhiteboardNodeTitleUpdatedTransaction extends Transaction {
 
     try {
       this.forwardMessageToOtherClients();
-      await this.cacheService.updateNodeProperty(casefileId, nodeId, 'title', this.messageBody);
+      await this.cacheService.updateNodeProperty(casefileId, nodeId, 'title', this.messageBody?.title);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.logger.error(error);

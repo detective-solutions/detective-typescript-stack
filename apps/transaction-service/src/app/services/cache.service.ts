@@ -181,9 +181,11 @@ export class CacheService {
     casefileId: string,
     updatedNodeId: string,
     propertyToUpdate: string,
-    updateValue: string | number | boolean
+    updateValue: string | number | boolean | undefined
   ): Promise<boolean> {
     this.logger.log(`Updating ${propertyToUpdate} property of whiteboard node in casefile "${casefileId}"`);
+
+    updateValue = updateValue ?? null; // Convert empty or undefined values to null for correct database removal
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
