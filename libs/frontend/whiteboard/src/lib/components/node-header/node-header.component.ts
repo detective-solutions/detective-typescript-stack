@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Observable, combineLatest, filter, map } from 'rxjs';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Observable, combineLatest, debounceTime, distinctUntilChanged, filter, map } from 'rxjs';
 
 import { IUserForWhiteboard } from '@detective.solutions/shared/data-access';
 import { Store } from '@ngrx/store';
@@ -15,6 +15,18 @@ import { selectActiveUsers } from '../../state';
 export class NodeHeaderComponent implements OnInit {
   @Input() title!: string;
   @Input() isBlocked$!: Observable<string>;
+
+  updatedTitleEventEmitter$ = new EventEmitter<Event>();
+  @Output() updatedTitle$ = this.updatedTitleEventEmitter$.pipe(
+    debounceTime(300),
+    map((event: Event) => (event.target as HTMLInputElement).value),
+    distinctUntilChanged()
+  );
+
+  enterKeyPressedEventEmitter$ = new EventEmitter<Event>();
+  @Output() enterKeyPressed$ = this.enterKeyPressedEventEmitter$.pipe(
+    map((event: Event) => (event.target as HTMLInputElement).value)
+  );
 
   blockInfo$!: Observable<Partial<IUserForWhiteboard>>;
   userName$!: Observable<string>;

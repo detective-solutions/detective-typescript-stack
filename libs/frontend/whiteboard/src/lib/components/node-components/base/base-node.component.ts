@@ -38,6 +38,8 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     map(([_context, blockedBy]) => blockedBy)
   );
 
+  readonly nodeHeaderHeight = 50;
+
   protected currentUserId!: string;
   protected readonly subscriptions = new Subscription();
 
@@ -69,10 +71,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
       .pipe(take(1), pluck('userId'))
       .subscribe((userId: string) => {
         this.currentUserId = userId;
-        this.whiteboardFacade.applyDragBehaviorToComponent(this, this.currentUserId);
+        this.whiteboardFacade.applyDragBehaviorToComponent(this as any, this.currentUserId);
         this.customAfterViewInit();
       });
-    this.whiteboardFacade.applyResizeBehaviorToComponent(this);
+    this.whiteboardFacade.applyResizeBehaviorToComponent(this as any);
   }
 
   ngOnDestroy() {
@@ -103,11 +105,16 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
         deletedNodeId: this.node.id,
       })
     );
+    this.customDelete();
   }
 
   // Can be used by child classes to add custom logic to the ngAfterViewInit hook
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected customAfterViewInit() {}
+
+  // Can be used by child classes to add custom logic to the delete method
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customDelete() {}
 
   protected updateExistingNodeObject(updatedNode: AnyWhiteboardNode) {
     Object.keys(updatedNode).forEach((key: string) => {
