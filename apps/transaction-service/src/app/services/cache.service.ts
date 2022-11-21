@@ -182,7 +182,7 @@ export class CacheService {
     updatedNodeId: string,
     propertyToUpdate: string,
     updateValue: string | number | boolean | undefined
-  ): Promise<boolean> {
+  ): Promise<void> {
     this.logger.log(`Updating ${propertyToUpdate} property of whiteboard node in casefile "${casefileId}"`);
 
     updateValue = updateValue ?? null; // Convert empty or undefined values to null for correct database removal
@@ -197,7 +197,6 @@ export class CacheService {
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    return true;
   }
 
   async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
