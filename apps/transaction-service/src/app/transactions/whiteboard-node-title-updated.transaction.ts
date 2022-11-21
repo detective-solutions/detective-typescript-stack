@@ -22,18 +22,27 @@ export class WhiteboardNodeTitleUpdatedTransaction extends Transaction {
     const casefileId = this.messageContext.casefileId;
     const nodeId = this.messageContext.nodeId;
 
+    this.forwardMessageToOtherClients();
     try {
-      this.forwardMessageToOtherClients();
-      await this.cacheService.updateNodeProperty(casefileId, nodeId, 'title', this.messageBody?.title);
-      this.logger.log(`${this.logContext} Transaction successful`);
+      await this.updateCache(casefileId, nodeId);
     } catch (error) {
       this.logger.error(error);
-      this.handleError(casefileId);
+      this.logger.log(`${this.logContext} Retrying node title property cache update`);
+      try {
+        await this.updateCache(casefileId, nodeId);
+      } catch (error) {
+        this.handleFinalError(error);
+      }
     }
+    this.logger.log(`${this.logContext} Transaction successful`);
   }
 
-  private handleError(casefileId: string) {
-    // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not update node positions in casefile ${casefileId}`);
+  private async updateCache(casefileId: string, nodeId: string) {
+    await this.cacheService.updateNodeProperty(casefileId, nodeId, 'title', this.messageBody?.title);
+  }
+
+  private handleFinalError(casefileId: string) {
+    // TODO: Add mechanism to publish failed transaction to error topic
+    throw new InternalServerErrorException(`Could not update node title property in casefile ${casefileId}`);
   }
 }
