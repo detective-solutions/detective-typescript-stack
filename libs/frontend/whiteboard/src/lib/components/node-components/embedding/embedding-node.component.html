@@ -26,14 +26,17 @@
     </div>
   </foreignObject>
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="nodeHeaderHeight">
+    <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
     <node-header
       [title]="node.title"
       [isBlocked$]="isBlocked$"
       (titleChangesOnKeyUp$)="nodeTitleUpdate$.next($event)"
       (enterKeyPressed$)="renderEmbedding($event)"
     ></node-header>
-    <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-src-button">
-      <mat-icon>send</mat-icon>
-    </button>
+    <ng-container *ngIf="(isBlocked$ | async) === null">
+      <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-src-button">
+        <mat-icon>send</mat-icon>
+      </button>
+    </ng-container>
   </foreignObject>
 </svg:g>
