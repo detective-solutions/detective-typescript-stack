@@ -4,15 +4,16 @@
     node-selection-halo
     [nodeId]="node.id"
     [nodeWidth]="node.width"
-    [nodeHeight]="hasHref ? node.height : nodeHeaderHeight"
+    [nodeHeight]="node.height"
+    [disableResize]="!hasSrc"
   ></svg:g>
   <foreignObject
     *ngIf="selected$ | async"
     [attr.x]="node.width"
     [attr.width]="75"
-    [attr.height]="hasHref ? node.height : selectionBarMinHeight"
+    [attr.height]="hasSrc ? node.height : selectionBarMinHeight"
   >
-    <div class="node-actions-wrapper table-actions">
+    <div class="node-actions-wrapper embedding-actions">
       <div fxFlex fxLayout="column" fxLayoutAlign="center center">
         <button mat-icon-button (click)="toggleLock()">
           <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
@@ -24,19 +25,14 @@
       </div>
     </div>
   </foreignObject>
-  <foreignObject
-    class="node-content"
-    [attr.width]="node.width"
-    [attr.height]="hasHref ? nodeHeaderHeight : node.height"
-  >
-    <div *ngIf="(isDragging$ | async) && hasHref" class="drag-overlay"></div>
+  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="nodeHeaderHeight">
     <node-header
       [title]="node.title"
       [isBlocked$]="isBlocked$"
       (titleChangesOnKeyUp$)="nodeTitleUpdate$.next($event)"
       (enterKeyPressed$)="renderEmbedding($event)"
     ></node-header>
-    <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-href-button">
+    <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-src-button">
       <mat-icon>send</mat-icon>
     </button>
   </foreignObject>

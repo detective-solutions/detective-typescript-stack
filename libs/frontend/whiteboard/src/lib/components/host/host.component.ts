@@ -201,7 +201,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             x: convertedDOMPoint.x,
             y: convertedDOMPoint.y,
             width: 900,
-            height: 500,
+            height: 50,
             locked: false,
             author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
             editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],

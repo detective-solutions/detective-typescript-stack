@@ -63,6 +63,9 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeTitleUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
+  on(WhiteboardNodeActions.WhiteboardEmbeddingNodeUpdated, (state: IWhiteboardNodeState, action: any) =>
+    whiteboardNodeEntityAdapter.updateOne(action.update, state)
+  ),
   on(WhiteboardNodeActions.WhiteboardNodeBatchUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),

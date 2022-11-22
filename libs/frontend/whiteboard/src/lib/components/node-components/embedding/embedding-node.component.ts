@@ -1,7 +1,6 @@
 import { Component, DoCheck, ViewEncapsulation } from '@angular/core';
 
 import { BaseNodeComponent } from '../base/base-node.component';
-import { IEmbeddingWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
@@ -11,25 +10,35 @@ import { WhiteboardNodeActions } from '../../../state';
   encapsulation: ViewEncapsulation.None,
 })
 export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck {
-  private static SIBLING_ELEMENT_ID_PREFIX = 'embedding-';
+  private static IFRAME_SIBLING_ELEMENT_ID_PREFIX = 'embedding-';
+  private static DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX = 'embedding-drag-overlay-';
+  private static DEFAULT_NODE_HEIGHT = 50;
+  private static DEFAULT_NODE_HEIGHT_WITH_SRC = 500;
 
-  hasHref = false;
-  headerTitleInputValue = '';
+  hasSrc = false;
+  currentNodeTitle = '';
 
-  readonly selectionBarMinHeight = 250;
+  readonly selectionBarMinHeight = 110;
 
   private siblingEmbeddingElement!: SVGForeignObjectElement | null;
   private iFrameElement!: HTMLIFrameElement;
 
   protected override customAfterViewInit() {
-    // Title property is used as href value for embedding nodes
-    if ((this.node as IEmbeddingWhiteboardNode).title) {
-      this.hasHref = true;
-      this.initIFrame();
+    // Title property is used as src value for iFrames controlled by embedding nodes
+    if (this.node.title) {
+      this.currentNodeTitle = this.node.title;
+      this.hasSrc = true;
+    } else {
+      // Reset node incl. height and removing sibling embedding element if title is missing
+      this.customDelete();
+      this.node.height = EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT;
+      this.hasSrc = false;
     }
+    this.initIFrameIfNecessary();
     this.subscriptions.add(
-      this.nodeTitleUpdate$.subscribe((updatedTitle: string) => (this.headerTitleInputValue = updatedTitle))
+      this.nodeTitleUpdate$.subscribe((updatedNodeTitle: string) => (this.currentNodeTitle = updatedNodeTitle))
     );
+    this.subscriptions.add(this.isDragging$.subscribe(() => this.displayInvisibleSiblingDragOverLay()));
   }
 
   ngDoCheck() {
@@ -43,20 +52,43 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
     }
   }
 
-  renderEmbedding(href?: string) {
-    this.customDelete(); // Make sure to delete sibling embedding element if already existing
+  displayInvisibleSiblingDragOverLay() {
+    if (!this.hasSrc) {
+      return;
+    }
+    const zoomContainer = window.document.getElementById('zoom-container');
+    if (!zoomContainer) {
+      throw new Error('Could not query zoom container for creating embedding drag overlay');
+    }
+    const siblingDragOverlayElement = zoomContainer.querySelector(
+      `#${EmbeddingNodeComponent.DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
+    );
+    if (siblingDragOverlayElement) {
+      console.log('REMOVE');
+      siblingDragOverlayElement.remove();
+    } else {
+      console.log('ADD');
+    }
+  }
+
+  renderEmbedding(src?: string) {
+    if (!src || this.node?.title) {
+      this.node.height = EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT;
+    } else if (this.node.height === EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT) {
+      this.node.height = EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT_WITH_SRC;
+    }
     // Dispatching this action will cause the node to re-render, which will invoke initIFrame() automatically
     this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
+      WhiteboardNodeActions.WhiteboardEmbeddingNodeUpdated({
         update: {
           id: this.node.id,
-          changes: { title: href ?? this.headerTitleInputValue },
+          changes: { title: src ?? this.currentNodeTitle, height: this.node.height },
         },
       })
     );
   }
 
-  initIFrame() {
+  initIFrameIfNecessary() {
     // It is necessary to create a sibling element that is not part of whiteboard simulation to prevent reloading of
     // the iFrame on every change. The sibling element has to react on any changes to the actual embedding node.
     const embeddingsWrapper = window.document.getElementById('embeddings-wrapper');
@@ -64,9 +96,12 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       throw new Error('Could not query embeddings wrapper for creating embedding node sibling element');
     }
     this.siblingEmbeddingElement = embeddingsWrapper.querySelector(
-      `#${EmbeddingNodeComponent.SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
+      `#${EmbeddingNodeComponent.IFRAME_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
     );
-    if (!this.siblingEmbeddingElement) {
+
+    const shouldReloadIFrame = this.iFrameHasDifferentSrc(this.siblingEmbeddingElement, this.node.title);
+    if (!this.siblingEmbeddingElement || shouldReloadIFrame) {
+      this.customDelete(); // Delete existing sibling embeddings if existing
       // At the moment we need to use these native imperative functions in order
       // to manipulate the DOM outside of the component's template
       this.siblingEmbeddingElement = this.createSiblingEmbeddingElement();
@@ -90,21 +125,35 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       'transform',
       `translate(${this.node.x},${this.node.y + this.nodeHeaderHeight})`
     );
-    siblingEmbeddingElement.id = EmbeddingNodeComponent.SIBLING_ELEMENT_ID_PREFIX + this.node.id;
+    siblingEmbeddingElement.id = EmbeddingNodeComponent.IFRAME_SIBLING_ELEMENT_ID_PREFIX + this.node.id;
     return siblingEmbeddingElement;
   }
 
   private createIFrameElement(): HTMLIFrameElement {
-    const href = (this.node as IEmbeddingWhiteboardNode).title ?? '';
+    const src = this.node.title ?? '';
     const iFrameElement = document.createElement('iframe');
     iFrameElement.setAttribute('frameBorder', '0');
     iFrameElement.width = '100%';
     iFrameElement.height = '100%';
-    iFrameElement.src = this.checkHrefForProtocol(href);
+    iFrameElement.src = this.checkSrcForProtocol(src);
     return iFrameElement;
   }
 
-  private checkHrefForProtocol(href: string) {
-    return href.startsWith('http') ? href : `http://${href}`;
+  private checkSrcForProtocol(src: string) {
+    return src.startsWith('http') ? src : `http://${src}`;
+  }
+
+  private iFrameHasDifferentSrc(embeddingElement: SVGForeignObjectElement | null, srcToCompare: string) {
+    if (!embeddingElement) {
+      return true;
+    }
+    const iFrameElement = embeddingElement.querySelector('iframe');
+    return iFrameElement
+      ? this.removeSlashFromSrc(iFrameElement.src) !== this.checkSrcForProtocol(this.removeSlashFromSrc(srcToCompare))
+      : true;
+  }
+
+  private removeSlashFromSrc(src: string) {
+    return src.endsWith('/') ? src.slice(0, -1) : src;
   }
 }

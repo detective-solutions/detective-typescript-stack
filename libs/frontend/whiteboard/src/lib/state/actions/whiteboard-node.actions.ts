@@ -1,5 +1,6 @@
 import {
   AnyWhiteboardNode,
+  IWhiteboardEmbeddingNodeUpdate,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
   IWhiteboardNodeSizeUpdate,
@@ -80,4 +81,8 @@ export const WhiteboardNodeTitleUpdated = createAction(
 export const WhiteboardNodeTitleUpdatedRemotely = createAction(
   `${actionPrefix} Node title updated remotely`,
   props<{ update: Update<IWhiteboardNodeTitleUpdate> }>()
+);
+export const WhiteboardEmbeddingNodeUpdated = createAction(
+  `${actionPrefix} Embedding node updated`,
+  props<{ update: Update<IWhiteboardEmbeddingNodeUpdate> }>()
 );

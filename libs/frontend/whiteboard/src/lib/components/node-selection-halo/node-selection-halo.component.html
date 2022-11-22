@@ -1,5 +1,6 @@
 <svg:circle
   id="drag-handle-{{ nodeId }}"
+  [ngStyle]="{ display: disableResize ? 'none' : 'block' }"
   [attr.cx]="nodeWidth + haloOffset"
   [attr.cy]="nodeHeight + haloOffset"
   [attr.r]="haloHandleRadius"

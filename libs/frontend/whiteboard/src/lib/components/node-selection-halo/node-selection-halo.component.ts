@@ -10,6 +10,7 @@ export class NodeSelectionHaloComponent {
   @Input() nodeId!: string;
   @Input() nodeWidth!: number;
   @Input() nodeHeight!: number;
+  @Input() disableResize!: boolean;
 
   readonly haloHandleRadius = 10;
   readonly haloOffset = 4;
