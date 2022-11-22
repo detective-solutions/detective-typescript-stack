@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { AnyWhiteboardNode, IGeneralWhiteboardNodeTemporaryData } from '@detective.solutions/shared/data-access';
 import { BehaviorSubject, Subject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
-import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../state';
+import { WhiteboardNodeActions, selectWhiteboardContextState, selectWhiteboardNodeById } from '../../../state';
 
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
@@ -13,7 +13,7 @@ import { WhiteboardFacadeService } from '../../../services';
   template: '',
   styleUrls: ['./base-node.component.scss'],
 })
-export class BaseNodeComponent implements AfterViewInit, OnDestroy {
+export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() node!: AnyWhiteboardNode;
 
   readonly isDragging$ = this.whiteboardFacade.isDragging$;
@@ -66,6 +66,32 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     protected readonly keyboardService: KeyboardService
   ) {}
 
+  ngOnInit() {
+    this.subscriptions.add(
+      this.nodeTitleUpdate$.subscribe((updatedTitle: string) =>
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
+            update: { id: this.node.id, changes: { title: updatedTitle } },
+          })
+        )
+      )
+    );
+
+    // Node update subscription needs to be defined here, otherwise this.id would be undefined
+    this.subscriptions.add(
+      this.store
+        .select(selectWhiteboardNodeById(this.node.id))
+        .pipe(filter(Boolean))
+        .subscribe((updatedNode: AnyWhiteboardNode) => {
+          // WARNING: It is not possible to simply reassign this.node reference when updating the node values
+          // Currently the rendering will break due to some conflicts between HTML and SVG handling
+          this.updateExistingNodeObject(updatedNode);
+          this.nodeUpdates$.next(updatedNode);
+        })
+    );
+    this.customOnInit();
+  }
+
   ngAfterViewInit() {
     this.store
       .select(selectWhiteboardContextState)
@@ -108,6 +134,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     );
     this.customDelete();
   }
+
+  // Can be used by child classes to add custom logic to the ngOnInit hook
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customOnInit() {}
 
   // Can be used by child classes to add custom logic to the ngAfterViewInit hook
   // eslint-disable-next-line @typescript-eslint/no-empty-function
