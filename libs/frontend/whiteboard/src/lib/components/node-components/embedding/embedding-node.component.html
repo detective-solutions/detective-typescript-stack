@@ -31,6 +31,7 @@
       [title]="node.title"
       [isBlocked$]="isBlocked$"
       (titleChangesOnKeyUp$)="nodeTitleUpdate$.next($event)"
+      (titleChangesOnBlur$)="nodeTitleBlur$.next($event)"
       (enterKeyPressed$)="renderEmbedding($event)"
     ></node-header>
     <ng-container *ngIf="(isBlocked$ | async) === null">

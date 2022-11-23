@@ -12,8 +12,11 @@ import { WhiteboardNodeActions } from '../../../state';
 export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck {
   private static IFRAME_SIBLING_ELEMENT_ID_PREFIX = 'embedding-';
   private static DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX = 'embedding-drag-overlay-';
+  private static DEFAULT_NODE_WIDTH = 900;
   private static DEFAULT_NODE_HEIGHT = 50;
   private static DEFAULT_NODE_HEIGHT_WITH_SRC = 500;
+  private static SVG_ELEMENT_NAMESPACE = 'http://www.w3.org/2000/svg';
+  private static SVG_FOREIGN_OBJECT_ELEMENT_NAME = 'foreignObject';
 
   hasSrc = false;
   currentNodeTitle = '';
@@ -21,6 +24,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
   readonly selectionBarMinHeight = 110;
 
   private siblingEmbeddingElement!: SVGForeignObjectElement | null;
+  private siblingDragOverlayElement!: SVGForeignObjectElement | null;
   private iFrameElement!: HTMLIFrameElement;
 
   protected override customAfterViewInit() {
@@ -38,7 +42,12 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
     this.subscriptions.add(
       this.nodeTitleUpdate$.subscribe((updatedNodeTitle: string) => (this.currentNodeTitle = updatedNodeTitle))
     );
-    this.subscriptions.add(this.isDragging$.subscribe(() => this.displayInvisibleSiblingDragOverLay()));
+    this.subscriptions.add(
+      this.nodeTitleBlur$.subscribe((updatedNodeTitle: string) => this.renderEmbedding(updatedNodeTitle))
+    );
+    this.subscriptions.add(
+      this.isDragging$.subscribe((isDragging: boolean) => this.displayInvisibleSiblingDragOverLay(isDragging))
+    );
   }
 
   ngDoCheck() {
@@ -50,31 +59,49 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       this.siblingEmbeddingElement.setAttribute('width', String(this.node.width));
       this.siblingEmbeddingElement.setAttribute('height', String(this.node.height - this.nodeHeaderHeight));
     }
+    if (this.siblingDragOverlayElement) {
+      this.siblingDragOverlayElement.setAttribute(
+        'transform',
+        `translate(${this.node.x},${this.node.y + this.nodeHeaderHeight})`
+      );
+    }
   }
 
-  displayInvisibleSiblingDragOverLay() {
+  displayInvisibleSiblingDragOverLay(isDragging: boolean) {
     if (!this.hasSrc) {
       return;
     }
+
     const zoomContainer = window.document.getElementById('zoom-container');
     if (!zoomContainer) {
       throw new Error('Could not query zoom container for creating embedding drag overlay');
     }
-    const siblingDragOverlayElement = zoomContainer.querySelector(
-      `#${EmbeddingNodeComponent.DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
-    );
-    if (siblingDragOverlayElement) {
-      console.log('REMOVE');
-      siblingDragOverlayElement.remove();
+
+    if (!this.siblingDragOverlayElement) {
+      this.siblingDragOverlayElement = zoomContainer.querySelector(
+        `#${EmbeddingNodeComponent.DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
+      );
+    }
+
+    if (isDragging) {
+      if (!this.siblingDragOverlayElement) {
+        this.siblingDragOverlayElement = this.createSiblingDragOverLayElement();
+        zoomContainer.appendChild(this.siblingDragOverlayElement);
+      }
     } else {
-      console.log('ADD');
+      if (this.siblingDragOverlayElement) {
+        this.siblingDragOverlayElement.remove();
+      }
     }
   }
 
   renderEmbedding(src?: string) {
-    if (!src || this.node?.title) {
+    if (!src && !this.node?.title) {
+      // Reset node to initial state
+      this.node.width = EmbeddingNodeComponent.DEFAULT_NODE_WIDTH;
       this.node.height = EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT;
     } else if (this.node.height === EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT) {
+      // Init node with default height
       this.node.height = EmbeddingNodeComponent.DEFAULT_NODE_HEIGHT_WITH_SRC;
     }
     // Dispatching this action will cause the node to re-render, which will invoke initIFrame() automatically
@@ -82,7 +109,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       WhiteboardNodeActions.WhiteboardEmbeddingNodeUpdated({
         update: {
           id: this.node.id,
-          changes: { title: src ?? this.currentNodeTitle, height: this.node.height },
+          changes: { title: src ?? this.currentNodeTitle, width: this.node.width, height: this.node.height },
         },
       })
     );
@@ -98,8 +125,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
     this.siblingEmbeddingElement = embeddingsWrapper.querySelector(
       `#${EmbeddingNodeComponent.IFRAME_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
     );
-
-    const shouldReloadIFrame = this.iFrameHasDifferentSrc(this.siblingEmbeddingElement, this.node.title);
+    const shouldReloadIFrame = this.iFrameHasDifferentSrc(this.siblingEmbeddingElement, this.currentNodeTitle);
     if (!this.siblingEmbeddingElement || shouldReloadIFrame) {
       this.customDelete(); // Delete existing sibling embeddings if existing
       // At the moment we need to use these native imperative functions in order
@@ -118,7 +144,10 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
   }
 
   private createSiblingEmbeddingElement(): SVGForeignObjectElement {
-    const siblingEmbeddingElement = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+    const siblingEmbeddingElement = document.createElementNS(
+      EmbeddingNodeComponent.SVG_ELEMENT_NAMESPACE,
+      EmbeddingNodeComponent.SVG_FOREIGN_OBJECT_ELEMENT_NAME
+    ) as SVGForeignObjectElement;
     siblingEmbeddingElement.setAttribute('width', String(this.node.width));
     siblingEmbeddingElement.setAttribute('height', String(this.node.height - this.nodeHeaderHeight));
     siblingEmbeddingElement.setAttribute(
@@ -139,7 +168,26 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
     return iFrameElement;
   }
 
-  private checkSrcForProtocol(src: string) {
+  private createSiblingDragOverLayElement(): SVGForeignObjectElement {
+    const siblingDragOverlayElement = document.createElementNS(
+      EmbeddingNodeComponent.SVG_ELEMENT_NAMESPACE,
+      EmbeddingNodeComponent.SVG_FOREIGN_OBJECT_ELEMENT_NAME
+    ) as SVGForeignObjectElement;
+    siblingDragOverlayElement.setAttribute(
+      'id',
+      `${EmbeddingNodeComponent.DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
+    );
+    siblingDragOverlayElement.setAttribute('width', String(this.node.width));
+    siblingDragOverlayElement.setAttribute('height', String(this.node.height - this.nodeHeaderHeight));
+    siblingDragOverlayElement.setAttribute(
+      'transform',
+      `translate(${this.node.x},${this.node.y + this.nodeHeaderHeight})`
+    );
+    siblingDragOverlayElement.setAttribute('fill', 'transparent');
+    return siblingDragOverlayElement;
+  }
+
+  private checkSrcForProtocol(src: string): string {
     return src.startsWith('http') ? src : `http://${src}`;
   }
 
@@ -153,7 +201,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       : true;
   }
 
-  private removeSlashFromSrc(src: string) {
+  private removeSlashFromSrc(src: string): string {
     return src.endsWith('/') ? src.slice(0, -1) : src;
   }
 }
