@@ -39,7 +39,7 @@
     <node-header
       [title]="node.title"
       [isBlocked$]="isBlocked$"
-      (titleChangesOnBlur$)="nodeTitleUpdate$.next($event)"
+      (titleChangesOnBlur$)="nodeTitleBlur$.next($event)"
     ></node-header>
     <ag-grid-angular
       class="ag-theme-alpine"

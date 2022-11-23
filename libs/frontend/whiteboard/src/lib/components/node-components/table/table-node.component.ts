@@ -7,6 +7,7 @@ import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
 import { IQueryResponse as IQueryResponseBody } from './models';
 import { TableNodeActions } from './state';
+import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
   selector: '[tableNode]',
@@ -33,6 +34,16 @@ export class TableNodeComponent extends BaseNodeComponent {
   };
 
   protected override customOnInit() {
+    this.subscriptions.add(
+      this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
+            update: { id: this.node.id, changes: { title: updatedTitle } },
+          })
+        )
+      )
+    );
+
     // Listen to QUERY_TABLE websocket message events
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$

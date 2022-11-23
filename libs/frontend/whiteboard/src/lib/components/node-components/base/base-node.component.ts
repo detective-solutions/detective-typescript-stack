@@ -38,6 +38,7 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
     map(([_context, blockedBy]) => blockedBy)
   );
   readonly nodeTitleUpdate$ = new Subject<string>();
+  readonly nodeTitleBlur$ = new Subject<string>();
 
   readonly nodeHeaderHeight = 50;
 
@@ -67,16 +68,6 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.subscriptions.add(
-      this.nodeTitleUpdate$.subscribe((updatedTitle: string) =>
-        this.store.dispatch(
-          WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
-            update: { id: this.node.id, changes: { title: updatedTitle } },
-          })
-        )
-      )
-    );
-
     // Node update subscription needs to be defined here, otherwise this.id would be undefined
     this.subscriptions.add(
       this.store
