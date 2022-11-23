@@ -1,7 +1,7 @@
 import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
-  IWhiteboardNodeTitleUpdate,
+  IWhiteboardNodePropertiesUpdate,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
@@ -10,7 +10,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
-import { WhiteboardNodeTitleUpdatedTransaction } from './whiteboard-node-title-updated.transaction';
+import { WhiteboardNodePropertiesUpdatedTransaction } from './whiteboard-node-properties-updated.transaction';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
@@ -18,8 +18,8 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const updateNodePropertyMethodName = 'updateNodeProperty';
-const cacheServiceMock = { [updateNodePropertyMethodName]: jest.fn() };
+const updateNodePropertiesMethodName = 'updateNodeProperties';
+const cacheServiceMock = { [updateNodePropertiesMethodName]: jest.fn() };
 
 const testMessageContext = {
   eventType: MessageEventType.WhiteboardNodeResized,
@@ -33,14 +33,16 @@ const testMessageContext = {
 
 const testMessageBody = {
   title: 'testTitle',
+  width: 100,
+  y: 0,
 };
 
-const testMessagePayload: IMessage<IWhiteboardNodeTitleUpdate> = {
+const testMessagePayload: IMessage<IWhiteboardNodePropertiesUpdate> = {
   context: testMessageContext,
   body: testMessageBody,
 };
 
-describe('WhiteboardNodeTitleUpdatedTransaction', () => {
+describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -72,9 +74,9 @@ describe('WhiteboardNodeTitleUpdatedTransaction', () => {
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-      const updateNodePropertySpy = jest.spyOn(cacheService, updateNodePropertyMethodName);
+      const updateNodePropertySpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
 
-      const transaction = new WhiteboardNodeTitleUpdatedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
@@ -83,8 +85,7 @@ describe('WhiteboardNodeTitleUpdatedTransaction', () => {
       expect(updateNodePropertySpy).toBeCalledWith(
         testMessageContext.casefileId,
         testMessageContext.nodeId,
-        'title',
-        testMessageBody.title
+        testMessageBody
       );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
@@ -93,12 +94,12 @@ describe('WhiteboardNodeTitleUpdatedTransaction', () => {
     it('should retry the cache update if it fails once', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
       const updateNodePropertySpy = jest
-        .spyOn(cacheService, updateNodePropertyMethodName)
+        .spyOn(cacheService, updateNodePropertiesMethodName)
         .mockImplementationOnce(() => {
           throw new Error();
         });
 
-      const transaction = new WhiteboardNodeTitleUpdatedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
@@ -111,31 +112,29 @@ describe('WhiteboardNodeTitleUpdatedTransaction', () => {
         1,
         testMessageContext.casefileId,
         testMessageContext.nodeId,
-        'title',
-        testMessageBody.title
+        testMessageBody
       );
       expect(updateNodePropertySpy).toHaveBeenNthCalledWith(
         2,
         testMessageContext.casefileId,
         testMessageContext.nodeId,
-        'title',
-        testMessageBody.title
+        testMessageBody
       );
     });
 
     it('should throw an InternalServerException if the cache update fails at least twice', async () => {
-      jest.spyOn(cacheService, updateNodePropertyMethodName).mockImplementation(() => {
+      jest.spyOn(cacheService, updateNodePropertiesMethodName).mockImplementation(() => {
         throw new Error();
       });
 
-      const transaction = new WhiteboardNodeTitleUpdatedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
-      const transaction = new WhiteboardNodeTitleUpdatedTransaction(serviceRefs, {
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
         ...testMessagePayload,
         body: undefined,
       });
@@ -145,7 +144,7 @@ describe('WhiteboardNodeTitleUpdatedTransaction', () => {
     });
 
     it('should throw an InternalServerException if the given message context is missing a node id', async () => {
-      const transaction = new WhiteboardNodeTitleUpdatedTransaction(serviceRefs, {
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
         ...testMessagePayload,
         context: { ...testMessageContext, nodeId: undefined },
       });

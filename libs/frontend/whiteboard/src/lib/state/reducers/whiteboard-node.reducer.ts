@@ -3,7 +3,7 @@ import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
 import { IWhiteboardNodeState } from '../interfaces';
-import { TableNodeActions } from '../../components/node-components/table/state';
+import { TableNodeActions } from '../../components';
 import { createEntityAdapter } from '@ngrx/entity';
 import { serializeWhiteboardNodes } from '../../utils';
 
@@ -57,13 +57,10 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeResizedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeTitleUpdated, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeTitleUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardEmbeddingNodeUpdated, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateOne(action.update, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodeBatchUpdate, (state: IWhiteboardNodeState, action: any) =>

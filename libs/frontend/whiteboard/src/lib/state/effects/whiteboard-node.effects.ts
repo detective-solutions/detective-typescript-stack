@@ -194,24 +194,24 @@ export class WhiteboardNodeEffects {
     { dispatch: false }
   );
 
-  readonly whiteboardNodeTitleUpdated$ = createEffect(
+  readonly whiteboardNodePropertiesUpdated$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeTitleUpdated),
+        ofType(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated),
         switchMap((action) =>
           combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
         ),
         tap(([context, action]) => {
           this.whiteboardFacade.sendWebsocketMessage({
-            event: MessageEventType.WhiteboardNodeTitleUpdated,
+            event: MessageEventType.WhiteboardNodePropertiesUpdated,
             data: {
               context: {
                 ...context,
-                eventType: MessageEventType.WhiteboardNodeTitleUpdated,
+                eventType: MessageEventType.WhiteboardNodePropertiesUpdated,
                 userId: context.userId,
                 nodeId: action.update.id,
               } as IMessageContext,
-              body: { title: action.update.changes.title },
+              body: action.update,
             },
           });
         })

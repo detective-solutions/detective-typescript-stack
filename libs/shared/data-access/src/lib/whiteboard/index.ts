@@ -9,7 +9,7 @@ export * from './general-whiteboard-node.interface';
 export * from './whiteboard-embedding-node-update.interface';
 export * from './whiteboard-node-block-update.interface';
 export * from './whiteboard-node-position-update.interface';
+export * from './whiteboard-node-properties-update.interface';
 export * from './whiteboard-node-size-update.interface';
-export * from './whiteboard-node-title-update.interface';
 export * from './whiteboard-node-types.enum';
 export * from './whiteboard-options.type';

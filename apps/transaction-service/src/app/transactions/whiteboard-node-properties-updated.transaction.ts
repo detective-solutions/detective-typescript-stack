@@ -1,13 +1,13 @@
-import { IMessage, IWhiteboardNodeTitleUpdate, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { IMessage, IWhiteboardNodePropertiesUpdate, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
 
-export class WhiteboardNodeTitleUpdatedTransaction extends Transaction {
-  readonly logger = new Logger(WhiteboardNodeTitleUpdatedTransaction.name);
+export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
+  readonly logger = new Logger(WhiteboardNodePropertiesUpdatedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<IWhiteboardNodeTitleUpdate>; // Define message body type
+  override message: IMessage<IWhiteboardNodePropertiesUpdate>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
@@ -38,7 +38,7 @@ export class WhiteboardNodeTitleUpdatedTransaction extends Transaction {
   }
 
   private async updateCache(casefileId: string, nodeId: string) {
-    await this.cacheService.updateNodeProperty(casefileId, nodeId, 'title', this.messageBody?.title);
+    await this.cacheService.updateNodeProperties(casefileId, nodeId, this.messageBody);
   }
 
   private handleFinalError(casefileId: string) {

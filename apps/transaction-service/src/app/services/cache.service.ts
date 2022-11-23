@@ -3,6 +3,7 @@ import {
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodePropertiesUpdate,
   IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
@@ -191,6 +192,29 @@ export class CacheService {
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === updatedNodeId) {
         node[propertyToUpdate] = updateValue;
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+  }
+
+  async updateNodeProperties(
+    casefileId: string,
+    nodeId: string,
+    propertyUpdates: IWhiteboardNodePropertiesUpdate
+  ): Promise<void> {
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+
+    cachedNodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === nodeId) {
+        Object.entries(propertyUpdates).forEach(([propertyToUpdate, updateValue]) => {
+          this.logger.log(
+            `Updating ${propertyToUpdate} property of whiteboard node ${nodeId} in casefile "${casefileId}"`
+          );
+          node[propertyToUpdate] = updateValue;
+        });
       }
     });
 

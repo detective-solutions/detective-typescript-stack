@@ -37,7 +37,7 @@ export class TableNodeComponent extends BaseNodeComponent {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
         this.store.dispatch(
-          WhiteboardNodeActions.WhiteboardNodeTitleUpdated({
+          WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
             update: { id: this.node.id, changes: { title: updatedTitle } },
           })
         )

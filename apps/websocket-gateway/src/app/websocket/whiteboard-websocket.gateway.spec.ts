@@ -206,7 +206,7 @@ describe('WhiteboardWebsocketGateway', () => {
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
-      const context = _createContext(MessageEventType.WhiteboardNodeTitleUpdated);
+      const context = _createContext(MessageEventType.WhiteboardNodeResized);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
       expect(webSocketGateway.onWhiteboardNodeResized({ context: context, body: {} })).rejects.toThrow(
@@ -216,26 +216,29 @@ describe('WhiteboardWebsocketGateway', () => {
     });
   });
 
-  describe('onWhiteboardNodeTitleUpdatedEvent', () => {
+  describe('onWhiteboardNodePropertiesUpdatedEvent', () => {
     it('should forward WHITEBOARD_NODE_TITLE_UPDATED events to the correct target topic', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
       const testMessage = {
-        context: _createContext(MessageEventType.WhiteboardNodeTitleUpdated),
+        context: _createContext(MessageEventType.WhiteboardNodePropertiesUpdated),
         body: testMessageBody,
       };
 
-      await webSocketGateway.onWhiteboardNodeTitleUpdated(testMessage);
+      await webSocketGateway.onWhiteboardNodePropertiesUpdated(testMessage);
 
       expect(producerMock).toBeCalledTimes(1);
-      expect(producerMock).toBeCalledWith(EventTypeTopicMapping.whiteboardNodeTitleUpdated.targetTopic, testMessage);
+      expect(producerMock).toBeCalledWith(
+        EventTypeTopicMapping.whiteboardNodePropertiesUpdated.targetTopic,
+        testMessage
+      );
     });
 
     it('should throw an InternalServerErrorException if the message context validation fails', async () => {
       const producerMock = jest.spyOn(mockWhiteboardProducer, sendKafkaMessageMethodName);
-      const context = _createContext(MessageEventType.WhiteboardNodeTitleUpdated);
+      const context = _createContext(MessageEventType.WhiteboardNodePropertiesUpdated);
       delete context['tenantId']; // tenantId is required in the MessageContextDTO
 
-      expect(webSocketGateway.onWhiteboardNodeTitleUpdated({ context: context, body: {} })).rejects.toThrow(
+      expect(webSocketGateway.onWhiteboardNodePropertiesUpdated({ context: context, body: {} })).rejects.toThrow(
         InternalServerErrorException
       );
       expect(producerMock).toBeCalledTimes(0);

@@ -16,8 +16,8 @@ import {
   IUserForWhiteboard,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodePropertiesUpdate,
   IWhiteboardNodeSizeUpdate,
-  IWhiteboardNodeTitleUpdate,
   MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
@@ -407,13 +407,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         )
     );
 
-    // Listen to WHITEBOARD_NODE_TITLE_UPDATED websocket message event
+    // Listen to WHITEBOARD_NODE_PROPERTIES_UPDATED websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
         .pipe(
           switchMap((webSocketSubject$) =>
             combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeTitleUpdated),
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodePropertiesUpdated),
               this.store.select(selectWhiteboardContextState).pipe(take(1)),
             ])
           ),
@@ -421,14 +421,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<IWhiteboardNodeTitleUpdate>) =>
+        .subscribe((messageData: IMessage<IWhiteboardNodePropertiesUpdate>) =>
           // Convert incoming message to ngRx Update type
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeTitleUpdatedRemotely({
+            WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely({
               update: {
                 id: messageData.context.nodeId,
                 changes: messageData.body,
-              } as Update<IWhiteboardNodeTitleUpdate>,
+              } as Update<IWhiteboardNodePropertiesUpdate>,
             })
           )
         )

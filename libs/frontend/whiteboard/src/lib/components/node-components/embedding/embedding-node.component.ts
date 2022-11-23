@@ -106,7 +106,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
     }
     // Dispatching this action will cause the node to re-render, which will invoke initIFrame() automatically
     this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardEmbeddingNodeUpdated({
+      WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
         update: {
           id: this.node.id,
           changes: { title: src ?? this.currentNodeTitle, width: this.node.width, height: this.node.height },
