@@ -74,15 +74,15 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-      const updateNodePropertySpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
+      const updateNodePropertiesSpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
 
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
-      expect(updateNodePropertySpy).toBeCalledTimes(1);
-      expect(updateNodePropertySpy).toBeCalledWith(
+      expect(updateNodePropertiesSpy).toBeCalledTimes(1);
+      expect(updateNodePropertiesSpy).toBeCalledWith(
         testMessageContext.casefileId,
         testMessageContext.nodeId,
         testMessageBody
@@ -93,7 +93,7 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
     it('should retry the cache update if it fails once', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-      const updateNodePropertySpy = jest
+      const updateNodePropertiesSpy = jest
         .spyOn(cacheService, updateNodePropertiesMethodName)
         .mockImplementationOnce(() => {
           throw new Error();
@@ -107,14 +107,14 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
 
-      expect(updateNodePropertySpy).toBeCalledTimes(2);
-      expect(updateNodePropertySpy).toHaveBeenNthCalledWith(
+      expect(updateNodePropertiesSpy).toBeCalledTimes(2);
+      expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         1,
         testMessageContext.casefileId,
         testMessageContext.nodeId,
         testMessageBody
       );
-      expect(updateNodePropertySpy).toHaveBeenNthCalledWith(
+      expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         2,
         testMessageContext.casefileId,
         testMessageContext.nodeId,

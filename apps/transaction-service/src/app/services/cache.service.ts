@@ -178,28 +178,6 @@ export class CacheService {
     return true;
   }
 
-  async updateNodeProperty(
-    casefileId: string,
-    updatedNodeId: string,
-    propertyToUpdate: string,
-    updateValue: string | number | boolean | undefined
-  ): Promise<void> {
-    this.logger.log(`Updating ${propertyToUpdate} property of whiteboard node in casefile "${casefileId}"`);
-
-    updateValue = updateValue ?? null; // Convert empty or undefined values to null for correct database removal
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    cachedNodes.forEach((node: AnyWhiteboardNode) => {
-      if (node.id === updatedNodeId) {
-        node[propertyToUpdate] = updateValue;
-      }
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-  }
-
   async updateNodeProperties(
     casefileId: string,
     nodeId: string,
