@@ -1,10 +1,5 @@
-import {
-  AnyWhiteboardNode,
-  IMessage,
-  ITableNodeTemporaryData,
-  MessageEventType,
-} from '@detective.solutions/shared/data-access';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
+import { IMessage, ITableNodeTemporaryData, MessageEventType } from '@detective.solutions/shared/data-access';
 import { filter, map, pluck, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
@@ -12,7 +7,7 @@ import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
 import { IQueryResponse as IQueryResponseBody } from './models';
 import { TableNodeActions } from './state';
-import { selectWhiteboardNodeById } from '../../../state';
+import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
   selector: '[tableNode]',
@@ -20,7 +15,7 @@ import { selectWhiteboardNodeById } from '../../../state';
   styleUrls: ['./table-node.component.scss', '../base/base-node.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TableNodeComponent extends BaseNodeComponent implements OnInit {
+export class TableNodeComponent extends BaseNodeComponent {
   // Use this observable for column updates to correctly toggle the table loading screen
   readonly colDefUpdates$ = this.nodeTemporaryData$.pipe(
     filter((temporaryData: ITableNodeTemporaryData) => !!temporaryData?.colDefs && temporaryData?.colDefs.length >= 0),
@@ -38,18 +33,15 @@ export class TableNodeComponent extends BaseNodeComponent implements OnInit {
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
 
-  ngOnInit() {
-    // Node update subscription needs to be defined here, otherwise this.id would be undefined
+  protected override customOnInit() {
     this.subscriptions.add(
-      this.store
-        .select(selectWhiteboardNodeById(this.node.id))
-        .pipe(filter(Boolean))
-        .subscribe((updatedNode: AnyWhiteboardNode) => {
-          // WARNING: It is not possible to simply reassign this.node reference when updating the node values
-          // Currently the rendering will break due to some conflicts between HTML and SVG handling
-          this.updateExistingNodeObject(updatedNode);
-          this.nodeUpdates$.next(updatedNode);
-        })
+      this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+            update: { id: this.node.id, changes: { title: updatedTitle } },
+          })
+        )
+      )
     );
 
     // Listen to QUERY_TABLE websocket message events

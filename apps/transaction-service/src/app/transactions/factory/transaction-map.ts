@@ -3,6 +3,8 @@ import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transac
 import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
 import { WhiteboardNodeMovedTransaction } from '../whiteboard-node-moved.transaction';
+import { WhiteboardNodePropertiesUpdatedTransaction } from '../whiteboard-node-properties-updated.transaction';
+import { WhiteboardNodeResizedTransaction } from '../whiteboard-node-resized.transaction';
 import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
 import { WhiteboardTitleFocusedTransaction } from '../whiteboard-title-focused.transaction';
 import { WhiteboardTitleUpdatedTransaction } from '../whiteboard-title-updated.transaction';
@@ -30,6 +32,12 @@ Object.values(MessageEventType).forEach((eventType: string) => {
   }
   if (eventType === MessageEventType.WhiteboardNodeMoved) {
     tempTransactionMap[eventType] = WhiteboardNodeMovedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardNodeResized) {
+    tempTransactionMap[eventType] = WhiteboardNodeResizedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardNodePropertiesUpdated) {
+    tempTransactionMap[eventType] = WhiteboardNodePropertiesUpdatedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardTitleFocused) {
     tempTransactionMap[eventType] = WhiteboardTitleFocusedTransaction;

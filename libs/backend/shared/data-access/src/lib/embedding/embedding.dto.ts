@@ -13,7 +13,7 @@ export class EmbeddingDTO implements IEmbedding {
 
   @IsUrl()
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   href!: string;
 
   @IsNumber()

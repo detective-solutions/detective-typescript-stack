@@ -16,6 +16,8 @@ import {
   IUserForWhiteboard,
   IWhiteboardNodeBlockUpdate,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodePropertiesUpdate,
+  IWhiteboardNodeSizeUpdate,
   MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
@@ -51,6 +53,7 @@ import {
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
+import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -192,15 +195,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
           // TODO: Remove when data from dragged element is used
-          const href = 'google.com';
+          // const href = 'https://www.simplesite.com';
           const embeddingNode = EmbeddingWhiteboardNode.Build({
             id: uuidv4(),
-            title: href,
-            href: href,
+            title: '',
             x: convertedDOMPoint.x,
             y: convertedDOMPoint.y,
             width: 900,
-            height: 500,
+            height: 50,
             locked: false,
             author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
             editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
@@ -316,13 +318,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<null>) =>
+        .subscribe((messageData: IMessage<null>) => {
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
               deletedNodeId: messageData.context.nodeId as string,
             })
-          )
-        )
+          );
+          this.deleteWhiteboardNodeSiblingElement(
+            WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX + messageData.context.nodeId
+          );
+        })
     );
 
     // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
@@ -373,10 +378,64 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           });
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely({
-              updates: updates as Update<AnyWhiteboardNode>[],
+              updates: updates as Update<IWhiteboardNodePositionUpdate>[],
             })
           );
         })
+    );
+
+    // Listen to WHITEBOARD_NODE_RESIZED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodeResized),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IWhiteboardNodeSizeUpdate>) =>
+          // Convert incoming message to ngRx Update type
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodeResizedRemotely({
+              update: {
+                id: messageData.context.nodeId,
+                changes: messageData.body,
+              } as Update<IWhiteboardNodeSizeUpdate>,
+            })
+          )
+        )
+    );
+
+    // Listen to WHITEBOARD_NODE_PROPERTIES_UPDATED websocket message event
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) =>
+            combineLatest([
+              webSocketSubject$.on$(MessageEventType.WhiteboardNodePropertiesUpdated),
+              this.store.select(selectWhiteboardContextState).pipe(take(1)),
+            ])
+          ),
+          filter(([messageData, context]) => messageData.context.userId !== context.userId),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          map(([messageData, _context]) => messageData)
+        )
+        .subscribe((messageData: IMessage<IWhiteboardNodePropertiesUpdate>) =>
+          // Convert incoming message to ngRx Update type
+          this.store.dispatch(
+            WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely({
+              update: {
+                id: messageData.context.nodeId,
+                changes: messageData.body,
+              } as Update<IWhiteboardNodePropertiesUpdate>,
+            })
+          )
+        )
     );
 
     // Listen to WHITEBOARD_USER_JOINED websocket message event
@@ -508,6 +567,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           timeout: window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval),
         });
       }
+    }
+  }
+
+  private deleteWhiteboardNodeSiblingElement(elementId: string) {
+    const nodeSiblingElement = document.getElementById(elementId);
+    if (nodeSiblingElement) {
+      nodeSiblingElement.remove();
     }
   }
 }

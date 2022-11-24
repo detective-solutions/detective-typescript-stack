@@ -3,6 +3,8 @@ import {
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
   IWhiteboardNodePositionUpdate,
+  IWhiteboardNodePropertiesUpdate,
+  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
@@ -74,13 +76,15 @@ export class CacheService {
     return cacheResponse;
   }
 
-  async removeActiveUser(casefileId: string, userId: string): Promise<'OK'> {
+  async removeActiveUser(casefileId: string, userId: string): Promise<'OK' | null> {
     this.logger.log(`Removing active user "${userId}" from casefile "${casefileId}"`);
 
     // Check if active users are present & filter out the user that left
-    const activeUsers = (await this.getActiveUsersByCasefile(casefileId)).filter(
-      (user: IUserForWhiteboard) => user.id !== userId
-    );
+    let activeUsers = await this.getActiveUsersByCasefile(casefileId);
+    if (!activeUsers) {
+      return null;
+    }
+    activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
@@ -145,12 +149,68 @@ export class CacheService {
     return filteredPositionUpdates;
   }
 
+  async updateNodeSize(
+    casefileId: string,
+    updatedNodeId: string,
+    userId: string,
+    sizeUpdate: IWhiteboardNodeSizeUpdate
+  ): Promise<boolean> {
+    this.logger.log(`Updating size of whiteboard node in casefile "${casefileId}"`);
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+
+    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
+    if (
+      cachedNodes.some((node: AnyWhiteboardNode) => node.id === updatedNodeId && node?.temporary?.blockedBy !== userId)
+    ) {
+      return false;
+    }
+
+    cachedNodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === updatedNodeId) {
+        node.width = sizeUpdate.width;
+        node.height = sizeUpdate.height;
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+    return true;
+  }
+
+  async updateNodeProperties(
+    casefileId: string,
+    nodeId: string,
+    propertyUpdates: IWhiteboardNodePropertiesUpdate
+  ): Promise<void> {
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+
+    cachedNodes.forEach((node: AnyWhiteboardNode) => {
+      if (node.id === nodeId) {
+        Object.entries(propertyUpdates).forEach(([propertyToUpdate, updateValue]) => {
+          this.logger.log(
+            `Updating ${propertyToUpdate} property of whiteboard node ${nodeId} in casefile "${casefileId}"`
+          );
+          node[propertyToUpdate] = updateValue;
+        });
+      }
+    });
+
+    // Can't match Redis client return type with domain type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
+  }
+
   async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
     this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)) {
+    if (
+      !cachedNodes ||
+      cachedNodes.length === 0 ||
+      cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)
+    ) {
       return false;
     }
 

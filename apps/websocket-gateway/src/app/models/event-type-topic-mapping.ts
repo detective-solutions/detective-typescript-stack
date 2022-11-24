@@ -18,6 +18,14 @@ export const EventTypeTopicMapping = {
     targetTopic: KafkaTopic.TransactionInput,
   },
   whiteboardNodeMoved: { eventType: MessageEventType.WhiteboardNodeMoved, targetTopic: KafkaTopic.TransactionInput },
+  whiteboardNodeResized: {
+    eventType: MessageEventType.WhiteboardNodeResized,
+    targetTopic: KafkaTopic.TransactionInput,
+  },
+  whiteboardNodePropertiesUpdated: {
+    eventType: MessageEventType.WhiteboardNodePropertiesUpdated,
+    targetTopic: KafkaTopic.TransactionInput,
+  },
   whiteboardTitleFocused: {
     eventType: MessageEventType.WhiteboardTitleFocused,
     targetTopic: KafkaTopic.TransactionInput,

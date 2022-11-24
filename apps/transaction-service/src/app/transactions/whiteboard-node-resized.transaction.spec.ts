@@ -1,7 +1,7 @@
 import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
-  IWhiteboardNodePositionUpdate,
+  IWhiteboardNodeSizeUpdate,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
@@ -10,7 +10,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
-import { WhiteboardNodeMovedTransaction } from './whiteboard-node-moved.transaction';
+import { WhiteboardNodeResizedTransaction } from './whiteboard-node-resized.transaction';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
@@ -18,11 +18,11 @@ const transactionEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
-const updateNodePositionsMethodName = 'updateNodePositions';
-const cacheServiceMock = { [updateNodePositionsMethodName]: jest.fn() };
+const updateNodeSizeMethodName = 'updateNodeSize';
+const cacheServiceMock = { [updateNodeSizeMethodName]: jest.fn() };
 
 const testMessageContext = {
-  eventType: MessageEventType.WhiteboardNodeMoved,
+  eventType: MessageEventType.WhiteboardNodeResized,
   tenantId: uuidv4(),
   casefileId: uuidv4(),
   userId: uuidv4(),
@@ -31,30 +31,17 @@ const testMessageContext = {
   timestamp: 123456,
 };
 
-const testMessageBody = [
-  {
-    id: uuidv4(),
-    x: 1,
-    y: 1,
-  },
-  {
-    id: uuidv4(),
-    x: 2,
-    y: 2,
-  },
-  {
-    id: uuidv4(),
-    x: 3,
-    y: 3,
-  },
-];
+const testMessageBody = {
+  width: 1,
+  height: 1,
+};
 
-const testMessagePayload: IMessage<IWhiteboardNodePositionUpdate[]> = {
+const testMessagePayload: IMessage<IWhiteboardNodeSizeUpdate> = {
   context: testMessageContext,
   body: testMessageBody,
 };
 
-describe('WhiteboardNodeMovedTransaction', () => {
+describe('WhiteboardNodeResizedTransaction', () => {
   let transactionEventProducer: TransactionEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -86,16 +73,17 @@ describe('WhiteboardNodeMovedTransaction', () => {
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-      const updateNodePositionsSpy = jest.spyOn(cacheService, updateNodePositionsMethodName);
+      const updateNodeSizeSpy = jest.spyOn(cacheService, updateNodeSizeMethodName).mockResolvedValue(true);
 
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
-      expect(updateNodePositionsSpy).toBeCalledTimes(1);
-      expect(updateNodePositionsSpy).toBeCalledWith(
+      expect(updateNodeSizeSpy).toBeCalledTimes(1);
+      expect(updateNodeSizeSpy).toBeCalledWith(
         testMessageContext.casefileId,
+        testMessageContext.nodeId,
         testMessageContext.userId,
         testMessageBody
       );
@@ -103,49 +91,53 @@ describe('WhiteboardNodeMovedTransaction', () => {
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
     });
 
+    it('should not forward message if resized node is blocked by another user', async () => {
+      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, testMessagePayload);
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await transaction.execute();
+
+      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+    });
+
     it('should throw an InternalServerException if the given message is missing a body', async () => {
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, { ...testMessagePayload, body: undefined });
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, { ...testMessagePayload, body: undefined });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
-    it('should throw an InternalServerException if the given message body is not any array', async () => {
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, { ...testMessagePayload, body: {} });
+    it('should throw an InternalServerException if the given message context is missing a node id', async () => {
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, {
+        ...testMessagePayload,
+        context: { ...testMessageContext, nodeId: undefined },
+      });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw an InternalServerError if the message body does not pass the DTO validation', async () => {
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, {
+        context: testMessagePayload.context,
+        body: { ...testMessageBody, width: undefined },
+      });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(cacheService, updateNodePositionsMethodName).mockImplementation(() => {
+      jest.spyOn(cacheService, updateNodeSizeMethodName).mockImplementation(() => {
         throw new Error();
       });
 
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodeResizedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should remove invalid position updates from message body if they do not pass the DTO validation', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
-      const updateNodePositionsSpy = jest.spyOn(cacheService, updateNodePositionsMethodName);
-
-      const transaction = new WhiteboardNodeMovedTransaction(serviceRefs, {
-        context: testMessagePayload.context,
-        body: [testMessageBody[0], { ...testMessageBody[1], x: undefined }, testMessageBody[2]],
-      });
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await transaction.execute();
-
-      expect(updateNodePositionsSpy).toBeCalledTimes(1);
-      expect(updateNodePositionsSpy).toHaveBeenCalledWith(testMessageContext.casefileId, testMessageContext.userId, [
-        testMessageBody[0],
-        testMessageBody[2],
-      ]);
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
     });
   });
 });

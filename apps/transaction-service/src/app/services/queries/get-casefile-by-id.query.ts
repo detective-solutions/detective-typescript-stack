@@ -21,8 +21,8 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        lastUpdatedBy: TableOccurrence.lastUpdatedBy @normalize {
-          User.xid
+        TableOccurrence.lastUpdatedBy @normalize {
+          lastUpdateBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
@@ -40,11 +40,11 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
-        author: UserQueryOccurrence.author @normalize {
-          User.xid
+        UserQueryOccurrence.author @normalize {
+          author: User.xid
         }
-        lastUpdatedBy: UserQueryOccurrence.lastUpdatedBy @normalize {
-          User.xid
+        UserQueryOccurrence.lastUpdatedBy @normalize {
+          lastUpdatedBy: User.xid
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
         created: UserQueryOccurrence.created
@@ -53,7 +53,7 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
-      embeddings: Casefile.embeddings {
+      embeddings: Casefile.embeddings @normalize {
         id: Embedding.xid
         title: Embedding.title
         href: Embedding.href
@@ -62,11 +62,11 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        author: Embedding.author @normalize {
-          User.xid
+        Embedding.author {
+          author: User.xid
         }
-        lastUpdatedBy: Embedding.lastUpdatedBy @normalize {
-          User.xid
+        Embedding.lastUpdatedBy {
+          lastUpdatedBy: User.xid
         }
         lastUpdated: Embedding.lastUpdated
         created: Embedding.created

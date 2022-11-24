@@ -1,0 +1,17 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin node-selection-halo-component-theme($theme) {
+  $color-config: mat.get-color-config($theme);
+
+  $accent-palette: map.get($color-config, 'accent');
+  $default-accent-color: mat.get-color-from-palette($accent-palette);
+
+  rect {
+    stroke: $default-accent-color;
+  }
+
+  circle {
+    fill: $default-accent-color;
+  }
+}

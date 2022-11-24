@@ -3,7 +3,7 @@ import { ILoadingOverlayAngularComp } from 'ag-grid-angular';
 import { ILoadingOverlayParams } from 'ag-grid-community';
 
 @Component({
-  selector: 'table-loading-overlay',
+  selector: 'table-node-loading-overlay',
   template: `<div><div class="loading-spinner"></div></div>`,
   styles: [''],
 })

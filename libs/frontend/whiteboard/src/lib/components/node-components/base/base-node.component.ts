@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { AnyWhiteboardNode, IGeneralWhiteboardNodeTemporaryData } from '@detective.solutions/shared/data-access';
-import { BehaviorSubject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
-import { WhiteboardNodeActions, selectWhiteboardContextState } from '../../../state';
+import { BehaviorSubject, Subject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
+import { WhiteboardNodeActions, selectWhiteboardContextState, selectWhiteboardNodeById } from '../../../state';
 
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
@@ -13,7 +13,7 @@ import { WhiteboardFacadeService } from '../../../services';
   template: '',
   styleUrls: ['./base-node.component.scss'],
 })
-export class BaseNodeComponent implements AfterViewInit, OnDestroy {
+export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() node!: AnyWhiteboardNode;
 
   readonly isDragging$ = this.whiteboardFacade.isDragging$;
@@ -37,6 +37,10 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     map(([_context, blockedBy]) => blockedBy)
   );
+  readonly nodeTitleUpdate$ = new Subject<string>();
+  readonly nodeTitleBlur$ = new Subject<string>();
+
+  readonly nodeHeaderHeight = 50;
 
   protected currentUserId!: string;
   protected readonly subscriptions = new Subscription();
@@ -63,14 +67,31 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
     protected readonly keyboardService: KeyboardService
   ) {}
 
+  ngOnInit() {
+    // Node update subscription needs to be defined here, otherwise this.id would be undefined
+    this.subscriptions.add(
+      this.store
+        .select(selectWhiteboardNodeById(this.node.id))
+        .pipe(filter(Boolean))
+        .subscribe((updatedNode: AnyWhiteboardNode) => {
+          // WARNING: It is not possible to simply reassign this.node reference when updating the node values
+          // Currently the rendering will break due to some conflicts between HTML and SVG handling
+          this.updateExistingNodeObject(updatedNode);
+          this.nodeUpdates$.next(updatedNode);
+        })
+    );
+    this.customOnInit();
+  }
+
   ngAfterViewInit() {
     this.store
       .select(selectWhiteboardContextState)
       .pipe(take(1), pluck('userId'))
       .subscribe((userId: string) => {
         this.currentUserId = userId;
-        this.whiteboardFacade.applyDragBehaviorToComponent(this, this.currentUserId);
         this.customAfterViewInit();
+        this.whiteboardFacade.applyDragBehaviorToComponent(this as any, this.currentUserId);
+        this.whiteboardFacade.applyResizeBehaviorToComponent(this as any);
       });
   }
 
@@ -102,11 +123,20 @@ export class BaseNodeComponent implements AfterViewInit, OnDestroy {
         deletedNodeId: this.node.id,
       })
     );
+    this.customDelete();
   }
+
+  // Can be used by child classes to add custom logic to the ngOnInit hook
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customOnInit() {}
 
   // Can be used by child classes to add custom logic to the ngAfterViewInit hook
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected customAfterViewInit() {}
+
+  // Can be used by child classes to add custom logic to the delete method
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected customDelete() {}
 
   protected updateExistingNodeObject(updatedNode: AnyWhiteboardNode) {
     Object.keys(updatedNode).forEach((key: string) => {

@@ -6,17 +6,18 @@ import { WhiteboardNodeActions } from '../../state';
 
 @Injectable()
 export class BufferService {
-  private readonly nodeUpdateBuffer: Set<AnyWhiteboardNode> = new Set();
+  private readonly nodePositionUpdateBuffer: Set<AnyWhiteboardNode> = new Set();
+  private readonly nodeResizeUpdateBuffer: Set<AnyWhiteboardNode> = new Set();
 
   constructor(private readonly store: Store) {}
 
-  addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
-    this.nodeUpdateBuffer.add(node);
+  addToNodePositionBuffer(node: AnyWhiteboardNode) {
+    this.nodePositionUpdateBuffer.add(node);
   }
 
-  updateNodesFromBuffer() {
+  updateNodePositionsFromBuffer() {
     const updates: Update<AnyWhiteboardNode>[] = [];
-    this.nodeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
+    this.nodePositionUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
       updates.push({
         id: node.id,
         // Round node position to reduce data
@@ -24,6 +25,22 @@ export class BufferService {
       });
     });
     this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesPositionUpdated({ updates: updates }));
-    this.nodeUpdateBuffer.clear();
+    this.nodePositionUpdateBuffer.clear();
+  }
+
+  addToNodeResizeUpdateBuffer(node: AnyWhiteboardNode) {
+    this.nodeResizeUpdateBuffer.add(node);
+  }
+
+  updateNodeSizeFromBuffer() {
+    this.nodeResizeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
+      // Round node dimensions to reduce data
+      this.store.dispatch(
+        WhiteboardNodeActions.WhiteboardNodeResized({
+          update: { id: node.id, changes: { width: Math.round(node.width), height: Math.round(node.height) } },
+        })
+      );
+    });
+    this.nodeResizeUpdateBuffer.clear();
   }
 }

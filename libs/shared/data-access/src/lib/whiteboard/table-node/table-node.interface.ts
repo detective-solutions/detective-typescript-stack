@@ -4,7 +4,6 @@ import { IGeneralWhiteboardNodeTemporaryData } from '../general-whiteboard-node-
 import { ITableOccurrence } from '../../table';
 
 export interface ITableNode extends ITableOccurrence {
-  title: string;
   temporary?: ITableNodeTemporaryData;
 }
 

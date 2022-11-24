@@ -1,5 +1,7 @@
 @import '../components/topbar/topbar.component-theme';
+@import '../components/node-selection-halo/node-selection-halo.component-theme';
 
 @mixin custom-components-theme($theme) {
   @include topbar-component-theme($theme);
+  @include node-selection-halo-component-theme($theme);
 }
