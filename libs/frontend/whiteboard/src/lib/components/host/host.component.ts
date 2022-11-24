@@ -53,6 +53,7 @@ import {
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
+import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -317,13 +318,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<null>) =>
+        .subscribe((messageData: IMessage<null>) => {
           this.store.dispatch(
             WhiteboardNodeActions.WhiteboardNodeDeletedRemotely({
               deletedNodeId: messageData.context.nodeId as string,
             })
-          )
-        )
+          );
+          this.deleteWhiteboardNodeSiblingElement(
+            WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX + messageData.context.nodeId
+          );
+        })
     );
 
     // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
@@ -563,6 +567,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           timeout: window.setTimeout(cursorTimeoutHandler, this.cursorTimeoutInterval),
         });
       }
+    }
+  }
+
+  private deleteWhiteboardNodeSiblingElement(elementId: string) {
+    const nodeSiblingElement = document.getElementById(elementId);
+    if (nodeSiblingElement) {
+      nodeSiblingElement.remove();
     }
   }
 }

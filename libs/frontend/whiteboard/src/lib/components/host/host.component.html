@@ -16,7 +16,7 @@
   height="100%"
 >
   <g #zoomContainer id="zoom-container">
-    <g id="embeddings-wrapper"></g>
+    <g id="embedding-sibling-wrapper"></g>
     <ng-container *ngFor="let node of whiteboardNodes$ | async">
       <ng-container [ngSwitch]="node.type">
         <g *ngSwitchCase="nodeType.TABLE" tableNode [node]="node"></g>

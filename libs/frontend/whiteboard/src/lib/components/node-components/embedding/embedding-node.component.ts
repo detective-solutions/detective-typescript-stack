@@ -1,6 +1,7 @@
 import { Component, DoCheck, ViewEncapsulation } from '@angular/core';
 
 import { BaseNodeComponent } from '../base/base-node.component';
+import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../../utils';
 import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
@@ -10,7 +11,6 @@ import { WhiteboardNodeActions } from '../../../state';
   encapsulation: ViewEncapsulation.None,
 })
 export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck {
-  private static IFRAME_SIBLING_ELEMENT_ID_PREFIX = 'embedding-';
   private static DRAG_OVERLAY_SIBLING_ELEMENT_ID_PREFIX = 'embedding-drag-overlay-';
   private static DEFAULT_NODE_WIDTH = 900;
   private static DEFAULT_NODE_HEIGHT = 50;
@@ -72,7 +72,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       return;
     }
 
-    const zoomContainer = window.document.getElementById('zoom-container');
+    const zoomContainer = document.getElementById('zoom-container');
     if (!zoomContainer) {
       throw new Error('Could not query zoom container for creating embedding drag overlay');
     }
@@ -118,12 +118,12 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
   initIFrameIfNecessary() {
     // It is necessary to create a sibling element that is not part of whiteboard simulation to prevent reloading of
     // the iFrame on every change. The sibling element has to react on any changes to the actual embedding node.
-    const embeddingsWrapper = window.document.getElementById('embeddings-wrapper');
+    const embeddingsWrapper = document.getElementById('embedding-sibling-wrapper');
     if (!embeddingsWrapper) {
       throw new Error('Could not query embeddings wrapper for creating embedding node sibling element');
     }
     this.siblingEmbeddingElement = embeddingsWrapper.querySelector(
-      `#${EmbeddingNodeComponent.IFRAME_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
+      `#${WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX}${this.node.id}`
     );
     const shouldReloadIFrame = this.iFrameHasDifferentSrc(this.siblingEmbeddingElement, this.currentNodeTitle);
     if (!this.siblingEmbeddingElement || shouldReloadIFrame) {
@@ -154,7 +154,7 @@ export class EmbeddingNodeComponent extends BaseNodeComponent implements DoCheck
       'transform',
       `translate(${this.node.x},${this.node.y + this.nodeHeaderHeight})`
     );
-    siblingEmbeddingElement.id = EmbeddingNodeComponent.IFRAME_SIBLING_ELEMENT_ID_PREFIX + this.node.id;
+    siblingEmbeddingElement.id = WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX + this.node.id;
     return siblingEmbeddingElement;
   }
 
