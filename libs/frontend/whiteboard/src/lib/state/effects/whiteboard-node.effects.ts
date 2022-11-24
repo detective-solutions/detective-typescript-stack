@@ -211,7 +211,7 @@ export class WhiteboardNodeEffects {
                 userId: context.userId,
                 nodeId: action.update.id,
               } as IMessageContext,
-              body: action.update,
+              body: action.update.changes,
             },
           });
         })
