@@ -1,4 +1,3 @@
-/* eslint-disable sort-imports */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockModule, MockService, ngMocks } from 'ng-mocks';
 

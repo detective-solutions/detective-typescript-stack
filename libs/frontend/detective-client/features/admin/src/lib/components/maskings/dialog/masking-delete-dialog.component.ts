@@ -1,15 +1,14 @@
-/* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
-import { catchError, EMPTY, map, take } from 'rxjs';
+import { EMPTY, catchError, map, take } from 'rxjs';
+import { IMask, IMasking } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
-import { MaskingService } from '../../../services';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IMasking, IMask } from '@detective.solutions/shared/data-access';
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { IDeleteMaskingGQLResponse } from '../../../graphql';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { MaskingService } from '../../../services';
 
 @Component({
   selector: 'masking-delete-dialog',
@@ -21,7 +20,7 @@ export class MaskingDeleteDialogComponent {
   readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IMasking) => value.name));
 
   isSubmitting = false;
-  selectedMasking$!: IMasking;
+  selectedMasking!: IMasking;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { xid: string },
@@ -32,14 +31,14 @@ export class MaskingDeleteDialogComponent {
     private readonly dialogRef: MatDialogRef<MaskingDeleteDialogComponent>,
     private readonly logger: LogService
   ) {
-    this.maskingService.getMaskingById(this.dialogInputData.xid).subscribe((x) => {
-      this.selectedMasking$ = x;
+    this.maskingService.getMaskingById(this.dialogInputData.xid).subscribe((selectedMasking: IMasking) => {
+      this.selectedMasking = selectedMasking;
     });
   }
 
   getMaskIdsToDelete() {
-    const columns = this.selectedMasking$.columns ?? [];
-    const rows = this.selectedMasking$.rows ?? [];
+    const columns = this.selectedMasking.columns ?? [];
+    const rows = this.selectedMasking.rows ?? [];
 
     return {
       columns: columns.map((mask: IMask) => mask.xid ?? ''),

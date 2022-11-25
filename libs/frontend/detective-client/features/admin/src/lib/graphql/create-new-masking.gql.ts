@@ -1,8 +1,7 @@
-/* eslint-disable sort-imports */
 import { Mutation, gql } from 'apollo-angular';
 
-import { Injectable } from '@angular/core';
 import { IMasking } from '@detective.solutions/shared/data-access';
+import { Injectable } from '@angular/core';
 
 export interface ICreateNewMaskingGQLResponse {
   addMasking: {

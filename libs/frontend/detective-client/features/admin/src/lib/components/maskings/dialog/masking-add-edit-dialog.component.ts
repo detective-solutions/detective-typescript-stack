@@ -1,34 +1,34 @@
-/* eslint-disable sort-imports */
+import { AfterViewChecked, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   BaseFormField,
   CheckboxFormField,
-  DynamicFormControlService,
-  TextBoxFormField,
   DropdownFormField,
+  DynamicFormControlService,
   DynamicFormError,
+  TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
-import { AfterViewChecked, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { EMPTY, Subscription, catchError, map, pluck, tap, Observable, delay, take } from 'rxjs';
+import { ConnectionsService, MaskingService, UsersService } from '../../../services';
+import { EMPTY, Observable, Subscription, catchError, delay, map, pluck, take, tap } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {
   IConnectorPropertiesResponse,
   IGetAllConnectionsResponse,
+  IMaskDeleteInput,
   IMaskSubTableDataDef,
   IMaskSubTableDataDropdown,
   IMaskSubTableDef,
-  IMaskDeleteInput,
   ITableColumns,
 } from '../../../models';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ConnectionsService, MaskingService, UsersService } from '../../../services';
-import { IDropDownValues, IMasking, IMask } from '@detective.solutions/shared/data-access';
-import { IConnectionTable } from '@detective.solutions/frontend/shared/data-access';
-import { v4 as uuidv4 } from 'uuid';
-import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { ProviderScope, TranslocoService, TRANSLOCO_SCOPE } from '@ngneat/transloco';
-import { environment } from '@detective.solutions/frontend/shared/environments';
 import { ICreateNewMaskingGQLResponse, IUpdateMaskingGQLResponse } from '../../../graphql';
+import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/data-access';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+
+import { IConnectionTable } from '@detective.solutions/frontend/shared/data-access';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { environment } from '@detective.solutions/frontend/shared/environments';
+import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

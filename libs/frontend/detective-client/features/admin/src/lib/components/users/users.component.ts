@@ -1,21 +1,21 @@
-/* eslint-disable sort-imports */
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { IGetAllUsersResponse, IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import {
   ITableCellEvent,
   ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, map, shareReplay, take, filter, combineLatest } from 'rxjs';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SubscriptionService, UsersService } from '../../services';
-import { IUser } from '@detective.solutions/shared/data-access';
-import { IGetAllUsersResponse, IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { UsersDeleteDialogComponent } from './dialog';
+import { Observable, Subject, Subscription, combineLatest, filter, map, shareReplay, take } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import { SubscriptionService, UsersService } from '../../services';
+
 import { ComponentType } from '@angular/cdk/portal';
+import { IUser } from '@detective.solutions/shared/data-access';
 import { UserEditDialogComponent } from './dialog/users-edit-dialog.component';
+import { UsersDeleteDialogComponent } from './dialog';
 
 @Component({
   selector: 'users',
@@ -23,9 +23,6 @@ import { UserEditDialogComponent } from './dialog/users-edit-dialog.component';
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnDestroy, OnInit {
-  readonly pageSize = 10;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
-
   readonly deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === UsersClickEvent.DELETE_USER),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
@@ -47,14 +44,17 @@ export class UsersComponent implements OnDestroy, OnInit {
       shareReplay()
     );
 
+  readonly fetchMoreDataByOffset$ = new Subject<number>();
+
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
   productInfo$!: Observable<{ userLimit: number }>;
   userRatio$!: Observable<number>;
 
+  readonly pageSize = 10;
+
   private readonly subscriptions = new Subscription();
   private readonly initialPageOffset = 0;
-
   private readonly dialogDefaultConfig = {
     width: '650px',
     minWidth: '400px',

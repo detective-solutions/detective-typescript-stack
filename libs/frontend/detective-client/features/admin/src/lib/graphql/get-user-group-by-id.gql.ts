@@ -1,7 +1,7 @@
-/* eslint-disable sort-imports */
 import { Query, gql } from 'apollo-angular';
-import { Injectable } from '@angular/core';
+
 import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { Injectable } from '@angular/core';
 
 export interface IGetUserGroupByIdGQLResponse {
   getUserGroup: IUserGroup;

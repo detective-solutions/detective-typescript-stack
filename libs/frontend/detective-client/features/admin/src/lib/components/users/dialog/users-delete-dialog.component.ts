@@ -1,15 +1,14 @@
-/* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
-import { catchError, EMPTY, map, take } from 'rxjs';
+import { EMPTY, catchError, map, take } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-
-import { UsersService } from '../../../services';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IUser } from '@detective.solutions/shared/data-access';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { IDeleteUserGQLResponse } from '../../../graphql';
+
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
+import { IDeleteUserGQLResponse } from '../../../graphql';
+import { IUser } from '@detective.solutions/shared/data-access';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { UsersService } from '../../../services';
 
 @Component({
   selector: 'users-delete-dialog',
@@ -19,6 +18,7 @@ import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-f
 export class UsersDeleteDialogComponent {
   readonly userToBeDeleted$ = this.userService.getUserById(this.dialogInputData.id);
   readonly userName$ = this.userToBeDeleted$.pipe(map((value: IUser) => `${value.firstname} ${value.lastname}`));
+
   isSubmitting = false;
 
   constructor(

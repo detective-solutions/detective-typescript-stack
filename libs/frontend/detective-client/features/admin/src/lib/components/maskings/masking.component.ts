@@ -1,4 +1,5 @@
-/* eslint-disable sort-imports */
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { IGetAllMaskingsResponse, IMaskingTableDef, MaskingClickEvent, MaskingDialogComponent } from '../../models';
 import {
   ITableCellEvent,
@@ -6,15 +7,14 @@ import {
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, map, shareReplay, take, filter } from 'rxjs';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { MaskingService } from '../../services';
-import { IMasking } from '@detective.solutions/shared/data-access';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MaskingDeleteDialogComponent, MaskingAddEditDialogComponent } from './dialog';
+import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './dialog';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+
 import { ComponentType } from '@angular/cdk/portal';
+import { IMasking } from '@detective.solutions/shared/data-access';
+import { MaskingService } from '../../services';
 
 @Component({
   selector: 'maskings',
@@ -22,9 +22,6 @@ import { ComponentType } from '@angular/cdk/portal';
   styleUrls: ['./masking.component.scss'],
 })
 export class MaskingsComponent implements OnDestroy, OnInit {
-  readonly pageSize = 10;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
-
   readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === MaskingClickEvent.EDIT_MASKING),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
@@ -40,6 +37,9 @@ export class MaskingsComponent implements OnDestroy, OnInit {
       map((result) => result.matches),
       shareReplay()
     );
+
+  readonly pageSize = 10;
+  readonly fetchMoreDataByOffset$ = new Subject<number>();
 
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;

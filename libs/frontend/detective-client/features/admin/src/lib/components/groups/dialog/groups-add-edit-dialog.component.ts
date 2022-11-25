@@ -1,4 +1,3 @@
-/* eslint-disable sort-imports */
 import {
   BaseFormField,
   DynamicFormControlService,
@@ -6,17 +5,17 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { EMPTY, Subscription, catchError, take, Observable, tap, map, pluck, combineLatest, debounceTime } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, debounceTime, map, pluck, take, tap } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
+import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
+import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
+import { IDropDownUser, IMember, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
-import { UsersService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IDropDownUser, IMember, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
-import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
-import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
+import { UsersService } from '../../../services';
 
 @Component({
   selector: 'groups-add-edit-dialog',
