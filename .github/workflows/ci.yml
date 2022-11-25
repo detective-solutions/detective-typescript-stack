@@ -53,7 +53,7 @@ jobs:
           fetch-depth: 0
 
       - name: Detect changed apps
-        uses: detective-solutions/nx-check-changes@v2.0.0
+        uses: detective-solutions/nx-check-changes@v3.0.0
         id: nx-changes
 
     outputs:
