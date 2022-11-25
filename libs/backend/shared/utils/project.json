@@ -1,5 +1,6 @@
 {
-  "root": "libs/backend/shared/utils",
+  "name": "backend-shared-utils",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/backend/shared/utils/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/backend/shared/utils"],
+      "outputs": ["{workspaceRoot}/coverage/libs/backend/shared/utils"],
       "options": {
-        "jestConfig": "libs/backend/shared/utils/jest.config.js",
+        "jestConfig": "libs/backend/shared/utils/jest.config.ts",
         "passWithNoTests": true
       }
     }

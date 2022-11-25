@@ -1,5 +1,6 @@
 {
-  "root": "libs/backend/redis-client",
+  "name": "backend-redis-client",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/backend/redis-client/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/backend/redis-client"],
+      "outputs": ["{workspaceRoot}/coverage/libs/backend/redis-client"],
       "options": {
-        "jestConfig": "libs/backend/redis-client/jest.config.js",
+        "jestConfig": "libs/backend/redis-client/jest.config.ts",
         "passWithNoTests": true
       }
     }

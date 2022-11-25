@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'backend-auth',
+/* eslint-disable */
+export default {
+  displayName: 'backend-redis-client',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +12,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/backend/auth',
+  coverageDirectory: '../../../coverage/libs/backend/redis-client',
 };

@@ -1,6 +1,7 @@
-module.exports = {
-  displayName: 'frontend-shared-error-handling',
-  preset: '../../../../jest.preset.js',
+/* eslint-disable */
+export default {
+  displayName: 'detective-client',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -8,7 +9,7 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../../coverage/libs/frontend/shared/error-handling',
+  coverageDirectory: '../../coverage/apps/detective-client',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

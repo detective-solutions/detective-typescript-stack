@@ -6,13 +6,13 @@ import {
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { EMPTY, Observable, Subscription, catchError, combineLatest, debounceTime, map, pluck, take, tap } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
 import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
 import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
 import { IDropDownUser, IMember, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { UsersService } from '../../../services';
@@ -45,7 +45,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
     (col: { key: string; type: string; label: string }) => col.key
   );
 
-  readonly searchBox = new FormControl('');
+  readonly searchBox = new UntypedFormControl('');
   readonly isAddDialog = !this.dialogInputData?.id;
   readonly existingFormFieldData$ = this.userService.getUserGroupById(this.dialogInputData?.id).pipe(
     map((response: IUserGroup) => {
@@ -82,7 +82,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
     private readonly logger: LogService
   ) {
     this.subscriptions.add(
-      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
+      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: UntypedFormGroup) => this.submitForm(formGroup))
     );
   }
 
@@ -114,7 +114,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
     );
   }
 
-  submitForm(formGroup?: FormGroup) {
+  submitForm(formGroup?: UntypedFormGroup) {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
 
     const members = this.dataSource

@@ -1,5 +1,6 @@
 {
-  "root": "libs/frontend/detective-client/features/auth",
+  "name": "frontend-shared-auth",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/detective-client/features/auth/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/frontend/shared/auth"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/shared/auth"],
       "options": {
-        "jestConfig": "libs/frontend/shared/auth/jest.config.js",
+        "jestConfig": "libs/frontend/shared/auth/jest.config.ts",
         "passWithNoTests": true
       }
     }

@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'frontend-shared-rx-websocket-wrapper',
+/* eslint-disable */
+export default {
+  displayName: 'frontend-shared-utils',
   preset: '../../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -10,5 +11,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../../coverage/libs/frontend/shared/rx-websocket-wrapper',
+  coverageDirectory: '../../../../coverage/libs/frontend/shared/utils',
 };

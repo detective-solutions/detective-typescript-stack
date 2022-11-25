@@ -7,11 +7,11 @@ import {
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
 import { EMPTY, Subscription, catchError, map, pluck, switchMap, take, tap } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { IConnectionsAddEditResponse, IConnectorPropertiesResponse } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 
 import { ConnectionsService } from '../../../services';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
@@ -73,16 +73,16 @@ export class ConnectionsAddEditDialogComponent {
     private readonly toastService: ToastService,
     private readonly connectionsService: ConnectionsService,
     private readonly dialogRef: MatDialogRef<ConnectionsAddEditDialogComponent>,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly logger: LogService
   ) {
     this.subscriptions.add(
-      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
+      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: UntypedFormGroup) => this.submitForm(formGroup))
     );
   }
 
-  submitForm(formGroup?: FormGroup) {
+  submitForm(formGroup?: UntypedFormGroup) {
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
     if (formGroup.valid) {
       const formValues = this.removeEmptyStringFormValues(formGroup.value);
