@@ -73,7 +73,6 @@
     "ts-enum-util": "4.0.2",
     "tslib": "2.4.1",
     "uuid": "9.0.0",
-    "ws": "8.11.0",
     "zone.js": "0.11.8"
   },
   "devDependencies": {
