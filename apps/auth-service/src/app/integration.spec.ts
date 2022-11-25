@@ -1,5 +1,6 @@
 import { AuthModule, AuthModuleEnvironment, AuthService } from '@detective.solutions/backend/auth';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import {
@@ -13,7 +14,6 @@ import {
 
 import { AppController } from './app.controller';
 import { DGraphGrpcClientEnvironment } from '@detective.solutions/backend/dgraph-grpc-client';
-import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { defaultEnvConfig } from './default-env.config';
 import jwtDecode from 'jwt-decode';
@@ -42,7 +42,7 @@ beforeAll(async () => {
     controllers: [AppController],
   }).compile();
 
-  // app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+  app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
 
@@ -54,8 +54,7 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-// TODO: Reactivate me
-xdescribe('AppController Integration', () => {
+describe('AppController Integration', () => {
   describe('/POST login', () => {
     it('should return a valid access and refresh token', () => {
       const testJwtUserInfo = {
