@@ -6,7 +6,6 @@ import { NestFactory } from '@nestjs/core';
 import { environment } from '@detective.solutions/backend/shared/environments';
 
 async function bootstrap() {
-  console.log(); // TODO: REMOVE ME
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }));
 
   app.enableVersioning({
