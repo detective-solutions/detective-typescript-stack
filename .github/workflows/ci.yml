@@ -4,7 +4,7 @@ on:
   - pull_request_target
 
 env:
-  NODE_VERSION: 16
+  NODE_VERSION: 18
   DOCKER_REGISTRY: quay.io
   ORGANIZATION: detective.solutions
 
