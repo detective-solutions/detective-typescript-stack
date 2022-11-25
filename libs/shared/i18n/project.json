@@ -1,5 +1,5 @@
 {
-  "name": "shared-utils",
+  "name": "shared-i18n",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/shared/i18n/src",
