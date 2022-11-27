@@ -9,7 +9,6 @@
     "backend-shared-utils": "libs/backend/shared/utils",
     "backend-users": "libs/backend/users",
     "detective-client": "apps/detective-client",
-    "detective-client-e2e": "apps/detective-client-e2e",
     "detective-client-feature-admin": "libs/frontend/detective-client/features/admin",
     "detective-client-feature-home": "libs/frontend/detective-client/features/home",
     "detective-client-ui": "libs/frontend/detective-client/ui",
