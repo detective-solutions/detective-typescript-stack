@@ -6,7 +6,7 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject } from '@angular/core';
-import { EMPTY, Subscription, catchError, map, pluck, switchMap, take, tap } from 'rxjs';
+import { EMPTY, Subscription, catchError, map, switchMap, take, tap } from 'rxjs';
 import { IConnectionsAddEditResponse, IConnectorPropertiesResponse } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
@@ -41,7 +41,7 @@ export class ConnectionsAddEditDialogComponent {
       switchMap((selectedConnectorType: string) =>
         this.connectionsService.getConnectorProperties(selectedConnectorType)
       ),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
       map(this.getFormFieldByType),
       tap(() => (this.showSubmitButton = true)),
       catchError((error) => {
@@ -54,7 +54,7 @@ export class ConnectionsAddEditDialogComponent {
     .getExistingConnectorPropertiesById(this.dialogInputData?.id)
     .pipe(
       tap((response) => (this.connectorType = response.connectorType)),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData.properties),
       map(this.getFormFieldByType),
       tap(() => (this.showSubmitButton = true)),
       catchError((error: Error) => {

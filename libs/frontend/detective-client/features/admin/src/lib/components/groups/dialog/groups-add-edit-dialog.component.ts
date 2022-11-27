@@ -5,7 +5,7 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, debounceTime, map, pluck, take, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, debounceTime, map, take, tap } from 'rxjs';
 import { GroupMember, IConnectorPropertiesResponse, IGetAllUsersResponse } from '../../../models';
 import { ICreateUserGroupGQLResponse, IUpdateUserGroupGQLResponse } from '../../../graphql';
 import { IDropDownUser, IMember, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
@@ -56,7 +56,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
       return response;
     }),
     map((response: IUserGroup) => this.generateTableProperties(response.name ?? '', response.description ?? '')),
-    pluck('properties'),
+    map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
     map(this.getFormFieldByType),
     tap(() => (this.isSubmitting = false)),
     catchError((error: Error) => {

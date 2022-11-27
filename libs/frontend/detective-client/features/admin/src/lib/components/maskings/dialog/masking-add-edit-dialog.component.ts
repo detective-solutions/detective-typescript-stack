@@ -8,7 +8,7 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { ConnectionsService, MaskingService, UsersService } from '../../../services';
-import { EMPTY, Observable, Subscription, catchError, delay, map, pluck, take, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, delay, map, take, tap } from 'rxjs';
 import {
   IConnectorPropertiesResponse,
   IGetAllConnectionsResponse,
@@ -139,7 +139,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       }),
       delay(700),
       map(() => this.generateTableProperties()),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
@@ -188,7 +188,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         this.dataSource = [];
       }),
       map(() => this.generateTableProperties()),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),

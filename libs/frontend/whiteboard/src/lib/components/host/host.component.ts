@@ -28,19 +28,7 @@ import {
   IWhiteboardCollaborationCursor,
   TableWhiteboardNode,
 } from '../../models';
-import {
-  Subject,
-  Subscription,
-  combineLatest,
-  debounceTime,
-  delayWhen,
-  filter,
-  map,
-  pluck,
-  switchMap,
-  take,
-  tap,
-} from 'rxjs';
+import { Subject, Subscription, combineLatest, debounceTime, delayWhen, filter, map, switchMap, take, tap } from 'rxjs';
 import {
   WhiteboardGeneralActions,
   WhiteboardMetadataActions,
@@ -57,6 +45,8 @@ import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
   selector: 'whiteboard-host',
@@ -249,7 +239,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       this.whiteboardFacade.getWebSocketSubjectAsync$
         .pipe(
           switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.LoadWhiteboardData)),
-          pluck('body')
+          map((webSocketResponse: any) => webSocketResponse?.body)
         )
         .subscribe((messageData: ICachableCasefileForWhiteboard) =>
           this.store.dispatch(
