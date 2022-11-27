@@ -1,6 +1,7 @@
 {
+  "name": "detective-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "root": "apps/detective-client",
   "sourceRoot": "apps/detective-client/src",
   "targets": {
     "build": {
@@ -116,9 +117,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/detective-client"],
+      "outputs": ["{workspaceRoot}/coverage/apps/detective-client"],
       "options": {
-        "jestConfig": "apps/detective-client/jest.config.js",
+        "jestConfig": "apps/detective-client/jest.config.ts",
         "passWithNoTests": true
       }
     }

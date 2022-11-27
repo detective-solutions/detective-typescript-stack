@@ -1,8 +1,7 @@
-const esModules = ['d3', 'd3-drag', 'd3-selection', 'd3-zoom'].join('|');
-
-module.exports = {
-  displayName: 'frontend-whiteboard',
-  preset: '../../../jest.preset.js',
+/* eslint-disable */
+export default {
+  displayName: 'frontend-detective-client-features-login',
+  preset: '../../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -10,11 +9,11 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../coverage/libs/frontend/whiteboard',
+  coverageDirectory: '../../../../../coverage/libs/frontend/detective-client/features/login',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },
-  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)', `/node_modules/(?!${esModules})`],
+  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',

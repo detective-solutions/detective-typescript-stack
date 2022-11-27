@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'frontend-shared-page-not-found',
+/* eslint-disable */
+export default {
+  displayName: 'detective-client-ui',
   preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -8,7 +9,7 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../../coverage/libs/frontend/shared/page-not-found',
+  coverageDirectory: '../../coverage/libs/frontend/detective-client/ui',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

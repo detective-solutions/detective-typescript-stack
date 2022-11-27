@@ -1,5 +1,6 @@
 {
-  "root": "libs/backend/shared/environments",
+  "name": "backend-shared-environments",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/backend/shared/environments/src",
   "projectType": "library",
   "targets": {

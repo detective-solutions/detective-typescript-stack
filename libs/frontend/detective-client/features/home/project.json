@@ -1,5 +1,6 @@
 {
-  "root": "libs/frontend/detective-client/features/home",
+  "name": "detective-client-feature-home",
+  "$schema": "../../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/detective-client/features/home/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/frontend/detective-client/features/home"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/detective-client/features/home"],
       "options": {
-        "jestConfig": "libs/frontend/detective-client/features/home/jest.config.js",
+        "jestConfig": "libs/frontend/detective-client/features/home/jest.config.ts",
         "passWithNoTests": true
       }
     }

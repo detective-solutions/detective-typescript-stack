@@ -8,8 +8,7 @@ import {
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
 import { ConnectionsService, MaskingService, UsersService } from '../../../services';
-import { EMPTY, Observable, Subscription, catchError, delay, map, pluck, take, tap } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { EMPTY, Observable, Subscription, catchError, delay, map, take, tap } from 'rxjs';
 import {
   IConnectorPropertiesResponse,
   IGetAllConnectionsResponse,
@@ -24,6 +23,7 @@ import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/da
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 
 import { IConnectionTable } from '@detective.solutions/frontend/shared/data-access';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
@@ -139,7 +139,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       }),
       delay(700),
       map(() => this.generateTableProperties()),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
@@ -160,13 +160,13 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     private readonly userService: UsersService,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly connectionsService: ConnectionsService,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly toastService: ToastService,
     private readonly logger: LogService,
     private readonly dialogRef: MatDialogRef<MaskingAddEditDialogComponent>
   ) {
     this.subscriptions.add(
-      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: FormGroup) => this.submitForm(formGroup))
+      this.dynamicFormControlService.formSubmit$.subscribe((formGroup: UntypedFormGroup) => this.submitForm(formGroup))
     );
 
     this.maskingService.getAvailableUserGroups().subscribe((groups: IDropDownValues[]) => {
@@ -188,7 +188,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         this.dataSource = [];
       }),
       map(() => this.generateTableProperties()),
-      pluck('properties'),
+      map((formFieldData: { properties: IConnectorPropertiesResponse[] }) => formFieldData?.properties),
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
@@ -314,7 +314,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     }
   }
 
-  submitForm(formGroup?: FormGroup) {
+  submitForm(formGroup?: UntypedFormGroup) {
     this.isSubmitting = true;
     formGroup = formGroup ?? this.dynamicFormControlService.currentFormGroup;
 

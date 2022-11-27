@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { AnyWhiteboardNode, IGeneralWhiteboardNodeTemporaryData } from '@detective.solutions/shared/data-access';
-import { BehaviorSubject, Subject, Subscription, combineLatest, filter, map, of, pluck, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, combineLatest, filter, map, of, switchMap, take } from 'rxjs';
 import { WhiteboardNodeActions, selectWhiteboardContextState, selectWhiteboardNodeById } from '../../../state';
 
+import { IWhiteboardContextState } from '../../../state/interfaces';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../services';
@@ -23,12 +24,12 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly nodeUpdates$ = new BehaviorSubject<AnyWhiteboardNode>(this.node);
   readonly nodeTemporaryData$ = this.nodeUpdates$.pipe(
     filter((node: AnyWhiteboardNode) => !!node?.temporary),
-    pluck('temporary'),
+    map((node: AnyWhiteboardNode) => node?.temporary),
     filter(Boolean)
   );
   readonly isBlocked$ = this.nodeTemporaryData$.pipe(
     filter((temporaryData: IGeneralWhiteboardNodeTemporaryData) => !!temporaryData?.blockedBy),
-    pluck('blockedBy'),
+    map((temporaryData: IGeneralWhiteboardNodeTemporaryData) => temporaryData?.blockedBy),
     filter(Boolean),
     switchMap((blockedBy: string) =>
       combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(blockedBy).pipe(take(1))])
@@ -86,7 +87,10 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.store
       .select(selectWhiteboardContextState)
-      .pipe(take(1), pluck('userId'))
+      .pipe(
+        take(1),
+        map((whiteboardContext: IWhiteboardContextState) => whiteboardContext?.userId)
+      )
       .subscribe((userId: string) => {
         this.currentUserId = userId;
         this.customAfterViewInit();

@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'shared-ui',
+/* eslint-disable */
+export default {
+  displayName: 'frontend-shared-page-not-found',
   preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -8,7 +9,7 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../coverage/libs/shared/ui',
+  coverageDirectory: '../../../../coverage/libs/frontend/shared/page-not-found',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

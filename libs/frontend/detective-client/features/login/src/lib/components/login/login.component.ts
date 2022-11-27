@@ -1,8 +1,8 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { LoginEmailValidation, LoginPasswordValidation } from '@detective.solutions/frontend/shared/utils';
 import { Subscription, debounceTime, filter, take } from 'rxjs';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 
@@ -13,14 +13,14 @@ import { AuthService } from '@detective.solutions/frontend/shared/auth';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   redirectUrl!: string;
-  loginForm!: FormGroup;
+  loginForm!: UntypedFormGroup;
   loginError = '';
   hidePassword = true;
 
   private readonly subscriptions = new Subscription();
 
   constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly route: ActivatedRoute

@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 
 import { BaseFormField } from '../../models';
 import { DynamicFormControlService } from '../../services';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'dynamic-form',
@@ -13,7 +13,7 @@ export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() formFieldDefinitions!: BaseFormField<string | boolean>[];
   @Input() optionalFieldsPanelName!: string;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
   get requiredFormFields() {
     return this.formFieldDefinitions.filter((formFieldDefinition) => formFieldDefinition.required);

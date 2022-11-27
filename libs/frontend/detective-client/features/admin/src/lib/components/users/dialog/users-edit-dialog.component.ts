@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { EMPTY, catchError, take } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IUser, UserRole } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { IUpdateUserRoleGQLResponse } from '../../../graphql';
@@ -27,7 +27,7 @@ export class UserEditDialogComponent implements OnInit {
   currentUser!: IUser;
   isSubmitting = false;
   isLoaded = false;
-  userRoleForm!: FormGroup;
+  userRoleForm!: UntypedFormGroup;
   currentRole!: { roleId: number; name: string };
 
   constructor(
@@ -37,7 +37,7 @@ export class UserEditDialogComponent implements OnInit {
     private readonly toastService: ToastService,
     private readonly userService: UsersService,
     private readonly dialogRef: MatDialogRef<UserEditDialogComponent>,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly logger: LogService
   ) {}
 

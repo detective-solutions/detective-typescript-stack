@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { IMessage, ITableNodeTemporaryData, MessageEventType } from '@detective.solutions/shared/data-access';
-import { filter, map, pluck, switchMap } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
@@ -50,7 +50,7 @@ export class TableNodeComponent extends BaseNodeComponent {
         .pipe(
           switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.QueryTable)),
           filter((message: IMessage<IQueryResponseBody>) => message.context.nodeId === this.node.id),
-          pluck('body')
+          map((message: IMessage<IQueryResponseBody>) => message?.body)
         )
         .subscribe((messageData: IQueryResponseBody) => {
           this.store.dispatch(

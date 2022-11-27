@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 
 import { BaseFormField } from '../models';
 import { Injectable } from '@angular/core';
@@ -8,26 +8,26 @@ import { Subject } from 'rxjs';
 
 @Injectable()
 export class DynamicFormControlService {
-  formGroup!: FormGroup;
-  formSubmit$ = new Subject<FormGroup>();
+  formGroup!: UntypedFormGroup;
+  formSubmit$ = new Subject<UntypedFormGroup>();
   selectionChanged$ = new Subject<{ key: string; value: string }>();
 
-  get currentFormGroup(): FormGroup {
+  get currentFormGroup(): UntypedFormGroup {
     if (this.formGroup) {
       return this.formGroup;
     }
     throw new Error('No dynamic form group available');
   }
 
-  toFormGroup(inputFormFields: BaseFormField<string | boolean>[]): FormGroup {
+  toFormGroup(inputFormFields: BaseFormField<string | boolean>[]): UntypedFormGroup {
     const group: any = {};
 
     inputFormFields.forEach((formField) => {
       group[formField.key] = formField.required
-        ? new FormControl({ value: formField.value, disabled: formField.disabled }, Validators.required)
-        : new FormControl(formField.value);
+        ? new UntypedFormControl({ value: formField.value, disabled: formField.disabled }, Validators.required)
+        : new UntypedFormControl(formField.value);
     });
-    this.formGroup = new FormGroup(group);
+    this.formGroup = new UntypedFormGroup(group);
     return this.formGroup;
   }
 

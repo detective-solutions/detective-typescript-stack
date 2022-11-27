@@ -1,5 +1,6 @@
-module.exports = {
-  displayName: 'backend-dgraph-grpc-client',
+/* eslint-disable */
+export default {
+  displayName: 'backend-auth',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +12,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/backend/dgraph-grpc-client',
+  coverageDirectory: '../../../coverage/libs/backend/auth',
 };
