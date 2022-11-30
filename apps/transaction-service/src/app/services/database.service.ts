@@ -263,7 +263,6 @@ export class DatabaseService {
     return {
       uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
-      [`${embeddingWhiteboardNode.type}.href`]: embeddingWhiteboardNode.href,
       [`${embeddingWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(embeddingWhiteboardNode.author, 'User')) ?? null,
       },

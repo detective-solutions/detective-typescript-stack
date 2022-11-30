@@ -1,5 +1,5 @@
 import { IEmbedding, IUser } from '@detective.solutions/shared/data-access';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, IsUrl, MaxLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class EmbeddingDTO implements IEmbedding {
   @IsUUID()
@@ -10,11 +10,6 @@ export class EmbeddingDTO implements IEmbedding {
   @IsString()
   @IsOptional()
   title!: string;
-
-  @IsUrl()
-  @IsString()
-  @IsOptional()
-  href!: string;
 
   @IsNumber()
   @IsNotEmpty()

@@ -56,7 +56,6 @@ export const getCasefileByIdQuery = `
       embeddings: Casefile.embeddings @normalize {
         id: Embedding.xid
         title: Embedding.title
-        href: Embedding.href
         x: Embedding.x
         y: Embedding.y
         width: Embedding.width

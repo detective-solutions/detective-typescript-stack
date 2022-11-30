@@ -12,7 +12,6 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
   constructor(
     public id: string,
     public title: string,
-    public href: string | undefined,
     public x: number,
     public y: number,
     public width: number,
@@ -31,7 +30,6 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
       return new EmbeddingWhiteboardNode(
         nodeInput.id,
         nodeInput.title,
-        nodeInput?.href,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,
