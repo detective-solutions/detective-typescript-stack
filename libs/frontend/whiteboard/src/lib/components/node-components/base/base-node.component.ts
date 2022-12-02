@@ -112,11 +112,13 @@ export class BaseNodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleLock() {
     this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodeUpdate({
-        update: {
-          id: this.node.id,
-          changes: { locked: !this.node.locked },
-        },
+      WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+        updates: [
+          {
+            id: this.node.id,
+            changes: { locked: !this.node.locked },
+          },
+        ],
       })
     );
   }

@@ -1,5 +1,9 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { AnyWhiteboardNode, IMessageContext, MessageEventType } from '@detective.solutions/shared/data-access';
+import {
+  IMessageContext,
+  IWhiteboardNodePropertiesUpdate,
+  MessageEventType,
+} from '@detective.solutions/shared/data-access';
 import { combineLatest, filter, of, switchMap, take, tap } from 'rxjs';
 
 import { Injectable } from '@angular/core';
@@ -136,64 +140,6 @@ export class WhiteboardNodeEffects {
     { dispatch: false }
   );
 
-  readonly whiteboardNodesMoved$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodesPositionUpdated),
-        switchMap((action) =>
-          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
-        ),
-        tap(([context, action]) => {
-          this.whiteboardFacade.sendWebsocketMessage({
-            event: MessageEventType.WhiteboardNodeMoved,
-            data: {
-              context: {
-                ...context,
-                eventType: MessageEventType.WhiteboardNodeMoved,
-                userId: context.userId,
-              } as IMessageContext,
-              // Convert ngRx Update type to plain node list for backend
-              body: action.updates.map((update: Update<AnyWhiteboardNode>) => {
-                return {
-                  id: update.id,
-                  x: update.changes.x,
-                  y: update.changes.y,
-                };
-              }),
-            },
-          });
-        })
-      );
-    },
-    { dispatch: false }
-  );
-
-  readonly whiteboardNodeResized$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeResized),
-        switchMap((action) =>
-          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
-        ),
-        tap(([context, action]) => {
-          this.whiteboardFacade.sendWebsocketMessage({
-            event: MessageEventType.WhiteboardNodeResized,
-            data: {
-              context: {
-                ...context,
-                eventType: MessageEventType.WhiteboardNodeResized,
-                userId: context.userId,
-                nodeId: action.update.id,
-              } as IMessageContext,
-              body: { width: action.update.changes.width, height: action.update.changes.height },
-            },
-          });
-        })
-      );
-    },
-    { dispatch: false }
-  );
-
   readonly whiteboardNodePropertiesUpdated$ = createEffect(
     () => {
       return this.actions$.pipe(
@@ -209,9 +155,11 @@ export class WhiteboardNodeEffects {
                 ...context,
                 eventType: MessageEventType.WhiteboardNodePropertiesUpdated,
                 userId: context.userId,
-                nodeId: action.update.id,
               } as IMessageContext,
-              body: action.update.changes,
+              // Convert ngRx Update type to plain node list for backend
+              body: action.updates.map((update: Update<IWhiteboardNodePropertiesUpdate>) => {
+                return { nodeId: update.id, ...update.changes };
+              }),
             },
           });
         })

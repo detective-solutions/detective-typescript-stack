@@ -75,8 +75,8 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
-    this.bufferService.addToNodeResizeUpdateBuffer(node);
+  addToNodePositionBuffer(node: AnyWhiteboardNode) {
+    this.bufferService.addToNodePositionBuffer(node);
   }
 
   updateNodesFromBuffer() {

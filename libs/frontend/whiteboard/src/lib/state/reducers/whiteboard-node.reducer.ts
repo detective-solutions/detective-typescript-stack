@@ -42,28 +42,10 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardUnblockAllNodesOnUserLeft, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeUpdate, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdated, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeResized, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeResizedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
   on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
+    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeBatchUpdate, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
   on(TableNodeActions.TableDataReceived, (state: IWhiteboardNodeState, action: any) =>
