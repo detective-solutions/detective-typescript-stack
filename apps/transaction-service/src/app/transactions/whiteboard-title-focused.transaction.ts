@@ -17,20 +17,18 @@ export class WhiteboardTitleFocusedTransaction extends Transaction {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
 
-    const casefileId = this.messageContext.casefileId;
-
     try {
+      await this.cacheService.updateCasefileTitleFocus(this.casefileId, this.messageBody);
       this.forwardMessageToOtherClients();
-      await this.cacheService.updateCasefileTitleFocus(casefileId, this.messageBody);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(casefileId);
+      this.handleError(error);
     }
   }
 
-  private handleError(casefileId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not update title of casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not update title of casefile "${this.casefileId}"`);
   }
 }

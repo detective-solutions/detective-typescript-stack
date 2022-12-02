@@ -1,10 +1,5 @@
 import { CacheService, DatabaseService } from '../services';
-import {
-  IMessage,
-  IWhiteboardNodePositionUpdate,
-  MessageEventType,
-  UserRole,
-} from '@detective.solutions/shared/data-access';
+import { IMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -12,6 +7,8 @@ import { TransactionEventProducer } from '../events';
 import { TransactionServiceRefs } from './factory';
 import { WhiteboardNodeMovedTransaction } from './whiteboard-node-moved.transaction';
 import { v4 as uuidv4 } from 'uuid';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
 const transactionEventProducerMock = {
@@ -49,7 +46,7 @@ const testMessageBody = [
   },
 ];
 
-const testMessagePayload: IMessage<IWhiteboardNodePositionUpdate[]> = {
+const testMessagePayload: IMessage<any[]> = {
   context: testMessageContext,
   body: testMessageBody,
 };

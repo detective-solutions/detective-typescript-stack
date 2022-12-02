@@ -1,15 +1,17 @@
-import { IMessage, IWhiteboardNodeSizeUpdate, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
 import { WhiteboardNodeSizeUpdateDTO } from '../models';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export class WhiteboardNodeResizedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeResizedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<IWhiteboardNodeSizeUpdate[]>; // Define message body type
+  override message: IMessage<any[]>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
@@ -26,7 +28,7 @@ export class WhiteboardNodeResizedTransaction extends Transaction {
     const userId = this.messageContext.userId;
 
     try {
-      await validateDto(WhiteboardNodeSizeUpdateDTO, this.messageBody as IWhiteboardNodeSizeUpdate, this.logger);
+      await validateDto(WhiteboardNodeSizeUpdateDTO, this.messageBody, this.logger);
       // Only return position updates for nodes that are not blocked by other users
       // Updating the message.body property instead of messageBody, because it is used for message forwarding
       const resizeAllowed = await this.cacheService.updateNodeSize(casefileId, nodeId, userId, this.messageBody);

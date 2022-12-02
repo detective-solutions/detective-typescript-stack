@@ -1,8 +1,6 @@
 import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
-import { IWhiteboardNodePositionUpdate } from '@detective.solutions/shared/data-access';
-
-export class WhiteboardNodePositionUpdateDTO implements IWhiteboardNodePositionUpdate {
+export class WhiteboardNodePositionUpdateDTO {
   @IsUUID()
   @IsNotEmpty()
   id!: string;

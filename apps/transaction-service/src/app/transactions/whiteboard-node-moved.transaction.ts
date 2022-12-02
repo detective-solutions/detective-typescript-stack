@@ -1,15 +1,17 @@
-import { IMessage, IWhiteboardNodePositionUpdate, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
 import { WhiteboardNodePositionUpdateDTO } from '../models';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export class WhiteboardNodeMovedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeMovedTransaction.name);
   readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
 
-  override message: IMessage<IWhiteboardNodePositionUpdate[]>; // Define message body type
+  override message: IMessage<any[]>; // Define message body type
 
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
@@ -24,12 +26,10 @@ export class WhiteboardNodeMovedTransaction extends Transaction {
     try {
       for (const node of this.messageBody) {
         try {
-          await validateDto(WhiteboardNodePositionUpdateDTO, node as IWhiteboardNodePositionUpdate, this.logger);
+          await validateDto(WhiteboardNodePositionUpdateDTO, node, this.logger);
         } catch {
           // Remove invalid position updates from message body
-          this.messageBody = this.messageBody.filter(
-            (nodePositionUpdate: IWhiteboardNodePositionUpdate) => nodePositionUpdate.id !== node.id
-          );
+          this.messageBody = this.messageBody.filter((nodePositionUpdate: any) => nodePositionUpdate.id !== node.id);
         }
       }
 

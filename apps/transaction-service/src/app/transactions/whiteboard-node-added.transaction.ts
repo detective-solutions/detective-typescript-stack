@@ -16,22 +16,21 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
 
-    const casefileId = this.messageContext.casefileId;
-    const addedWhiteboardNode = this.messageBody as AnyWhiteboardNode;
-
     try {
+      await this.cacheService.addNode(this.casefileId, this.messageBody);
       this.forwardMessageToOtherClients();
-      await this.cacheService.addNode(casefileId, addedWhiteboardNode);
-      this.logger.verbose(`Node "${addedWhiteboardNode.id}" was successfully added to casefile "${casefileId}"`);
+      this.logger.verbose(`Node "${this.nodeId}" was successfully added to casefile "${this.casefileId}"`);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(casefileId, addedWhiteboardNode.id);
+      this.handleError(error);
     }
   }
 
-  private handleError(casefileId: string, nodeId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`There was an error adding node "${nodeId}" to casefile "${casefileId}"`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(
+      `There was an error adding node "${this.nodeId}" to casefile "${this.casefileId}"`
+    );
   }
 }

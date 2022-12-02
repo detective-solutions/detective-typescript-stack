@@ -12,22 +12,20 @@ export class WhiteboardSaveTransaction extends Transaction {
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    const casefileId = this.messageContext.casefileId;
-
     try {
-      const cachedCasefileId = await this.cacheService.getCasefileById(casefileId);
+      const cachedCasefileId = await this.cacheService.getCasefileById(this.casefileId);
       if (cachedCasefileId) {
         await this.databaseService.saveCasefile(cachedCasefileId);
         this.logger.log(`${this.logContext} Transaction successful`);
       }
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(casefileId);
+      this.handleError(error);
     }
   }
 
-  private handleError(casefileId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not update title of casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not update title of casefile "${this.casefileId}"`);
   }
 }

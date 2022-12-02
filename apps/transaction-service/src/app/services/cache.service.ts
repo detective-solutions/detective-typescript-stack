@@ -2,9 +2,7 @@ import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
-  IWhiteboardNodePositionUpdate,
   IWhiteboardNodePropertiesUpdate,
-  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
@@ -120,20 +118,16 @@ export class CacheService {
     this.client.json.set(casefileId, '.title', title);
   }
 
-  async updateNodePositions(
-    casefileId: string,
-    userId: string,
-    positionUpdates: IWhiteboardNodePositionUpdate[]
-  ): Promise<IWhiteboardNodePositionUpdate[]> {
+  async updateNodePositions(casefileId: string, userId: string, positionUpdates: any[]): Promise<any[]> {
     this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    const filteredPositionUpdates = positionUpdates.filter((update: IWhiteboardNodePositionUpdate) =>
+    const filteredPositionUpdates = positionUpdates.filter((update: any) =>
       cachedNodes.some((node: AnyWhiteboardNode) => node.id === update.id && node?.temporary?.blockedBy === userId)
     );
 
-    filteredPositionUpdates.forEach((update: IWhiteboardNodePositionUpdate) => {
+    filteredPositionUpdates.forEach((update: any) => {
       cachedNodes.forEach((node: AnyWhiteboardNode) => {
         if (node.id === update.id) {
           node.x = update.x;
@@ -149,12 +143,7 @@ export class CacheService {
     return filteredPositionUpdates;
   }
 
-  async updateNodeSize(
-    casefileId: string,
-    updatedNodeId: string,
-    userId: string,
-    sizeUpdate: IWhiteboardNodeSizeUpdate
-  ): Promise<boolean> {
+  async updateNodeSize(casefileId: string, updatedNodeId: string, userId: string, sizeUpdate: any): Promise<boolean> {
     this.logger.log(`Updating size of whiteboard node in casefile "${casefileId}"`);
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
@@ -180,19 +169,27 @@ export class CacheService {
 
   async updateNodeProperties(
     casefileId: string,
+    userId: string,
     nodeId: string,
-    propertyUpdates: IWhiteboardNodePropertiesUpdate
+    updatedProperties: IWhiteboardNodePropertiesUpdate
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === nodeId) {
-        Object.entries(propertyUpdates).forEach(([propertyToUpdate, updateValue]) => {
-          this.logger.log(
-            `Updating ${propertyToUpdate} property of whiteboard node ${nodeId} in casefile "${casefileId}"`
+        // Check if node is already blocked by another user. If yes, abort property update process to avoid inconsistency!
+        if (node?.temporary?.blockedBy !== null && node?.temporary.blockedBy !== userId) {
+          this.logger.warn(
+            `Properties of whiteboard node "${node.id}" cannot be updated, because it is blocked by another user`
           );
-          node[propertyToUpdate] = updateValue;
-        });
+        } else {
+          Object.entries(updatedProperties).forEach(([propertyToUpdate, updateValue]) => {
+            this.logger.log(
+              `Updating ${propertyToUpdate} property of whiteboard node "${nodeId}" in casefile "${casefileId}"`
+            );
+            node[propertyToUpdate] = updateValue;
+          });
+        }
       }
     });
 

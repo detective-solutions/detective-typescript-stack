@@ -18,19 +18,16 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    const casefileId = this.messageContext.casefileId;
-    const userId = this.messageContext.userId;
-
     try {
       // Get user info from database
-      const newUserInfo = await this.databaseService.getWhiteboardUserById(userId);
+      const newUserInfo = await this.databaseService.getWhiteboardUserById(this.userId);
 
       // Check if casefile is already cached
-      let casefileData = await this.cacheService.getCasefileById(casefileId);
+      let casefileData = await this.cacheService.getCasefileById(this.casefileId);
       if (casefileData) {
         casefileData = await this.enhanceCacheWithNewUser(casefileData, newUserInfo);
       } else {
-        casefileData = await this.setupNewCasefileCache(casefileId, newUserInfo);
+        casefileData = await this.setupNewCasefileCache(this.casefileId, newUserInfo);
       }
 
       // Send LOAD_CASEFILE_DATA event to connected user
@@ -45,8 +42,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(userId, casefileId);
+      this.handleError(error);
     }
   }
 
@@ -72,12 +68,13 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     const casefileData = await this.databaseService.getCachableCasefileById(casefileId);
     casefileData.temporary.activeUsers.push(newUserInfo);
     await this.cacheService.saveCasefile(casefileData);
-    this.logger.log(`${this.logContext} Successfully created new cache for casefile ${casefileId}`);
+    this.logger.log(`${this.logContext} Successfully created new cache for casefile "${casefileId}"`);
     return casefileData;
   }
 
-  private handleError(nodeId: string, casefileId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not add new user ${nodeId} to casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not add new user "${this.userId}" to casefile "${this.casefileId}"`);
   }
 }
