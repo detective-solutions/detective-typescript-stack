@@ -27,7 +27,6 @@ const testMessageContext = {
   casefileId: uuidv4(),
   userId: uuidv4(),
   userRole: UserRole.BASIC,
-  nodeId: uuidv4(),
   timestamp: 123456,
 };
 
@@ -88,8 +87,9 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       expect(updateNodePropertiesSpy).toBeCalledTimes(1);
       expect(updateNodePropertiesSpy).toBeCalledWith(
         testMessageContext.casefileId,
-        testMessageContext.nodeId,
-        testMessageBody
+        testMessageContext.userId,
+        testMessageBody[0].nodeId,
+        testMessageBody[0]
       );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
@@ -115,14 +115,16 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         1,
         testMessageContext.casefileId,
-        testMessageContext.nodeId,
-        testMessageBody
+        testMessageContext.userId,
+        testMessageBody[0].nodeId,
+        testMessageBody[0]
       );
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         2,
         testMessageContext.casefileId,
-        testMessageContext.nodeId,
-        testMessageBody
+        testMessageContext.userId,
+        testMessageBody[0].nodeId,
+        testMessageBody[0]
       );
     });
 
