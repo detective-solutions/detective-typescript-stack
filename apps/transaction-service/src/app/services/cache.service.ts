@@ -2,7 +2,6 @@ import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
-  IWhiteboardNodePropertiesUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
