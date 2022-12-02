@@ -177,7 +177,7 @@ export class CacheService {
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === nodeId) {
         // Check if node is already blocked by another user. If yes, abort property update process to avoid inconsistency!
-        if (node?.temporary?.blockedBy !== null && node?.temporary.blockedBy !== userId) {
+        if (node?.temporary?.blockedBy !== null && node?.temporary?.blockedBy !== userId) {
           this.logger.warn(
             `Properties of whiteboard node "${node.id}" cannot be updated, because it is blocked by another user`
           );
