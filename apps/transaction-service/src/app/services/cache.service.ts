@@ -171,7 +171,7 @@ export class CacheService {
     casefileId: string,
     userId: string,
     nodeId: string,
-    updatedProperties: IWhiteboardNodePropertiesUpdate
+    updatedProperties: Record<string, any>
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
