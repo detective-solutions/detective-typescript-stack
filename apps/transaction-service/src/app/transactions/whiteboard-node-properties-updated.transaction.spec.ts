@@ -22,7 +22,7 @@ const updateNodePropertiesMethodName = 'updateNodeProperties';
 const cacheServiceMock = { [updateNodePropertiesMethodName]: jest.fn() };
 
 const testMessageContext = {
-  eventType: MessageEventType.WhiteboardNodeResized,
+  eventType: MessageEventType.WhiteboardNodePropertiesUpdated,
   tenantId: uuidv4(),
   casefileId: uuidv4(),
   userId: uuidv4(),

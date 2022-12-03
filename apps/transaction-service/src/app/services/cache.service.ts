@@ -142,30 +142,6 @@ export class CacheService {
     return filteredPositionUpdates;
   }
 
-  async updateNodeSize(casefileId: string, updatedNodeId: string, userId: string, sizeUpdate: any): Promise<boolean> {
-    this.logger.log(`Updating size of whiteboard node in casefile "${casefileId}"`);
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (
-      cachedNodes.some((node: AnyWhiteboardNode) => node.id === updatedNodeId && node?.temporary?.blockedBy !== userId)
-    ) {
-      return false;
-    }
-
-    cachedNodes.forEach((node: AnyWhiteboardNode) => {
-      if (node.id === updatedNodeId) {
-        node.width = sizeUpdate.width;
-        node.height = sizeUpdate.height;
-      }
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    return true;
-  }
-
   async updateNodeProperties(
     casefileId: string,
     userId: string,
