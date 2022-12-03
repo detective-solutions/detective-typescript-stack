@@ -129,16 +129,27 @@ export class CacheService {
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === nodeId) {
         // Check if node is already blocked by another user. If yes, abort property update process to avoid inconsistency!
+        // TODO: Extract to own function
         if (node?.temporary?.blockedBy !== null && node?.temporary?.blockedBy !== userId) {
           this.logger.warn(
             `Properties of whiteboard node "${node.id}" cannot be updated, because it is blocked by another user`
           );
         } else {
+          // TODO: Extract to own function
           Object.entries(updatedProperties).forEach(([propertyToUpdate, updateValue]) => {
-            this.logger.log(
-              `Updating ${propertyToUpdate} property of whiteboard node "${nodeId}" in casefile "${casefileId}"`
-            );
-            node[propertyToUpdate] = updateValue;
+            if (typeof updateValue === 'object' && propertyToUpdate === 'temporary') {
+              Object.entries(updateValue).forEach(([temporaryPropertyToUpdate, temporaryUpdateValue]) => {
+                this.logger.log(
+                  `Updating temporary ${propertyToUpdate} property of whiteboard node "${nodeId}" in casefile "${casefileId}"`
+                );
+                node.temporary[temporaryPropertyToUpdate] = temporaryUpdateValue;
+              });
+            } else {
+              this.logger.log(
+                `Updating ${propertyToUpdate} property of whiteboard node "${nodeId}" in casefile "${casefileId}"`
+              );
+              node[propertyToUpdate] = updateValue;
+            }
           });
         }
       }
@@ -147,31 +158,6 @@ export class CacheService {
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-  }
-
-  async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<boolean> {
-    this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (
-      !cachedNodes ||
-      cachedNodes.length === 0 ||
-      cachedNodes.some((node: AnyWhiteboardNode) => node.id === nodeId && node?.temporary?.blockedBy === userId)
-    ) {
-      return false;
-    }
-
-    cachedNodes.forEach((node: AnyWhiteboardNode) => {
-      if (node.id === nodeId) {
-        node.temporary = { blockedBy: userId };
-      }
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    return true;
   }
 
   async unblockAllWhiteboardNodesByUserId(casefileId: string, userId: string): Promise<void> {
