@@ -19,34 +19,23 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
     }
 
     for (const propertyUpdate of this.messageBody) {
+      await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
+    }
+
+    try {
+      await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`${this.logContext} Retrying node property cache update`);
       try {
-        await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
-        await this.updateNodePropertiesInCache(propertyUpdate);
+        await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
       } catch (error) {
-        this.logger.error(error);
-        this.logger.log(`${this.logContext} Retrying node property cache update`);
-        try {
-          await this.updateNodePropertiesInCache(propertyUpdate);
-        } catch (error) {
-          this.handleFinalError(error);
-        }
+        this.handleFinalError(error);
       }
     }
     this.forwardMessageToOtherClients();
 
     this.logger.log(`${this.logContext} Transaction successful`);
-  }
-
-  private async updateNodePropertiesInCache(propertyUpdate: IWhiteboardNodePropertiesUpdate) {
-    const { nodeId, ...propertyUpdateWithoutNodeId } = propertyUpdate;
-    if (nodeId) {
-      await this.cacheService.updateNodeProperties(
-        this.casefileId,
-        this.userId,
-        nodeId,
-        propertyUpdateWithoutNodeId as IWhiteboardNodePropertiesUpdate
-      );
-    }
   }
 
   private handleFinalError(error: Error) {
