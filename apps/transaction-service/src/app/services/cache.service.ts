@@ -117,31 +117,6 @@ export class CacheService {
     this.client.json.set(casefileId, '.title', title);
   }
 
-  async updateNodePositions(casefileId: string, userId: string, positionUpdates: any[]): Promise<any[]> {
-    this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    const filteredPositionUpdates = positionUpdates.filter((update: any) =>
-      cachedNodes.some((node: AnyWhiteboardNode) => node.id === update.id && node?.temporary?.blockedBy === userId)
-    );
-
-    filteredPositionUpdates.forEach((update: any) => {
-      cachedNodes.forEach((node: AnyWhiteboardNode) => {
-        if (node.id === update.id) {
-          node.x = update.x;
-          node.y = update.y;
-        }
-      });
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    // Only return position updates for nodes that are not blocked by other users
-    return filteredPositionUpdates;
-  }
-
   async updateNodeProperties(
     casefileId: string,
     userId: string,

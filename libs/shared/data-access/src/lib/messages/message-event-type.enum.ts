@@ -6,7 +6,6 @@ export enum MessageEventType {
   WhiteboardNodeAdded = 'WHITEBOARD_NODE_ADDED',
   WhiteboardNodeDeleted = 'WHITEBOARD_NODE_DELETED',
   WhiteboardNodeBlocked = 'WHITEBOARD_NODE_BLOCKED',
-  WhiteboardNodeMoved = 'WHITEBOARD_NODE_MOVED',
   WhiteboardNodePropertiesUpdated = 'WHITEBOARD_NODE_PROPERTIES_UPDATED',
   WhiteboardTitleFocused = 'WHITEBOARD_TITLE_FOCUSED',
   WhiteboardTitleUpdated = 'WHITEBOARD_TITLE_UPDATED',
