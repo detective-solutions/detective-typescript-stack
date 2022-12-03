@@ -124,17 +124,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic, message);
   }
 
-  @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeBlocked.eventType)
-  async onWhiteboardNodeBlockedEvent(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(
-      `${buildLogContext(message.context)} Routing ${message.context.eventType} event to topic ${
-        EventTypeTopicMapping.whiteboardNodeBlocked.targetTopic
-      }`
-    );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeBlocked.targetTopic, message);
-  }
-
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodePropertiesUpdated.eventType)
   async onWhiteboardNodePropertiesUpdated(@MessageBody() message: IMessage<any>) {
     await this.validateMessageContext(message?.context);

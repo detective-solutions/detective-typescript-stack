@@ -21,21 +21,6 @@ export const WhiteboardNodeDeletedRemotely = createAction(
   props<{ deletedNodeId: string }>()
 );
 
-export const WhiteboardNodeBlocked = createAction(
-  `${actionPrefix} Node blocked`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
-export const WhiteboardNodeUnblocked = createAction(
-  `${actionPrefix} Node unblocked`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
-export const WhiteboardNodeBlockedRemotely = createAction(
-  `${actionPrefix} Node un/blocked remotely`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
 export const WhiteboardUnblockAllNodesOnUserLeft = createAction(
   `${actionPrefix} Unblocking all nodes blocked by a user that left`,
   props<{ updates: Update<IWhiteboardNodeBlockUpdate>[] }>()

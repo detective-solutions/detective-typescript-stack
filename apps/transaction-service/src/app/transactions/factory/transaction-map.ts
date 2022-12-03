@@ -1,6 +1,5 @@
 import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transaction';
-import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
 import { WhiteboardNodePropertiesUpdatedTransaction } from '../whiteboard-node-properties-updated.transaction';
 import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
@@ -24,9 +23,6 @@ Object.values(MessageEventType).forEach((eventType: string) => {
   }
   if (eventType === MessageEventType.WhiteboardNodeDeleted) {
     tempTransactionMap[eventType] = WhiteboardNodeDeletedTransaction;
-  }
-  if (eventType === MessageEventType.WhiteboardNodeBlocked) {
-    tempTransactionMap[eventType] = WhiteboardNodeBlockedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardNodePropertiesUpdated) {
     tempTransactionMap[eventType] = WhiteboardNodePropertiesUpdatedTransaction;
