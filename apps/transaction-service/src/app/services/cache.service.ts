@@ -121,6 +121,7 @@ export class CacheService {
     casefileId: string,
     userId: string,
     nodeId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatedProperties: Record<string, any>
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
