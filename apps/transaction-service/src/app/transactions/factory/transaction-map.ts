@@ -2,9 +2,7 @@ import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transaction';
 import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
-import { WhiteboardNodeMovedTransaction } from '../whiteboard-node-moved.transaction';
 import { WhiteboardNodePropertiesUpdatedTransaction } from '../whiteboard-node-properties-updated.transaction';
-import { WhiteboardNodeResizedTransaction } from '../whiteboard-node-resized.transaction';
 import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
 import { WhiteboardTitleFocusedTransaction } from '../whiteboard-title-focused.transaction';
 import { WhiteboardTitleUpdatedTransaction } from '../whiteboard-title-updated.transaction';
@@ -29,12 +27,6 @@ Object.values(MessageEventType).forEach((eventType: string) => {
   }
   if (eventType === MessageEventType.WhiteboardNodeBlocked) {
     tempTransactionMap[eventType] = WhiteboardNodeBlockedTransaction;
-  }
-  if (eventType === MessageEventType.WhiteboardNodeMoved) {
-    tempTransactionMap[eventType] = WhiteboardNodeMovedTransaction;
-  }
-  if (eventType === MessageEventType.WhiteboardNodeResized) {
-    tempTransactionMap[eventType] = WhiteboardNodeResizedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardNodePropertiesUpdated) {
     tempTransactionMap[eventType] = WhiteboardNodePropertiesUpdatedTransaction;

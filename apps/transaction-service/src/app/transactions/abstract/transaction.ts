@@ -18,6 +18,11 @@ export abstract class Transaction {
 
   message: IMessage<any>;
   messageContext: IMessageContext;
+  tenantId: string;
+  casefileId: string;
+  userId: string;
+  nodeId: string | undefined;
+  timestamp: number;
   messageBody: any;
   logContext: string;
 
@@ -30,6 +35,11 @@ export abstract class Transaction {
     this.databaseService = serviceRefs.databaseService;
     this.message = message;
     this.messageContext = message.context;
+    this.tenantId = this.messageContext.tenantId;
+    this.casefileId = this.messageContext.casefileId;
+    this.userId = this.messageContext.userId;
+    this.nodeId = this.messageContext?.nodeId;
+    this.timestamp = this.messageContext.timestamp;
     this.messageBody = message.body;
     this.logContext = buildLogContext(this.messageContext);
   }

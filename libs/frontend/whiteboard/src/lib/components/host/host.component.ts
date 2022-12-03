@@ -15,9 +15,7 @@ import {
   IMessage,
   IUserForWhiteboard,
   IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodePositionUpdate,
   IWhiteboardNodePropertiesUpdate,
-  IWhiteboardNodeSizeUpdate,
   MessageEventType,
   WhiteboardNodeType,
   WhiteboardOptions,
@@ -107,7 +105,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     // Handle position updates caused by the graph force
     this.subscriptions.add(
       this.forceGraph.nodePositionUpdatedByForce$.subscribe((node: AnyWhiteboardNode) =>
-        this.whiteboardFacade.addToNodeUpdateBuffer(node)
+        this.whiteboardFacade.addToNodePositionBuffer(node)
       )
     );
 
@@ -185,7 +183,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
           // TODO: Remove when data from dragged element is used
-          // const href = 'https://www.simplesite.com';
           const embeddingNode = EmbeddingWhiteboardNode.Build({
             id: uuidv4(),
             title: '',
@@ -347,60 +344,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
         )
     );
 
-    // Listen to WHITEBOARD_NODE_MOVED websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) =>
-            combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeMoved),
-              this.store.select(selectWhiteboardContextState).pipe(take(1)),
-            ])
-          ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
-        )
-        .subscribe((messageData: IMessage<IWhiteboardNodePositionUpdate[]>) => {
-          // Convert incoming message to ngRx Update type
-          const updates = messageData.body.map((positionUpdate: IWhiteboardNodePositionUpdate) => {
-            return { id: positionUpdate.id, changes: { x: positionUpdate.x, y: positionUpdate.y } };
-          });
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely({
-              updates: updates as Update<IWhiteboardNodePositionUpdate>[],
-            })
-          );
-        })
-    );
-
-    // Listen to WHITEBOARD_NODE_RESIZED websocket message event
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) =>
-            combineLatest([
-              webSocketSubject$.on$(MessageEventType.WhiteboardNodeResized),
-              this.store.select(selectWhiteboardContextState).pipe(take(1)),
-            ])
-          ),
-          filter(([messageData, context]) => messageData.context.userId !== context.userId),
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          map(([messageData, _context]) => messageData)
-        )
-        .subscribe((messageData: IMessage<IWhiteboardNodeSizeUpdate>) =>
-          // Convert incoming message to ngRx Update type
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeResizedRemotely({
-              update: {
-                id: messageData.context.nodeId,
-                changes: messageData.body,
-              } as Update<IWhiteboardNodeSizeUpdate>,
-            })
-          )
-        )
-    );
-
     // Listen to WHITEBOARD_NODE_PROPERTIES_UPDATED websocket message event
     this.subscriptions.add(
       this.whiteboardFacade.getWebSocketSubjectAsync$
@@ -415,17 +358,15 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           map(([messageData, _context]) => messageData)
         )
-        .subscribe((messageData: IMessage<IWhiteboardNodePropertiesUpdate>) =>
+        .subscribe((messageData: IMessage<IWhiteboardNodePropertiesUpdate[]>) => {
           // Convert incoming message to ngRx Update type
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely({
-              update: {
-                id: messageData.context.nodeId,
-                changes: messageData.body,
-              } as Update<IWhiteboardNodePropertiesUpdate>,
-            })
-          )
-        )
+          const updates: Update<IWhiteboardNodePropertiesUpdate>[] = [];
+          messageData.body.forEach((propertiesUpdate: IWhiteboardNodePropertiesUpdate) => {
+            const { nodeId, ...actualUpdatedProperties } = propertiesUpdate;
+            updates.push({ id: nodeId, changes: actualUpdatedProperties });
+          });
+          this.store.dispatch(WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely({ updates }));
+        })
     );
 
     // Listen to WHITEBOARD_USER_JOINED websocket message event

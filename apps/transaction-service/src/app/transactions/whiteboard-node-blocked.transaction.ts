@@ -19,14 +19,11 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
       throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
     }
 
-    const casefileId = this.messageContext.casefileId;
-    const nodeId = this.messageContext?.nodeId;
-
     try {
       const isBlockSuccessful = await this.cacheService.updateNodeBlock(
-        casefileId,
+        this.casefileId,
         this.messageBody?.temporary?.blockedBy ?? null,
-        nodeId
+        this.nodeId
       );
       if (isBlockSuccessful) {
         this.forwardMessageToOtherClients();
@@ -35,13 +32,13 @@ export class WhiteboardNodeBlockedTransaction extends Transaction {
         this.logger.warn(`${this.logContext} Node blocking skipped because it is already blocked`);
       }
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(nodeId, casefileId);
+      this.handleError(error);
     }
   }
 
-  private handleError(nodeId: string, casefileId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not block node ${nodeId} in casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not block node "${this.nodeId}" in casefile "${this.casefileId}"`);
   }
 }

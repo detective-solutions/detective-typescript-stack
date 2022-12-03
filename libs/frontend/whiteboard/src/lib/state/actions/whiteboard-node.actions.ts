@@ -1,9 +1,7 @@
 import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodePositionUpdate,
   IWhiteboardNodePropertiesUpdate,
-  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
 
@@ -21,16 +19,6 @@ export const WhiteboardNodeDeleted = createAction(`${actionPrefix} Node deleted`
 export const WhiteboardNodeDeletedRemotely = createAction(
   `${actionPrefix} Node deleted remotely`,
   props<{ deletedNodeId: string }>()
-);
-
-export const WhiteboardNodeUpdate = createAction(
-  `${actionPrefix} Node updated`,
-  props<{ update: Update<AnyWhiteboardNode> }>()
-);
-
-export const WhiteboardNodeBatchUpdate = createAction(
-  `${actionPrefix} Multiple nodes updated`,
-  props<{ updates: Update<AnyWhiteboardNode>[] }>()
 );
 
 export const WhiteboardNodeBlocked = createAction(
@@ -53,31 +41,11 @@ export const WhiteboardUnblockAllNodesOnUserLeft = createAction(
   props<{ updates: Update<IWhiteboardNodeBlockUpdate>[] }>()
 );
 
-export const WhiteboardNodesPositionUpdated = createAction(
-  `${actionPrefix} Node positions updated`,
-  props<{ updates: Update<IWhiteboardNodePositionUpdate>[] }>()
-);
-
-export const WhiteboardNodesPositionUpdatedRemotely = createAction(
-  `${actionPrefix} Node positions updated remotely`,
-  props<{ updates: Update<AnyWhiteboardNode>[] }>()
-);
-
-export const WhiteboardNodeResized = createAction(
-  `${actionPrefix} Node resized`,
-  props<{ update: Update<IWhiteboardNodeSizeUpdate> }>()
-);
-
-export const WhiteboardNodeResizedRemotely = createAction(
-  `${actionPrefix} Node resized remotely`,
-  props<{ update: Update<IWhiteboardNodeSizeUpdate> }>()
-);
-
 export const WhiteboardNodePropertiesUpdated = createAction(
-  `${actionPrefix} Node title updated`,
-  props<{ update: Update<IWhiteboardNodePropertiesUpdate> }>()
+  `${actionPrefix} Node properties updated`,
+  props<{ updates: Update<IWhiteboardNodePropertiesUpdate>[] }>()
 );
 export const WhiteboardNodePropertiesUpdatedRemotely = createAction(
-  `${actionPrefix} Node title updated remotely`,
-  props<{ update: Update<IWhiteboardNodePropertiesUpdate> }>()
+  `${actionPrefix} Node properties updated remotely`,
+  props<{ updates: Update<IWhiteboardNodePropertiesUpdate>[] }>()
 );

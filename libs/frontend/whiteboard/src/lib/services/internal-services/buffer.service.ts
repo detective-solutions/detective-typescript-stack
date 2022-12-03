@@ -1,4 +1,5 @@
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IWhiteboardNodePropertiesUpdate } from '@detective.solutions/shared/data-access';
+
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
@@ -16,15 +17,14 @@ export class BufferService {
   }
 
   updateNodePositionsFromBuffer() {
-    const updates: Update<AnyWhiteboardNode>[] = [];
+    const updates: Update<IWhiteboardNodePropertiesUpdate>[] = [];
     this.nodePositionUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
       updates.push({
         id: node.id,
-        // Round node position to reduce data
-        changes: { x: Math.round(node.x), y: Math.round(node.y) },
+        changes: { x: Math.round(node.x), y: Math.round(node.y) }, // Round node position to reduce data
       });
     });
-    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodesPositionUpdated({ updates: updates }));
+    this.store.dispatch(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({ updates }));
     this.nodePositionUpdateBuffer.clear();
   }
 
@@ -34,10 +34,10 @@ export class BufferService {
 
   updateNodeSizeFromBuffer() {
     this.nodeResizeUpdateBuffer.forEach((node: AnyWhiteboardNode) => {
-      // Round node dimensions to reduce data
       this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodeResized({
-          update: { id: node.id, changes: { width: Math.round(node.width), height: Math.round(node.height) } },
+        WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+          // Round node dimensions to reduce data
+          updates: [{ id: node.id, changes: { width: Math.round(node.width), height: Math.round(node.height) } }],
         })
       );
     });

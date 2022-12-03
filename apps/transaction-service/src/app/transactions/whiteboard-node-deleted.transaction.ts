@@ -16,21 +16,18 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
       throw new InternalServerErrorException('Received message context is missing mandatory nodeId');
     }
 
-    const casefileId = this.messageContext.casefileId;
-    const nodeId = this.messageContext.nodeId;
-
     try {
+      await this.cacheService.deleteNode(this.casefileId, this.nodeId);
       this.forwardMessageToOtherClients();
-      await this.cacheService.deleteNode(casefileId, nodeId);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(casefileId, nodeId);
+      this.handleError(error);
     }
   }
 
-  private handleError(casefileId: string, nodeId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not delete node ${nodeId} from casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not delete node ${this.nodeId} from casefile ${this.casefileId}`);
   }
 }

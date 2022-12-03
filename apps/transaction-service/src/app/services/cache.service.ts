@@ -2,9 +2,6 @@ import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
-  IWhiteboardNodePositionUpdate,
-  IWhiteboardNodePropertiesUpdate,
-  IWhiteboardNodeSizeUpdate,
 } from '@detective.solutions/shared/data-access';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { RedisClientType, RedisDefaultModules } from 'redis';
@@ -120,79 +117,30 @@ export class CacheService {
     this.client.json.set(casefileId, '.title', title);
   }
 
-  async updateNodePositions(
-    casefileId: string,
-    userId: string,
-    positionUpdates: IWhiteboardNodePositionUpdate[]
-  ): Promise<IWhiteboardNodePositionUpdate[]> {
-    this.logger.log(`Updating positions of whiteboard node in casefile "${casefileId}"`);
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    const filteredPositionUpdates = positionUpdates.filter((update: IWhiteboardNodePositionUpdate) =>
-      cachedNodes.some((node: AnyWhiteboardNode) => node.id === update.id && node?.temporary?.blockedBy === userId)
-    );
-
-    filteredPositionUpdates.forEach((update: IWhiteboardNodePositionUpdate) => {
-      cachedNodes.forEach((node: AnyWhiteboardNode) => {
-        if (node.id === update.id) {
-          node.x = update.x;
-          node.y = update.y;
-        }
-      });
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    // Only return position updates for nodes that are not blocked by other users
-    return filteredPositionUpdates;
-  }
-
-  async updateNodeSize(
-    casefileId: string,
-    updatedNodeId: string,
-    userId: string,
-    sizeUpdate: IWhiteboardNodeSizeUpdate
-  ): Promise<boolean> {
-    this.logger.log(`Updating size of whiteboard node in casefile "${casefileId}"`);
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-
-    // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-    if (
-      cachedNodes.some((node: AnyWhiteboardNode) => node.id === updatedNodeId && node?.temporary?.blockedBy !== userId)
-    ) {
-      return false;
-    }
-
-    cachedNodes.forEach((node: AnyWhiteboardNode) => {
-      if (node.id === updatedNodeId) {
-        node.width = sizeUpdate.width;
-        node.height = sizeUpdate.height;
-      }
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-    return true;
-  }
-
   async updateNodeProperties(
     casefileId: string,
+    userId: string,
     nodeId: string,
-    propertyUpdates: IWhiteboardNodePropertiesUpdate
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updatedProperties: Record<string, any>
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     cachedNodes.forEach((node: AnyWhiteboardNode) => {
       if (node.id === nodeId) {
-        Object.entries(propertyUpdates).forEach(([propertyToUpdate, updateValue]) => {
-          this.logger.log(
-            `Updating ${propertyToUpdate} property of whiteboard node ${nodeId} in casefile "${casefileId}"`
+        // Check if node is already blocked by another user. If yes, abort property update process to avoid inconsistency!
+        if (node?.temporary?.blockedBy !== null && node?.temporary?.blockedBy !== userId) {
+          this.logger.warn(
+            `Properties of whiteboard node "${node.id}" cannot be updated, because it is blocked by another user`
           );
-          node[propertyToUpdate] = updateValue;
-        });
+        } else {
+          Object.entries(updatedProperties).forEach(([propertyToUpdate, updateValue]) => {
+            this.logger.log(
+              `Updating ${propertyToUpdate} property of whiteboard node "${nodeId}" in casefile "${casefileId}"`
+            );
+            node[propertyToUpdate] = updateValue;
+          });
+        }
       }
     });
 

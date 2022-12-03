@@ -12,23 +12,20 @@ export class WhiteboardUserLeftTransaction extends Transaction {
   async execute(): Promise<void> {
     this.logger.log(`${this.logContext} Executing transaction`);
 
-    const casefileId = this.messageContext.casefileId;
-    const userId = this.messageContext.userId;
-
     try {
-      const response = await this.cacheService.removeActiveUser(casefileId, userId);
+      const response = await this.cacheService.removeActiveUser(this.casefileId, this.userId);
       if (response === 'OK') {
         this.forwardMessageToOtherClients();
         this.logger.log(`${this.logContext} Transaction successful`);
       }
     } catch (error) {
-      this.logger.error(error);
-      this.handleError(userId, casefileId);
+      this.handleError(error);
     }
   }
 
-  private handleError(nodeId: string, casefileId: string) {
+  private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
-    throw new InternalServerErrorException(`Could not add new user ${nodeId} to casefile ${casefileId}`);
+    this.logger.error(error);
+    throw new InternalServerErrorException(`Could not add new user "${this.userId}" to casefile "${this.casefileId}"`);
   }
 }
