@@ -22,6 +22,7 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
       await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
     }
 
+    console.log('YO', this.messageBody);
     try {
       await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
     } catch (error) {

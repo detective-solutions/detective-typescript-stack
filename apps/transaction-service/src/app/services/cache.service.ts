@@ -124,6 +124,7 @@ export class CacheService {
     nodePropertiesUpdates: IWhiteboardNodePropertiesUpdate[]
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
+    console.log('UPDATES', nodePropertiesUpdates);
     console.log('CACHED NODES', cachedNodes);
 
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
