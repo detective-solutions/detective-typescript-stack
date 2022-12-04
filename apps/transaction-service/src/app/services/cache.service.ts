@@ -125,19 +125,15 @@ export class CacheService {
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
     console.log('CACHED NODES', cachedNodes);
-    const updatedNodes = cachedNodes.map((cachedNode: AnyWhiteboardNode) => {
-      console.log('CACHED NODE', cachedNode);
-      const correspondingPropertiesUpdate = nodePropertiesUpdates.find(({ nodeId }) => nodeId === cachedNode.id);
 
-      console.log('CORRESPONDING', correspondingPropertiesUpdate);
-      console.log('CURRENT USER', userId);
-      console.log('BLOCKED BY USER', this.isNodeAlreadyBlocked(cachedNode, userId));
+    cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
+      const correspondingPropertiesUpdate = nodePropertiesUpdates.find(({ nodeId }) => nodeId === cachedNode.id);
 
       if (!correspondingPropertiesUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
         this.logger.warn(
           `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated, because it is blocked by another user`
         );
-        return cachedNode; // No node update necessary
+        return; // No node update necessary
       }
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
@@ -149,21 +145,21 @@ export class CacheService {
             this.logger.log(
               `Updating temporary ${temporaryPropertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
             );
-            return { ...cachedNode, temporary: { [temporaryPropertyToUpdate]: updatedTemporaryValue } };
+            cachedNode['temporary'] = { [temporaryPropertyToUpdate]: updatedTemporaryValue };
           });
           // In case of a regular property update, simply return the updated object
         } else {
           this.logger.log(`Updating ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`);
-          return { ...cachedNode, [propertyToUpdate]: updatedValue };
+          cachedNode[propertyToUpdate] = updatedValue;
         }
       });
     });
 
-    console.log('UPDATED NODES', updatedNodes);
+    console.log('UPDATED NODES', cachedNodes);
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, updatedNodes as any);
+    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
   }
 
   async unblockAllWhiteboardNodesByUserId(casefileId: string, userId: string): Promise<void> {
