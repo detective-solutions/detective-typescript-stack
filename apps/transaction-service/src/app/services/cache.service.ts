@@ -126,7 +126,10 @@ export class CacheService {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
       const correspondingPropertiesUpdate = nodePropertiesUpdates.find(
-        (nodePropertiesUpdate: IWhiteboardNodePropertiesUpdate) => nodePropertiesUpdate.nodeId === cachedNode.id
+        (nodePropertiesUpdate: IWhiteboardNodePropertiesUpdate) => {
+          console.log('PROPERTY UPDATE', nodePropertiesUpdate);
+          return nodePropertiesUpdate.nodeId === cachedNode.id;
+        }
       );
 
       if (!correspondingPropertiesUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
@@ -137,6 +140,8 @@ export class CacheService {
       }
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
+
+      console.log('ACTUAL PROPERTY UPDATE', actualPropertiesUpdate);
 
       Object.entries(actualPropertiesUpdate).forEach(([propertyToUpdate, updatedValue]) => {
         // Check if updated property is temporary data (another nested object)
