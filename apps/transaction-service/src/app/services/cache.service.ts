@@ -126,12 +126,15 @@ export class CacheService {
     const updatedNodes = (await this.getNodesByCasefile(casefileId)).map((cachedNode: AnyWhiteboardNode) => {
       const correspondingPropertiesUpdate = nodePropertiesUpdates.find(({ nodeId }) => nodeId === cachedNode.id);
 
-      if (!correspondingPropertiesUpdate || !this.isNodeBlockedByCurrentUser(cachedNode, userId)) {
-        this.logger.warn(
-          `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated, because it is blocked by another user`
-        );
-        return cachedNode; // No node update necessary
-      }
+      console.log('CORRESPONDING', correspondingPropertiesUpdate);
+      console.log('BLOCKED BY USER', this.isNodeBlockedByCurrentUser(cachedNode, userId));
+
+      // if (!correspondingPropertiesUpdate || !this.isNodeBlockedByCurrentUser(cachedNode, userId)) {
+      //   this.logger.warn(
+      //     `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated, because it is blocked by another user`
+      //   );
+      //   return cachedNode; // No node update necessary
+      // }
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
 
