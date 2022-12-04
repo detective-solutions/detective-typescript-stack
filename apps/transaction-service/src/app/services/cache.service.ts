@@ -123,10 +123,14 @@ export class CacheService {
     userId: string,
     nodePropertiesUpdates: IWhiteboardNodePropertiesUpdate[]
   ): Promise<void> {
-    const updatedNodes = (await this.getNodesByCasefile(casefileId)).map((cachedNode: AnyWhiteboardNode) => {
+    const cachedNodes = await this.getNodesByCasefile(casefileId);
+    console.log('CACHED NODES', cachedNodes);
+    const updatedNodes = cachedNodes.map((cachedNode: AnyWhiteboardNode) => {
+      console.log('CACHED NODE', cachedNode);
       const correspondingPropertiesUpdate = nodePropertiesUpdates.find(({ nodeId }) => nodeId === cachedNode.id);
 
       console.log('CORRESPONDING', correspondingPropertiesUpdate);
+      console.log('CURRENT USER', userId);
       console.log('BLOCKED BY USER', this.isNodeAlreadyBlocked(cachedNode, userId));
 
       if (!correspondingPropertiesUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
@@ -154,6 +158,8 @@ export class CacheService {
         }
       });
     });
+
+    console.log('UPDATED NODES', updatedNodes);
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
