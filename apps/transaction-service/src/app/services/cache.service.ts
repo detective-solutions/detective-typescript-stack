@@ -127,14 +127,14 @@ export class CacheService {
       const correspondingPropertiesUpdate = nodePropertiesUpdates.find(({ nodeId }) => nodeId === cachedNode.id);
 
       console.log('CORRESPONDING', correspondingPropertiesUpdate);
-      console.log('BLOCKED BY USER', this.isNodeBlockedByCurrentUser(cachedNode, userId));
+      console.log('BLOCKED BY USER', this.isNodeAlreadyBlocked(cachedNode, userId));
 
-      // if (!correspondingPropertiesUpdate || !this.isNodeBlockedByCurrentUser(cachedNode, userId)) {
-      //   this.logger.warn(
-      //     `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated, because it is blocked by another user`
-      //   );
-      //   return cachedNode; // No node update necessary
-      // }
+      if (!correspondingPropertiesUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
+        this.logger.warn(
+          `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated, because it is blocked by another user`
+        );
+        return cachedNode; // No node update necessary
+      }
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
 
@@ -210,7 +210,8 @@ export class CacheService {
     return cacheResponse;
   }
 
-  private isNodeBlockedByCurrentUser(nodeToCheck: AnyWhiteboardNode, currentUserId: string): boolean {
-    return nodeToCheck?.temporary?.blockedBy === currentUserId;
+  private isNodeAlreadyBlocked(nodeToCheck: AnyWhiteboardNode, currentUserId: string): boolean {
+    const blockedBy = nodeToCheck?.temporary?.blockedBy;
+    return blockedBy && blockedBy !== currentUserId;
   }
 }
