@@ -22,13 +22,15 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
       await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
     }
 
+    const isTemporaryUpdate = Object.keys(this.messageBody).includes('temporary');
+
     try {
-      await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
+      await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody, isTemporaryUpdate);
     } catch (error) {
       this.logger.error(error);
       this.logger.log(`${this.logContext} Retrying node property cache update`);
       try {
-        await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
+        await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody, isTemporaryUpdate);
       } catch (error) {
         this.handleFinalError(error);
       }

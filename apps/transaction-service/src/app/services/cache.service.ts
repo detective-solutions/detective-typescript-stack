@@ -121,15 +121,15 @@ export class CacheService {
   async updateNodeProperties(
     casefileId: string,
     userId: string,
-    nodePropertiesUpdates: IWhiteboardNodePropertiesUpdate[]
+    nodePropertyUpdates: IWhiteboardNodePropertiesUpdate[],
+    isTemporary: boolean
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
-      const correspondingPropertiesUpdate = nodePropertiesUpdates.find(
-        (nodePropertiesUpdate: IWhiteboardNodePropertiesUpdate) => {
-          console.log('PROPERTY UPDATE', nodePropertiesUpdate);
-          return nodePropertiesUpdate.nodeId === cachedNode.id;
+      const correspondingPropertiesUpdate = nodePropertyUpdates.find(
+        (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) => {
+          return nodePropertyUpdate.nodeId === cachedNode.id;
         }
       );
 
@@ -142,22 +142,24 @@ export class CacheService {
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
 
-      console.log('ACTUAL PROPERTY UPDATE', actualPropertiesUpdate);
-
       Object.entries(actualPropertiesUpdate).forEach(([propertyToUpdate, updatedValue]) => {
-        this.logger.log(`Updating ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`);
-        cachedNode[propertyToUpdate] = updatedValue;
+        this.logger.log(
+          `Updating ${
+            isTemporary ? 'temporary' : ''
+          } ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
+        );
+        isTemporary
+          ? (cachedNode['temporary'][propertyToUpdate] = updatedValue)
+          : (cachedNode[propertyToUpdate] = updatedValue);
       });
     });
-
-    console.log('UPDATED NODES', cachedNodes);
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
   }
 
-  async updateNodeBlock(casefileId: string, userId: string | null, nodeId: string): Promise<void> {
+  async updateNodeBlock(casefileId: string, nodeId: string, userId: string | null): Promise<void> {
     this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
 
     const cachedNodes = await this.getNodesByCasefile(casefileId);
@@ -175,7 +177,7 @@ export class CacheService {
             `Properties of whiteboard node "${nodeId}" cannot be updated as it is blocked by another user`
           );
         } else {
-          node.temporary = { blockedBy: userId };
+          node['temporary']['blockedBy'] = userId;
         }
         return;
       }
