@@ -29,8 +29,8 @@ export class WhiteboardSelectionService {
       setTimeout(
         () =>
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
-              updates: [{ id: selectedNodeId, changes: { temporary: { blockedBy: currentUserId } } }],
+            WhiteboardNodeActions.WhiteboardNodeBlocked({
+              update: { id: selectedNodeId, changes: { temporary: { blockedBy: currentUserId } } },
             })
           ),
         this.actionTimeout
@@ -45,8 +45,8 @@ export class WhiteboardSelectionService {
       setTimeout(
         () =>
           this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
-              updates: [{ id: deselectedNodeId, changes: { temporary: { blockedBy: null } } }],
+            WhiteboardNodeActions.WhiteboardNodeBlocked({
+              update: { id: deselectedNodeId, changes: { temporary: { blockedBy: null } } },
             })
           ),
         this.actionTimeout

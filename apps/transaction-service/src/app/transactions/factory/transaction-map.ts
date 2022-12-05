@@ -1,5 +1,6 @@
 import { MessageEventType } from '@detective.solutions/shared/data-access';
 import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transaction';
+import { WhiteboardNodeBlockedTransaction } from '../whiteboard-node-blocked.transaction';
 import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
 import { WhiteboardNodePropertiesUpdatedTransaction } from '../whiteboard-node-properties-updated.transaction';
 import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
@@ -12,14 +13,11 @@ import { WhiteboardUserLeftTransaction } from '../whiteboard-user-left.transacti
 
 const tempTransactionMap: any = {};
 Object.values(MessageEventType).forEach((eventType: string) => {
-  if (eventType === MessageEventType.WhiteboardUserJoined) {
-    tempTransactionMap[eventType] = WhiteboardUserJoinedTransaction;
-  }
-  if (eventType === MessageEventType.WhiteboardUserLeft) {
-    tempTransactionMap[eventType] = WhiteboardUserLeftTransaction;
-  }
   if (eventType === MessageEventType.WhiteboardNodeAdded) {
     tempTransactionMap[eventType] = WhiteboardNodeAddedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardNodeBlocked) {
+    tempTransactionMap[eventType] = WhiteboardNodeBlockedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardNodeDeleted) {
     tempTransactionMap[eventType] = WhiteboardNodeDeletedTransaction;
@@ -27,14 +25,20 @@ Object.values(MessageEventType).forEach((eventType: string) => {
   if (eventType === MessageEventType.WhiteboardNodePropertiesUpdated) {
     tempTransactionMap[eventType] = WhiteboardNodePropertiesUpdatedTransaction;
   }
+  if (eventType === MessageEventType.SaveWhiteboard) {
+    tempTransactionMap[eventType] = WhiteboardSaveTransaction;
+  }
   if (eventType === MessageEventType.WhiteboardTitleFocused) {
     tempTransactionMap[eventType] = WhiteboardTitleFocusedTransaction;
   }
   if (eventType === MessageEventType.WhiteboardTitleUpdated) {
     tempTransactionMap[eventType] = WhiteboardTitleUpdatedTransaction;
   }
-  if (eventType === MessageEventType.SaveWhiteboard) {
-    tempTransactionMap[eventType] = WhiteboardSaveTransaction;
+  if (eventType === MessageEventType.WhiteboardUserJoined) {
+    tempTransactionMap[eventType] = WhiteboardUserJoinedTransaction;
+  }
+  if (eventType === MessageEventType.WhiteboardUserLeft) {
+    tempTransactionMap[eventType] = WhiteboardUserLeftTransaction;
   }
 });
 
