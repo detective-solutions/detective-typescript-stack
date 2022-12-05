@@ -121,8 +121,7 @@ export class CacheService {
   async updateNodeProperties(
     casefileId: string,
     userId: string,
-    nodePropertyUpdates: IWhiteboardNodePropertiesUpdate[],
-    isTemporary: boolean
+    nodePropertyUpdates: IWhiteboardNodePropertiesUpdate[]
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
@@ -143,6 +142,7 @@ export class CacheService {
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
 
       Object.entries(actualPropertiesUpdate).forEach(([propertyToUpdate, updatedValue]) => {
+        const isTemporary = propertyToUpdate === 'temporary'; // Check if nested temporary data should be updated
         this.logger.log(
           `Updating ${
             isTemporary ? 'temporary' : ''
