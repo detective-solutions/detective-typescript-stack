@@ -7,7 +7,7 @@ import {
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
-import { InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
+import { Inject, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayDisconnect,
@@ -17,6 +17,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { MessagePropagationService, TransactionCoordinationService } from '../services';
+import { broadcastWebSocketContext, coordinationServiceInjectionToken } from '../utils';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
@@ -25,7 +26,6 @@ import { JwtService } from '@nestjs/jwt';
 import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket/websocket-info.type';
-import { broadcastWebSocketContext } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -41,6 +41,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   server: Server<IWebSocketClient>;
 
   constructor(
+    @Inject(coordinationServiceInjectionToken)
     private readonly transactionCoordinationService: TransactionCoordinationService,
     private readonly messagePropagationService: MessagePropagationService,
     private readonly jwtService: JwtService,
