@@ -161,6 +161,8 @@ export class CacheService {
           }
         }
 
+        console.log(cachedNode);
+
         isTemporary
           ? (cachedNode['temporary'][propertyToUpdate] = updatedValue ?? null)
           : (cachedNode[propertyToUpdate] = updatedValue ?? null);
