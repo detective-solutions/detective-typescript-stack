@@ -1,11 +1,10 @@
-import { AnyWhiteboardNode, IMessage, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { AnyWhiteboardNode, IMessage } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
 
 export class WhiteboardNodeAddedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeAddedTransaction.name);
-  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<AnyWhiteboardNode>; // Define message body type
 

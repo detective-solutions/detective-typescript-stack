@@ -97,7 +97,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
         testMessageBody[0]
       );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should retry the cache update if it fails once', async () => {
@@ -114,7 +114,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
 
       expect(updateNodePropertiesSpy).toBeCalledTimes(2);
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(

@@ -2,16 +2,15 @@ import {
   ICachableCasefileForWhiteboard,
   IMessage,
   IUserForWhiteboard,
-  KafkaTopic,
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
+import { unicastWebSocketContext } from '../utils';
 
 export class WhiteboardUserJoinedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserJoinedTransaction.name);
-  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<IUserForWhiteboard>; // Define message body type
 
@@ -31,10 +30,13 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       }
 
       // Send LOAD_CASEFILE_DATA event to connected user
-      this.kafkaEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
-        context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
-        body: casefileData,
-      });
+      this.whiteboardWebSocketGateway.sendMessageByContext(
+        {
+          context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
+          body: casefileData,
+        },
+        unicastWebSocketContext
+      );
 
       // Update message body with new user info & forward to other clients
       this.message.body = newUserInfo;

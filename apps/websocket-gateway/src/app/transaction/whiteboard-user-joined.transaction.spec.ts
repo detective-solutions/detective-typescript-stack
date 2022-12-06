@@ -139,11 +139,11 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       expect(saveCasefileToCacheSpy).toBeCalledWith(getCasefileByIdResponse);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
+      expect(sendKafkaMessageSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(KafkaTopic.TransactionOutputBroadcast, {
+      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });
@@ -184,11 +184,11 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       expect(addActiveWhiteboardUsersSpy).toBeCalledWith(testMessageContext.casefileId, [testUserForWhiteboard]);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
+      expect(sendKafkaMessageSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputBroadcast, {
+      expect(sendKafkaMessageSpy).toBeCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });
@@ -214,11 +214,11 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
 
       expect(insertActiveUsersSpy).toBeCalledTimes(0);
       expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputUnicast, {
+      expect(sendKafkaMessageSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toBeCalledWith(KafkaTopic.TransactionOutputBroadcast, {
+      expect(sendKafkaMessageSpy).toBeCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });

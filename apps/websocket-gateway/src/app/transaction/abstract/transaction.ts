@@ -12,7 +12,6 @@ import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 export abstract class Transaction {
   abstract readonly logger: Logger;
-  abstract readonly kafkaTopic: KafkaTopic;
 
   readonly cacheService: CacheService;
   readonly databaseService: DatabaseService;
@@ -60,8 +59,8 @@ export abstract class Transaction {
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 
-  protected sendKafkaMessage() {
-    this.kafkaEventProducer.sendKafkaMessage(this.kafkaTopic, this.message);
+  protected sendKafkaMessage(targetTopic: KafkaTopic) {
+    this.kafkaEventProducer.sendKafkaMessage(targetTopic, this.message);
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 }

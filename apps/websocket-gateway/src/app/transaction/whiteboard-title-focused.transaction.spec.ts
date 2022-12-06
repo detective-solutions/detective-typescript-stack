@@ -76,7 +76,7 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
@@ -99,7 +99,7 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, modifiedMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(modifiedMessagePayload);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {

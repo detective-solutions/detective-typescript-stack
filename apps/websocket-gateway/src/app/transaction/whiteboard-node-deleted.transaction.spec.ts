@@ -76,7 +76,7 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
       expect(deleteNodeSpy).toBeCalledTimes(1);
       expect(deleteNodeSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.nodeId);
     });

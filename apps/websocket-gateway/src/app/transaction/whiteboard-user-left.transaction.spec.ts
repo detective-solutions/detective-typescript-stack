@@ -87,10 +87,7 @@ describe('WhiteboardUserLeftTransaction', () => {
       expect(removeActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.userId);
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(
-        whiteboardUserLeftTransaction.kafkaTopic,
-        testMessagePayload
-      );
+      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {

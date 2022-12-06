@@ -90,7 +90,7 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
     jest.resetAllMocks();
   });
 
-  describe('execute', () => {
+  xdescribe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
@@ -101,7 +101,7 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
       expect(addNodeSpy).toBeCalledTimes(1);
       expect(addNodeSpy).toBeCalledWith(testMessagePayload.context.casefileId, testMessagePayload.body);
     });
