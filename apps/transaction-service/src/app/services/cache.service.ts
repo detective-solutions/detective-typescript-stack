@@ -157,15 +157,15 @@ export class CacheService {
         if (isTemporary) {
           if (!cachedNode['temporary']) {
             cachedNode['temporary'] = {};
-            console.log('NEW & EXTRACTED', cachedNode['temporary']);
           }
+
+          const temporary = cachedNode.temporary;
+          console.log('TEMP', temporary);
+          temporary[propertyToUpdate] = updatedValue;
+        } else {
+          cachedNode[propertyToUpdate] = updatedValue;
         }
-
         console.log(cachedNode);
-
-        isTemporary
-          ? (cachedNode.temporary[propertyToUpdate] = updatedValue ?? null)
-          : (cachedNode[propertyToUpdate] = updatedValue ?? null);
       });
     });
 
