@@ -124,50 +124,58 @@ export class CacheService {
     nodePropertyUpdates: IWhiteboardNodePropertiesUpdate[]
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
+    const temporaryKey = 'temporary';
 
-    cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
-      const correspondingPropertyUpdate = nodePropertyUpdates.find(
-        (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) =>
-          nodePropertyUpdate?.nodeId && nodePropertyUpdate.nodeId === cachedNode.id
+    for (const nodePropertyUpdate of nodePropertyUpdates) {
+      const correspondingCachedNode = cachedNodes.find(
+        (cachedNode: AnyWhiteboardNode) => cachedNode.id === nodePropertyUpdate.nodeId
       );
 
-      if (!correspondingPropertyUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
-        this.logger.warn(
-          `Properties of whiteboard node "${correspondingPropertyUpdate.nodeId}" cannot be updated as it is blocked by another user`
+      if (!correspondingCachedNode) {
+        throw new InternalServerErrorException(
+          `Could not find a corresponding cached node for property update with node id ${nodePropertyUpdate.nodeId}`
         );
-        return;
+      }
+
+      if (this.isNodeAlreadyBlocked(correspondingCachedNode, userId)) {
+        this.logger.warn(
+          `Properties of whiteboard node "${correspondingCachedNode.id}" cannot be updated as it is blocked by another user`
+        );
+        continue;
       }
 
       // eslint-disable-next-line prefer-const
-      let { nodeId, ...actualPropertyUpdate } = correspondingPropertyUpdate;
+      let { nodeId, ...actualPropertyUpdate } = nodePropertyUpdate;
 
-      // Check if it is a nested temporary property update
-      const isTemporary = Object.keys(actualPropertyUpdate).includes('temporary');
-      if (isTemporary) {
-        actualPropertyUpdate = actualPropertyUpdate['temporary'] as IWhiteboardNodePropertiesUpdate;
+      // Flatten property update object in case of a nested temporary property update
+      const isTemporaryPropertyUpdate = Object.keys(actualPropertyUpdate).includes(temporaryKey);
+      if (isTemporaryPropertyUpdate) {
+        actualPropertyUpdate = actualPropertyUpdate[temporaryKey] as Record<string, string | number | boolean | null>;
       }
 
-      Object.entries(actualPropertyUpdate).forEach(([propertyToUpdate, updatedValue]) => {
+      for (const [propertyToUpdate, updateValue] of Object.entries(actualPropertyUpdate)) {
         this.logger.log(
           `Updating ${
-            isTemporary ? 'temporary' : ''
+            isTemporaryPropertyUpdate ? temporaryKey : ''
           } ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
         );
 
-        if (isTemporary) {
-          if (!cachedNode['temporary']) {
-            cachedNode['temporary'] = {};
+        if (isTemporaryPropertyUpdate) {
+          // Check if temporary key already exists
+          if (!correspondingCachedNode[temporaryKey]) {
+            correspondingCachedNode[temporaryKey] = {};
           }
-
-          const temporary = cachedNode.temporary;
-          console.log('TEMP', temporary);
-          temporary[propertyToUpdate] = updatedValue;
+          // Update temporary property
+          correspondingCachedNode[temporaryKey][propertyToUpdate] = updateValue;
         } else {
-          cachedNode[propertyToUpdate] = updatedValue;
+          // Update regular property
+          correspondingCachedNode[propertyToUpdate] = updateValue;
         }
-        console.log(cachedNode);
-      });
-    });
+
+        this.logger.debug('Sending updated node to cache:');
+        this.logger.debug(correspondingCachedNode);
+      }
+    }
 
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
