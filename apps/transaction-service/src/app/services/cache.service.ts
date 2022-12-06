@@ -125,13 +125,14 @@ export class CacheService {
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
+    console.log(nodePropertyUpdates);
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
       const correspondingPropertyUpdate = nodePropertyUpdates.find(
-        (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) => {
-          console.log(nodePropertyUpdate);
-          return nodePropertyUpdate?.nodeId === cachedNode.id;
-        }
+        (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) =>
+          nodePropertyUpdate?.nodeId && nodePropertyUpdate.nodeId === cachedNode.id
       );
+
+      console.log(correspondingPropertyUpdate);
 
       if (!correspondingPropertyUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
         this.logger.warn(
