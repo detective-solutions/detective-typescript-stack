@@ -132,9 +132,9 @@ export class CacheService {
       );
 
       if (!correspondingCachedNode) {
-        throw new InternalServerErrorException(
-          `Could not find a corresponding cached node for property update with node id ${nodePropertyUpdate.nodeId}`
-        );
+        this.logger.log(`Skipping node property update due to missing corresponding cache node`);
+        this.logger.verbose(nodePropertyUpdate);
+        continue;
       }
 
       if (this.isNodeAlreadyBlocked(correspondingCachedNode, userId)) {
