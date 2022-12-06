@@ -125,14 +125,11 @@ export class CacheService {
   ): Promise<void> {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
-    console.log(nodePropertyUpdates);
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
       const correspondingPropertyUpdate = nodePropertyUpdates.find(
         (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) =>
           nodePropertyUpdate?.nodeId && nodePropertyUpdate.nodeId === cachedNode.id
       );
-
-      console.log(correspondingPropertyUpdate);
 
       if (!correspondingPropertyUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
         this.logger.warn(
@@ -150,12 +147,19 @@ export class CacheService {
         actualPropertyUpdate = actualPropertyUpdate['temporary'] as IWhiteboardNodePropertiesUpdate;
       }
 
+      console.log('NODE ID', nodeId);
+      console.log('ACTUAL', actualPropertyUpdate);
+
       Object.entries(actualPropertyUpdate).forEach(([propertyToUpdate, updatedValue]) => {
         this.logger.log(
           `Updating ${
             isTemporary ? 'temporary' : ''
           } ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
         );
+        console.log('CACHED NODE', cachedNode);
+        console.log('PROP TO UPDATE', propertyToUpdate);
+        console.log('UPDATED VALUE', updatedValue);
+        console.log('EXTRACTED', cachedNode['temporary']);
         isTemporary
           ? (cachedNode['temporary'][propertyToUpdate] = updatedValue ?? null)
           : (cachedNode[propertyToUpdate] = updatedValue ?? null);
