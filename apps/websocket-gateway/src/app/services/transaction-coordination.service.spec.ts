@@ -3,11 +3,11 @@ import { MessageEventType, UserRole } from '@detective.solutions/shared/data-acc
 import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { Test } from '@nestjs/testing';
 import { TransactionCoordinationService } from './transaction-coordination.service';
-import { WhiteboardTransactionFactory } from '../transaction';
+import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
 import { v4 as uuidv4 } from 'uuid';
 
 const whiteboardTransactionFactoryMock = {
-  createTransaction: jest.fn(),
+  createTransactionByType: jest.fn(),
 };
 
 describe('TransactionCoordinationService', () => {
@@ -35,7 +35,6 @@ describe('TransactionCoordinationService', () => {
 
   describe('createTransactionByEventType', () => {
     it('should correctly forward incoming message data to the whiteboard transaction factory', () => {
-      const testEventType = MessageEventType.LoadWhiteboardData;
       const testPayload = {
         context: {
           tenantId: uuidv4(),
@@ -48,12 +47,12 @@ describe('TransactionCoordinationService', () => {
         },
         body: { test: '123' },
       };
-      const whiteboardTransactionFactorySpy = jest.spyOn(whiteboardTransactionFactoryMock, 'createTransaction');
+      const whiteboardTransactionFactorySpy = jest.spyOn(whiteboardTransactionFactoryMock, 'createTransactionByType');
 
-      coordinationService.createTransactionByEventType(testEventType, testPayload);
+      coordinationService.createTransactionByType(testPayload);
 
       expect(whiteboardTransactionFactorySpy).toHaveBeenCalledTimes(1);
-      expect(whiteboardTransactionFactorySpy).toBeCalledWith(testEventType, testPayload);
+      expect(whiteboardTransactionFactorySpy).toBeCalledWith(testPayload);
     });
   });
 });

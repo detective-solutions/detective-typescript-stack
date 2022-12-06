@@ -5,7 +5,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardNodeDeletedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeDeletedTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<AnyWhiteboardNode>; // Define message body type
 
@@ -18,7 +18,7 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
 
     try {
       await this.cacheService.deleteNode(this.casefileId, this.nodeId);
-      this.forwardMessageToOtherClients();
+      this.broadcastMessage();
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.handleError(error);

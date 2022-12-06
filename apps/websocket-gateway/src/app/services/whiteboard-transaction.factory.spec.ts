@@ -1,14 +1,16 @@
-import { CacheService, DatabaseService } from '../../services';
+import { CacheService, DatabaseService } from '.';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
+import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
 import { WhiteboardTransactionFactory } from './whiteboard-transaction.factory';
-import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
+import { WhiteboardUserJoinedTransaction } from '../transaction/whiteboard-user-joined.transaction';
+import { WhiteboardWebSocketGateway } from '../websocket';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-xdescribe('TransactionCoordinationService', () => {
+describe('TransactionCoordinationService', () => {
   let whiteboardTransactionFactory: WhiteboardTransactionFactory;
 
   beforeAll(async () => {
@@ -17,6 +19,8 @@ xdescribe('TransactionCoordinationService', () => {
         WhiteboardTransactionFactory,
         { provide: CacheService, useValue: jest.fn() },
         { provide: DatabaseService, useValue: jest.fn() },
+        { provide: WhiteboardWebSocketGateway, useValue: jest.fn() },
+        { provide: KafkaEventProducer, useValue: jest.fn() },
       ],
     }).compile();
 
@@ -50,19 +54,19 @@ xdescribe('TransactionCoordinationService', () => {
     const transactionSpy = jest.spyOn(WhiteboardUserJoinedTransaction.prototype as any, 'execute').mockImplementation();
 
     it('should correctly create a new transaction instance if the given event type is part of the transaction map', () => {
-      const transaction = whiteboardTransactionFactory.createTransaction(
-        MessageEventType.WhiteboardUserJoined,
-        testMessagePayload
-      );
+      const transaction = whiteboardTransactionFactory.createTransactionByType(testMessagePayload);
 
       expect(transaction).toBeInstanceOf(WhiteboardUserJoinedTransaction);
       expect(transactionSpy).toBeCalledTimes(1);
     });
 
     it('should throw an InternalServerErrorException if the given event key is not part of the transaction map', () => {
-      expect(() => whiteboardTransactionFactory.createTransaction(undefined, testMessagePayload)).toThrow(
-        InternalServerErrorException
-      );
+      expect(() =>
+        whiteboardTransactionFactory.createTransactionByType({
+          ...testMessagePayload,
+          context: { ...testMessagePayload.context, eventType: 'unknownEventType' as MessageEventType },
+        })
+      ).toThrow(InternalServerErrorException);
       expect(transactionSpy).toBeCalledTimes(0);
     });
   });

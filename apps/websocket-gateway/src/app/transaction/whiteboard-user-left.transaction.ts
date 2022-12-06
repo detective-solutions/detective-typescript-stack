@@ -5,7 +5,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardUserLeftTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserLeftTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<void>; // Define message body type
 
@@ -15,7 +15,7 @@ export class WhiteboardUserLeftTransaction extends Transaction {
     try {
       const response = await this.cacheService.removeActiveUser(this.casefileId, this.userId);
       if (response === 'OK') {
-        this.forwardMessageToOtherClients();
+        this.broadcastMessage();
         this.logger.log(`${this.logContext} Transaction successful`);
       }
     } catch (error) {

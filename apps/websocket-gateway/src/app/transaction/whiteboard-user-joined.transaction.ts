@@ -11,7 +11,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardUserJoinedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserJoinedTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<IUserForWhiteboard>; // Define message body type
 
@@ -31,14 +31,14 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       }
 
       // Send LOAD_CASEFILE_DATA event to connected user
-      this.transactionEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
+      this.kafkaEventProducer.sendKafkaMessage(KafkaTopic.TransactionOutputUnicast, {
         context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: casefileData,
       });
 
       // Update message body with new user info & forward to other clients
       this.message.body = newUserInfo;
-      this.forwardMessageToOtherClients();
+      this.broadcastMessage();
 
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {

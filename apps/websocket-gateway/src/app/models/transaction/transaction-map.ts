@@ -1,12 +1,15 @@
+import {
+  WhiteboardNodeAddedTransaction,
+  WhiteboardNodeDeletedTransaction,
+  WhiteboardNodePropertiesUpdatedTransaction,
+  WhiteboardSaveTransaction,
+  WhiteboardTitleFocusedTransaction,
+  WhiteboardTitleUpdatedTransaction,
+  WhiteboardUserJoinedTransaction,
+  WhiteboardUserLeftTransaction,
+} from '../../transaction';
+
 import { MessageEventType } from '@detective.solutions/shared/data-access';
-import { WhiteboardNodeAddedTransaction } from '../whiteboard-node-added.transaction';
-import { WhiteboardNodeDeletedTransaction } from '../whiteboard-node-deleted.transaction';
-import { WhiteboardNodePropertiesUpdatedTransaction } from '../whiteboard-node-properties-updated.transaction';
-import { WhiteboardSaveTransaction } from '../whiteboard-save.transaction';
-import { WhiteboardTitleFocusedTransaction } from '../whiteboard-title-focused.transaction';
-import { WhiteboardTitleUpdatedTransaction } from '../whiteboard-title-updated.transaction';
-import { WhiteboardUserJoinedTransaction } from '../whiteboard-user-joined.transaction';
-import { WhiteboardUserLeftTransaction } from '../whiteboard-user-left.transaction';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

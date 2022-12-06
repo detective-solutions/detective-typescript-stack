@@ -7,7 +7,7 @@ import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodePropertiesUpdatedTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<IWhiteboardNodePropertiesUpdate[]>; // Define message body type
 
@@ -33,7 +33,7 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
         this.handleFinalError(error);
       }
     }
-    this.forwardMessageToOtherClients();
+    this.broadcastMessage();
     this.logger.log(`${this.logContext} Transaction successful`);
   }
 

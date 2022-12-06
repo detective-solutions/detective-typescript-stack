@@ -1,2 +1,2 @@
 export const kafkaClientInjectionToken = 'CLIENT_KAFKA';
-export const coordinationServiceInjectionToken = 'TRANSACTION_CONSUMER';
+export const transactionCoordinationServiceInjectionToken = 'TRANSACTION_CONSUMER';

@@ -1,7 +1,7 @@
 import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
+import { KafkaEventConsumer } from './kafka-event.consumer';
 import { Test } from '@nestjs/testing';
-import { WhiteboardEventConsumer } from './whiteboard-event.consumer';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
 import { broadcastWebSocketContext } from '../utils';
 
@@ -10,16 +10,16 @@ const mockWebSocketGateway = {
 };
 
 describe('WhiteboardConsumer', () => {
-  let whiteboardEventConsumer: WhiteboardEventConsumer;
+  let whiteboardEventConsumer: KafkaEventConsumer;
   let webSocketGateway: WhiteboardWebSocketGateway;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [WhiteboardEventConsumer],
+      controllers: [KafkaEventConsumer],
       providers: [{ provide: WhiteboardWebSocketGateway, useValue: mockWebSocketGateway }],
     }).compile();
 
-    whiteboardEventConsumer = moduleRef.get<WhiteboardEventConsumer>(WhiteboardEventConsumer);
+    whiteboardEventConsumer = moduleRef.get<KafkaEventConsumer>(KafkaEventConsumer);
     webSocketGateway = moduleRef.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
   });
 

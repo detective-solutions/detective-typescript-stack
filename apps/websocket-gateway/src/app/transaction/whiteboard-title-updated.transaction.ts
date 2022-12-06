@@ -5,7 +5,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardTitleUpdatedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardTitleUpdatedTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<string>; // Define message body type
 
@@ -18,7 +18,7 @@ export class WhiteboardTitleUpdatedTransaction extends Transaction {
 
     try {
       await this.cacheService.updateCasefileTitle(this.casefileId, this.messageBody);
-      this.forwardMessageToOtherClients();
+      this.broadcastMessage();
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
       this.handleError(error);

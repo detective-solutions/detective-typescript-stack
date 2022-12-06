@@ -1,20 +1,23 @@
 import { CacheService, DatabaseService } from '../../services';
 import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { broadcastWebSocketContext, unicastWebSocketContext } from '../../utils';
 
+import { KafkaEventProducer } from '../../kafka';
 import { Logger } from '@nestjs/common';
-import { TransactionServiceRefs } from '../factory';
-import { WhiteboardEventProducer } from '../../events';
+import { TransactionServiceRefs } from '../../models';
+import { WhiteboardWebSocketGateway } from '../../websocket';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export abstract class Transaction {
   abstract readonly logger: Logger;
-  abstract readonly targetTopic: KafkaTopic;
+  abstract readonly kafkaTopic: KafkaTopic;
 
-  readonly transactionEventProducer: WhiteboardEventProducer;
   readonly cacheService: CacheService;
   readonly databaseService: DatabaseService;
+  readonly kafkaEventProducer: KafkaEventProducer;
+  readonly whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
 
   message: IMessage<any>;
   messageContext: IMessageContext;
@@ -30,9 +33,10 @@ export abstract class Transaction {
     'Transaction cannot be executed due to missing message body information';
 
   constructor(serviceRefs: TransactionServiceRefs, message: IMessage<any>) {
-    this.transactionEventProducer = serviceRefs.transactionEventProducer;
     this.cacheService = serviceRefs.cacheService;
     this.databaseService = serviceRefs.databaseService;
+    this.whiteboardWebSocketGateway = serviceRefs.whiteboardWebSocketGateway;
+    this.kafkaEventProducer = serviceRefs.kafkaEventProducer;
     this.message = message;
     this.messageContext = message.context;
     this.tenantId = this.messageContext.tenantId;
@@ -46,10 +50,18 @@ export abstract class Transaction {
 
   abstract execute(): Promise<void>;
 
-  protected forwardMessageToOtherClients() {
-    this.transactionEventProducer.sendKafkaMessage(this.targetTopic, this.message);
-    this.logger.verbose(
-      `${this.logContext} Forwarded transaction information to topic ${KafkaTopic.TransactionOutputUnicast}`
-    );
+  protected broadcastMessage() {
+    this.whiteboardWebSocketGateway.sendMessageByContext(this.message, broadcastWebSocketContext);
+    this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
+  }
+
+  protected unicastMessage() {
+    this.whiteboardWebSocketGateway.sendMessageByContext(this.message, unicastWebSocketContext);
+    this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
+  }
+
+  protected sendKafkaMessage() {
+    this.kafkaEventProducer.sendKafkaMessage(this.kafkaTopic, this.message);
+    this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 }

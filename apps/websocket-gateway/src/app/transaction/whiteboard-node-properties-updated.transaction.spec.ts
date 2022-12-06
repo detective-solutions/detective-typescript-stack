@@ -7,14 +7,15 @@ import {
 } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
+import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
-import { TransactionServiceRefs } from './factory';
-import { WhiteboardEventProducer } from '../events';
+import { TransactionServiceRefs } from '../models';
 import { WhiteboardNodePropertiesUpdatedTransaction } from './whiteboard-node-properties-updated.transaction';
+import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionEventProducerMock = {
+const kafkaEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
@@ -46,27 +47,31 @@ const testMessagePayload: IMessage<IWhiteboardNodePropertiesUpdate[]> = {
 
 // TODO: Reactivate me!
 xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
-  let transactionEventProducer: WhiteboardEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
+  let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
+  let kafkaEventProducer: KafkaEventProducer;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
       ],
     }).compile();
 
-    transactionEventProducer = app.get<WhiteboardEventProducer>(WhiteboardEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
+    whiteboardWebSocketGateway = app.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
+    kafkaEventProducer = app.get<KafkaEventProducer>(KafkaEventProducer);
     serviceRefs = {
-      transactionEventProducer: transactionEventProducer,
       cacheService: cacheService,
       databaseService: databaseService,
+      whiteboardWebSocketGateway: whiteboardWebSocketGateway,
+      kafkaEventProducer: kafkaEventProducer,
     };
   });
 
@@ -76,7 +81,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
       const updateNodePropertiesSpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
 
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
@@ -92,11 +97,11 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
         testMessageBody[0]
       );
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
     });
 
     it('should retry the cache update if it fails once', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
       const updateNodePropertiesSpy = jest
         .spyOn(cacheService, updateNodePropertiesMethodName)
         .mockImplementationOnce(() => {
@@ -109,7 +114,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       await transaction.execute();
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.targetTopic, testMessagePayload);
+      expect(sendKafkaMessageSpy).toBeCalledWith(transaction.kafkaTopic, testMessagePayload);
 
       expect(updateNodePropertiesSpy).toBeCalledTimes(2);
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(

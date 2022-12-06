@@ -5,7 +5,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardNodeAddedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardNodeAddedTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<AnyWhiteboardNode>; // Define message body type
 
@@ -18,7 +18,7 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
 
     try {
       await this.cacheService.addNode(this.casefileId, this.messageBody);
-      this.forwardMessageToOtherClients();
+      this.broadcastMessage();
       this.logger.verbose(`Node "${this.nodeId}" was successfully added to casefile "${this.casefileId}"`);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {

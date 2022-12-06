@@ -8,8 +8,8 @@ import { kafkaClientInjectionToken } from '../utils';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
-export class WhiteboardEventProducer {
-  private readonly logger = new Logger(WhiteboardEventProducer.name);
+export class KafkaEventProducer {
+  private readonly logger = new Logger(KafkaEventProducer.name);
 
   constructor(@Inject(kafkaClientInjectionToken) private readonly client: ClientKafka) {}
 

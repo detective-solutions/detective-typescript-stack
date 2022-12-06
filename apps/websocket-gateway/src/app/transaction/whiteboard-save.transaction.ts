@@ -5,7 +5,7 @@ import { Transaction } from './abstract';
 
 export class WhiteboardSaveTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardSaveTransaction.name);
-  readonly targetTopic = KafkaTopic.TransactionOutputBroadcast;
+  readonly kafkaTopic = KafkaTopic.TransactionOutputBroadcast;
 
   override message: IMessage<void>; // Define message body type
 

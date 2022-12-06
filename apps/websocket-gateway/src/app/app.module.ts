@@ -1,19 +1,24 @@
-import { CacheService, DatabaseService, MessagePropagationService, TransactionCoordinationService } from './services';
+import {
+  CacheService,
+  DatabaseService,
+  MessagePropagationService,
+  TransactionCoordinationService,
+  WhiteboardTransactionFactory,
+} from './services';
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
 import { DGraphGrpcClientEnvironment, DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
+import { KafkaEventConsumer, KafkaEventProducer } from './kafka';
 import { RedisClientEnvironment, RedisClientModule } from '@detective.solutions/backend/redis-client';
-import { WhiteboardEventConsumer, WhiteboardEventProducer } from './events';
 
 import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
-import { WhiteboardTransactionFactory } from './transaction';
 import { WhiteboardWebSocketGateway } from './websocket';
-import { coordinationServiceInjectionToken } from './utils';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
 import { kafkaConfig } from './kafka-config';
+import { transactionCoordinationServiceInjectionToken } from './utils';
 
 @Module({
   imports: [
@@ -21,12 +26,6 @@ import { kafkaConfig } from './kafka-config';
       isGlobal: true,
       cache: true,
       validationSchema: defaultEnvConfig,
-    }),
-    ClientsModule.register([kafkaConfig] as ClientsModuleOptions),
-    RedisClientModule.register({
-      address: `${process.env[RedisClientEnvironment.REDIS_SERVICE_NAME]}:${
-        process.env[RedisClientEnvironment.REDIS_PORT]
-      }`,
     }),
     RedisClientModule.register({
       address: `${process.env[RedisClientEnvironment.REDIS_SERVICE_NAME]}:${
@@ -43,18 +42,19 @@ import { kafkaConfig } from './kafka-config';
       ],
       debug: !environment.production,
     }),
+    ClientsModule.register([kafkaConfig] as ClientsModuleOptions),
     AuthModule,
     ScheduleModule.forRoot(),
   ],
-  controllers: [WhiteboardEventConsumer],
+  controllers: [KafkaEventConsumer],
   providers: [
-    WhiteboardEventProducer,
+    KafkaEventProducer,
     WhiteboardWebSocketGateway,
     MessagePropagationService,
-    { provide: coordinationServiceInjectionToken, useClass: TransactionCoordinationService },
+    { provide: transactionCoordinationServiceInjectionToken, useClass: TransactionCoordinationService },
+    WhiteboardTransactionFactory,
     CacheService,
     DatabaseService,
-    WhiteboardTransactionFactory,
   ],
 })
 export class AppModule {}

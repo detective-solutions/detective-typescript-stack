@@ -2,13 +2,14 @@ import { CacheService, DatabaseService } from '../services';
 import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
 import { InternalServerErrorException } from '@nestjs/common';
+import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
-import { WhiteboardEventProducer } from '../events';
 import { WhiteboardUserLeftTransaction } from './whiteboard-user-left.transaction';
+import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendKafkaMessageMethodName = 'sendKafkaMessage';
-const transactionEventProducerMock = {
+const kafkaEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
 
@@ -34,27 +35,31 @@ const testMessagePayload = {
 
 describe('WhiteboardUserLeftTransaction', () => {
   let whiteboardUserLeftTransaction: WhiteboardUserLeftTransaction;
-  let transactionEventProducer: WhiteboardEventProducer;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
+  let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
+  let kafkaEventProducer: KafkaEventProducer;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardEventProducer, useValue: transactionEventProducerMock },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
       ],
     }).compile();
 
-    transactionEventProducer = app.get<WhiteboardEventProducer>(WhiteboardEventProducer);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
+    whiteboardWebSocketGateway = app.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
+    kafkaEventProducer = app.get<KafkaEventProducer>(KafkaEventProducer);
     whiteboardUserLeftTransaction = new WhiteboardUserLeftTransaction(
       {
-        transactionEventProducer: transactionEventProducer,
         cacheService: cacheService,
         databaseService: databaseService,
+        whiteboardWebSocketGateway: whiteboardWebSocketGateway,
+        kafkaEventProducer: kafkaEventProducer,
       },
       testMessagePayload
     );
@@ -74,7 +79,7 @@ describe('WhiteboardUserLeftTransaction', () => {
   xdescribe('execute', () => {
     it('should correctly load casefile data from database if no cache exists', async () => {
       const removeActiveWhiteboardUserSpy = jest.spyOn(cacheService, removeActiveWhiteboardUserMethodName);
-      const sendKafkaMessageSpy = jest.spyOn(transactionEventProducer, sendKafkaMessageMethodName);
+      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserLeftTransaction.execute();
 
@@ -83,7 +88,7 @@ describe('WhiteboardUserLeftTransaction', () => {
 
       expect(sendKafkaMessageSpy).toBeCalledTimes(1);
       expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(
-        whiteboardUserLeftTransaction.targetTopic,
+        whiteboardUserLeftTransaction.kafkaTopic,
         testMessagePayload
       );
     });
