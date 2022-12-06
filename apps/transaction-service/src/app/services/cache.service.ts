@@ -155,7 +155,9 @@ export class CacheService {
             isTemporary ? 'temporary' : ''
           } ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
         );
-        cachedNode[propertyToUpdate] = updatedValue;
+        isTemporary
+          ? (cachedNode['temporary'][propertyToUpdate] = updatedValue ?? null)
+          : (cachedNode[propertyToUpdate] = updatedValue ?? null);
       });
     });
 
