@@ -2,7 +2,6 @@ import { CacheService, DatabaseService } from '../services';
 import {
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
-  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
