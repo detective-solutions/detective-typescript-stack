@@ -141,7 +141,11 @@ export class CacheService {
 
       const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
 
+      console.log('ACTUAL', actualPropertiesUpdate);
+
       Object.entries(actualPropertiesUpdate).forEach(([propertyToUpdate, updatedValue]) => {
+        console.log(propertyToUpdate);
+        console.log(updatedValue);
         const isTemporary = propertyToUpdate === 'temporary'; // Check if nested temporary data should be updated
         this.logger.log(
           `Updating ${
