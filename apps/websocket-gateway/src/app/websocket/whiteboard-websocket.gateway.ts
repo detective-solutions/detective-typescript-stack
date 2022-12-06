@@ -4,7 +4,6 @@ import {
   IJwtTokenPayload,
   IMessage,
   IMessageContext,
-  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
@@ -17,16 +16,15 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { MessagePropagationService, TransactionCoordinationService } from '../services';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
-import { MessagePropagationService } from '../services';
 import { Server } from 'ws';
-import { WebSocketInfo } from '../models/websocket-info.type';
-import { WhiteboardEventProducer } from '../events/whiteboard-event.producer';
+import { WebSocketInfo } from '../models/websocket/websocket-info.type';
 import { broadcastWebSocketContext } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -43,7 +41,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   server: Server<IWebSocketClient>;
 
   constructor(
-    private readonly whiteboardEventProducer: WhiteboardEventProducer,
+    private readonly transactionCoordinationService: TransactionCoordinationService,
     private readonly messagePropagationService: MessagePropagationService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService
@@ -71,11 +69,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   handleDisconnect(client: any) {
     this.logger.log(`${buildLogContext(client._socket.context)} Client has disconnected`);
 
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserLeft.targetTopic, {
+    this.transactionCoordinationService.createTransactionByEventType(MessageEventType.WhiteboardUserLeft, {
       context: {
         ...client._socket.context,
         eventType: MessageEventType.WhiteboardUserLeft,
-        timestamp: new Date().getTime(),
       },
       body: null,
     });
@@ -99,7 +96,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.loadWhiteboardData.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.loadWhiteboardData.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.loadWhiteboardData.eventType,
+      message
+    );
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeAdded.eventType)
@@ -110,7 +110,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.whiteboardNodeAdded.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeAdded.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.whiteboardNodeAdded.eventType,
+      message
+    );
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodeDeleted.eventType)
@@ -121,7 +124,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardNodeDeleted.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.whiteboardNodeDeleted.eventType,
+      message
+    );
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardNodePropertiesUpdated.eventType)
@@ -132,8 +138,8 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.whiteboardNodePropertiesUpdated.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(
-      EventTypeTopicMapping.whiteboardNodePropertiesUpdated.targetTopic,
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.whiteboardNodePropertiesUpdated.eventType,
       message
     );
   }
@@ -146,7 +152,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.whiteboardTitleFocused.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardTitleFocused.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.whiteboardTitleFocused.eventType,
+      message
+    );
   }
 
   @SubscribeMessage(EventTypeTopicMapping.whiteboardTitleUpdated.eventType)
@@ -157,7 +166,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.whiteboardTitleUpdated.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardTitleUpdated.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.whiteboardTitleUpdated.eventType,
+      message
+    );
   }
 
   @SubscribeMessage(EventTypeTopicMapping.queryTable.eventType)
@@ -168,7 +180,10 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         EventTypeTopicMapping.queryTable.targetTopic
       }`
     );
-    this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.queryTable.targetTopic, message);
+    this.transactionCoordinationService.createTransactionByEventType(
+      EventTypeTopicMapping.queryTable.eventType,
+      message
+    );
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -185,7 +200,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         },
         body: null,
       };
-      this.whiteboardEventProducer.sendKafkaMessage(KafkaTopic.TransactionInput, message);
+      this.transactionCoordinationService.createTransactionByEventType(MessageEventType.SaveWhiteboard, message);
     });
   }
 
@@ -241,7 +256,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         },
         body: null,
       };
-      this.whiteboardEventProducer.sendKafkaMessage(EventTypeTopicMapping.whiteboardUserJoined.targetTopic, message);
+      this.transactionCoordinationService.createTransactionByEventType(MessageEventType.WhiteboardUserJoined, message);
 
       this.logger.log(`Currently handling ${server.clients.size + 1} simultaneous client connections`);
       cb(true, 200, 'Verified');
