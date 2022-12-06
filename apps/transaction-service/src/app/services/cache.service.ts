@@ -128,7 +128,8 @@ export class CacheService {
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
       const correspondingPropertyUpdate = nodePropertyUpdates.find(
         (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) => {
-          return nodePropertyUpdate.nodeId === cachedNode.id;
+          console.log(nodePropertyUpdate);
+          return nodePropertyUpdate?.nodeId === cachedNode.id;
         }
       );
 
