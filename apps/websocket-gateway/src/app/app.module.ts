@@ -10,6 +10,7 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WhiteboardTransactionFactory } from './transaction';
 import { WhiteboardWebSocketGateway } from './websocket';
+import { coordinationServiceInjectionToken } from './utils';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
 import { kafkaConfig } from './kafka-config';
@@ -50,7 +51,7 @@ import { kafkaConfig } from './kafka-config';
     WhiteboardEventProducer,
     WhiteboardWebSocketGateway,
     MessagePropagationService,
-    TransactionCoordinationService,
+    { provide: coordinationServiceInjectionToken, useClass: TransactionCoordinationService },
     CacheService,
     DatabaseService,
     WhiteboardTransactionFactory,
