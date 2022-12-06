@@ -3,7 +3,6 @@ import { IKafkaMessage, KafkaTopic } from '@detective.solutions/shared/data-acce
 
 import { EventPattern } from '@nestjs/microservices';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
-import { broadcastWebSocketContext } from '../utils';
 import { buildLogContext } from '@detective.solutions/backend/shared/utils';
 
 @Controller()
@@ -19,6 +18,6 @@ export class KafkaEventConsumer {
         message.topic
       } with timestamp ${message.timestamp}`
     );
-    this.whiteboardWebSocketGateway.sendMessageByContext(message.value, broadcastWebSocketContext);
+    this.whiteboardWebSocketGateway.sendPropagatedBroadcastMessage(message.value);
   }
 }

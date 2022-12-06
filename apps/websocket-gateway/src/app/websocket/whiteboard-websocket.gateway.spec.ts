@@ -69,7 +69,7 @@ xdescribe('WhiteboardWebsocketGateway', () => {
       await webSocketGateway.onWhiteboardCursorMovedEvent(testMessage);
 
       expect(propagateMessageMock).toHaveBeenCalledTimes(1);
-      expect(propagateMessageMock).toHaveBeenCalledWith(WhiteboardWebSocketGateway.cursorPropagationChannel, {
+      expect(propagateMessageMock).toHaveBeenCalledWith(WhiteboardWebSocketGateway.cursorMessagePropagationChannel, {
         ...testMessage,
         propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
       });
@@ -229,7 +229,7 @@ xdescribe('WhiteboardWebsocketGateway', () => {
       await _createWebSocketClient(context2);
       await _createWebSocketClient(context3);
 
-      webSocketGateway.saveActiveCasefiles();
+      webSocketGateway.saveActiveWhiteboards();
 
       expect(producerMock).toBeCalledTimes(3);
     });

@@ -14,9 +14,9 @@ import { WhiteboardNodePropertiesUpdatedTransaction } from './whiteboard-node-pr
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const produceKafkaEventMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const updateNodePropertiesMethodName = 'updateNodeProperties';
@@ -81,7 +81,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
       const updateNodePropertiesSpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
 
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
@@ -96,12 +96,12 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
         testMessageBody[0].nodeId,
         testMessageBody[0]
       );
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should retry the cache update if it fails once', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
       const updateNodePropertiesSpy = jest
         .spyOn(cacheService, updateNodePropertiesMethodName)
         .mockImplementationOnce(() => {
@@ -113,8 +113,8 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
       await transaction.execute();
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
 
       expect(updateNodePropertiesSpy).toBeCalledTimes(2);
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(

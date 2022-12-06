@@ -6,7 +6,7 @@ import { Test } from '@nestjs/testing';
 import { kafkaClientInjectionToken } from '../utils';
 import { v4 as uuidv4 } from 'uuid';
 
-describe('WhiteboardProducer', () => {
+describe('KafkaEventProducer', () => {
   let whiteboardProducer: KafkaEventProducer;
   let client: ClientKafka;
 
@@ -52,7 +52,7 @@ describe('WhiteboardProducer', () => {
       };
       const emitSpy = jest.spyOn(client, 'emit');
 
-      whiteboardProducer.sendKafkaMessage(testTopicName, testMessage);
+      whiteboardProducer.produceKafkaEvent(testTopicName, testMessage);
 
       expect(emitSpy).toBeCalledTimes(1);
       expect(emitSpy).toBeCalledWith(testTopicName, testMessage);

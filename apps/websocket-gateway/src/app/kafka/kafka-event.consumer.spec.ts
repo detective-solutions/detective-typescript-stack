@@ -3,13 +3,12 @@ import { IKafkaMessage, MessageEventType, UserRole } from '@detective.solutions/
 import { KafkaEventConsumer } from './kafka-event.consumer';
 import { Test } from '@nestjs/testing';
 import { WhiteboardWebSocketGateway } from '../websocket/whiteboard-websocket.gateway';
-import { broadcastWebSocketContext } from '../utils';
 
 const mockWebSocketGateway = {
-  sendMessageByContext: jest.fn(),
+  sendPropagatedBroadcastMessage: jest.fn(),
 };
 
-describe('WhiteboardConsumer', () => {
+describe('KafkaEventConsumer', () => {
   let whiteboardEventConsumer: KafkaEventConsumer;
   let webSocketGateway: WhiteboardWebSocketGateway;
 
@@ -52,12 +51,12 @@ describe('WhiteboardConsumer', () => {
         headers: {},
         topic: 'testTopic',
       };
-      const broadcastSpy = jest.spyOn(webSocketGateway, 'sendMessageByContext');
+      const broadcastSpy = jest.spyOn(webSocketGateway, 'sendPropagatedBroadcastMessage');
 
       whiteboardEventConsumer.forwardQueryExecution(testKafkaMessage);
 
       expect(broadcastSpy).toBeCalledTimes(1);
-      expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value, broadcastWebSocketContext);
+      expect(broadcastSpy).toBeCalledWith(testKafkaMessage.value);
     });
   });
 });

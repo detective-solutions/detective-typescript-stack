@@ -14,9 +14,9 @@ import { WhiteboardUserJoinedTransaction } from './whiteboard-user-joined.transa
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const produceKafkaEventMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const getCachedCasefileByIdMethodName = 'getCasefileById';
@@ -122,7 +122,7 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
         .spyOn(databaseService, getCasefileByIdMethodName)
         .mockResolvedValue(getCasefileByIdResponse);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName).mockResolvedValue('OK');
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
 
@@ -138,12 +138,12 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       expect(saveCasefileToCacheSpy).toHaveBeenCalledTimes(1);
       expect(saveCasefileToCacheSpy).toBeCalledWith(getCasefileByIdResponse);
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith({
+      expect(produceKafkaEventSpy).toBeCalledTimes(2);
+      expect(produceKafkaEventSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith({
+      expect(produceKafkaEventSpy).toHaveBeenLastCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });
@@ -167,7 +167,7 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       const getDatabaseCasefileByIdSpy = jest.spyOn(databaseService, getCasefileByIdMethodName);
       const saveCasefileToCacheSpy = jest.spyOn(cacheService, saveCasefileToCacheMethodName);
       const addActiveWhiteboardUsersSpy = jest.spyOn(cacheService, insertActiveUsersMethodName);
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
 
@@ -183,12 +183,12 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       expect(addActiveWhiteboardUsersSpy).toBeCalledTimes(1);
       expect(addActiveWhiteboardUsersSpy).toBeCalledWith(testMessageContext.casefileId, [testUserForWhiteboard]);
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith({
+      expect(produceKafkaEventSpy).toBeCalledTimes(2);
+      expect(produceKafkaEventSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toBeCalledWith({
+      expect(produceKafkaEventSpy).toBeCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });
@@ -208,17 +208,17 @@ xdescribe('WhiteboardUserJoinedTransaction', () => {
       jest.spyOn(databaseService, getWhiteboardUserByIdMethodName).mockResolvedValue(testUserForWhiteboard);
       jest.spyOn(cacheService, getCachedCasefileByIdMethodName).mockResolvedValue(getCasefileByIdResponse);
       const insertActiveUsersSpy = jest.spyOn(cacheService, insertActiveUsersMethodName);
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       await whiteboardUserJoinedTransaction.execute();
 
       expect(insertActiveUsersSpy).toBeCalledTimes(0);
-      expect(sendKafkaMessageSpy).toBeCalledTimes(2);
-      expect(sendKafkaMessageSpy).toBeCalledWith({
+      expect(produceKafkaEventSpy).toBeCalledTimes(2);
+      expect(produceKafkaEventSpy).toBeCalledWith({
         context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: getCasefileByIdResponse,
       });
-      expect(sendKafkaMessageSpy).toBeCalledWith({
+      expect(produceKafkaEventSpy).toBeCalledWith({
         context: testMessageContext,
         body: testUserForWhiteboard,
       });

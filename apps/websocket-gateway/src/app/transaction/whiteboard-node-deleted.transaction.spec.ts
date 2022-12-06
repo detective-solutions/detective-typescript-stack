@@ -9,9 +9,9 @@ import { WhiteboardNodeDeletedTransaction } from './whiteboard-node-deleted.tran
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const produceKafkaEventMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const deleteNodeMethodName = 'deleteNode';
@@ -67,7 +67,7 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
       const deleteNodeSpy = jest.spyOn(cacheService, deleteNodeMethodName);
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
@@ -75,8 +75,8 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
       await transaction.execute();
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
       expect(deleteNodeSpy).toBeCalledTimes(1);
       expect(deleteNodeSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.nodeId);
     });

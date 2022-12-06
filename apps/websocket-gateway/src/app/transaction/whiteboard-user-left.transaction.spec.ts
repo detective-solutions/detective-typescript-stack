@@ -8,7 +8,7 @@ import { WhiteboardUserLeftTransaction } from './whiteboard-user-left.transactio
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const sendKafkaMessageMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
   [sendKafkaMessageMethodName]: jest.fn(),
 };
@@ -79,15 +79,15 @@ describe('WhiteboardUserLeftTransaction', () => {
   xdescribe('execute', () => {
     it('should correctly load casefile data from database if no cache exists', async () => {
       const removeActiveWhiteboardUserSpy = jest.spyOn(cacheService, removeActiveWhiteboardUserMethodName);
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
 
       await whiteboardUserLeftTransaction.execute();
 
       expect(removeActiveWhiteboardUserSpy).toBeCalledTimes(1);
       expect(removeActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.userId);
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toHaveBeenLastCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toHaveBeenLastCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {

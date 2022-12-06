@@ -9,9 +9,9 @@ import { WhiteboardTitleUpdatedTransaction } from './whiteboard-title-updated.tr
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const produceKafkaEventMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const updateCasefileTitleMethodName = 'updateCasefileTitle';
@@ -68,15 +68,15 @@ xdescribe('WhiteboardTitleUpdatedTransaction', () => {
 
   xdescribe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       const transaction = new WhiteboardTitleUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
@@ -90,7 +90,7 @@ xdescribe('WhiteboardTitleUpdatedTransaction', () => {
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName).mockImplementation(() => {
+      jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName).mockImplementation(() => {
         throw new Error();
       });
 

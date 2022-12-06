@@ -1,6 +1,5 @@
 import { CacheService, DatabaseService } from '../../services';
 import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
-import { broadcastWebSocketContext, unicastWebSocketContext } from '../../utils';
 
 import { KafkaEventProducer } from '../../kafka';
 import { Logger } from '@nestjs/common';
@@ -50,17 +49,17 @@ export abstract class Transaction {
   abstract execute(): Promise<void>;
 
   protected broadcastMessage() {
-    this.whiteboardWebSocketGateway.sendMessageByContext(this.message, broadcastWebSocketContext);
+    this.whiteboardWebSocketGateway.sendPropagatedBroadcastMessage(this.message);
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 
   protected unicastMessage() {
-    this.whiteboardWebSocketGateway.sendMessageByContext(this.message, unicastWebSocketContext);
+    this.whiteboardWebSocketGateway.sendPropagatedUnicastMessage(this.message);
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 
   protected sendKafkaMessage(targetTopic: KafkaTopic) {
-    this.kafkaEventProducer.sendKafkaMessage(targetTopic, this.message);
+    this.kafkaEventProducer.produceKafkaEvent(targetTopic, this.message);
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
   }
 }

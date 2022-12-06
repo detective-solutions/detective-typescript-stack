@@ -17,9 +17,9 @@ import { WhiteboardWebSocketGateway } from '../websocket';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'sendKafkaMessage';
+const produceKafkaEventMethodName = 'produceKafkaEvent';
 const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const addNodeMethodName = 'addNode';
@@ -52,7 +52,7 @@ const testMessageBody: ITableWhiteboardNode = {
   type: WhiteboardNodeType.TABLE,
 };
 
-const testMessagePayload: IMessage<ITableWhiteboardNode> = {
+const testEventPayload: IMessage<ITableWhiteboardNode> = {
   context: testMessageContext,
   body: testMessageBody,
 };
@@ -92,22 +92,22 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
 
   xdescribe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
-      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testEventPayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(1);
-      expect(sendKafkaMessageSpy).toBeCalledWith(testMessagePayload);
+      expect(produceKafkaEventSpy).toBeCalledTimes(1);
+      expect(produceKafkaEventSpy).toBeCalledWith(testEventPayload);
       expect(addNodeSpy).toBeCalledTimes(1);
-      expect(addNodeSpy).toBeCalledWith(testMessagePayload.context.casefileId, testMessagePayload.body);
+      expect(addNodeSpy).toBeCalledWith(testEventPayload.context.casefileId, testEventPayload.body);
     });
 
     it('should throw an InternalServerErrorException if the given message is missing a body', async () => {
-      const sendKafkaMessageSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
       const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
@@ -118,7 +118,7 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
-      expect(sendKafkaMessageSpy).toBeCalledTimes(0);
+      expect(produceKafkaEventSpy).toBeCalledTimes(0);
       expect(addNodeSpy).toBeCalledTimes(0);
     });
 
@@ -127,7 +127,7 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
         throw new Error();
       });
 
-      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testEventPayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
