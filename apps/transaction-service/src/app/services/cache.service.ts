@@ -126,61 +126,36 @@ export class CacheService {
     const cachedNodes = await this.getNodesByCasefile(casefileId);
 
     cachedNodes.forEach((cachedNode: AnyWhiteboardNode) => {
-      const correspondingPropertiesUpdate = nodePropertyUpdates.find(
+      const correspondingPropertyUpdate = nodePropertyUpdates.find(
         (nodePropertyUpdate: IWhiteboardNodePropertiesUpdate) => {
           return nodePropertyUpdate.nodeId === cachedNode.id;
         }
       );
 
-      if (!correspondingPropertiesUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
+      if (!correspondingPropertyUpdate || this.isNodeAlreadyBlocked(cachedNode, userId)) {
         this.logger.warn(
-          `Properties of whiteboard node "${correspondingPropertiesUpdate.nodeId}" cannot be updated as it is blocked by another user`
+          `Properties of whiteboard node "${correspondingPropertyUpdate.nodeId}" cannot be updated as it is blocked by another user`
         );
         return;
       }
 
-      const { nodeId, ...actualPropertiesUpdate } = correspondingPropertiesUpdate;
+      // eslint-disable-next-line prefer-const
+      let { nodeId, ...actualPropertyUpdate } = correspondingPropertyUpdate;
 
-      console.log('ACTUAL', actualPropertiesUpdate); // TODO: Remove me
-
-      Object.entries(actualPropertiesUpdate).forEach(([propertyToUpdate, updatedValue]) => {
-        console.log(propertyToUpdate); // TODO: Remove me
-        console.log(updatedValue); // TODO: Remove me
-
-        this.logger.log(`Updating ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`);
-        propertyToUpdate === 'temporary' // Check if nested temporary data should be updated
-          ? (cachedNode['temporary'][propertyToUpdate] = updatedValue)
-          : (cachedNode[propertyToUpdate] = updatedValue);
-      });
-    });
-
-    // Can't match Redis client return type with domain type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.client.json.set(casefileId, CacheService.NODES_PATH, cachedNodes as any);
-  }
-
-  async updateNodeBlock(casefileId: string, nodeId: string, userId: string | null): Promise<void> {
-    this.logger.log(`Marking whiteboard node "${nodeId}" as blocked by user "${userId}"`);
-
-    const cachedNodes = await this.getNodesByCasefile(casefileId);
-    if (!cachedNodes) {
-      throw new InternalServerErrorException(
-        `Could not fetch cached whiteboard nodes for casefile id "${casefileId}" while trying to block node "${nodeId}"`
-      );
-    }
-
-    cachedNodes.forEach((node: AnyWhiteboardNode) => {
-      if (node.id === nodeId) {
-        // Check if node is already blocked by another user. If yes, abort blocking process to avoid inconsistency!
-        if (this.isNodeAlreadyBlocked(node, userId)) {
-          this.logger.warn(
-            `Properties of whiteboard node "${nodeId}" cannot be updated as it is blocked by another user`
-          );
-        } else {
-          node['temporary']['blockedBy'] = userId;
-        }
-        return;
+      // Check if it is a nested temporary property update
+      const isTemporary = Object.keys(actualPropertyUpdate).includes('temporary');
+      if (isTemporary) {
+        actualPropertyUpdate = actualPropertyUpdate['temporary'] as IWhiteboardNodePropertiesUpdate;
       }
+
+      Object.entries(actualPropertyUpdate).forEach(([propertyToUpdate, updatedValue]) => {
+        this.logger.log(
+          `Updating ${
+            isTemporary ? 'temporary' : ''
+          } ${propertyToUpdate} property of node "${nodeId}" in casefile "${casefileId}"`
+        );
+        cachedNode[propertyToUpdate] = updatedValue;
+      });
     });
 
     // Can't match Redis client return type with domain type
