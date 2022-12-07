@@ -52,9 +52,9 @@ import { transactionCoordinationServiceInjectionToken } from './utils';
     WhiteboardWebSocketGateway,
     MessagePropagationService,
     { provide: transactionCoordinationServiceInjectionToken, useClass: TransactionCoordinationService },
-    WhiteboardTransactionFactory,
     CacheService,
     DatabaseService,
+    WhiteboardTransactionFactory,
   ],
 })
 export class AppModule {}
