@@ -33,8 +33,8 @@ import { v4 as uuidv4 } from 'uuid';
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
   static propagationSourceId = uuidv4();
-  static broadcastMessagePropagationChannel = 'ws_broadcast';
-  static unicastMessagePropagationChannel = 'ws_unicast';
+  static broadcastMessagePropagationChannel = 'broadcast_propagation';
+  static unicastMessagePropagationChannel = 'unicast_propagation';
 
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
