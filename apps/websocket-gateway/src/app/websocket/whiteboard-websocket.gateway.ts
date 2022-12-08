@@ -96,40 +96,39 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.sendPropagatedBroadcastMessage(message);
   }
 
-  @SubscribeMessage([
-    MessageEventType.LoadWhiteboardData,
-    MessageEventType.WhiteboardNodeAdded,
-    MessageEventType.WhiteboardNodeDeleted,
-    MessageEventType.WhiteboardNodePropertiesUpdated,
-    MessageEventType.WhiteboardTitleFocused,
-    MessageEventType.WhiteboardTitleUpdated,
-    MessageEventType.QueryTable,
-  ])
+  @SubscribeMessage(MessageEventType.LoadWhiteboardData)
   async onWhiteboardTransactionalEvent(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.whiteboardTransactionFactory.createTransactionByType(message);
+    this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodeAdded)
   async onWhiteboardNodeAdded(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.whiteboardTransactionFactory.createTransactionByType(message);
+    this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodeDeleted)
   async onWhiteboardNodeDeleted(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.whiteboardTransactionFactory.createTransactionByType(message);
+    this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodePropertiesUpdated)
   async onWhiteboardNodePropertiesUpdated(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.whiteboardTransactionFactory.createTransactionByType(message);
+    this.convertMessageToWhiteboardTransaction(message);
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardTitleFocused)
+  async onWhiteboardTitleFocused(@MessageBody() message: IMessage<any>) {
+    this.convertMessageToWhiteboardTransaction(message);
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardTitleUpdated)
+  async onWhiteboardTitleUpdated(@MessageBody() message: IMessage<any>) {
+    this.convertMessageToWhiteboardTransaction(message);
+  }
+
+  @SubscribeMessage(MessageEventType.QueryTable)
+  async onQueryTable(@MessageBody() message: IMessage<any>) {
+    this.convertMessageToWhiteboardTransaction(message);
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -288,6 +287,12 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
 
     // Return value after path parameter title
     return parameterTitleIndex ? splittedUrl[parameterTitleIndex + 1] : null;
+  }
+
+  private async convertMessageToWhiteboardTransaction(message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(`${buildLogContext(message.context)} Forwarding message for transaction`);
+    this.whiteboardTransactionFactory.createTransactionByType(message);
   }
 
   private async validateMessageContext(context: IMessageContext): Promise<void> {
