@@ -111,6 +111,27 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.whiteboardTransactionFactory.createTransactionByType(message);
   }
 
+  @SubscribeMessage(MessageEventType.WhiteboardNodeAdded)
+  async onWhiteboardNodeAdded(@MessageBody() message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(this.createSubscriberLog(message.context));
+    this.whiteboardTransactionFactory.createTransactionByType(message);
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardNodeDeleted)
+  async onWhiteboardNodeDeleted(@MessageBody() message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(this.createSubscriberLog(message.context));
+    this.whiteboardTransactionFactory.createTransactionByType(message);
+  }
+
+  @SubscribeMessage(MessageEventType.WhiteboardNodePropertiesUpdated)
+  async onWhiteboardNodePropertiesUpdated(@MessageBody() message: IMessage<any>) {
+    await this.validateMessageContext(message?.context);
+    this.logger.verbose(this.createSubscriberLog(message.context));
+    this.whiteboardTransactionFactory.createTransactionByType(message);
+  }
+
   @Cron(CronExpression.EVERY_10_SECONDS)
   saveActiveWhiteboards() {
     const activeWhiteboardContexts = new Set<WebSocketClientContext>();
