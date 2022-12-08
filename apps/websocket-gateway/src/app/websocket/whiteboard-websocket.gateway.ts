@@ -7,7 +7,7 @@ import {
   UserRole,
 } from '@detective.solutions/shared/data-access';
 import { IPropagationMessage, IWebSocketClient, WebSocketClientContext } from '../models';
-import { Inject, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
+import { Inject, InternalServerErrorException, Logger, UnauthorizedException, forwardRef } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayDisconnect,
@@ -16,12 +16,8 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { MessagePropagationService, TransactionCoordinationService } from '../services';
-import {
-  broadcastWebSocketContext,
-  transactionCoordinationServiceInjectionToken,
-  unicastWebSocketContext,
-} from '../utils';
+import { MessagePropagationService, WhiteboardTransactionFactory } from '../services';
+import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
 import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
@@ -37,9 +33,8 @@ import { v4 as uuidv4 } from 'uuid';
 @WebSocketGateway(7777)
 export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisconnect {
   static propagationSourceId = uuidv4();
-  static broadcastMessagePropagationChannel = 'ws_broadcast_propagation';
-  static unicastMessagePropagationChannel = 'ws_unicast_propagation';
-  static cursorMessagePropagationChannel = 'ws_cursor_propagation';
+  static broadcastMessagePropagationChannel = 'ws_broadcast';
+  static unicastMessagePropagationChannel = 'ws_unicast';
 
   readonly logger = new Logger(WhiteboardWebSocketGateway.name);
 
@@ -47,8 +42,8 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   server: Server<IWebSocketClient>;
 
   constructor(
-    @Inject(transactionCoordinationServiceInjectionToken)
-    private readonly transactionCoordinationService: TransactionCoordinationService,
+    @Inject(forwardRef(() => WhiteboardTransactionFactory))
+    private readonly whiteboardTransactionFactory: WhiteboardTransactionFactory,
     private readonly messagePropagationService: MessagePropagationService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService
@@ -82,23 +77,12 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
         }
       }
     );
-
-    // Subscribe to cursor message propagations from other gateways
-    this.messagePropagationService.subscribeToChannel(
-      WhiteboardWebSocketGateway.cursorMessagePropagationChannel,
-      (message: string) => {
-        const parsedMessage = JSON.parse(message) as IPropagationMessage;
-        if (parsedMessage.propagationSourceId !== WhiteboardWebSocketGateway.propagationSourceId) {
-          this.sendMessageByContext(parsedMessage, broadcastWebSocketContext);
-        }
-      }
-    );
   }
 
   handleDisconnect(client: any) {
     this.logger.log(`${buildLogContext(client._socket.context)} Client has disconnected`);
 
-    this.transactionCoordinationService.createTransactionByType({
+    this.whiteboardTransactionFactory.createTransactionByType({
       context: {
         ...client._socket.context,
         eventType: MessageEventType.WhiteboardUserLeft,
@@ -109,61 +93,22 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
 
   @SubscribeMessage(MessageEventType.WhiteboardCursorMoved)
   async onWhiteboardCursorMovedEvent(@MessageBody() message: IMessage<any>) {
-    // Propagate message to other websocket gateways that subscribed to the same channel
-    this.messagePropagationService.propagateMessage(WhiteboardWebSocketGateway.cursorMessagePropagationChannel, {
-      ...message,
-      propagationSourceId: WhiteboardWebSocketGateway.propagationSourceId,
-    });
-    this.sendMessageByContext(message, broadcastWebSocketContext);
+    this.sendPropagatedBroadcastMessage(message);
   }
 
-  @SubscribeMessage(MessageEventType.LoadWhiteboardData)
-  async onLoadWhiteboardDataEvent(@MessageBody() message: IMessage<any>) {
+  @SubscribeMessage([
+    MessageEventType.LoadWhiteboardData,
+    MessageEventType.WhiteboardNodeAdded,
+    MessageEventType.WhiteboardNodeDeleted,
+    MessageEventType.WhiteboardNodePropertiesUpdated,
+    MessageEventType.WhiteboardTitleFocused,
+    MessageEventType.WhiteboardTitleUpdated,
+    MessageEventType.QueryTable,
+  ])
+  async onWhiteboardTransactionalEvent(@MessageBody() message: IMessage<any>) {
     await this.validateMessageContext(message?.context);
     this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.WhiteboardNodeAdded)
-  async onWhiteboardNodeAddedEvent(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.WhiteboardNodeDeleted)
-  async onWhiteboardNodeDeletedEvent(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.WhiteboardNodePropertiesUpdated)
-  async onWhiteboardNodePropertiesUpdated(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.WhiteboardTitleFocused)
-  async onWhiteboardTitleFocused(@MessageBody() message: IMessage<boolean>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.WhiteboardTitleUpdated)
-  async onWhiteboardTitleUpdated(@MessageBody() message: IMessage<string>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
-  }
-
-  @SubscribeMessage(MessageEventType.QueryTable)
-  async onQueryTableEvent(@MessageBody() message: IMessage<any>) {
-    await this.validateMessageContext(message?.context);
-    this.logger.verbose(this.createSubscriberLog(message.context));
-    this.transactionCoordinationService.createTransactionByType(message);
+    this.whiteboardTransactionFactory.createTransactionByType(message);
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -172,7 +117,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.server.clients.forEach((client: IWebSocketClient) => activeWhiteboardContexts.add(client._socket.context));
 
     for (const whiteboardContext of activeWhiteboardContexts) {
-      this.transactionCoordinationService.createTransactionByType({
+      this.whiteboardTransactionFactory.createTransactionByType({
         context: {
           ...whiteboardContext,
           timestamp: new Date().getTime(),
@@ -201,7 +146,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.sendMessageByContext(message, unicastWebSocketContext);
   }
 
-  sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
+  private sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
     this.server.clients.forEach((client: IWebSocketClient) => {
       const clientContext = client._socket.context;
       if (!clientContext) {
@@ -244,7 +189,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       );
 
       // Create a new WHITEBOARD_USER_JOINED transaction
-      this.transactionCoordinationService.createTransactionByType({
+      this.whiteboardTransactionFactory.createTransactionByType({
         context: {
           ...clientContext,
           timestamp: new Date().getTime(),

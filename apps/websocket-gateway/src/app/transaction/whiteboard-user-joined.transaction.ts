@@ -7,7 +7,6 @@ import {
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { Transaction } from './abstract';
-import { unicastWebSocketContext } from '../utils';
 
 export class WhiteboardUserJoinedTransaction extends Transaction {
   readonly logger = new Logger(WhiteboardUserJoinedTransaction.name);
@@ -30,13 +29,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
       }
 
       // Send LOAD_CASEFILE_DATA event to connected user
-      this.whiteboardWebSocketGateway.sendMessageByContext(
-        {
-          context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
-          body: casefileData,
-        },
-        unicastWebSocketContext
-      );
+      this.whiteboardWebSocketGateway.sendPropagatedUnicastMessage({
+        context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
+        body: casefileData,
+      });
 
       // Update message body with new user info & forward to other clients
       this.message.body = newUserInfo;

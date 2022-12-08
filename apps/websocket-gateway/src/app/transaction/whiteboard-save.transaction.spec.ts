@@ -46,30 +46,30 @@ const testCachableCasefile: ICachableCasefileForWhiteboard = {
 };
 
 xdescribe('WhiteboardSaveTransaction', () => {
+  let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
-  let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let kafkaEventProducer: KafkaEventProducer;
   let serviceRefs: TransactionServiceRefs;
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
+        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
+    whiteboardWebSocketGateway = app.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
     cacheService = app.get<CacheService>(CacheService);
     databaseService = app.get<DatabaseService>(DatabaseService);
-    whiteboardWebSocketGateway = app.get<WhiteboardWebSocketGateway>(WhiteboardWebSocketGateway);
     kafkaEventProducer = app.get<KafkaEventProducer>(KafkaEventProducer);
     serviceRefs = {
+      whiteboardWebSocketGateway: whiteboardWebSocketGateway,
       cacheService: cacheService,
       databaseService: databaseService,
-      whiteboardWebSocketGateway: whiteboardWebSocketGateway,
       kafkaEventProducer: kafkaEventProducer,
     };
   });

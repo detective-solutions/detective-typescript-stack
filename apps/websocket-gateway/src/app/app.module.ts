@@ -1,10 +1,4 @@
-import {
-  CacheService,
-  DatabaseService,
-  MessagePropagationService,
-  TransactionCoordinationService,
-  WhiteboardTransactionFactory,
-} from './services';
+import { CacheService, DatabaseService, MessagePropagationService, WhiteboardTransactionFactory } from './services';
 import { ClientsModule, ClientsModuleOptions } from '@nestjs/microservices';
 import { DGraphGrpcClientEnvironment, DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc-client';
 import { KafkaEventConsumer, KafkaEventProducer } from './kafka';
@@ -18,7 +12,6 @@ import { WhiteboardWebSocketGateway } from './websocket';
 import { defaultEnvConfig } from './default-env.config';
 import { environment } from '@detective.solutions/backend/shared/environments';
 import { kafkaConfig } from './kafka-config';
-import { transactionCoordinationServiceInjectionToken } from './utils';
 
 @Module({
   imports: [
@@ -51,7 +44,6 @@ import { transactionCoordinationServiceInjectionToken } from './utils';
     KafkaEventProducer,
     WhiteboardWebSocketGateway,
     MessagePropagationService,
-    { provide: transactionCoordinationServiceInjectionToken, useClass: TransactionCoordinationService },
     CacheService,
     DatabaseService,
     WhiteboardTransactionFactory,

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, Logger, forwardRef } from '@nestjs/common';
 import { TransactionServiceRefs, transactionMap } from '../models';
 
 import { CacheService } from './cache.service';
@@ -15,16 +15,17 @@ export class WhiteboardTransactionFactory {
   readonly logger = new Logger(WhiteboardTransactionFactory.name);
 
   serviceRefs: TransactionServiceRefs = {
+    whiteboardWebSocketGateway: this.whiteboardWebSocketGateway,
     cacheService: this.cacheService,
     databaseService: this.databaseService,
     kafkaEventProducer: this.kafkaEventProducer,
-    whiteboardWebSocketGateway: this.whiteboardWebSocketGateway,
   };
 
   constructor(
+    @Inject(forwardRef(() => WhiteboardWebSocketGateway))
+    private readonly whiteboardWebSocketGateway: WhiteboardWebSocketGateway,
     private readonly cacheService: CacheService,
     private readonly databaseService: DatabaseService,
-    private readonly whiteboardWebSocketGateway: WhiteboardWebSocketGateway,
     private readonly kafkaEventProducer: KafkaEventProducer
   ) {}
 

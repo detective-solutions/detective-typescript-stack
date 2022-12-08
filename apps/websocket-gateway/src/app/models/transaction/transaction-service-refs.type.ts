@@ -4,8 +4,8 @@ import { KafkaEventProducer } from '../../kafka';
 import { WhiteboardWebSocketGateway } from '../../websocket';
 
 export type TransactionServiceRefs = {
+  whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   cacheService: CacheService;
   databaseService: DatabaseService;
-  whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   kafkaEventProducer: KafkaEventProducer;
 };
