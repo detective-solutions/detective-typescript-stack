@@ -166,25 +166,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     this.sendMessageByContext(message, unicastWebSocketContext);
   }
 
-  private sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
-    this.server.clients.forEach((client: IWebSocketClient) => {
-      const clientContext = client._socket.context;
-      if (!clientContext) {
-        this.logger.error(
-          `${buildLogContext(message.context)} Cannot route message, websocket client is missing its context`
-        );
-        throw new InternalServerErrorException();
-      }
-
-      if (this.isContextMatch(message.context, clientContext, contextMatchKeys)) {
-        this.logger.verbose(
-          `${buildLogContext(message.context)} Forwarding websocket message of event type ${message.context.eventType}`
-        );
-        client.send(JSON.stringify({ event: message.context.eventType, data: message }));
-      }
-    });
-  }
-
   private async handleNewClientConnection(server: Server, info: WebSocketInfo, cb: (boolean, number, string) => void) {
     const requestUrl = info.req.url;
     this.logger.debug(`Incoming connection request on url ${requestUrl}`);
@@ -224,6 +205,14 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     } else {
       this.logger.warn(`Denied invalid connection. Cannot verify access token ${accessToken}`);
       cb(false, 401, 'Unauthorized');
+    }
+  }
+
+  private extractAccessTokenFromUrl(connectionUrl: string): string | null {
+    try {
+      return connectionUrl.split('token=')[1];
+    } catch {
+      return null;
     }
   }
 
@@ -269,18 +258,6 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     });
   }
 
-  private createSubscriberLog(messageContext: IMessageContext) {
-    return `${buildLogContext(messageContext)} Forwarding message for transaction`;
-  }
-
-  private extractAccessTokenFromUrl(connectionUrl: string): string | null {
-    try {
-      return connectionUrl.split('token=')[1];
-    } catch {
-      return null;
-    }
-  }
-
   private extractUrlPathParameter(url: string, parameterName: string): string | null {
     const splittedUrl = url.split('?')[0].split('/'); // Remove possible query parameter and split by slashes
     const parameterTitleIndex = splittedUrl.findIndex((part) => part === parameterName);
@@ -300,6 +277,25 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
       throw new InternalServerErrorException('The incoming websocket message is missing mandatory context information');
     }
     await validateDto(MessageContextDTO, context, this.logger);
+  }
+
+  private sendMessageByContext(message: IMessage<any>, contextMatchKeys: string[]) {
+    this.server.clients.forEach((client: IWebSocketClient) => {
+      const clientContext = client._socket.context;
+      if (!clientContext) {
+        this.logger.error(
+          `${buildLogContext(message.context)} Cannot route message, websocket client is missing its context`
+        );
+        throw new InternalServerErrorException();
+      }
+
+      if (this.isContextMatch(message.context, clientContext, contextMatchKeys)) {
+        this.logger.verbose(
+          `${buildLogContext(message.context)} Forwarding websocket message of event type ${message.context.eventType}`
+        );
+        client.send(JSON.stringify({ event: message.context.eventType, data: message }));
+      }
+    });
   }
 
   private isContextMatch(
