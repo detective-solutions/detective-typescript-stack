@@ -21,6 +21,7 @@ import {
   WhiteboardOptions,
 } from '@detective.solutions/shared/data-access';
 import {
+  DisplayWhiteboardNode,
   EmbeddingWhiteboardNode,
   ForceDirectedGraph,
   IWhiteboardCollaborationCursor,
@@ -36,6 +37,7 @@ import {
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
+import { DomSanitizer } from '@angular/platform-browser';
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
@@ -95,7 +97,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly whiteboardFacade: WhiteboardFacadeService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -131,14 +134,19 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onElementDrop(event: DragEvent) {
+    event.preventDefault();
     // TODO: Add interface for drag data transfer object
+    const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+    const now = formatDate(new Date());
+    const isFile = event.dataTransfer?.files.length ?? 0 > 0;
+    const defaultMargin = 50;
+    const defaultWidth = 900;
+    const defaultHeight = 500;
     const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
+
     if (!dragDataTransfer) {
       console.error('Could not extract drag data for adding whiteboard node');
     }
-
-    const now = formatDate(new Date());
-    const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
 
     // TODO: Remove these when actual node data is loaded
     const randomTitles = [
@@ -155,6 +163,40 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((context: IWhiteboardContextState) => {
+        if (isFile) {
+          for (let i = 0; i < event.dataTransfer!.files.length; i++) {
+            convertedDOMPoint.x += i === 0 ? convertedDOMPoint.x : i * (defaultMargin + defaultWidth);
+
+            const file = event.dataTransfer!.files[i];
+            const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+
+            const displayNode = DisplayWhiteboardNode.Build({
+              id: '78b4daab-dfe4-4bad-855f-ac575cc59755',
+              title: 'test',
+              fileName: 'test.pdf',
+              pageCount: 0,
+              x: convertedDOMPoint.x,
+              y: convertedDOMPoint.y,
+              width: defaultWidth,
+              height: defaultHeight,
+              locked: false,
+              file: { file, url },
+              author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+              editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+              lastUpdatedBy: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+              lastUpdated: now,
+              created: now,
+            });
+
+            this.store.dispatch(
+              WhiteboardNodeActions.WhiteboardNodeAdded({
+                addedNode: displayNode,
+                addedManually: true,
+              })
+            );
+          }
+        }
+
         if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
           // TODO: Remove when data from dragged element is used
           const tableNode = TableWhiteboardNode.Build({
@@ -162,8 +204,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
             x: convertedDOMPoint.x,
             y: convertedDOMPoint.y,
-            width: 900,
-            height: 500,
+            width: defaultWidth,
+            height: defaultHeight,
             locked: false,
             lastUpdatedBy: context.userId,
             lastUpdated: now,
@@ -188,7 +230,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             title: '',
             x: convertedDOMPoint.x,
             y: convertedDOMPoint.y,
-            width: 900,
+            width: defaultWidth,
             height: 50,
             locked: false,
             author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
