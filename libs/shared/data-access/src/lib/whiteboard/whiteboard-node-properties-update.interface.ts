@@ -1,4 +1,4 @@
 export interface IWhiteboardNodePropertiesUpdate {
   nodeId: string;
-  [key: string]: string | number | boolean | null;
+  [key: string]: string | number | boolean | null | object;
 }

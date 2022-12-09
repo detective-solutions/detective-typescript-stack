@@ -83,63 +83,6 @@ export class WhiteboardNodeEffects {
     { dispatch: false }
   );
 
-  readonly whiteboardNodeBlocked$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeBlocked),
-        switchMap((action) =>
-          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
-        ),
-        tap(([context, action]) => {
-          this.whiteboardFacade.sendWebsocketMessage({
-            event: MessageEventType.WhiteboardNodeBlocked,
-            data: {
-              context: {
-                ...context,
-                eventType: MessageEventType.WhiteboardNodeBlocked,
-                userId: context.userId,
-                nodeId: action.update.id,
-              } as IMessageContext,
-              body: {
-                temporary: { blockedBy: action.update.changes.temporary?.blockedBy },
-              },
-            },
-          });
-        })
-      );
-    },
-    { dispatch: false }
-  );
-
-  readonly whiteboardNodeUnBlocked$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(WhiteboardNodeActions.WhiteboardNodeUnblocked),
-        switchMap((action) =>
-          combineLatest([this.store.select(selectWhiteboardContextState).pipe(take(1)), of(action).pipe(take(1))])
-        ),
-        tap(([context, action]) => {
-          // Use WHITEBOARD_NODE_BLOCKED event type with null value to be handled by the backend
-          this.whiteboardFacade.sendWebsocketMessage({
-            event: MessageEventType.WhiteboardNodeBlocked,
-            data: {
-              context: {
-                ...context,
-                eventType: MessageEventType.WhiteboardNodeBlocked,
-                nodeId: action.update.id,
-                userId: context.userId,
-              } as IMessageContext,
-              body: {
-                temporary: { blockedBy: null },
-              },
-            },
-          });
-        })
-      );
-    },
-    { dispatch: false }
-  );
-
   readonly whiteboardNodePropertiesUpdated$ = createEffect(
     () => {
       return this.actions$.pipe(

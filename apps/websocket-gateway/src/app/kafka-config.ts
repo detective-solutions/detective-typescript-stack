@@ -13,11 +13,7 @@ export const kafkaConfig = {
       },
     },
     consumer: {
-      groupId:
-        // Currently, each gateway needs to be in its own consumer group!
-        // This way it can be ensured that each gateway consumes all incoming events and has the chance to forward
-        // them to connected webclients within an applicable context
-        process.env.KAFKA_CONSUMER_GROUP_ID ?? `websocket-gateway-consumer-group-${Math.floor(Math.random() * 12)}`,
+      groupId: process.env.KAFKA_CONSUMER_GROUP_ID ?? 'websocket-gateway-consumer-group',
     },
   },
 };

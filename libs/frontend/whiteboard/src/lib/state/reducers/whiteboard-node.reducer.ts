@@ -30,15 +30,6 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeDeletedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.removeOne(action.deletedNodeId, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeBlocked, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeUnblocked, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeBlockedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
   on(WhiteboardNodeActions.WhiteboardUnblockAllNodesOnUserLeft, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
