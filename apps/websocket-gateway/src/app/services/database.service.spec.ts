@@ -280,4 +280,110 @@ describe('DatabaseService', () => {
       expect(sendQuerySpy).toBeCalledTimes(1);
     });
   });
+
+  describe('saveCasefile', () => {
+    const cachedCasefile: ICachableCasefileForWhiteboard = {
+      id: uuidv4(),
+      title: 'testCasefile',
+      description: 'test',
+      nodes: [
+        {
+          id: uuidv4(),
+          type: WhiteboardNodeType.TABLE,
+          title: '',
+          locked: null,
+          width: 100,
+          height: 100,
+          x: 100,
+          y: 100,
+          author: uuidv4(),
+          lastUpdatedBy: uuidv4(),
+          created: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+        },
+        {
+          id: uuidv4(),
+          type: WhiteboardNodeType.EMBEDDING,
+          title: '',
+          locked: null,
+          width: 100,
+          height: 100,
+          x: 100,
+          y: 100,
+          author: uuidv4(),
+          editors: [],
+          lastUpdatedBy: uuidv4(),
+          created: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+        },
+      ],
+      temporary: { activeUsers: [] },
+    };
+
+    const savedCasefile = {
+      ...cachedCasefile,
+      nodes: [
+        {
+          id: uuidv4(),
+          type: WhiteboardNodeType.TABLE,
+          title: '',
+          locked: null,
+          width: 100,
+          height: 100,
+          x: 100,
+          y: 100,
+          author: uuidv4(),
+          lastUpdatedBy: uuidv4(),
+          created: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+        },
+      ],
+    };
+
+    it('should correctly create all available mutation objects and send them to the database', async () => {
+      const getUuidByTypeMock = jest
+        .spyOn(DatabaseService.prototype, 'getUidByType')
+        .mockResolvedValueOnce('ux1d')
+        .mockResolvedValueOnce('ux2d')
+        .mockResolvedValueOnce('ux3d')
+        .mockResolvedValueOnce('ux4d');
+      const getCachableCasefileByIdMock = jest
+        .spyOn(DatabaseService.prototype, 'getCachableCasefileById')
+        .mockResolvedValue(savedCasefile);
+      const getDeleteNodeInCasefileMutationMock = jest
+        .spyOn(DatabaseService.prototype, 'getDeleteNodeInCasefileMutation')
+        .mockResolvedValue({ uid: '1xus' });
+      const getTableOccurrenceToCasefileMutationMock = jest
+        .spyOn(DatabaseService.prototype, 'getTableOccurrenceToCasefileMutation')
+        .mockResolvedValue({
+          uid: '1xus',
+          xid: uuidv4(),
+          title: 'title',
+          entity: { uid: '1xu1' },
+          casefile: { uid: 'ux1d', 'Casefile.tables': { uid: '2xu1' } },
+        });
+
+      await databaseService.saveCasefile(cachedCasefile);
+
+      expect(getUuidByTypeMock).toHaveBeenCalledTimes(4);
+      expect(getCachableCasefileByIdMock).toHaveBeenCalledTimes(1);
+      expect(getDeleteNodeInCasefileMutationMock).toHaveBeenCalledTimes(1);
+      expect(getTableOccurrenceToCasefileMutationMock).toHaveBeenCalledTimes(1);
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('should thrown an exception if no casefile uid could be determined', () => {});
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('should thrown an exception if the deleted nodes could not be determined', () => {});
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('should thrown an exception if the node mutations array could not be created correctly', () => {});
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('should thrown an exception if a casefile metadata mutation could not be created correctly', () => {});
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('should continue with creating further mutations even if one mutation type fails', () => {});
+  });
 });
