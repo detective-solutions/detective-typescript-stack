@@ -9,9 +9,9 @@ import { WhiteboardNodeDeletedTransaction } from './whiteboard-node-deleted.tran
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const produceKafkaEventMethodName = 'produceKafkaEvent';
-const kafkaEventProducerMock = {
-  [produceKafkaEventMethodName]: jest.fn(),
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
 const deleteNodeMethodName = 'deleteNode';
@@ -32,7 +32,7 @@ const testMessagePayload: IMessage<void> = {
   body: null,
 };
 
-xdescribe('WhiteboardNodeDeletedTransaction', () => {
+describe('WhiteboardNodeDeletedTransaction', () => {
   let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -42,10 +42,10 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
+        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -67,7 +67,10 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const deleteNodeSpy = jest.spyOn(cacheService, deleteNodeMethodName);
 
       const transaction = new WhiteboardNodeDeletedTransaction(serviceRefs, testMessagePayload);
@@ -75,8 +78,8 @@ xdescribe('WhiteboardNodeDeletedTransaction', () => {
 
       await transaction.execute();
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
       expect(deleteNodeSpy).toBeCalledTimes(1);
       expect(deleteNodeSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.nodeId);
     });

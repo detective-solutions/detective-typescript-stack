@@ -9,9 +9,9 @@ import { WhiteboardTitleFocusedTransaction } from './whiteboard-title-focused.tr
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const produceKafkaEventMethodName = 'produceKafkaEvent';
-const kafkaEventProducerMock = {
-  [produceKafkaEventMethodName]: jest.fn(),
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
 const updateCasefileTitleMethodName = 'updateCasefileTitleFocus';
@@ -33,7 +33,7 @@ const testMessagePayload: IMessage<string | null> = {
   body: testMessageContext.userId,
 };
 
-xdescribe('WhiteboardTitleFocusedTransaction', () => {
+describe('WhiteboardTitleFocusedTransaction', () => {
   let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -43,10 +43,10 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
+        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -68,15 +68,18 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        whiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
 
       const transaction = new WhiteboardTitleFocusedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
@@ -90,7 +93,10 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
     });
 
     it('should still execute transaction if messageBody is null', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        whiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const modifiedMessagePayload = { context: testMessageContext, body: null };
 
       const transaction = new WhiteboardTitleFocusedTransaction(serviceRefs, modifiedMessagePayload);
@@ -98,12 +104,12 @@ xdescribe('WhiteboardTitleFocusedTransaction', () => {
 
       await transaction.execute();
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(modifiedMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(modifiedMessagePayload);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
-      jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName).mockImplementation(() => {
+      jest.spyOn(whiteboardWebSocketGateway, sendPropagatedBroadcastMessageMethodName).mockImplementation(() => {
         throw new Error();
       });
 

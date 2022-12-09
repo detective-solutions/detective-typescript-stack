@@ -97,38 +97,38 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
   }
 
   @SubscribeMessage(MessageEventType.LoadWhiteboardData)
-  async onWhiteboardTransactionalEvent(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+  async onLoadWhiteboardData(@MessageBody() message: IMessage<any>) {
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodeAdded)
   async onWhiteboardNodeAdded(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodeDeleted)
   async onWhiteboardNodeDeleted(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardNodePropertiesUpdated)
   async onWhiteboardNodePropertiesUpdated(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardTitleFocused)
   async onWhiteboardTitleFocused(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.WhiteboardTitleUpdated)
   async onWhiteboardTitleUpdated(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @SubscribeMessage(MessageEventType.QueryTable)
   async onQueryTable(@MessageBody() message: IMessage<any>) {
-    this.convertMessageToWhiteboardTransaction(message);
+    await this.convertMessageToWhiteboardTransaction(message);
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)

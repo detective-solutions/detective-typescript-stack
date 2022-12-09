@@ -14,9 +14,9 @@ import { WhiteboardNodePropertiesUpdatedTransaction } from './whiteboard-node-pr
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const produceKafkaEventMethodName = 'produceKafkaEvent';
-const kafkaEventProducerMock = {
-  [produceKafkaEventMethodName]: jest.fn(),
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
 const updateNodePropertiesMethodName = 'updateNodeProperties';
@@ -45,8 +45,7 @@ const testMessagePayload: IMessage<IWhiteboardNodePropertiesUpdate[]> = {
   body: testMessageBody,
 };
 
-// TODO: Reactivate me!
-xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
+describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
   let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -56,10 +55,10 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
+        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -81,7 +80,10 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const updateNodePropertiesSpy = jest.spyOn(cacheService, updateNodePropertiesMethodName);
 
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
@@ -93,15 +95,17 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       expect(updateNodePropertiesSpy).toBeCalledWith(
         testMessageContext.casefileId,
         testMessageContext.userId,
-        testMessageBody[0].nodeId,
-        testMessageBody[0]
+        testMessageBody
       );
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
     });
 
     it('should retry the cache update if it fails once', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const updateNodePropertiesSpy = jest
         .spyOn(cacheService, updateNodePropertiesMethodName)
         .mockImplementationOnce(() => {
@@ -113,23 +117,21 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
       await transaction.execute();
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(testMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
 
       expect(updateNodePropertiesSpy).toBeCalledTimes(2);
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         1,
         testMessageContext.casefileId,
         testMessageContext.userId,
-        testMessageBody[0].nodeId,
-        testMessageBody[0]
+        testMessageBody
       );
       expect(updateNodePropertiesSpy).toHaveBeenNthCalledWith(
         2,
         testMessageContext.casefileId,
         testMessageContext.userId,
-        testMessageBody[0].nodeId,
-        testMessageBody[0]
+        testMessageBody
       );
     });
 
@@ -146,7 +148,7 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
     it('should throw an InternalServerException if the given message is missing a body', async () => {
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
-        ...testMessagePayload,
+        context: testMessageContext,
         body: undefined,
       });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
@@ -156,8 +158,8 @@ xdescribe('WhiteboardNodePropertiesUpdatedTransaction', () => {
 
     it('should throw an InternalServerException if the given message context is missing a node id', async () => {
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
-        ...testMessagePayload,
-        context: { ...testMessageContext, nodeId: undefined },
+        context: testMessageContext,
+        body: [{ ...testMessagePayload, nodeId: undefined }],
       });
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 

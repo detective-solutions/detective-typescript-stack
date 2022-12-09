@@ -45,7 +45,7 @@ const testCachableCasefile: ICachableCasefileForWhiteboard = {
   temporary: { activeUsers: [] },
 };
 
-xdescribe('WhiteboardSaveTransaction', () => {
+describe('WhiteboardSaveTransaction', () => {
   let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;

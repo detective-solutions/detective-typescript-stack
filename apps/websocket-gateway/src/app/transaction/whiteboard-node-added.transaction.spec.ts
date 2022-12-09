@@ -17,9 +17,9 @@ import { WhiteboardWebSocketGateway } from '../websocket';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const produceKafkaEventMethodName = 'produceKafkaEvent';
-const kafkaEventProducerMock = {
-  [produceKafkaEventMethodName]: jest.fn(),
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
 const addNodeMethodName = 'addNode';
@@ -57,7 +57,7 @@ const testEventPayload: IMessage<ITableWhiteboardNode> = {
   body: testMessageBody,
 };
 
-xdescribe('WhiteboardNodeAddedTransaction', () => {
+describe('WhiteboardNodeAddedTransaction', () => {
   let whiteboardWebSocketGateway: WhiteboardWebSocketGateway;
   let cacheService: CacheService;
   let databaseService: DatabaseService;
@@ -67,10 +67,10 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
+        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -90,9 +90,12 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
     jest.resetAllMocks();
   });
 
-  xdescribe('execute', () => {
+  describe('execute', () => {
     it('should correctly execute transaction', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
       const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testEventPayload);
@@ -100,14 +103,17 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
 
       await transaction.execute();
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toBeCalledWith(testEventPayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testEventPayload);
       expect(addNodeSpy).toBeCalledTimes(1);
       expect(addNodeSpy).toBeCalledWith(testEventPayload.context.casefileId, testEventPayload.body);
     });
 
     it('should throw an InternalServerErrorException if the given message is missing a body', async () => {
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
       const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, {
@@ -118,7 +124,7 @@ xdescribe('WhiteboardNodeAddedTransaction', () => {
 
       await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(0);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(0);
       expect(addNodeSpy).toBeCalledTimes(0);
     });
 
