@@ -8,9 +8,9 @@ import { WhiteboardUserLeftTransaction } from './whiteboard-user-left.transactio
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendKafkaMessageMethodName = 'produceKafkaEvent';
-const kafkaEventProducerMock = {
-  [sendKafkaMessageMethodName]: jest.fn(),
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
 const removeActiveWhiteboardUserMethodName = 'removeActiveUser';
@@ -43,10 +43,10 @@ describe('WhiteboardUserLeftTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
+        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -76,18 +76,23 @@ describe('WhiteboardUserLeftTransaction', () => {
     expect(whiteboardUserLeftTransaction).toBeDefined();
   });
 
-  xdescribe('execute', () => {
-    it('should correctly load casefile data from database if no cache exists', async () => {
-      const removeActiveWhiteboardUserSpy = jest.spyOn(cacheService, removeActiveWhiteboardUserMethodName);
-      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, sendKafkaMessageMethodName);
+  describe('execute', () => {
+    it('should correctly execute transaction', async () => {
+      const removeActiveWhiteboardUserSpy = jest
+        .spyOn(cacheService, removeActiveWhiteboardUserMethodName)
+        .mockResolvedValue('OK');
+      const sendPropagatedBroadcastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedBroadcastMessageMethodName
+      );
 
       await whiteboardUserLeftTransaction.execute();
 
       expect(removeActiveWhiteboardUserSpy).toBeCalledTimes(1);
       expect(removeActiveWhiteboardUserSpy).toBeCalledWith(testMessageContext.casefileId, testMessageContext.userId);
 
-      expect(produceKafkaEventSpy).toBeCalledTimes(1);
-      expect(produceKafkaEventSpy).toHaveBeenLastCalledWith(testMessagePayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
+      expect(sendPropagatedBroadcastMessageSpy).toHaveBeenLastCalledWith(testMessagePayload);
     });
 
     it('should throw an InternalServerException if any error occurs during the transaction', async () => {
