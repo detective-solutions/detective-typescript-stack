@@ -9,7 +9,7 @@ export interface IEmbedding {
   height: number;
   locked: boolean;
   author: string;
-  editors: IUser[];
+  editors?: IUser[];
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;
