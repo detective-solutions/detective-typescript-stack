@@ -6,6 +6,7 @@ import {
   WhiteboardSelectionService,
 } from './services/internal-services';
 import {
+  DisplayNodeComponent,
   EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
@@ -16,6 +17,7 @@ import {
   TopbarComponent,
 } from './components';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { UploadService, WhiteboardFacadeService } from './services';
 import {
   WHITEBOARD_STORE_NAME,
   WhiteboardGeneralEffects,
@@ -32,7 +34,6 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardContextResolver } from './resolvers';
-import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
@@ -63,11 +64,13 @@ import { whiteboardFeatureReducers } from './state/reducers';
     TestLinkComponent,
     TableNodeComponent,
     EmbeddingNodeComponent,
+    DisplayNodeComponent,
     IFrameTrackerDirective,
   ],
   providers: [
     WhiteboardContextResolver,
     WhiteboardFacadeService,
+    UploadService,
     BufferService,
     D3AdapterService,
     DragService,

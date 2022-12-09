@@ -20,6 +20,7 @@
       <ng-container [ngSwitch]="node.type">
         <g *ngSwitchCase="nodeType.TABLE" tableNode [node]="node"></g>
         <g *ngSwitchCase="nodeType.EMBEDDING" embeddingNode [node]="node"></g>
+        <g *ngSwitchCase="nodeType.DISPLAY" displayNode [node]="node"></g>
       </ng-container>
     </ng-container>
     <g id="collaboration-cursors-wrapper">

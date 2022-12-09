@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion*/
+
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -39,6 +42,7 @@ import {
   take,
   tap,
 } from 'rxjs';
+import { UploadService, WhiteboardFacadeService } from '../../services';
 import {
   WhiteboardGeneralActions,
   WhiteboardMetadataActions,
@@ -48,10 +52,11 @@ import {
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
+import { DisplayWhiteboardNode } from '../../models/display';
+import { DomSanitizer } from '@angular/platform-browser';
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
-import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -103,8 +108,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private readonly whiteboardFacade: WhiteboardFacadeService,
+    private readonly uploadService: UploadService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -140,83 +147,154 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onElementDrop(event: DragEvent) {
+    event.preventDefault();
     // TODO: Add interface for drag data transfer object
-    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
-    if (!dragDataTransfer) {
-      console.error('Could not extract drag data for adding whiteboard node');
-    }
-
-    const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+    const now = formatDate(new Date());
+    const isFile = event.dataTransfer?.files.length ?? 0 > 0;
+    const defaultMargin = 50;
+    const defaultWidth = 900;
+    const defaultHeight = 500;
 
-    // TODO: Remove these when actual node data is loaded
-    const randomTitles = [
-      'Clue 1',
-      'I am a randomly chosen title',
-      'Clue 2',
-      'Find suspicious content',
-      'Clue 3',
-      'Suspicious data',
-      '',
-    ];
+    if (isFile) {
+      for (let i = 0; i < event.dataTransfer!.files.length; i++) {
+        convertedDOMPoint.x += i === 0 ? convertedDOMPoint.x : i * (defaultMargin + defaultWidth);
 
-    this.store
-      .select(selectWhiteboardContextState)
-      .pipe(take(1))
-      .subscribe((context: IWhiteboardContextState) => {
-        if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
-          // TODO: Remove when data from dragged element is used
-          const tableNode = TableWhiteboardNode.Build({
-            id: uuidv4(),
-            title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: 900,
-            height: 500,
-            locked: false,
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-            entity: {
-              id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
-            },
-          });
+        const file = event.dataTransfer!.files[i];
+        const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
 
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: tableNode,
-              addedManually: true,
-            })
-          );
-        }
+        const displayNode = DisplayWhiteboardNode.Build({
+          id: '78b4daab-dfe4-4bad-855f-ac575cc59755',
+          title: 'test',
+          fileName: 'test.pdf',
+          pageCount: 0,
+          x: convertedDOMPoint.x,
+          y: convertedDOMPoint.y,
+          width: defaultWidth,
+          height: defaultHeight,
+          locked: false,
+          file: { file, url },
+          author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+          editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+          lastUpdatedBy: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+          lastUpdated: now,
+          created: now,
+        });
 
-        if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
-          // TODO: Remove when data from dragged element is used
-          const href = 'google.com';
-          const embeddingNode = EmbeddingWhiteboardNode.Build({
-            id: uuidv4(),
-            title: href,
-            href: href,
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: 900,
-            height: 500,
-            locked: false,
-            author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-            editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-          });
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeAdded({
+            addedNode: displayNode,
+            addedManually: true,
+          })
+        );
+      }
+    } else {
+      const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
 
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: embeddingNode,
-              addedManually: true,
-            })
-          );
-        }
-      });
+      if (!dragDataTransfer) {
+        console.error('Could not extract drag data for adding whiteboard node');
+      }
+
+      // TODO: Remove these when actual node data is loaded
+      const randomTitles = [
+        'Clue 1',
+        'I am a randomly chosen title',
+        'Clue 2',
+        'Find suspicious content',
+        'Clue 3',
+        'Suspicious data',
+        '',
+      ];
+
+      this.store
+        .select(selectWhiteboardContextState)
+        .pipe(take(1))
+        .subscribe((context: IWhiteboardContextState) => {
+          if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
+            // TODO: Remove when data from dragged element is used
+            const tableNode = TableWhiteboardNode.Build({
+              id: uuidv4(),
+              title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+              x: convertedDOMPoint.x,
+              y: convertedDOMPoint.y,
+              width: 900,
+              height: 500,
+              locked: false,
+              lastUpdatedBy: context.userId,
+              lastUpdated: now,
+              created: now,
+              entity: {
+                id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
+              },
+            });
+
+            this.store.dispatch(
+              WhiteboardNodeActions.WhiteboardNodeAdded({
+                addedNode: tableNode,
+                addedManually: true,
+              })
+            );
+          }
+
+          if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
+            // TODO: Remove when data from dragged element is used
+            const href = 'google.com';
+            const embeddingNode = EmbeddingWhiteboardNode.Build({
+              id: uuidv4(),
+              title: href,
+              href: href,
+              x: convertedDOMPoint.x,
+              y: convertedDOMPoint.y,
+              width: 900,
+              height: 500,
+              locked: false,
+              author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+              editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+              lastUpdatedBy: context.userId,
+              lastUpdated: now,
+              created: now,
+            });
+
+            this.store.dispatch(
+              WhiteboardNodeActions.WhiteboardNodeAdded({
+                addedNode: embeddingNode,
+                addedManually: true,
+              })
+            );
+          }
+
+          if (dragDataTransfer)
+            if (
+              dragDataTransfer.type !== WhiteboardNodeType.TABLE &&
+              dragDataTransfer.type !== WhiteboardNodeType.EMBEDDING
+            ) {
+              // TODO: Remove when data from dragged element is used
+              this.uploadService.fileUpload(event);
+              const tableNode = TableWhiteboardNode.Build({
+                id: uuidv4(),
+                title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+                x: convertedDOMPoint.x,
+                y: convertedDOMPoint.y,
+                width: 900,
+                height: 500,
+                locked: false,
+                lastUpdatedBy: context.userId,
+                lastUpdated: now,
+                created: now,
+                entity: {
+                  id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
+                },
+              });
+
+              this.store.dispatch(
+                WhiteboardNodeActions.WhiteboardNodeAdded({
+                  addedNode: tableNode,
+                  addedManually: true,
+                })
+              );
+            }
+        });
+    }
   }
 
   trackCollaborationCursorByUserId(_index: number, collaborationCursor: IWhiteboardCollaborationCursor) {
