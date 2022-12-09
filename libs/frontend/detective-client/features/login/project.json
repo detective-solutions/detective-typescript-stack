@@ -1,14 +1,15 @@
 {
+  "name": "frontend-detective-client-features-login",
+  "$schema": "../../../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "root": "libs/frontend/detective-client/features/login",
   "sourceRoot": "libs/frontend/detective-client/features/login/src",
   "prefix": "detective-typescript-stack",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/frontend/detective-client/features/login"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/detective-client/features/login"],
       "options": {
-        "jestConfig": "libs/frontend/detective-client/features/login/jest.config.js",
+        "jestConfig": "libs/frontend/detective-client/features/login/jest.config.ts",
         "passWithNoTests": true
       }
     },

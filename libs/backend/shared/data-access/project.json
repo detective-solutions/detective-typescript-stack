@@ -19,5 +19,6 @@
       }
     }
   },
-  "tags": ["scope:backend", "scope:backend-shared", "type:data-access"]
+  "tags": ["scope:backend", "scope:backend-shared", "type:data-access"],
+  "name": "backend-shared-data-access"
 }

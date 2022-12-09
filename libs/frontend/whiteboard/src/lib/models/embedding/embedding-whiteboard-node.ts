@@ -12,14 +12,13 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
   constructor(
     public id: string,
     public title: string,
-    public href: string,
     public x: number,
     public y: number,
     public width: number,
     public height: number,
     public locked: boolean,
     public author: string,
-    public editors: IUser[],
+    public editors: IUser[] | undefined,
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,
@@ -31,7 +30,6 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
       return new EmbeddingWhiteboardNode(
         nodeInput.id,
         nodeInput.title,
-        nodeInput.href,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,

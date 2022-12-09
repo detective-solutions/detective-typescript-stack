@@ -1,13 +1,12 @@
-/* eslint-disable sort-imports */
 import { Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Observable, map, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { SubscriptionService } from '../../../services';
-import { map, Observable, take } from 'rxjs';
 import { IGetAllProductResponse } from '../../../models';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { MatDialogRef } from '@angular/material/dialog';
+import { SubscriptionService } from '../../../services';
 
 @Component({
   selector: 'subscriptions-upgrade-dialog',
@@ -15,8 +14,7 @@ import { IGetAllProductResponse } from '../../../models';
   templateUrl: './subscriptions-upgrade-dialog.component.html',
 })
 export class SubscriptionUpgradeDialogComponent {
-  isSubmitting = false;
-  selectedPlan = '';
+  @ViewChildren('upgradeCard', { read: ElementRef }) upgradeCards!: QueryList<ElementRef>;
 
   availablePlans$: Observable<IGetAllProductResponse> = this.subscriptionService.getAllProductPlan().pipe(
     map((response: IGetAllProductResponse) => {
@@ -26,7 +24,8 @@ export class SubscriptionUpgradeDialogComponent {
     })
   );
 
-  @ViewChildren('upgradeCard', { read: ElementRef }) upgradeCards!: QueryList<ElementRef>;
+  isSubmitting = false;
+  selectedPlan = '';
 
   constructor(
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,

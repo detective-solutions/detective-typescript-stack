@@ -33,7 +33,7 @@ export class WhiteboardFacadeService {
   readonly isDragging$ = this.dragService.isDragging$;
   readonly whiteboardSelection$ = this.whiteboardSelectionService.whiteboardSelection$;
 
-  initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: Element) {
+  initializeWhiteboard(whiteboardContainerElement: Element, zoomContainerElement: SVGGraphicsElement) {
     this.d3AdapterService.applyZoomBehavior(whiteboardContainerElement, zoomContainerElement);
     this.webSocketService.establishWebsocketConnection();
   }
@@ -59,6 +59,10 @@ export class WhiteboardFacadeService {
     this.d3AdapterService.applyDragBehavior(component.elementRef.nativeElement, component.node, currentUserId);
   }
 
+  applyResizeBehaviorToComponent(component: NodeComponent) {
+    this.d3AdapterService.applyResizeBehavior(component.node);
+  }
+
   activateDragging() {
     this.dragService.activateDragging();
   }
@@ -71,12 +75,12 @@ export class WhiteboardFacadeService {
     this.dragService.removeDelayedDragHandling();
   }
 
-  addToNodeUpdateBuffer(node: AnyWhiteboardNode) {
-    this.bufferService.addToNodeUpdateBuffer(node);
+  addToNodePositionBuffer(node: AnyWhiteboardNode) {
+    this.bufferService.addToNodePositionBuffer(node);
   }
 
   updateNodesFromBuffer() {
-    this.bufferService.updateNodesFromBuffer();
+    this.bufferService.updateNodePositionsFromBuffer();
   }
 
   sendWebsocketMessage(message: EventBasedWebSocketMessage) {

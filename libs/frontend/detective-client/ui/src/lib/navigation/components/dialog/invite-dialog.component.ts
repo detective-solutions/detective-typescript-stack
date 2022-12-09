@@ -1,18 +1,14 @@
-/* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { take } from 'rxjs';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { environment } from '@detective.solutions/frontend/shared/environments';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { ISendInviteInput } from '../../interfaces';
-
-export interface DialogData {
-  email: string;
-}
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { environment } from '@detective.solutions/frontend/shared/environments';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'invite-dialog',
@@ -23,7 +19,7 @@ export class InviteDialogComponent {
   isSubmitting = false;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    @Inject(MAT_DIALOG_DATA) public data: ISendInviteInput,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly httpClient: HttpClient,

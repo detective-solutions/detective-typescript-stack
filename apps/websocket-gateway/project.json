@@ -1,17 +1,19 @@
 {
-  "root": "apps/websocket-gateway",
+  "name": "websocket-gateway",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/websocket-gateway/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/websocket-gateway",
         "main": "apps/websocket-gateway/src/main.ts",
         "tsConfig": "apps/websocket-gateway/tsconfig.app.json",
-        "assets": ["apps/websocket-gateway/src/assets"],
-        "generatePackageJson": true
+        "generatePackageJson": true,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -42,9 +44,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/websocket-gateway"],
+      "outputs": ["{workspaceRoot}/coverage/apps/websocket-gateway"],
       "options": {
-        "jestConfig": "apps/websocket-gateway/jest.config.js",
+        "jestConfig": "apps/websocket-gateway/jest.config.ts",
         "passWithNoTests": true
       }
     }

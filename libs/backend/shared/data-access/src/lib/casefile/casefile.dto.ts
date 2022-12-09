@@ -6,6 +6,8 @@ import { TableOccurrenceDTO } from '../table';
 import { Type } from 'class-transformer';
 import { UserQueryOccurrenceDTO } from '../user-query';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export class CasefileDTO implements ICasefile {
   @IsUUID()
   @IsNotEmpty()

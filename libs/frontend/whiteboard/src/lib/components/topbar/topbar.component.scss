@@ -28,6 +28,7 @@ $active-user-avatar-size: 32px;
     background: none;
     border: none;
     text-overflow: ellipsis;
+    outline: none;
 
     &:disabled {
       color: gray;

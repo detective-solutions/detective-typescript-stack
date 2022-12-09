@@ -1,7 +1,16 @@
-/* eslint-disable sort-imports */
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription, filter, map, take, combineLatest, shareReplay } from 'rxjs';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import {
+  IGetAllUsersResponse,
+  IGetChangePaymentResponse,
+  IGetProductResponse,
+  IGetSubscriptionPaymentResponse,
+  IInvoice,
+  IInvoiceListResponse,
+  IInvoiceTableDef,
+  SubscriptionClickEvent,
+  SubscriptionDialogComponent,
+} from '../../models';
 import {
   ITableCellEvent,
   ITableInput,
@@ -9,21 +18,12 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ComponentType } from '@angular/cdk/portal';
-import {
-  IInvoiceTableDef,
-  IInvoice,
-  IInvoiceListResponse,
-  SubscriptionClickEvent,
-  SubscriptionDialogComponent,
-  IGetAllUsersResponse,
-  IGetProductResponse,
-  IGetSubscriptionPaymentResponse,
-  IGetChangePaymentResponse,
-} from '../../models';
-import { SubscriptionService } from '../../services';
+import { Observable, Subscription, combineLatest, filter, map, shareReplay, take } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { SubscriptionCancelDialogComponent, SubscriptionUpgradeDialogComponent } from './dialog';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+import { ComponentType } from '@angular/cdk/portal';
+import { SubscriptionService } from '../../services';
 
 @Component({
   selector: 'subscriptions',
@@ -31,8 +31,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   styleUrls: ['./subscriptions.component.scss'],
 })
 export class SubscriptionsComponent implements OnInit, OnDestroy {
-  readonly pageSize = 10;
-
   readonly activeUsers$: Observable<number> = this.subscriptionService
     .getAllUsers()
     .pipe(map((response: IGetAllUsersResponse) => response.totalElementsCount));
@@ -44,19 +42,20 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
+  readonly downloadButtonClick$ = this.tableCellEventService.iconButtonClicks$.pipe(
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === SubscriptionClickEvent.DOWNLOAD_INVOICE),
+    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
+  );
+
   tableItems$!: Observable<ITableInput>;
   totalElementsCount$!: Observable<number>;
   paymentMethod$!: Observable<IGetSubscriptionPaymentResponse>;
   productInfo$!: Observable<IGetProductResponse>;
   userRatio$!: Observable<number>;
 
+  readonly pageSize = 10;
+
   private readonly subscriptions = new Subscription();
-
-  readonly downloadButtonClick$ = this.tableCellEventService.iconButtonClicks$.pipe(
-    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === SubscriptionClickEvent.DOWNLOAD_INVOICE),
-    map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
-  );
-
   private readonly dialogDefaultConfig = {
     width: '650px',
     minWidth: '400px',

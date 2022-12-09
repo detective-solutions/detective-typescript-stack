@@ -1,4 +1,3 @@
-/* eslint-disable sort-imports */
 import { Mutation, gql } from 'apollo-angular';
 
 import { Injectable } from '@angular/core';

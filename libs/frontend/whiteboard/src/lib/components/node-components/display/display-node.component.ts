@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-
-import { AnyWhiteboardNode } from '@detective.solutions/shared/data-access';
+import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
-import { filter } from 'rxjs';
-import { selectWhiteboardNodeById } from '../../../state';
+import { filter, map, switchMap } from 'rxjs';
+import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
   selector: '[displayNode]',
@@ -12,18 +11,45 @@ import { selectWhiteboardNodeById } from '../../../state';
   encapsulation: ViewEncapsulation.None,
 })
 export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
-  ngOnInit() {
-    // Node update subscription needs to be defined here, otherwise this.id would be undefined
+  protected override customOnInit() {
     this.subscriptions.add(
-      this.store
-        .select(selectWhiteboardNodeById(this.node.id))
-        .pipe(filter(Boolean))
-        .subscribe((updatedNode: AnyWhiteboardNode) => {
-          // WARNING: It is not possible to simply reassign this.node reference when updating the node values
-          // Currently the rendering will break due to some conflicts between HTML and SVG handling
-          this.updateExistingNodeObject(updatedNode);
-          this.nodeUpdates$.next(updatedNode);
-        })
+      this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+            updates: [{ id: this.node.id, changes: { title: updatedTitle } }],
+          })
+        )
+      )
     );
+
+    // Listen to QUERY_TABLE websocket message events
+    this.subscriptions.add(
+      this.whiteboardFacade.getWebSocketSubjectAsync$
+        .pipe(
+          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.QueryTable)),
+          filter((message: IMessage<any>) => message.context.nodeId === this.node.id),
+          map((message: IMessage<any>) => message?.body)
+        )
+        .subscribe((x) => console.log(x))
+      /*
+        .subscribe((messageData: IQueryResponseBody) => {
+          this.store.dispatch(
+            DisplayNodeActions.TableDataReceived({
+              update: {
+                id: this.node.id,
+                changes: { temporary: { colDefs: messageData.tableSchema, rowData: messageData.tableData } },
+              },
+            })
+          );
+        })*/
+    );
+
+    // const isTemporaryTableDataAvailable =
+    //   !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
+    // if (isTemporaryTableDataAvailable) {
+    //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
+    //   // when it is handled by the state mechanism
+    //   this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
+    // }
   }
 }

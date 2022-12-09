@@ -1,22 +1,22 @@
-/* eslint-disable sort-imports */
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './dialog';
+import { GroupsClickEvent, GroupsDialogComponent } from '../../models';
 import {
   ITableCellEvent,
   ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subject, Subscription, map, shareReplay, take, filter } from 'rxjs';
-import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { IGroupTableDef } from '../../models/groups-table.interface';
-import { UsersService } from '../../services';
-import { IGetAllUserGroupsResponse } from '../../models/get-all-user-groups-response.interface';
-import { IUserGroup } from '@detective.solutions/shared/data-access';
-import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './dialog';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { GroupsClickEvent, GroupsDialogComponent } from '../../models';
+import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
+import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+
 import { ComponentType } from '@angular/cdk/portal';
+import { IGetAllUserGroupsResponse } from '../../models/get-all-user-groups-response.interface';
+import { IGroupTableDef } from '../../models/groups-table.interface';
+import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { UsersService } from '../../services';
 
 @Component({
   selector: 'groups',

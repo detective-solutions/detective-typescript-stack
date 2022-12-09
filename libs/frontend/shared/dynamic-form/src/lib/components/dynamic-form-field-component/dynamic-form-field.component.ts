@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 
 import { BaseFormField } from '../../models';
 import { DynamicFormControlService } from '../../services';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'dynamic-form-field',
@@ -11,7 +11,7 @@ import { FormGroup } from '@angular/forms';
 })
 export class DynamicFormFieldComponent {
   @Input() formFieldDefinition!: BaseFormField<string | boolean>;
-  @Input() form!: FormGroup;
+  @Input() form!: UntypedFormGroup;
 
   get isValid() {
     return this.form.controls[this.formFieldDefinition.key].valid;

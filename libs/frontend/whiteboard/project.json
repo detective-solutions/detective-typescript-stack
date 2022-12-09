@@ -1,5 +1,6 @@
 {
-  "root": "libs/frontend/whiteboard",
+  "name": "frontend-whiteboard",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/whiteboard/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/frontend/whiteboard"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/whiteboard"],
       "options": {
-        "jestConfig": "libs/frontend/whiteboard/jest.config.js",
+        "jestConfig": "libs/frontend/whiteboard/jest.config.ts",
         "passWithNoTests": true
       }
     }

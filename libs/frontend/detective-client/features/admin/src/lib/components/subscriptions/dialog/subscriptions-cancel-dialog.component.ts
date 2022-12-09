@@ -1,11 +1,11 @@
-/* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
-import { take } from 'rxjs';
+
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SubscriptionService } from '../../../services';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'subscriptions-cancel-dialog',
@@ -35,7 +35,7 @@ export class SubscriptionCancelDialogComponent {
     this.dialogRef.close();
   }
 
-  cancelModal() {
+  closeModal() {
     this.dialogRef.close();
   }
 

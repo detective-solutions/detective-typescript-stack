@@ -1,17 +1,16 @@
-/* eslint-disable sort-imports */
-import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { Component, Inject, OnInit } from '@angular/core';
 import { EMPTY, catchError, take } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IUser, UserRole } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
-import { UsersService } from '../../../services';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { IUser, UserRole } from '@detective.solutions/shared/data-access';
+import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { IUpdateUserRoleGQLResponse } from '../../../graphql';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { UserRoleInterface } from '../../../models';
+import { UsersService } from '../../../services';
 
 @Component({
   selector: 'users-edit-dialog',
@@ -19,17 +18,17 @@ import { UserRoleInterface } from '../../../models';
   templateUrl: 'users-edit-dialog.component.html',
 })
 export class UserEditDialogComponent implements OnInit {
-  currentUser!: IUser;
-  isSubmitting = false;
-  isLoaded = false;
-  userRoleForm!: FormGroup;
-  currentRole!: { roleId: number; name: string };
-
   readonly isAddDialog = !this.dialogInputData?.id;
   readonly roles = [
     { roleId: 1, name: UserRole.BASIC },
     { roleId: 2, name: UserRole.ADMIN },
   ];
+
+  currentUser!: IUser;
+  isSubmitting = false;
+  isLoaded = false;
+  userRoleForm!: UntypedFormGroup;
+  currentRole!: { roleId: number; name: string };
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
@@ -38,7 +37,7 @@ export class UserEditDialogComponent implements OnInit {
     private readonly toastService: ToastService,
     private readonly userService: UsersService,
     private readonly dialogRef: MatDialogRef<UserEditDialogComponent>,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly logger: LogService
   ) {}
 

@@ -1,5 +1,6 @@
 {
-  "root": "libs/backend/dgraph-grpc-client",
+  "name": "backend-dgraph-grpc-client",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/backend/dgraph-grpc-client/src",
   "projectType": "library",
   "targets": {
@@ -12,9 +13,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/backend/dgraph-grpc-client"],
+      "outputs": ["{workspaceRoot}/coverage/libs/backend/dgraph-grpc-client"],
       "options": {
-        "jestConfig": "libs/backend/dgraph-grpc-client/jest.config.js",
+        "jestConfig": "libs/backend/dgraph-grpc-client/jest.config.ts",
         "passWithNoTests": true
       }
     }

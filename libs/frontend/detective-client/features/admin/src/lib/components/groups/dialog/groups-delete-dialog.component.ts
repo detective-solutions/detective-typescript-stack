@@ -1,17 +1,18 @@
-/* eslint-disable sort-imports */
 import { Component, Inject } from '@angular/core';
-import { catchError, EMPTY, map, take } from 'rxjs';
+import { EMPTY, catchError, map, take } from 'rxjs';
+import { IMask, IMasking, IUserGroup } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MaskingService, UsersService } from '../../../services';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
+
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
 import { IDeleteUserGroupGQLResponse } from '../../../graphql';
-import { MaskingService, UsersService } from '../../../services';
-import { IMask, IMasking, IUserGroup } from '@detective.solutions/shared/data-access';
 import { IMaskingDeleteInput } from '../../../models';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 @Component({
   selector: 'groups-delete-dialog',
   styleUrls: ['groups-delete-dialog.component.scss'],

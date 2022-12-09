@@ -1,7 +1,19 @@
 <svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
-  <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
-  <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
-    <div class="node-actions-wrapper table-actions">
+  <svg:g
+    *ngIf="selected$ | async"
+    node-selection-halo
+    [nodeId]="node.id"
+    [nodeWidth]="node.width"
+    [nodeHeight]="node.height"
+    [disableResize]="!hasSrc"
+  ></svg:g>
+  <foreignObject
+    *ngIf="selected$ | async"
+    [attr.x]="node.width"
+    [attr.width]="75"
+    [attr.height]="hasSrc ? node.height : selectionBarMinHeight"
+  >
+    <div class="node-actions-wrapper embedding-actions">
       <div fxFlex fxLayout="column" fxLayoutAlign="center center">
         <button mat-icon-button (click)="toggleLock()">
           <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
@@ -13,14 +25,19 @@
       </div>
     </div>
   </foreignObject>
-  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
-    <div *ngIf="isDragging$ | async" class="drag-overlay"></div>
-    <node-header [title]="node.title"></node-header>
-    <iframe
-      IFrameClickTracker
-      src="http://detective.solutions"
-      style="height: inherit; width: inherit"
-      frameBorder="0"
-    ></iframe>
+  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="nodeHeaderHeight">
+    <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
+    <node-header
+      [title]="node.title"
+      [isBlocked$]="isBlocked$"
+      (titleChangesOnKeyUp$)="nodeTitleUpdate$.next($event)"
+      (titleChangesOnBlur$)="nodeTitleBlur$.next($event)"
+      (enterKeyPressed$)="renderEmbedding($event)"
+    ></node-header>
+    <ng-container *ngIf="(isBlocked$ | async) === null">
+      <button mat-icon-button (click)="renderEmbedding()" color="accent" aria-label="" class="submit-src-button">
+        <mat-icon>send</mat-icon>
+      </button>
+    </ng-container>
   </foreignObject>
 </svg:g>

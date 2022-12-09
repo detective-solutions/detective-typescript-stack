@@ -10,13 +10,14 @@ export class DragService {
   private dragHoldTimeout!: ReturnType<typeof setTimeout>;
 
   isMouseDown = false;
+  isResizing = false;
   isDraggingActivated = false;
   readonly isDragging$ = new BehaviorSubject<boolean>(false);
 
   addDelayedDragHandling(event: Event) {
     this.isMouseDown = true;
     this.dragHoldTimeout = setTimeout(() => {
-      if (this.isMouseDown && !this.isDraggingActivated) {
+      if (this.isMouseDown && !this.isResizing && !this.isDraggingActivated) {
         if (this.isDraggingAllowedOnTarget(event.target as HTMLElement)) {
           this.activateDragging();
         }

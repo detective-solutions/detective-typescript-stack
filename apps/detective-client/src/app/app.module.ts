@@ -1,4 +1,4 @@
-import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
+import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -26,9 +26,9 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
     SharedUiModule,
     BrowserAnimationsModule,
     SharedErrorHandlingModule, // Import last due to interceptor chain
+    ApolloModule,
   ],
   providers: [
-    Apollo,
     {
       provide: APOLLO_OPTIONS,
       useFactory(httpLink: HttpLink) {

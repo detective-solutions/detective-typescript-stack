@@ -1,7 +1,7 @@
 import {
   AnyWhiteboardNode,
   IWhiteboardNodeBlockUpdate,
-  IWhiteboardNodePositionUpdate,
+  IWhiteboardNodePropertiesUpdate,
 } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
 
@@ -21,42 +21,17 @@ export const WhiteboardNodeDeletedRemotely = createAction(
   props<{ deletedNodeId: string }>()
 );
 
-export const WhiteboardNodeUpdate = createAction(
-  `${actionPrefix} Node updated`,
-  props<{ update: Update<AnyWhiteboardNode> }>()
-);
-
-export const WhiteboardNodeBatchUpdate = createAction(
-  `${actionPrefix} Multiple nodes updated`,
-  props<{ updates: Update<AnyWhiteboardNode>[] }>()
-);
-
-export const WhiteboardNodeBlocked = createAction(
-  `${actionPrefix} Node blocked`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
-export const WhiteboardNodeUnblocked = createAction(
-  `${actionPrefix} Node unblocked`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
-export const WhiteboardNodeBlockedRemotely = createAction(
-  `${actionPrefix} Node un/blocked remotely`,
-  props<{ update: Update<IWhiteboardNodeBlockUpdate> }>()
-);
-
 export const WhiteboardUnblockAllNodesOnUserLeft = createAction(
   `${actionPrefix} Unblocking all nodes blocked by a user that left`,
   props<{ updates: Update<IWhiteboardNodeBlockUpdate>[] }>()
 );
 
-export const WhiteboardNodesPositionUpdated = createAction(
-  `${actionPrefix} Node positions updated`,
-  props<{ updates: Update<IWhiteboardNodePositionUpdate>[] }>()
+export const WhiteboardNodePropertiesUpdated = createAction(
+  `${actionPrefix} Node properties updated`,
+  props<{ updates: Update<IWhiteboardNodePropertiesUpdate>[] }>()
 );
 
-export const WhiteboardNodesPositionUpdatedRemotely = createAction(
-  `${actionPrefix} Node positions updated remotely`,
-  props<{ updates: Update<AnyWhiteboardNode>[] }>()
+export const WhiteboardNodePropertiesUpdatedRemotely = createAction(
+  `${actionPrefix} Node properties updated remotely`,
+  props<{ updates: Update<IWhiteboardNodePropertiesUpdate>[] }>()
 );

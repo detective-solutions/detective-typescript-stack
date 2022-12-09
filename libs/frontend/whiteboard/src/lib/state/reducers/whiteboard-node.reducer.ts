@@ -3,7 +3,7 @@ import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
 import { IWhiteboardNodeState } from '../interfaces';
-import { TableNodeActions } from '../../components/node-components/table/state';
+import { TableNodeActions } from '../../components';
 import { createEntityAdapter } from '@ngrx/entity';
 import { serializeWhiteboardNodes } from '../../utils';
 
@@ -30,28 +30,13 @@ export const whiteboardNodeReducer = createReducer(
   on(WhiteboardNodeActions.WhiteboardNodeDeletedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.removeOne(action.deletedNodeId, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeBlocked, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeUnblocked, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeBlockedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
   on(WhiteboardNodeActions.WhiteboardUnblockAllNodesOnUserLeft, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodeUpdate, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateOne(action.update, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdated, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
-  on(WhiteboardNodeActions.WhiteboardNodesPositionUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
-  ),
-  on(WhiteboardNodeActions.WhiteboardNodeBatchUpdate, (state: IWhiteboardNodeState, action: any) =>
+  on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
   on(TableNodeActions.TableDataReceived, (state: IWhiteboardNodeState, action: any) =>

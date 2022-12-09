@@ -1,13 +1,13 @@
 import { AnyWhiteboardNode, WhiteboardOptions } from '@detective.solutions/shared/data-access';
 import { D3DragEvent, SubjectPosition, drag as d3Drag } from 'd3-drag';
 import { D3ZoomEvent, zoom as d3Zoom } from 'd3-zoom';
+import { Selection, select as d3Select, selectAll as d3SelectAll } from 'd3-selection';
 
 import { BufferService } from './buffer.service';
 import { DragService } from './drag.service';
 import { ForceDirectedGraph } from '../../models';
 import { Injectable } from '@angular/core';
 import { WindowGlobals } from '@detective.solutions/frontend/shared/ui';
-import { select as d3Select } from 'd3-selection';
 
 declare let window: WindowGlobals;
 
@@ -15,13 +15,16 @@ declare let window: WindowGlobals;
 
 @Injectable()
 export class D3AdapterService {
+  private static NODE_RESIZE_MIN_WIDTH = 250;
+  private static NODE_RESIZE_MIN_HEIGHT = 150;
+
   constructor(private readonly dragService: DragService, private readonly bufferService: BufferService) {}
 
   getForceDirectedGraph(options: WhiteboardOptions) {
     return new ForceDirectedGraph(options);
   }
 
-  applyZoomBehavior(elementToZoomOn: Element, containerElement: Element) {
+  applyZoomBehavior(elementToZoomOn: Element, containerElement: SVGGraphicsElement) {
     const onZoom = (event: D3ZoomEvent<HTMLElement, any>) =>
       d3Select(containerElement).attr('transform', event.transform.toString());
 
@@ -85,9 +88,9 @@ export class D3AdapterService {
         deltaY = nodeToUpdate.y - dragStartEvent.y;
       }
 
-      dragStartEvent.on('drag', OnDrag).on('end', OnDragEnd);
+      dragStartEvent.on('drag', onDrag).on('end', onDragEnd);
 
-      function OnDrag(dragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      function onDrag(dragEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
         // Abort drag if dragging is not activated
         if (window.isDraggingActivated) {
           nodeToUpdate.fx = dragEvent.x + deltaX;
@@ -95,7 +98,7 @@ export class D3AdapterService {
         }
       }
 
-      function OnDragEnd(dragEndEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      function onDragEnd(dragEndEvent: D3DragEvent<SVGElement, any, SubjectPosition>) {
         const hasBeenDragged = dragStartEvent.x !== dragEndEvent.x || dragStartEvent.y !== dragEndEvent.y;
         if (hasBeenDragged) {
           nodeToUpdate.fx = null;
@@ -103,8 +106,8 @@ export class D3AdapterService {
           nodeToUpdate.x = dragEndEvent.x + deltaX;
           nodeToUpdate.y = dragEndEvent.y + deltaY;
 
-          bufferServiceRef.addToNodeUpdateBuffer(nodeToUpdate);
-          bufferServiceRef.updateNodesFromBuffer();
+          bufferServiceRef.addToNodePositionBuffer(nodeToUpdate);
+          bufferServiceRef.updateNodePositionsFromBuffer();
         }
       }
     }
@@ -112,5 +115,26 @@ export class D3AdapterService {
     d3element.on('pointerdown', () => {
       d3element.call(d3Drag().on('start', onDragStart));
     });
+  }
+
+  applyResizeBehavior(nodeToResize: AnyWhiteboardNode) {
+    const bufferService = this.bufferService;
+    const dragService = this.dragService;
+
+    function resize(event: D3DragEvent<SVGElement, any, SubjectPosition>) {
+      nodeToResize.width = Math.max(event.x, D3AdapterService.NODE_RESIZE_MIN_WIDTH);
+      nodeToResize.height = Math.max(event.y, D3AdapterService.NODE_RESIZE_MIN_HEIGHT);
+      dragService.isResizing = true;
+    }
+
+    function onResizeEnd() {
+      bufferService.addToNodeResizeUpdateBuffer(nodeToResize);
+      bufferService.updateNodeSizeFromBuffer();
+      dragService.isResizing = false;
+    }
+
+    (d3SelectAll(`#drag-handle-${nodeToResize.id}`) as Selection<Element, any, any, any>).call(
+      d3Drag().on('drag', resize).on('end', onResizeEnd)
+    );
   }
 }
