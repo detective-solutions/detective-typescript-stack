@@ -1,5 +1,4 @@
 export * from './get-all-connections.gql';
-export * from './get-connection-by-table-id.gql';
 export * from './get-all-columns-by-table-id.gql';
 export * from './get-all-maskings.gql';
 export * from './get-all-maskings-by-user-group-id.gql';
