@@ -1,7 +1,6 @@
 import {
   GetAllConnectionsGQL,
   GetConnectionByIdGQL,
-  GetConnectionByTableIdGQL,
   GetTablesBySourceConnectionIdGQL,
   IGetAllConnectionsGQLResponse,
   IGetConnectionByIdGQLResponse,
@@ -40,7 +39,6 @@ export class ConnectionsService {
   constructor(
     private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
-    private readonly getConnectionByTableIdGQL: GetConnectionByTableIdGQL,
     private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly httpClient: HttpClient,
     private readonly tableCellEventService: TableCellEventService,
