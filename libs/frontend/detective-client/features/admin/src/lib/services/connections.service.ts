@@ -34,7 +34,6 @@ export class ConnectionsService {
   private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
   private getAllTablesWatchQuery!: QueryRef<Response>;
-  private getConnectionByTableIdWatchQuery!: QueryRef<Response>;
 
   constructor(
     private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
