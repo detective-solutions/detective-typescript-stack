@@ -37,6 +37,7 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
@@ -79,6 +80,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cursorTimeoutInterval = 7000;
   readonly whiteboardHtmlId = 'whiteboard';
 
+  private cdkOverlay: HTMLElement;
   private readonly subscriptions = new Subscription();
 
   // Reset element selection when clicking blank space on the whiteboard
@@ -95,8 +97,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly whiteboardFacade: WhiteboardFacadeService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly overlayContainer: OverlayContainer,
     private readonly store: Store
-  ) {}
+  ) {
+    // As the overlay is not part of Angular Material, we need to inject the theme class manually
+    this.cdkOverlay = this.overlayContainer.getContainerElement();
+    this.cdkOverlay.classList.add('default-theme'); // TODO: Inject a theme service to provide the current theme
+  }
 
   ngOnInit() {
     // Bind Angular change detection to each graph tick for render sync
@@ -155,6 +162,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((context: IWhiteboardContextState) => {
+        console.log(dragDataTransfer);
         if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
           // TODO: Remove when data from dragged element is used
           const tableNode = TableWhiteboardNode.Build({
@@ -169,7 +177,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             lastUpdated: now,
             created: now,
             entity: {
-              id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
+              id: dragDataTransfer.entityId,
             },
           });
 

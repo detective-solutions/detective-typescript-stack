@@ -38,6 +38,7 @@ export class SourceConnectionDTO implements ISourceConnection {
     public connectorName: string,
     public description: string,
     public iconSrc: string,
+    public connectedTables: any[],
     public status: SourceConnectionStatus,
     public lastUpdated: string
   ) {}
@@ -49,6 +50,7 @@ export class SourceConnectionDTO implements ISourceConnection {
       sourceConnectionInput.connectorName,
       sourceConnectionInput.description ?? '',
       sourceConnectionInput.iconSrc ?? SourceConnectionDTO.getIconSrc(sourceConnectionInput.connectorName),
+      sourceConnectionInput.connectedTables ?? [],
       sourceConnectionInput.status,
       sourceConnectionInput.lastUpdated
     );

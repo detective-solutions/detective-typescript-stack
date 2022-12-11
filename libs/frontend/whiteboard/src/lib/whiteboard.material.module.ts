@@ -2,10 +2,20 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgModule } from '@angular/core';
 
-const modules = [MatButtonModule, MatIconModule, MatTooltipModule, DragDropModule, FlexLayoutModule];
+const modules = [
+  MatButtonModule,
+  MatIconModule,
+  MatTooltipModule,
+  MatMenuModule,
+  MatInputModule,
+  DragDropModule,
+  FlexLayoutModule,
+];
 
 @NgModule({
   exports: modules,

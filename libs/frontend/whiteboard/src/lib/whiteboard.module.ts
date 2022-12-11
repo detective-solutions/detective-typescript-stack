@@ -26,6 +26,7 @@ import {
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
+import { GetAllWhiteboardTablesGQL } from './graphql';
 import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
@@ -74,6 +75,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardFacadeService,
     WebSocketService,
     WhiteboardSelectionService,
+    GetAllWhiteboardTablesGQL,
     {
       provide: TRANSLOCO_SCOPE,
       useValue: {

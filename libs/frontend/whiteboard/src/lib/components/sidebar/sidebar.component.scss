@@ -1,4 +1,5 @@
 $sidebar-height: 350px;
+$sidebar-assets-menu-height: 450px;
 
 #sidebar-wrapper {
   position: absolute;
@@ -14,12 +15,63 @@ $sidebar-height: 350px;
   .sidebar-button-wrapper {
     height: inherit;
 
+    #data-source-menu-icon:hover {
+      cursor: pointer;
+    }
+
     &:hover {
       cursor: grab;
     }
 
     mat-icon {
       width: 100%;
+    }
+  }
+}
+
+.mat-menu-panel {
+  margin-top: -65px;
+  margin-left: 75px;
+  min-width: 250px !important;
+  max-width: fit-content !important;
+
+  .data-source-menu-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .data-source-menu-search-box {
+    height: 50px;
+  }
+
+  .data-source-menu-separator {
+    height: 12px;
+    box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.14);
+  }
+
+  .data-source-menu-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -12px;
+    overflow-x: hidden;
+    width: 100%;
+
+    .data-source-menu-scroll-wrapper {
+      max-height: $sidebar-assets-menu-height;
+      width: inherit;
+    }
+
+    .data-source-list-item {
+      display: flex;
+      width: inherit;
+
+      &:hover {
+        cursor: grab;
+      }
     }
   }
 }

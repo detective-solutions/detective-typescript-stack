@@ -1,6 +1,11 @@
 <div id="sidebar-wrapper">
   <div class="sidebar-button-wrapper" fxFlex fxLayout="column">
-    <mat-icon #tableOccurrence fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
+    <mat-icon
+      id="data-source-menu-icon"
+      #dataSourceMenuIcon
+      fxFlex
+      fxLayoutAlign="center center"
+      [matMenuTriggerFor]="dataSources"
       >storage</mat-icon
     >
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">rectangle</mat-icon>
@@ -10,5 +15,34 @@
     <mat-icon #embedding fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
       >language</mat-icon
     >
+    <mat-menu #dataSources="matMenu" [hasBackdrop]="false" (menuOpened)="onMenuOpened()">
+      <h3 class="data-source-menu-header">Data</h3>
+      <div class="data-source-menu-search-box">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input matInput type="text" />
+          <button *ngIf="" matSuffix mat-icon-button aria-label="Clear">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <div class="data-source-menu-separator"></div>
+      <div class="data-source-menu-body">
+        <div class="data-source-menu-scroll-wrapper">
+          <div
+            *ngFor="let dataSource of dataSources$ | async"
+            mat-menu-item
+            #tableOccurrence
+            draggable="true"
+            (dragstart)="onDragStart($event)"
+            id="{{ dataSource.xid }}"
+            class="data-source-list-item"
+          >
+            <img src="{{ dataSource.iconSrc }}" alt="Data Icon" />
+            <span>{{ dataSource.name }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-menu>
   </div>
 </div>
