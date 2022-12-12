@@ -4,6 +4,13 @@
     "userAvatarAltAttribute": "detective Nutzer Avatar",
     "inviteButtonText": "Einladen"
   },
+  "sidebar": {
+    "assets": {
+      "searchBarPlaceholder": "Suchen",
+      "dataSourceHeader": "Daten",
+      "dataSourceIconAltText": "Icon der Datenquelle"
+    }
+  },
   "toastMessages": {
     "webSocketConnection": {
       "reconnecting": "Die Verbindung zum Server ist abgebrochen. Verbindung wird wiederhergestellt ...",
