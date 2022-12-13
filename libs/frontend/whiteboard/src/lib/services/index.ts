@@ -1,2 +1,2 @@
 export * from './whiteboard-facade.service';
-export * from './upload.service';
+export * from './internal-services/display.service';

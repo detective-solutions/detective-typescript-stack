@@ -2,11 +2,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
-export class UploadService {
+export class DisplayService {
   files: any[] = [];
 
   constructor(private readonly httpClient: HttpClient, private readonly authService: AuthService) {}
@@ -19,28 +20,21 @@ export class UploadService {
     return headers;
   }
 
-  prepareFilesList(files: Array<any>) {
-    for (const item of files) {
-      this.files.push(item);
-    }
+  requestPresignedURL(xid: string, fileName: string): Observable<any> {
+    return this.httpClient.post<any>(
+      'http://localhost:3009/v1/viewpoint/access',
+      { xid: xid, fileName: fileName },
+      { headers: this.getHeader() }
+    );
   }
 
-  fileUpload($event: any) {
-    this.prepareFilesList($event);
-    console.log(this.files);
-
+  fileUpload($event: any): Observable<any> {
+    console.log('file', $event.dataTransfer.files[0], $event.dataTransfer.files[0].name);
+    const formData: FormData = new FormData();
     if (this.files) {
-      console.log('file: ', this.files[0]);
-      console.log('filename', this.files[0].file.name);
-      const formData: FormData = new FormData();
-      formData.append('file', this.files[0].file, this.files[0].file.name);
-      // const now = formatDate(new Date());
-
-      this.httpClient
-        .post('http://localhost:3009/v1/upload/file', formData, { headers: this.getHeader() })
-        .subscribe(() => {
-          console.log('hello');
-        });
+      formData.append('file', $event.dataTransfer.files[0], $event.dataTransfer.files[0].name);
     }
+
+    return this.httpClient.post<any>('http://localhost:3009/v1/upload/file', formData, { headers: this.getHeader() });
   }
 }

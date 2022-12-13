@@ -5,6 +5,16 @@
   height: 60%;
 }
 
+.node-container{
+  overflow-y: scroll;
+}
+
+.page-content {
+  width: 100%;
+  object-fit: contain;
+
+}
+
 ag-grid-angular {
   width: 100%;
   height: calc(100% - 50px);

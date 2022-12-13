@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { IMessage, MessageEventType } from '@detective.solutions/shared/data-access';
+import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
-import { filter, map, switchMap } from 'rxjs';
 import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
@@ -11,6 +10,16 @@ import { WhiteboardNodeActions } from '../../../state';
   encapsulation: ViewEncapsulation.None,
 })
 export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
+  nodeValues: IDisplayWhiteboardNode = this.node as IDisplayWhiteboardNode;
+
+  currentIndex!: number;
+  xid!: string;
+  pages!: string[];
+  currentLink!: string;
+  fileName!: string;
+  pageCount!: number;
+  expires: Date = new Date();
+
   protected override customOnInit() {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
@@ -22,34 +31,77 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
       )
     );
 
-    // Listen to QUERY_TABLE websocket message events
-    this.subscriptions.add(
-      this.whiteboardFacade.getWebSocketSubjectAsync$
-        .pipe(
-          switchMap((webSocketSubject$) => webSocketSubject$.on$(MessageEventType.QueryTable)),
-          filter((message: IMessage<any>) => message.context.nodeId === this.node.id),
-          map((message: IMessage<any>) => message?.body)
-        )
-        .subscribe((x) => console.log(x))
-      /*
-        .subscribe((messageData: IQueryResponseBody) => {
-          this.store.dispatch(
-            DisplayNodeActions.TableDataReceived({
-              update: {
-                id: this.node.id,
-                changes: { temporary: { colDefs: messageData.tableSchema, rowData: messageData.tableData } },
-              },
-            })
-          );
-        })*/
-    );
+    this.setCurrentNodeValues();
 
-    // const isTemporaryTableDataAvailable =
-    //   !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
-    // if (isTemporaryTableDataAvailable) {
-    //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
-    //   // when it is handled by the state mechanism
-    //   this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
-    // }
+    if (this.checkForExpiry()) {
+      this.whiteboardFacade.getDisplayLocation(this.xid, this.fileName).subscribe((response: any) => {
+        this.pages = response.pages;
+        this.pageCount = response.pageCount;
+        this.setExpiry(response.exp);
+        this.setImageLink();
+      });
+    }
+  }
+
+  checkForExpiry() {
+    if (this.expires < new Date()) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  setCurrentNodeValues() {
+    this.currentIndex = (this.node as IDisplayWhiteboardNode).currentIndex;
+    this.pages = (this.node as IDisplayWhiteboardNode).pages;
+    this.fileName = (this.node as IDisplayWhiteboardNode).fileName;
+    this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
+    this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
+    this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
+  }
+
+  setExpiry(date: string) {
+    const year = parseInt(date.slice(0, 4));
+    const month = parseInt(date.slice(5, 7));
+    const day = parseInt(date.slice(8, 10));
+    const hours = parseInt(date.slice(11, 13));
+    const minutes = parseInt(date.slice(14, 16));
+    const seconds = parseInt(date.slice(17, 19));
+
+    this.expires = new Date(year, month, day, hours, minutes, seconds);
+  }
+
+  setImageLink() {
+    if (this.pages.length === this.pageCount) {
+      this.currentLink = this.pages[this.currentIndex];
+
+      this.store.dispatch(
+        WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+          updates: [
+            {
+              id: this.node.id,
+              changes: {
+                currentIndex: this.currentIndex,
+                currentLink: this.currentLink,
+              },
+            },
+          ],
+        })
+      );
+    }
+  }
+
+  previousPage() {
+    if (this.currentIndex > 0) {
+      this.currentIndex -= 1;
+      this.setImageLink();
+    }
+  }
+
+  nextPage() {
+    if (this.currentIndex < this.pageCount - 1) {
+      this.currentIndex += 1;
+      this.setImageLink();
+    }
   }
 }

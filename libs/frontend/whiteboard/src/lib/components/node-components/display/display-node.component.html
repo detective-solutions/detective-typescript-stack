@@ -3,16 +3,16 @@
   <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
     <div class="node-actions-wrapper display-actions">
       <div fxFlex fxLayout="column" fxLayoutAlign="center center">
-        <button mat-icon-button>
-          <mat-icon fxFlex>arrow_backward_ios</mat-icon>
+        <button mat-icon-button (click)="nextPage()">
+          <mat-icon fxFlex>keyboard_arrow_up</mat-icon>
         </button>
-        <span>1 of 10</span>
-        <button mat-icon-button>
-          <mat-icon fxFlex>arrow_forward_ios</mat-icon>
+        <span fxLayoutAlign="center center">{{ currentIndex + 1 }} of {{ pageCount }}</span>
+        <button mat-icon-button (click)="previousPage()">
+          <mat-icon fxFlex>keyboard_arrow_down</mat-icon>
         </button>
-        <button mat-icon-button>
-          <mat-icon fxFlex>lock</mat-icon>
-          <mat-icon fxFlex>lock_open</mat-icon>
+        <button mat-icon-button (click)="toggleLock()">
+          <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
+          <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
         </button>
         <button mat-icon-button (click)="delete()">
           <mat-icon fxFlex>delete</mat-icon>
@@ -24,7 +24,8 @@
     <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
     <node-header [title]="node.title" [isBlocked$]="isBlocked$"></node-header>
     <img
-      src="https://images.unsplash.com/photo-1670180399804-42701f598ff3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=872&q=80"
+      class="page-content"
+      src="{{ currentLink }}"
       alt="test"
     />
   </foreignObject>

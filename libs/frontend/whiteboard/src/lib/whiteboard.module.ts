@@ -16,8 +16,8 @@ import {
   TestLinkComponent,
   TopbarComponent,
 } from './components';
+import { DisplayService, WhiteboardFacadeService } from './services';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
-import { UploadService, WhiteboardFacadeService } from './services';
 import {
   WHITEBOARD_STORE_NAME,
   WhiteboardGeneralEffects,
@@ -78,7 +78,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardFacadeService,
     WebSocketService,
     WhiteboardSelectionService,
-    UploadService,
+    DisplayService,
     {
       provide: TRANSLOCO_SCOPE,
       useValue: {

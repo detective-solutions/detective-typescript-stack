@@ -11,6 +11,9 @@ export interface IDisplay {
   title: string;
   fileName: string;
   pageCount: number;
+  currentIndex: number;
+  pages: string[];
+  currentLink: string;
   x: number;
   y: number;
   width: number;

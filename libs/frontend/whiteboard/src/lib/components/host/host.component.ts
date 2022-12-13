@@ -28,6 +28,7 @@ import {
   TableWhiteboardNode,
 } from '../../models';
 import { Subject, Subscription, combineLatest, debounceTime, delayWhen, filter, map, switchMap, take, tap } from 'rxjs';
+import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import {
   WhiteboardGeneralActions,
   WhiteboardMetadataActions,
@@ -44,6 +45,7 @@ import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
+import { responsePathAsArray } from 'graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -98,7 +100,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly whiteboardFacade: WhiteboardFacadeService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly store: Store,
-    private readonly sanitizer: DomSanitizer
+    private readonly sanitizer: DomSanitizer,
+    private readonly toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -135,18 +138,14 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onElementDrop(event: DragEvent) {
     event.preventDefault();
+
     // TODO: Add interface for drag data transfer object
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
     const now = formatDate(new Date());
-    const isFile = event.dataTransfer?.files.length ?? 0 > 0;
+    const isFile = event.dataTransfer?.files.length !== 0;
     const defaultMargin = 50;
     const defaultWidth = 900;
     const defaultHeight = 500;
-    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
-
-    if (!dragDataTransfer) {
-      console.error('Could not extract drag data for adding whiteboard node');
-    }
 
     // TODO: Remove these when actual node data is loaded
     const randomTitles = [
@@ -159,95 +158,150 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       '',
     ];
 
-    this.store
-      .select(selectWhiteboardContextState)
-      .pipe(take(1))
-      .subscribe((context: IWhiteboardContextState) => {
-        if (isFile) {
-          for (let i = 0; i < event.dataTransfer!.files.length; i++) {
-            convertedDOMPoint.x += i === 0 ? convertedDOMPoint.x : i * (defaultMargin + defaultWidth);
+    if (isFile) {
+      this.toastService.showToast(
+        `Upload file ${event.dataTransfer!.files[0].name} this might take a while`,
+        '',
+        ToastType.INFO,
+        {
+          duration: 4000,
+        }
+      );
+      this.whiteboardFacade.uploadFile(event).subscribe((response: any) => {
+        this.store
+          .select(selectWhiteboardContextState)
+          .pipe(take(1))
+          .subscribe((context: IWhiteboardContextState) => {
+            if (isFile && response.success) {
+              if (response.nodeType === 'display') {
+                for (let i = 0; i < event.dataTransfer!.files.length; i++) {
+                  const margin = i * (defaultMargin + defaultWidth);
+                  convertedDOMPoint.x += margin;
 
-            const file = event.dataTransfer!.files[i];
-            const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+                  const file = event.dataTransfer!.files[i];
+                  const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
 
-            const displayNode = DisplayWhiteboardNode.Build({
-              id: '78b4daab-dfe4-4bad-855f-ac575cc59755',
-              title: 'test',
-              fileName: 'test.pdf',
-              pageCount: 0,
+                  const displayNode = DisplayWhiteboardNode.Build({
+                    id: response.xid,
+                    title: file.name,
+                    fileName: file.name,
+                    pageCount: response.setup.pageCount,
+                    currentIndex: 0,
+                    pages: response.setup.pages,
+                    currentLink: response.setup.pages[0],
+                    x: convertedDOMPoint.x,
+                    y: convertedDOMPoint.y,
+                    width: defaultWidth,
+                    height: defaultHeight,
+                    locked: false,
+                    file: { file, url },
+                    author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+                    editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+                    lastUpdatedBy: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+                    lastUpdated: now,
+                    created: now,
+                  });
+
+                  this.store.dispatch(
+                    WhiteboardNodeActions.WhiteboardNodeAdded({
+                      addedNode: displayNode,
+                      addedManually: true,
+                    })
+                  );
+                }
+              }
+
+              if (response.nodeType === 'table') {
+                // TODO: Remove when data from dragged element is used
+                const tableNode = TableWhiteboardNode.Build({
+                  id: response.xid,
+                  title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
+                  x: convertedDOMPoint.x,
+                  y: convertedDOMPoint.y,
+                  width: defaultWidth,
+                  height: defaultHeight,
+                  locked: false,
+                  lastUpdatedBy: context.userId,
+                  lastUpdated: now,
+                  created: now,
+                  entity: {
+                    id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
+                  },
+                });
+
+                this.store.dispatch(
+                  WhiteboardNodeActions.WhiteboardNodeAdded({
+                    addedNode: tableNode,
+                    addedManually: true,
+                  })
+                );
+              }
+            }
+          });
+      });
+    } else {
+      this.store
+        .select(selectWhiteboardContextState)
+        .pipe(take(1))
+        .subscribe((context: IWhiteboardContextState) => {
+          const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
+
+          if (!dragDataTransfer) {
+            console.error('Could not extract drag data for adding whiteboard node');
+          }
+
+          if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
+            // TODO: Remove when data from dragged element is used
+            const tableNode = TableWhiteboardNode.Build({
+              id: uuidv4(),
+              title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
               x: convertedDOMPoint.x,
               y: convertedDOMPoint.y,
               width: defaultWidth,
               height: defaultHeight,
               locked: false,
-              file: { file, url },
+              lastUpdatedBy: context.userId,
+              lastUpdated: now,
+              created: now,
+              entity: {
+                id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
+              },
+            });
+
+            this.store.dispatch(
+              WhiteboardNodeActions.WhiteboardNodeAdded({
+                addedNode: tableNode,
+                addedManually: true,
+              })
+            );
+          }
+
+          if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
+            // TODO: Remove when data from dragged element is used
+            const embeddingNode = EmbeddingWhiteboardNode.Build({
+              id: uuidv4(),
+              title: '',
+              x: convertedDOMPoint.x,
+              y: convertedDOMPoint.y,
+              width: defaultWidth,
+              height: 50,
+              locked: false,
               author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
               editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-              lastUpdatedBy: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+              lastUpdatedBy: context.userId,
               lastUpdated: now,
               created: now,
             });
 
             this.store.dispatch(
               WhiteboardNodeActions.WhiteboardNodeAdded({
-                addedNode: displayNode,
+                addedNode: embeddingNode,
                 addedManually: true,
               })
             );
           }
-        }
-
-        if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
-          // TODO: Remove when data from dragged element is used
-          const tableNode = TableWhiteboardNode.Build({
-            id: uuidv4(),
-            title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: defaultWidth,
-            height: defaultHeight,
-            locked: false,
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-            entity: {
-              id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
-            },
-          });
-
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: tableNode,
-              addedManually: true,
-            })
-          );
-        }
-
-        if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
-          // TODO: Remove when data from dragged element is used
-          const embeddingNode = EmbeddingWhiteboardNode.Build({
-            id: uuidv4(),
-            title: '',
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: defaultWidth,
-            height: 50,
-            locked: false,
-            author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-            editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-          });
-
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: embeddingNode,
-              addedManually: true,
-            })
-          );
-        }
-      });
+        });
+    }
   }
 
   trackCollaborationCursorByUserId(_index: number, collaborationCursor: IWhiteboardCollaborationCursor) {

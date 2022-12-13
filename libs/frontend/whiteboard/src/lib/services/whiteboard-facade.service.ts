@@ -3,6 +3,7 @@ import { AnyWhiteboardNode, WhiteboardOptions } from '@detective.solutions/share
 import {
   BufferService,
   D3AdapterService,
+  DisplayService,
   DragService,
   WebSocketService,
   WhiteboardSelectionService,
@@ -87,11 +88,21 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
+  getDisplayLocation(xid: string, fileName: string): Observable<any> {
+    return this.displayService.requestPresignedURL(xid, fileName);
+  }
+
+  uploadFile($event: any): Observable<any> {
+    console.log('event facade', $event);
+    return this.displayService.fileUpload($event);
+  }
+
   constructor(
     private readonly store: Store,
     private readonly actions$: Actions,
     private readonly bufferService: BufferService,
     private readonly d3AdapterService: D3AdapterService,
+    private readonly displayService: DisplayService,
     private readonly dragService: DragService,
     private readonly webSocketService: WebSocketService,
     private readonly whiteboardSelectionService: WhiteboardSelectionService
