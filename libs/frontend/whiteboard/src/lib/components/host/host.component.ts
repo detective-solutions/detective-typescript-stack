@@ -189,6 +189,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
                     currentIndex: 0,
                     pages: response.setup.pages,
                     currentLink: response.setup.pages[0],
+                    expires: new Date(),
                     x: convertedDOMPoint.x,
                     y: convertedDOMPoint.y,
                     width: defaultWidth,

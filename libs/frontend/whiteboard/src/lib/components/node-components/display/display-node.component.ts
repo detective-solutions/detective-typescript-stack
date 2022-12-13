@@ -32,8 +32,11 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     );
 
     this.setCurrentNodeValues();
+    this.refreshPages();
+  }
 
-    if (this.checkForExpiry()) {
+  refreshPages() {
+    if (!this.checkForExpiry()) {
       this.whiteboardFacade.getDisplayLocation(this.xid, this.fileName).subscribe((response: any) => {
         this.pages = response.pages;
         this.pageCount = response.pageCount;
@@ -58,6 +61,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
     this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
     this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
+    this.expires = (this.node as IDisplayWhiteboardNode).expires;
   }
 
   setExpiry(date: string) {
@@ -69,6 +73,18 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     const seconds = parseInt(date.slice(17, 19));
 
     this.expires = new Date(year, month, day, hours, minutes, seconds);
+    this.store.dispatch(
+      WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+        updates: [
+          {
+            id: this.node.id,
+            changes: {
+              expires: this.expires,
+            },
+          },
+        ],
+      })
+    );
   }
 
   setImageLink() {
@@ -92,6 +108,8 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   previousPage() {
+    console.log('valid: ', this.checkForExpiry());
+    this.refreshPages();
     if (this.currentIndex > 0) {
       this.currentIndex -= 1;
       this.setImageLink();
@@ -99,6 +117,8 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   nextPage() {
+    console.log('valid: ', this.checkForExpiry());
+    this.refreshPages();
     if (this.currentIndex < this.pageCount - 1) {
       this.currentIndex += 1;
       this.setImageLink();

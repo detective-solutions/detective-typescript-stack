@@ -14,6 +14,7 @@ export interface IDisplay {
   currentIndex: number;
   pages: string[];
   currentLink: string;
+  expires: Date;
   x: number;
   y: number;
   width: number;
