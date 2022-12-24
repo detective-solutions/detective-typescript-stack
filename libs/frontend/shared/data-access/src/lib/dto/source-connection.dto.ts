@@ -1,4 +1,4 @@
-import { ISourceConnection, SourceConnectionStatus } from '@detective.solutions/shared/data-access';
+import { ISourceConnection, ITable, SourceConnectionStatus } from '@detective.solutions/shared/data-access';
 
 export enum SourceConnectorName {
   EXCEL = 'excel',
@@ -38,7 +38,7 @@ export class SourceConnectionDTO implements ISourceConnection {
     public connectorName: string,
     public description: string,
     public iconSrc: string,
-    public connectedTables: any[],
+    public connectedTables: ITable[],
     public status: SourceConnectionStatus,
     public lastUpdated: string
   ) {}

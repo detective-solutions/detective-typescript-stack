@@ -1,1 +1,1 @@
-export * from './get-all-whiteboard-tables.gql';
+export * from './search-tables-by-tenant.gql';

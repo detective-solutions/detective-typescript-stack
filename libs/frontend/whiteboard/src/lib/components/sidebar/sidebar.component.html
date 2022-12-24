@@ -7,7 +7,7 @@
       [matMenuTriggerFor]="assets"
       #assetsMenuIcon
       #assetsMenuTrigger="matMenuTrigger"
-      (menuOpened)="getDataSources()"
+      (menuOpened)="initTableAssets()"
       >storage</mat-icon
     >
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">rectangle</mat-icon>
@@ -28,20 +28,20 @@
         <div class="assets-menu-search-box">
           <mat-form-field appearance="outline" [style.fontSize.px]="12">
             <mat-label>{{ t('assets.searchBarPlaceholder') }}</mat-label>
-            <input matInput type="text" />
-            <button *ngIf="" matSuffix mat-icon-button aria-label="Clear">
+            <input matInput [formControl]="searchInput" [autofocus]="true" type="text" />
+            <button matSuffix mat-icon-button aria-label="Clear">
               <mat-icon>close</mat-icon>
             </button>
           </mat-form-field>
         </div>
         <div class="assets-menu-separator"></div>
-        <div class="assets-menu-body" (scroll)="onScroll($event)">
+        <div class="assets-menu-body">
           <div class="assets-menu-scroll-wrapper">
             <div *ngIf="isLoading" fxLayoutAlign="center center" class="assets-menu-spinner-wrapper">
               <mat-spinner color="accent" [diameter]="35"></mat-spinner>
             </div>
             <div
-              *ngFor="let dataSource of dataSources"
+              *ngFor="let dataSource of dataSources$ | async"
               mat-menu-item
               #tableOccurrence
               draggable="true"

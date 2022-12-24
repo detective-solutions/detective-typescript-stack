@@ -1,4 +1,4 @@
-import { ITableOccurrence } from '../table';
+import { ITable } from '../table';
 import { SourceConnectionStatus } from './source-connection-status.enum';
 
 export interface ISourceConnection {
@@ -12,7 +12,7 @@ export interface ISourceConnection {
   database?: string;
   databaseSchema?: string;
   connectorName: string;
-  connectedTables?: ITableOccurrence[];
+  connectedTables?: ITable[];
   lastUpdated: string;
   status: SourceConnectionStatus;
   iconSrc?: string;

@@ -26,10 +26,11 @@ import {
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
-import { GetAllWhiteboardTablesGQL } from './graphql';
 import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SearchTablesByTenantGQL } from './graphql';
 import { StoreModule } from '@ngrx/store';
 import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardContextResolver } from './resolvers';
@@ -52,6 +53,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     ]),
     StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
     TranslocoModule,
+    ReactiveFormsModule,
     WhiteboardMaterialModule,
     WhiteboardRoutingModule,
   ],
@@ -75,7 +77,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardFacadeService,
     WebSocketService,
     WhiteboardSelectionService,
-    GetAllWhiteboardTablesGQL,
+    SearchTablesByTenantGQL,
     {
       provide: TRANSLOCO_SCOPE,
       useValue: {
