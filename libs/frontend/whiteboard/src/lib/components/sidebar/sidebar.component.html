@@ -1,6 +1,13 @@
-<div id="sidebar-wrapper">
+<div id="sidebar-wrapper" *transloco="let t; read: 'whiteboard.sidebar'">
   <div class="sidebar-button-wrapper" fxFlex fxLayout="column">
-    <mat-icon #tableOccurrence fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
+    <mat-icon
+      id="data-source-menu-icon"
+      fxFlex
+      fxLayoutAlign="center center"
+      [matMenuTriggerFor]="assets"
+      #assetsMenuIcon
+      #assetsMenuTrigger="matMenuTrigger"
+      (menuOpened)="initTableAssets()"
       >storage</mat-icon
     >
     <mat-icon fxFlex fxLayoutAlign="center center" draggable="true">rectangle</mat-icon>
@@ -10,5 +17,42 @@
     <mat-icon #embedding fxFlex fxLayoutAlign="center center" draggable="true" (dragstart)="onDragStart($event)"
       >language</mat-icon
     >
+    <mat-menu #assets="matMenu" [hasBackdrop]="false">
+      <div class="assets-menu-wrapper" (click)="$event.stopPropagation()">
+        <div class="assets-menu-header">
+          <h3>{{ t('assets.dataSourceHeader') }}</h3>
+          <button mat-icon-button color="accent" aria-label="Close assets menu" (click)="closeAssetsMenu()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="assets-menu-search-box">
+          <mat-form-field appearance="outline" [style.fontSize.px]="12">
+            <mat-label>{{ t('assets.searchBarPlaceholder') }}</mat-label>
+            <input matInput #assetsSearchInput [formControl]="assetsSearchFormControl" type="text" />
+          </mat-form-field>
+        </div>
+        <div class="assets-menu-separator"></div>
+        <div class="assets-menu-body">
+          <div class="assets-menu-scroll-wrapper">
+            <div *ngIf="isLoading" fxLayoutAlign="center center" class="assets-menu-spinner-wrapper">
+              <mat-spinner color="accent" [diameter]="35"></mat-spinner>
+            </div>
+            <div
+              *ngFor="let table of assetsMenuTables$ | async"
+              #tableOccurrence
+              draggable="true"
+              (dragstart)="onDragStart($event)"
+              [attr.data-entity-id]="table.xid"
+              [attr.data-name]="table.name"
+              fxLayoutAlign="start center"
+              class="assets-menu-list-item"
+            >
+              <img src="{{ table.iconSrc }}" alt="{{ t('assets.dataSourceIconAltText') }}" draggable="false" />
+              {{ table.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-menu>
   </div>
 </div>

@@ -37,6 +37,7 @@ import {
 } from '../../state';
 
 import { IWhiteboardContextState } from '../../state/interfaces';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
@@ -79,6 +80,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cursorTimeoutInterval = 7000;
   readonly whiteboardHtmlId = 'whiteboard';
 
+  private cdkOverlay: HTMLElement;
   private readonly subscriptions = new Subscription();
 
   // Reset element selection when clicking blank space on the whiteboard
@@ -95,8 +97,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly whiteboardFacade: WhiteboardFacadeService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly overlayContainer: OverlayContainer,
     private readonly store: Store
-  ) {}
+  ) {
+    // As the overlay is not part of Angular Material, we need to inject the theme class manually
+    this.cdkOverlay = this.overlayContainer.getContainerElement();
+    this.cdkOverlay.classList.add('default-theme'); // TODO: Inject a theme service to provide the current theme
+  }
 
   ngOnInit() {
     // Bind Angular change detection to each graph tick for render sync
@@ -131,81 +138,69 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onElementDrop(event: DragEvent) {
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1))
+      .subscribe((context: IWhiteboardContextState) => {
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeAdded({
+            addedNode: this.buildNodeByType(event, context),
+            addedManually: true,
+          })
+        );
+      });
+  }
+
+  buildNodeByType(event: DragEvent, whiteboardContext: IWhiteboardContextState): AnyWhiteboardNode {
     // TODO: Add interface for drag data transfer object
     const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
     if (!dragDataTransfer) {
       console.error('Could not extract drag data for adding whiteboard node');
     }
-
     const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
 
-    // TODO: Remove these when actual node data is loaded
-    const randomTitles = [
-      'Clue 1',
-      'I am a randomly chosen title',
-      'Clue 2',
-      'Find suspicious content',
-      'Clue 3',
-      'Suspicious data',
-      '',
-    ];
+    const defaultNodeWidth = 900;
+    const defaultNodeHeight = 500;
 
-    this.store
-      .select(selectWhiteboardContextState)
-      .pipe(take(1))
-      .subscribe((context: IWhiteboardContextState) => {
-        if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
-          // TODO: Remove when data from dragged element is used
-          const tableNode = TableWhiteboardNode.Build({
-            id: uuidv4(),
-            title: randomTitles[Math.floor(Math.random() * randomTitles.length)],
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: 900,
-            height: 500,
-            locked: false,
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-            entity: {
-              id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
-            },
-          });
-
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: tableNode,
-              addedManually: true,
-            })
-          );
-        }
-
-        if (dragDataTransfer.type === WhiteboardNodeType.EMBEDDING) {
-          // TODO: Remove when data from dragged element is used
-          const embeddingNode = EmbeddingWhiteboardNode.Build({
-            id: uuidv4(),
-            title: '',
-            x: convertedDOMPoint.x,
-            y: convertedDOMPoint.y,
-            width: 900,
-            height: 50,
-            locked: false,
-            author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-            editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-            lastUpdatedBy: context.userId,
-            lastUpdated: now,
-            created: now,
-          });
-
-          this.store.dispatch(
-            WhiteboardNodeActions.WhiteboardNodeAdded({
-              addedNode: embeddingNode,
-              addedManually: true,
-            })
-          );
-        }
-      });
+    switch (dragDataTransfer.type) {
+      case WhiteboardNodeType.TABLE: {
+        return TableWhiteboardNode.Build({
+          id: uuidv4(),
+          title: dragDataTransfer.title,
+          x: convertedDOMPoint.x,
+          y: convertedDOMPoint.y,
+          width: defaultNodeWidth,
+          height: defaultNodeHeight,
+          locked: false,
+          lastUpdatedBy: whiteboardContext.userId,
+          lastUpdated: now,
+          created: now,
+          entity: {
+            id: dragDataTransfer.entityId,
+          },
+        });
+      }
+      case WhiteboardNodeType.EMBEDDING: {
+        return EmbeddingWhiteboardNode.Build({
+          id: uuidv4(),
+          title: '',
+          x: convertedDOMPoint.x,
+          y: convertedDOMPoint.y,
+          width: defaultNodeWidth,
+          height: defaultNodeHeight,
+          locked: false,
+          author: whiteboardContext.userId,
+          editors: [{ id: whiteboardContext.userId }],
+          lastUpdatedBy: whiteboardContext.userId,
+          lastUpdated: now,
+          created: now,
+        });
+      }
+      default: {
+        throw new Error(`Could initialize node for type ${dragDataTransfer?.type}`);
+      }
+    }
   }
 
   trackCollaborationCursorByUserId(_index: number, collaborationCursor: IWhiteboardCollaborationCursor) {
