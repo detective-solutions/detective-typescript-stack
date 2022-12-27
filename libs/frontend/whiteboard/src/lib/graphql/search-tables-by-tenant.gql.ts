@@ -10,12 +10,9 @@ export interface ISearchTablesByTenantGQLResponse {
 @Injectable()
 export class SearchTablesByTenantGQL extends Query<Response> {
   override document = gql`
-    query searchTablesByTenant($tenantId: String!, $paginationOffset: Int!, $pageSize: Int!, $searchTerm: String) {
+    query searchTablesByTenant($tenantId: String!, $searchTerm: String) {
       querySourceConnection(
-        offset: $paginationOffset
-        first: $pageSize
         filter: { status: { eq: "${SourceConnectionStatus.AVAILABLE}" } }
-        order: { asc: name }
       ) @cascade {
         xid
         tenant(filter: {xid: {eq: $tenantId } }) {

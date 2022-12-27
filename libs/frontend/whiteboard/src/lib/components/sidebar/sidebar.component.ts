@@ -20,7 +20,7 @@ import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-a
 import { Store } from '@ngrx/store';
 import { selectWhiteboardContextState } from '../../state';
 
-interface IAssetsMenuDataSource {
+interface IAssetsMenuTable {
   xid: string;
   name: string;
   iconSrc: string;
@@ -38,33 +38,29 @@ export class SidebarComponent implements OnInit {
   @ViewChildren('tableOccurrence', { read: ElementRef }) tableOccurrence!: QueryList<ElementRef>;
   @ViewChild('embedding', { read: ElementRef }) embedding!: ElementRef;
   @ViewChild('assetsMenuIcon', { read: ElementRef }) assetsMenuIcon!: ElementRef;
+  @ViewChild('assetsSearchInput', { read: ElementRef }) assetsSearchInput!: ElementRef;
 
-  dataSources$ = new Subject<IAssetsMenuDataSource[]>();
-  pageOffset$ = new Subject<number>();
+  assetsMenuTables$ = new Subject<IAssetsMenuTable[]>();
 
+  assetsSearchFormControl = new FormControl<string>('', { nonNullable: true });
   isLoading = false;
-  totalElementsCount = 0;
-  isFetchingMoreData = false;
-
-  searchInput = new FormControl<string>('', { nonNullable: true });
 
   private searchTablesByTenantWatchQuery!: QueryRef<Response>;
-  private currentPageOffset = 0;
-  private alreadyLoadedElementsCount = 0;
-  private readonly defaultPageSize = 20;
+  private readonly searchDebounceTime = 500;
   private readonly subscriptions = new Subscription();
 
   constructor(private readonly searchTablesByTenantGQL: SearchTablesByTenantGQL, private readonly store: Store) {}
 
   ngOnInit() {
     this.subscriptions.add(
-      combineLatest([this.store.select(selectWhiteboardContextState), this.searchInput.valueChanges])
-        .pipe(debounceTime(600), filter(Boolean), distinctUntilChanged())
+      combineLatest([this.store.select(selectWhiteboardContextState), this.assetsSearchFormControl.valueChanges])
+        .pipe(debounceTime(this.searchDebounceTime), filter(Boolean), distinctUntilChanged())
         .subscribe(([searchTerm, whiteboardContext]) => this.searchTableAssets(searchTerm, whiteboardContext))
     );
   }
 
-  closeDataSourceMenu() {
+  closeAssetsMenu() {
+    this.assetsSearchFormControl.reset();
     this.assetsMenuTrigger.closeMenu();
   }
 
@@ -90,20 +86,17 @@ export class SidebarComponent implements OnInit {
   }
 
   initTableAssets() {
+    this.focusSearchInput();
     this.store
       .select(selectWhiteboardContextState)
       .pipe(take(1))
-      .subscribe((whiteboardContext: IWhiteboardContextState) => this.searchTableAssets(whiteboardContext));
+      .subscribe((whiteboardContext: IWhiteboardContextState) => this.searchTableAssets(whiteboardContext, ''));
   }
 
-  searchTableAssets(whiteboardContext: IWhiteboardContextState, searchTerm?: string) {
-    this.resetPageOffset();
-
+  searchTableAssets(whiteboardContext: IWhiteboardContextState, searchTerm: string) {
     const searchParameters = {
       tenantId: whiteboardContext.tenantId,
-      paginationOffset: this.currentPageOffset,
-      pageSize: this.defaultPageSize,
-      searchTerm: this.buildSearchTermRegEx(searchTerm ?? ''),
+      searchTerm: this.buildSearchTermRegEx(searchTerm),
     };
 
     if (!this.searchTablesByTenantWatchQuery) {
@@ -113,23 +106,20 @@ export class SidebarComponent implements OnInit {
           .pipe(
             tap(() => (this.isLoading = true)),
             map((response: any) => response.data),
-            map((response: ISearchTablesByTenantGQLResponse) =>
-              response.querySourceConnection
-                .map(SourceConnectionDTO.Build)
-                .filter((sourceConnection: SourceConnectionDTO) => sourceConnection.connectedTables.length > 0)
-                .map((sourceConnection: SourceConnectionDTO) => {
-                  return sourceConnection.connectedTables.map((connectedTable: ITable) => {
-                    return {
-                      ...connectedTable,
-                      iconSrc: sourceConnection.iconSrc,
-                    };
-                  });
-                })
-                .flat()
+            map(
+              (response: ISearchTablesByTenantGQLResponse) =>
+                response.querySourceConnection
+                  .map(SourceConnectionDTO.Build)
+                  .filter((sourceConnection: SourceConnectionDTO) => sourceConnection.connectedTables.length > 0)
+                  .map((sourceConnection: SourceConnectionDTO) =>
+                    this.createTablesFromSourceConnection(sourceConnection)
+                  )
+                  .flat()
+                  .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
             )
           )
           .subscribe((response: any) => {
-            this.dataSources$.next(response as IAssetsMenuDataSource[]);
+            this.assetsMenuTables$.next(response as IAssetsMenuTable[]);
             this.isLoading = false;
           })
       );
@@ -142,7 +132,18 @@ export class SidebarComponent implements OnInit {
     return searchTerm ? `/.*${searchTerm}.*/i` : '/.*/i';
   }
 
-  private resetPageOffset() {
-    this.currentPageOffset = 0;
+  private createTablesFromSourceConnection(sourceConnection: SourceConnectionDTO) {
+    return sourceConnection.connectedTables.map((connectedTable: ITable) => {
+      return {
+        ...connectedTable,
+        iconSrc: sourceConnection.iconSrc,
+      };
+    });
+  }
+
+  private focusSearchInput() {
+    if (this.assetsSearchInput) {
+      this.assetsSearchInput.nativeElement.focus();
+    }
   }
 }

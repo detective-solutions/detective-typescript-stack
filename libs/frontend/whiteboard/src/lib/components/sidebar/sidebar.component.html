@@ -21,17 +21,14 @@
       <div class="assets-menu-wrapper" (click)="$event.stopPropagation()">
         <div class="assets-menu-header">
           <h3>{{ t('assets.dataSourceHeader') }}</h3>
-          <button mat-icon-button color="accent" aria-label="Close assets menu" (click)="closeDataSourceMenu()">
+          <button mat-icon-button color="accent" aria-label="Close assets menu" (click)="closeAssetsMenu()">
             <mat-icon>close</mat-icon>
           </button>
         </div>
         <div class="assets-menu-search-box">
           <mat-form-field appearance="outline" [style.fontSize.px]="12">
             <mat-label>{{ t('assets.searchBarPlaceholder') }}</mat-label>
-            <input matInput [formControl]="searchInput" [autofocus]="true" type="text" />
-            <button matSuffix mat-icon-button aria-label="Clear">
-              <mat-icon>close</mat-icon>
-            </button>
+            <input matInput #assetsSearchInput [formControl]="assetsSearchFormControl" type="text" />
           </mat-form-field>
         </div>
         <div class="assets-menu-separator"></div>
@@ -41,17 +38,17 @@
               <mat-spinner color="accent" [diameter]="35"></mat-spinner>
             </div>
             <div
-              *ngFor="let dataSource of dataSources$ | async"
-              mat-menu-item
+              *ngFor="let table of assetsMenuTables$ | async"
               #tableOccurrence
               draggable="true"
               (dragstart)="onDragStart($event)"
-              [attr.data-entityId]="dataSource.xid"
-              [attr.data-name]="dataSource.name"
+              [attr.data-entityId]="table.xid"
+              [attr.data-name]="table.name"
+              fxLayoutAlign="start center"
               class="assets-menu-list-item"
             >
-              <img src="{{ dataSource.iconSrc }}" alt="{{ t('assets.dataSourceIconAltText') }}" />
-              {{ dataSource.name }}
+              <img src="{{ table.iconSrc }}" alt="{{ t('assets.dataSourceIconAltText') }}" />
+              {{ table.name }}
             </div>
           </div>
         </div>
