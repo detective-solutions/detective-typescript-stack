@@ -1,7 +1,7 @@
 import { AuthModule, AuthModuleEnvironment, AuthService } from '@detective.solutions/backend/auth';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, TenantStatus, UserRole } from '@detective.solutions/shared/data-access';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import {
   JwtUserInfo,
@@ -60,6 +60,7 @@ describe('AppController Integration', () => {
       const testJwtUserInfo = {
         id: uuidv4(),
         tenantId: uuidv4(),
+        tenantStatus: TenantStatus.ACTIVE,
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -167,6 +168,7 @@ describe('AppController Integration', () => {
       const testJwtUserInfo = {
         id: uuidv4(),
         tenantId: uuidv4(),
+        tenantStatus: TenantStatus.ACTIVE,
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -197,6 +199,7 @@ describe('AppController Integration', () => {
     const testJwtUserInfo: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     };
@@ -340,6 +343,7 @@ describe('AppController Integration', () => {
     const testJwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
     } as JwtUserInfo;
 

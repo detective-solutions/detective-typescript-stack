@@ -1,6 +1,6 @@
 import { BadRequestException, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, TenantStatus, UserRole } from '@detective.solutions/shared/data-access';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthModuleEnvironment } from './interfaces/auth-environment.enum';
@@ -25,6 +25,7 @@ describe('AuthService', () => {
     email: 'test@test.com',
     password: 'test',
     tenantId: uuidv4(),
+    tenantStatus: TenantStatus.ACTIVE,
     role: UserRole.BASIC,
     refreshTokenId: uuidv4(),
   };
@@ -92,6 +93,7 @@ describe('AuthService', () => {
         id: testUser.id,
         role: testUser.role,
         tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.ACTIVE,
         refreshTokenId: testUser.refreshTokenId,
       });
       const checkPasswordSpy = jest.spyOn(userService, 'checkPassword').mockResolvedValue(true);
@@ -117,6 +119,7 @@ describe('AuthService', () => {
         id: testUser.id,
         role: testUser.role,
         tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.ACTIVE,
         refreshTokenId: testUser.refreshTokenId,
       });
       const checkPasswordSpy = jest.spyOn(userService, 'checkPassword').mockResolvedValue(false);
@@ -183,6 +186,7 @@ describe('AuthService', () => {
         id: testUser.id,
         role: testUser.role,
         tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.ACTIVE,
         refreshTokenId: testUser.refreshTokenId,
       });
       jest.spyOn(userService, 'updateRefreshTokenId').mockResolvedValue({});
@@ -215,6 +219,7 @@ describe('AuthService', () => {
         id: testUser.id,
         role: testUser.role,
         tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.ACTIVE,
         refreshTokenId: 'differentTokenId',
       });
 
@@ -230,6 +235,7 @@ describe('AuthService', () => {
       id: testUser.id,
       role: testUser.role,
       tenantId: testUser.tenantId,
+      tenantStatus: TenantStatus.ACTIVE,
       refreshTokenId: testUser.refreshTokenId,
     };
 

@@ -29,6 +29,7 @@ export class AuthService {
       this.logger.warn('Provided email does not exist in the database. Returning Unauthorized (401)');
       throw new UnauthorizedException();
     }
+    console.log('TEST --- ', user);
 
     const passwordMatches = await this.userService.checkPassword(email, inputPassword);
     if (!passwordMatches) {

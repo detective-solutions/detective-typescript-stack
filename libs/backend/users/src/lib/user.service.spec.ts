@@ -1,3 +1,4 @@
+import { TenantStatus, UserRole } from '@detective.solutions/shared/data-access';
 import {
   getJwtUserInfoByEmailQuery,
   getJwtUserInfoByEmailQueryName,
@@ -14,7 +15,6 @@ import { DGraphGrpcClientModule } from '@detective.solutions/backend/dgraph-grpc
 import { InternalServerErrorException } from '@nestjs/common';
 import { JwtUserInfo } from './models';
 import { Test } from '@nestjs/testing';
-import { UserRole } from '@detective.solutions/shared/data-access';
 import { UserService } from './user.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -113,6 +113,7 @@ describe('UserService', () => {
     const testResponse: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     };
@@ -193,6 +194,7 @@ describe('UserService', () => {
     const testResponse: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     };
