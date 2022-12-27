@@ -67,6 +67,7 @@ export class SidebarComponent implements OnInit {
   onDragStart(event: DragEvent) {
     const isTable = this.tableOccurrence.find((elementRef: ElementRef) => elementRef.nativeElement === event.target);
     if (isTable) {
+      console.log(isTable.nativeElement.dataset);
       event.dataTransfer?.setDragImage(this.assetsMenuIcon.nativeElement, 0, 0);
       event.dataTransfer?.setData(
         'text/plain',

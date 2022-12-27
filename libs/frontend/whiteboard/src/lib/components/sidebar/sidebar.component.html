@@ -42,12 +42,12 @@
               #tableOccurrence
               draggable="true"
               (dragstart)="onDragStart($event)"
-              [attr.data-entityId]="table.xid"
+              [attr.data-entity-id]="table.xid"
               [attr.data-name]="table.name"
               fxLayoutAlign="start center"
               class="assets-menu-list-item"
             >
-              <img src="{{ table.iconSrc }}" alt="{{ t('assets.dataSourceIconAltText') }}" />
+              <img src="{{ table.iconSrc }}" alt="{{ t('assets.dataSourceIconAltText') }}" draggable="false" />
               {{ table.name }}
             </div>
           </div>
