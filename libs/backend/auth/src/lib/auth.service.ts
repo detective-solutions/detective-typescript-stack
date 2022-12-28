@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     if (user.tenantStatus !== TenantStatus.ACTIVE) {
-      this.logger.warn('Requested user is part of an inactive tenant. Returning Unauthorized (401)');
+      this.logger.warn(`Requested user is part of inactive tenant ${user.tenantId}. Returning Unauthorized (401)`);
       throw new UnauthorizedException();
     }
 
