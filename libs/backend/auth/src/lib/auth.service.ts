@@ -5,7 +5,12 @@ import {
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { IAuthServerResponse, IJwtTokenInput, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
+import {
+  IAuthServerResponse,
+  IJwtTokenInput,
+  IJwtTokenPayload,
+  TenantStatus,
+} from '@detective.solutions/shared/data-access';
 import { JwtUserInfo, UserService } from '@detective.solutions/backend/users';
 
 import { AuthModuleEnvironment } from './interfaces/auth-environment.enum';
@@ -29,7 +34,11 @@ export class AuthService {
       this.logger.warn('Provided email does not exist in the database. Returning Unauthorized (401)');
       throw new UnauthorizedException();
     }
-    console.log('TEST --- ', user);
+
+    if (user.tenantStatus !== TenantStatus.ACTIVE) {
+      this.logger.warn('Requested user is part of an inactive tenant. Returning Unauthorized (401)');
+      throw new UnauthorizedException();
+    }
 
     const passwordMatches = await this.userService.checkPassword(email, inputPassword);
     if (!passwordMatches) {
