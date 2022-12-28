@@ -1,12 +1,12 @@
 import * as Joi from 'joi';
 
+import { AuthEnvironment } from '@detective.solutions/backend/shared/data-access';
 import { DGraphGrpcClientEnvironment } from '@detective.solutions/backend/dgraph-grpc-client';
 import { RedisClientEnvironment } from '@detective.solutions/backend/redis-client';
 
 export const defaultEnvConfig = Joi.object({
-  NODE_ENV: Joi.string().valid('development', 'production').default('development'),
-  ACCESS_TOKEN_SECRET: Joi.string().required(),
-  REFRESH_TOKEN_SECRET: Joi.string().required(), // TODO: Make AuthModule work without specifying this secret
+  NODE_ENV: Joi.string().valid('development', 'production').default('production'),
+  [AuthEnvironment.ACCESS_TOKEN_SECRET]: Joi.string().required(),
   [RedisClientEnvironment.REDIS_SERVICE_NAME]: Joi.string().required(),
   [RedisClientEnvironment.REDIS_PORT]: Joi.number().required(),
   [DGraphGrpcClientEnvironment.DATABASE_SERVICE_NAME]: Joi.string().required(),

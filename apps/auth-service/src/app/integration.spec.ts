@@ -1,7 +1,7 @@
-import { AuthModule, AuthModuleEnvironment, AuthService } from '@detective.solutions/backend/auth';
+import { AuthModule, AuthService } from '@detective.solutions/backend/auth';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { IJwtTokenPayload, UserRole } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, TenantStatus, UserRole } from '@detective.solutions/shared/data-access';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import {
   JwtUserInfo,
@@ -13,6 +13,7 @@ import {
 } from '@detective.solutions/backend/users';
 
 import { AppController } from './app.controller';
+import { AuthEnvironment } from '@detective.solutions/backend/shared/data-access';
 import { DGraphGrpcClientEnvironment } from '@detective.solutions/backend/dgraph-grpc-client';
 import { Test } from '@nestjs/testing';
 import { defaultEnvConfig } from './default-env.config';
@@ -27,8 +28,8 @@ let jwtService: JwtService;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'production';
-  process.env[AuthModuleEnvironment.ACCESS_TOKEN_SECRET] = 'accessTokenSecret';
-  process.env[AuthModuleEnvironment.REFRESH_TOKEN_SECRET] = 'refreshTokenSecret';
+  process.env[AuthEnvironment.ACCESS_TOKEN_SECRET] = 'accessTokenSecret';
+  process.env[AuthEnvironment.REFRESH_TOKEN_SECRET] = 'refreshTokenSecret';
   process.env[DGraphGrpcClientEnvironment.DATABASE_SERVICE_NAME] = 'db-service-name';
   process.env[DGraphGrpcClientEnvironment.DATABASE_PORT] = '8090';
 
@@ -60,6 +61,7 @@ describe('AppController Integration', () => {
       const testJwtUserInfo = {
         id: uuidv4(),
         tenantId: uuidv4(),
+        tenantStatus: TenantStatus.ACTIVE,
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -167,6 +169,7 @@ describe('AppController Integration', () => {
       const testJwtUserInfo = {
         id: uuidv4(),
         tenantId: uuidv4(),
+        tenantStatus: TenantStatus.ACTIVE,
         role: UserRole.BASIC,
       } as JwtUserInfo;
 
@@ -197,6 +200,7 @@ describe('AppController Integration', () => {
     const testJwtUserInfo: JwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
       refreshTokenId: uuidv4(),
     };
@@ -252,7 +256,7 @@ describe('AppController Integration', () => {
       const decodedAccessToken = jwtDecode(accessToken) as IJwtTokenPayload;
       decodedAccessToken.exp = 123;
       const modifiedAccessToken = await jwtService.signAsync(decodedAccessToken, {
-        secret: configService.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_SECRET),
+        secret: configService.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
       });
 
       return app
@@ -340,6 +344,7 @@ describe('AppController Integration', () => {
     const testJwtUserInfo = {
       id: uuidv4(),
       tenantId: uuidv4(),
+      tenantStatus: TenantStatus.ACTIVE,
       role: UserRole.BASIC,
     } as JwtUserInfo;
 
@@ -449,7 +454,7 @@ describe('AppController Integration', () => {
       const decodedRefreshToken = jwtDecode(refreshToken) as IJwtTokenPayload;
       decodedRefreshToken.ip = '1.2.3.4';
       const modifiedRefreshToken = await jwtService.signAsync(decodedRefreshToken, {
-        secret: configService.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_SECRET),
+        secret: configService.get<string>(AuthEnvironment.REFRESH_TOKEN_SECRET),
       });
 
       // Clone testJwtUserInfo and add refresh token id to mocked JwtUserInfo response
@@ -529,7 +534,7 @@ describe('AppController Integration', () => {
       const decodedRefreshToken = jwtDecode(refreshToken) as IJwtTokenPayload;
       decodedRefreshToken.exp = 123;
       const modifiedRefreshToken = await jwtService.signAsync(decodedRefreshToken, {
-        secret: configService.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_SECRET),
+        secret: configService.get<string>(AuthEnvironment.REFRESH_TOKEN_SECRET),
       });
 
       // Clone testJwtUserInfo and add refresh token id to mocked JwtUserInfo response
