@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IJwtTokenPayload, TenantStatus, UserRole } from '@detective.solutions/shared/data-access';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthModuleEnvironment } from './interfaces/auth-environment.enum';
+import { AuthEnvironment } from '@detective.solutions/backend/shared/data-access';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -53,16 +53,10 @@ describe('AuthService', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (
-                key === AuthModuleEnvironment.ACCESS_TOKEN_SECRET ||
-                key === AuthModuleEnvironment.REFRESH_TOKEN_SECRET
-              ) {
+              if (key === AuthEnvironment.ACCESS_TOKEN_SECRET || key === AuthEnvironment.REFRESH_TOKEN_SECRET) {
                 return 'testSecret';
               }
-              if (
-                key === AuthModuleEnvironment.ACCESS_TOKEN_EXPIRY ||
-                key === AuthModuleEnvironment.REFRESH_TOKEN_EXPIRY
-              ) {
+              if (key === AuthEnvironment.ACCESS_TOKEN_EXPIRY || key === AuthEnvironment.REFRESH_TOKEN_EXPIRY) {
                 return '1m';
               }
               return null;

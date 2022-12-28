@@ -13,7 +13,7 @@ import {
 } from '@detective.solutions/shared/data-access';
 import { JwtUserInfo, UserService } from '@detective.solutions/backend/users';
 
-import { AuthModuleEnvironment } from './interfaces/auth-environment.enum';
+import { AuthEnvironment } from '@detective.solutions/backend/shared/data-access';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
@@ -131,13 +131,13 @@ export class AuthService {
     // Token secrets will be automatically cached after the first retrieval
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_SECRET),
-        expiresIn: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_EXPIRY),
+        secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
+        expiresIn: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_EXPIRY),
       }),
 
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_SECRET),
-        expiresIn: this.config.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_EXPIRY),
+        secret: this.config.get<string>(AuthEnvironment.REFRESH_TOKEN_SECRET),
+        expiresIn: this.config.get<string>(AuthEnvironment.REFRESH_TOKEN_EXPIRY),
         jwtid: jwtId,
       }),
     ]);

@@ -1,3 +1,4 @@
+export * from './lib/auth';
 export * from './lib/casefile';
 export * from './lib/embedding';
 export * from './lib/messages';

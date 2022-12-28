@@ -4,7 +4,6 @@ import { DGraphGrpcClientEnvironment, DGraphGrpcClientModule } from '@detective.
 import { KafkaEventConsumer, KafkaEventProducer } from './kafka';
 import { RedisClientEnvironment, RedisClientModule } from '@detective.solutions/backend/redis-client';
 
-import { AuthModule } from '@detective.solutions/backend/auth';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -36,7 +35,6 @@ import { kafkaConfig } from './kafka-config';
       debug: !environment.production,
     }),
     ClientsModule.register([kafkaConfig] as ClientsModuleOptions),
-    AuthModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [KafkaEventConsumer],

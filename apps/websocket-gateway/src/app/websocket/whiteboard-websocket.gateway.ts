@@ -1,3 +1,4 @@
+import { AuthEnvironment, MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   IJwtTokenPayload,
@@ -20,10 +21,8 @@ import { MessagePropagationService, WhiteboardTransactionFactory } from '../serv
 import { broadcastWebSocketContext, unicastWebSocketContext } from '../utils';
 import { buildLogContext, validateDto } from '@detective.solutions/backend/shared/utils';
 
-import { AuthModuleEnvironment } from '@detective.solutions/backend/auth';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { MessageContextDTO } from '@detective.solutions/backend/shared/data-access';
 import { Server } from 'ws';
 import { WebSocketInfo } from '../models/websocket/websocket-info.type';
 import { v4 as uuidv4 } from 'uuid';
@@ -220,7 +219,7 @@ export class WhiteboardWebSocketGateway implements OnGatewayInit, OnGatewayDisco
     try {
       // Verify if token is valid (algorithm & expiry)
       const tokenPayload = await this.jwtService.verifyAsync(accessToken, {
-        secret: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_SECRET),
+        secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
       });
       // Verify if token is valid for the requested tenantId
       const urlTenantId = this.extractUrlPathParameter(url, 'tenant');
