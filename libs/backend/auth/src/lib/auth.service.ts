@@ -29,14 +29,16 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, inputPassword: string): Promise<JwtUserInfo> {
-    const user = await this.userService.getJwtUserInfoByEmail(email);
-    if (!user) {
+    const jwtUserInfo = await this.userService.getJwtUserInfoByEmail(email);
+    if (!jwtUserInfo) {
       this.logger.warn('Provided email does not exist in the database. Returning Unauthorized (401)');
       throw new UnauthorizedException();
     }
 
-    if (user.tenantStatus !== TenantStatus.ACTIVE) {
-      this.logger.warn(`Requested user is part of inactive tenant ${user.tenantId}. Returning Unauthorized (401)`);
+    if (jwtUserInfo.tenantStatus !== TenantStatus.ACTIVE) {
+      this.logger.warn(
+        `Requested user is part of inactive tenant ${jwtUserInfo.tenantId}. Returning Unauthorized (401)`
+      );
       throw new UnauthorizedException();
     }
 
@@ -46,7 +48,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return jwtUserInfo;
   }
 
   async login(jwtUserInfo: JwtUserInfo, ipAddress: string): Promise<IAuthServerResponse> {
@@ -100,6 +102,13 @@ export class AuthService {
     if (!idsMatch) {
       this.logger.warn(
         'The incoming refresh token ID does not match the ID stored in the database. Returning Unauthorized (401)'
+      );
+      throw new UnauthorizedException();
+    }
+
+    if (jwtUserInfo.tenantStatus !== TenantStatus.ACTIVE) {
+      this.logger.warn(
+        `Requested user is part of inactive tenant ${jwtUserInfo.tenantId}. Returning Unauthorized (401)`
       );
       throw new UnauthorizedException();
     }

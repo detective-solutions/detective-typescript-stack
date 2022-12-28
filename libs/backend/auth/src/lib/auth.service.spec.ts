@@ -114,6 +114,21 @@ describe('AuthService', () => {
       expect(jwtUserInfoSpy).toBeCalledTimes(1);
     });
 
+    it('should throw an UnauthorizedException if user is associated with an inactive tenant', async () => {
+      const jwtUserInfoSpy = jest.spyOn(userService, 'getJwtUserInfoByEmail').mockResolvedValue({
+        id: testUser.id,
+        role: testUser.role,
+        tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.INACTIVE,
+        refreshTokenId: testUser.refreshTokenId,
+      });
+
+      const validationPromise = authService.validateUser(testUser.email, testUser.password);
+
+      await expect(validationPromise).rejects.toThrow(UnauthorizedException);
+      expect(jwtUserInfoSpy).toBeCalledTimes(1);
+    });
+
     it('should throw an UnauthorizedException if the passwords do not match', async () => {
       const jwtUserInfoSpy = jest.spyOn(userService, 'getJwtUserInfoByEmail').mockResolvedValue({
         id: testUser.id,
@@ -191,26 +206,26 @@ describe('AuthService', () => {
       });
       jest.spyOn(userService, 'updateRefreshTokenId').mockResolvedValue({});
 
-      const res = await authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
+      const refreshPromise = await authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
 
-      expect(res).toBeTruthy();
-      expect(res).toHaveProperty('access_token');
-      expect(res).toHaveProperty('refresh_token');
+      expect(refreshPromise).toBeTruthy();
+      expect(refreshPromise).toHaveProperty('access_token');
+      expect(refreshPromise).toHaveProperty('refresh_token');
       expect(jwtUserInfoSpy).toBeCalledTimes(1);
     });
 
     it('should throw an UnauthorizedException if the request IP addresses differs from the IP address in the refresh token', async () => {
-      const loginPromise = authService.refreshTokens(testTokenPayload, '721.1.2.0');
+      const refreshPromise = authService.refreshTokens(testTokenPayload, '721.1.2.0');
 
-      await expect(loginPromise).rejects.toThrow(UnauthorizedException);
+      await expect(refreshPromise).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw an UnauthorizedException if no user is found for the incoming token subject', async () => {
       const jwtUserInfoSpy = jest.spyOn(userService, 'getJwtUserInfoById').mockResolvedValue(null);
 
-      const loginPromise = authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
+      const refreshPromise = authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
 
-      await expect(loginPromise).rejects.toThrow(UnauthorizedException);
+      await expect(refreshPromise).rejects.toThrow(UnauthorizedException);
       expect(jwtUserInfoSpy).toBeCalledTimes(1);
     });
 
@@ -223,9 +238,24 @@ describe('AuthService', () => {
         refreshTokenId: 'differentTokenId',
       });
 
-      const loginPromise = authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
+      const refreshPromise = authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
 
-      await expect(loginPromise).rejects.toThrow(UnauthorizedException);
+      await expect(refreshPromise).rejects.toThrow(UnauthorizedException);
+      expect(jwtUserInfoSpy).toBeCalledTimes(1);
+    });
+
+    it('should throw an UnauthorizedException if user is associated with an inactive tenant', async () => {
+      const jwtUserInfoSpy = jest.spyOn(userService, 'getJwtUserInfoById').mockResolvedValue({
+        id: testUser.id,
+        role: testUser.role,
+        tenantId: testUser.tenantId,
+        tenantStatus: TenantStatus.INACTIVE,
+        refreshTokenId: testUser.refreshTokenId,
+      });
+
+      const refreshPromise = authService.refreshTokens(testTokenPayload, testTokenPayload.ip);
+
+      await expect(refreshPromise).rejects.toThrow(UnauthorizedException);
       expect(jwtUserInfoSpy).toBeCalledTimes(1);
     });
   });

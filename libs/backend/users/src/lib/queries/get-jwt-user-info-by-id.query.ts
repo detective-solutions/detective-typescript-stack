@@ -12,6 +12,7 @@ export const getJwtUserInfoByIdQuery = `
       id: User.xid
       User.tenants {
         tenantId: Tenant.xid
+        tenantStatus: Tenant.status
       }
       role: User.role
       refreshTokenId: User.refreshTokenId
