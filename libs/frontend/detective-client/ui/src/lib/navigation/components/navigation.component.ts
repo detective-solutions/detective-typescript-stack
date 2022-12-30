@@ -1,10 +1,11 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { ComponentType, OverlayContainer } from '@angular/cdk/overlay';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Observable, map, shareReplay, take } from 'rxjs';
+import { Observable, Subscription, debounceTime, distinctUntilChanged, filter, map, shareReplay, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
+import { FormControl } from '@angular/forms';
 import { ISidenavItem } from '../interfaces';
 import { InviteDialogComponent } from './dialog';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
@@ -17,7 +18,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./navigation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavigationComponent {
+export class NavigationComponent implements OnInit {
   @Input()
   sidenavItems!: ISidenavItem[];
   @Input()
@@ -28,7 +29,6 @@ export class NavigationComponent {
   showSearchInput = true;
 
   email!: string;
-  searchValue = '';
   logoutErrorToastMessage!: string;
   logoutErrorToastAction!: string;
   showTableView$: Observable<boolean>;
@@ -36,8 +36,11 @@ export class NavigationComponent {
     map((result) => result.matches),
     shareReplay()
   );
+  searchFormControl = new FormControl<string>('', { nonNullable: true });
 
   private cdkOverlay: HTMLElement;
+  private readonly searchDebounceTime = 500;
+  private readonly subscriptions = new Subscription();
 
   constructor(
     private readonly authService: AuthService,
@@ -52,6 +55,14 @@ export class NavigationComponent {
     this.cdkOverlay.classList.add('default-theme'); // TODO: Inject a theme service to provide the current theme
 
     this.showTableView$ = this.navigationEventService.showTableView$;
+  }
+
+  ngOnInit() {
+    this.subscriptions.add(
+      this.searchFormControl.valueChanges
+        .pipe(debounceTime(this.searchDebounceTime), filter(Boolean), distinctUntilChanged())
+        .subscribe((searchTerm: string) => this.navigationEventService.searchInput$.next(searchTerm))
+    );
   }
 
   toggleViews(toggleChange: MatSlideToggleChange) {
