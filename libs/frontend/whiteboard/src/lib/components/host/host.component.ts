@@ -26,8 +26,21 @@ import {
   ForceDirectedGraph,
   IWhiteboardCollaborationCursor,
   TableWhiteboardNode,
+  UploadResponse,
 } from '../../models';
-import { Subject, Subscription, combineLatest, debounceTime, delayWhen, filter, map, switchMap, take, tap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  combineLatest,
+  debounceTime,
+  delayWhen,
+  filter,
+  map,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import {
   WhiteboardGeneralActions,
@@ -158,15 +171,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     if (isFile) {
+      const dataTransfer = event.dataTransfer || { files: [{ name: '' }] };
       this.toastService.showToast(
-        `Upload file ${event.dataTransfer!.files[0].name || ''} this might take a while`,
+        `Upload file ${dataTransfer.files[0].name} this might take a while`,
         '',
         ToastType.INFO,
         {
           duration: 4000,
         }
       );
-      this.whiteboardFacade.uploadFile(event).subscribe((response: any) => {
+      this.whiteboardFacade.uploadFile(event).subscribe((response: UploadResponse) => {
         this.store
           .select(selectWhiteboardContextState)
           .pipe(take(1))
@@ -184,10 +198,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
                     id: response.xid,
                     title: file.name,
                     fileName: file.name,
-                    pageCount: response.setup.pageCount,
+                    pageCount: response.setup.pageCount || 0,
                     currentIndex: 0,
-                    pages: response.setup.pages,
-                    currentLink: response.setup.pages[0],
+                    pages: response.setup.pages || [],
+                    currentLink: (response.setup.pages || [''])[0],
                     expires: new Date(),
                     x: convertedDOMPoint.x,
                     y: convertedDOMPoint.y,
