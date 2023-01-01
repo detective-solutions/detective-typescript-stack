@@ -28,19 +28,7 @@ import {
   TableWhiteboardNode,
   UploadResponse,
 } from '../../models';
-import {
-  Observable,
-  Subject,
-  Subscription,
-  combineLatest,
-  debounceTime,
-  delayWhen,
-  filter,
-  map,
-  switchMap,
-  take,
-  tap,
-} from 'rxjs';
+import { Subject, Subscription, combineLatest, debounceTime, delayWhen, filter, map, switchMap, take, tap } from 'rxjs';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 import {
   WhiteboardGeneralActions,
