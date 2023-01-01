@@ -45,7 +45,6 @@ import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
 import { formatDate } from '@detective.solutions/shared/utils';
-import { responsePathAsArray } from 'graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -160,7 +159,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (isFile) {
       this.toastService.showToast(
-        `Upload file ${event.dataTransfer!.files[0].name} this might take a while`,
+        `Upload file ${event.dataTransfer!.files[0].name || ''} this might take a while`,
         '',
         ToastType.INFO,
         {
@@ -175,11 +174,11 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
             if (isFile && response.success) {
               if (response.nodeType === 'display') {
                 for (let i = 0; i < event.dataTransfer!.files.length; i++) {
-                  const margin = i * (defaultMargin + defaultWidth);
+                  const margin = i * (defaultMargin + defaultWidth) || 0;
                   convertedDOMPoint.x += margin;
 
                   const file = event.dataTransfer!.files[i];
-                  const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+                  const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file)) || '';
 
                   const displayNode = DisplayWhiteboardNode.Build({
                     id: response.xid,

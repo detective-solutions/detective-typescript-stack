@@ -8,7 +8,7 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
-import { ForceDirectedGraph, Link, NodeComponent } from '../models';
+import { ForceDirectedGraph, InitialSetup, Link, NodeComponent, UploadResponse } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 import { WhiteboardGeneralActions, selectAllWhiteboardNodes } from '../state';
 
@@ -88,13 +88,12 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
-  getDisplayLocation(xid: string, fileName: string): Observable<any> {
+  getDisplayLocation(xid: string, fileName: string): Observable<InitialSetup> {
     return this.displayService.requestPresignedURL(xid, fileName);
   }
 
-  uploadFile($event: any): Observable<any> {
-    console.log('event facade', $event);
-    return this.displayService.fileUpload($event);
+  uploadFile(event: Event): Observable<UploadResponse> {
+    return this.displayService.fileUpload(event);
   }
 
   constructor(
