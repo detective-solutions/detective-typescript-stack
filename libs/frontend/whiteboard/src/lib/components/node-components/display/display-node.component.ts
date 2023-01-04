@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/import-sort */
+/* eslint-disable sort-imports */
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
