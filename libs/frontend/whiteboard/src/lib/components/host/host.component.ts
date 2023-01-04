@@ -157,9 +157,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       'Suspicious data',
       '',
     ];
+    const dataTransfer = event.dataTransfer || { files: [] };
 
     if (isFile) {
-      const dataTransfer = event.dataTransfer || { files: [{ name: '' }] };
       this.toastService.showToast(
         `Upload file ${dataTransfer.files[0].name} this might take a while`,
         '',
@@ -175,11 +175,11 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           .subscribe((context: IWhiteboardContextState) => {
             if (isFile && response.success) {
               if (response.nodeType === 'display') {
-                for (let i = 0; i < event.dataTransfer!.files.length; i++) {
+                for (let i = 0; i < dataTransfer.files.length; i++) {
                   const margin = i * (defaultMargin + defaultWidth) || 0;
                   convertedDOMPoint.x += margin;
 
-                  const file = event.dataTransfer!.files[i];
+                  const file = dataTransfer.files[i];
                   const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file)) || '';
 
                   const displayNode = DisplayWhiteboardNode.Build({
