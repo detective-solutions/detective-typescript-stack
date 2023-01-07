@@ -109,7 +109,6 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   previousPage() {
-    console.log('valid: ', this.checkForExpiry());
     this.refreshPages();
     if (this.currentIndex > 0) {
       this.currentIndex -= 1;
@@ -118,7 +117,6 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   nextPage() {
-    console.log('valid: ', this.checkForExpiry());
     this.refreshPages();
     if (this.currentIndex < this.pageCount - 1) {
       this.currentIndex += 1;

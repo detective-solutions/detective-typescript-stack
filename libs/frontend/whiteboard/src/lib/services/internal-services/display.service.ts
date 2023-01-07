@@ -11,32 +11,39 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 @Injectable()
 export class DisplayService {
   files: any[] = [];
+
   constructor(private readonly httpClient: HttpClient, private readonly authService: AuthService) {}
 
-  getHeader(): HttpHeaders {
-    const token: string = this.authService.getAccessToken();
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-    headers.set('Content-Type', 'multipart/form-data');
+  getHeaders(): HttpHeaders {
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders();
+
+    headers
+      .set('Authentication', token)
+      .set('Access-Control-Allow-Origin', '*')
+      .set('Content-Type', 'multipart/form-data');
+
     return headers;
   }
 
   requestPresignedURL(xid: string, fileName: string): Observable<InitialSetup> {
     return this.httpClient.post<InitialSetup>(
-      `${environment.baseApiPath}/v1/viewpoint/access`,
+      `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiAccessV1}`,
       { xid: xid, fileName: fileName },
-      { headers: this.getHeader() }
+      { headers: this.getHeaders() }
     );
   }
 
-  fileUpload($event: any): Observable<UploadResponse> {
+  fileUpload(event: DragEvent): Observable<UploadResponse> {
     const formData: FormData = new FormData();
-    if (this.files) {
-      formData.append('file', $event.dataTransfer.files[0], $event.dataTransfer.files[0].name);
-    }
+    formData.append('file', event.dataTransfer!.files[0], event.dataTransfer!.files[0].name);
 
-    return this.httpClient.post<any>(`${environment.baseApiPath}/v1/upload/file`, formData, {
-      headers: this.getHeader(),
-    });
+    return this.httpClient.post<any>(
+      `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiFileV1}`,
+      formData,
+      {
+        headers: this.getHeaders(),
+      }
+    );
   }
 }

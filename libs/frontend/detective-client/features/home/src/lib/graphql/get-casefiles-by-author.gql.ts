@@ -30,4 +30,3 @@ export class GetCasefilesByAuthorGQL extends Query<Response> {
     }
   `;
 }
-//

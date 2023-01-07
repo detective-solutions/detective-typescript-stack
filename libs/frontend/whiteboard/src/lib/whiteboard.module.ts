@@ -28,7 +28,6 @@ import {
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
-import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
@@ -58,14 +57,12 @@ import { whiteboardFeatureReducers } from './state/reducers';
   declarations: [
     EmbeddingNodeComponent,
     HostComponent,
-    IFrameTrackerDirective,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
     SidebarComponent,
     TableNodeComponent,
     EmbeddingNodeComponent,
     DisplayNodeComponent,
-    IFrameTrackerDirective,
     TestLinkComponent,
     TopbarComponent,
   ],

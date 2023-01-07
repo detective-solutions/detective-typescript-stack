@@ -6,11 +6,11 @@ import { Update } from '@ngrx/entity';
 const actionPrefix = '[Display Node]';
 
 export const loadDisplayFiles = createAction(
-  `${actionPrefix} Requesting table data from backend`,
+  `${actionPrefix} Load uploaded file`,
   props<{ node: IDisplayWhiteboardNode }>()
 );
 
 export const DisplayFilesReceived = createAction(
-  `${actionPrefix} Received table data from backend`,
+  `${actionPrefix} Received uploaded file`,
   props<{ update: Update<IDisplayWhiteboardNode> }>()
 );
