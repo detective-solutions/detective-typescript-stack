@@ -36,7 +36,10 @@ export class DisplayService {
 
   fileUpload(event: DragEvent): Observable<UploadResponse> {
     const formData: FormData = new FormData();
-    formData.append('file', event.dataTransfer!.files[0], event.dataTransfer!.files[0].name);
+
+    if (event.dataTransfer !== null) {
+      formData.append('file', event.dataTransfer.files[0], event.dataTransfer.files[0].name);
+    }
 
     return this.httpClient.post<any>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiFileV1}`,
