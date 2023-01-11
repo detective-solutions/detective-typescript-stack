@@ -1,6 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
@@ -17,6 +19,8 @@ const modules = [
   MatProgressSpinnerModule,
   DragDropModule,
   FlexLayoutModule,
+  MatChipsModule,
+  MatGridListModule,
 ];
 
 @NgModule({

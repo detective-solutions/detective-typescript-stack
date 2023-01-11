@@ -1,0 +1,71 @@
+.editor-wrapper {
+  width: 300px;
+  top: 54px;
+  float: right;
+  position: relative;
+
+  .app-ace-editor {
+    width: 100%;
+    min-height: 96vh;
+    overflow-y: hidden;
+  }
+
+  .editor-menu {
+    display: block;
+    width: 100%;
+    position: absolute;
+    height: 10%;
+    bottom: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(228, 228, 228, 0.8));
+    overflow-y: scroll;
+    z-index: 500;
+
+    button {
+      float: right;
+      position: absolute;
+      right: 40px;
+      top: 40px;
+    }
+
+    .chip-wrapper {
+      float: right;
+      position: absolute;
+      right: 40px;
+      top: 38px;
+    }
+  }
+
+  .editor-dragger {
+    width: 5px;
+    min-height: 96vh;
+    display: inline-block;
+    overflow-y: hidden;
+    top: 50px;
+    right: 500px;
+    background-color: rgba(0, 0, 0, 0);
+    border-left: 2px solid #dedede;
+    text-justify: center;
+    z-index: 200;
+    cursor: col-resize;
+
+    .editor-close-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 200px;
+      position: absolute;
+      left: -80px;
+      top: 20px;
+      background-color: white;
+      border: none;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      span {
+        color: gray;
+      }
+    }
+  }
+}

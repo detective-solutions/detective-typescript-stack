@@ -1,3 +1,11 @@
+/* eslint-disable sort-imports */
+/* eslint-disable @typescript-eslint/member-ordering */
+import 'ace-builds';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/mode-yaml';
+import 'ace-builds/src-noconflict/mode-typescript';
+import 'ace-builds/src-noconflict/mode-scss';
+
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -46,7 +54,17 @@ import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export interface CodeModel {
+  language: string;
+  value: string;
+  uri: string;
 
+  dependencies?: Array<string>;
+  schemas?: Array<{
+    uri: string;
+    schema: any;
+  }>;
+}
 @Component({
   selector: 'whiteboard-host',
   templateUrl: './host.component.html',
@@ -54,6 +72,12 @@ import { v4 as uuidv4 } from 'uuid';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
+  title = 'angular-code-editor';
+  jsonInputData = '';
+  yamlInputData = '';
+  appModuleTsData = '';
+  scssData = '';
+
   private static readonly options: WhiteboardOptions = {
     width: window.innerWidth,
     height: window.innerHeight,

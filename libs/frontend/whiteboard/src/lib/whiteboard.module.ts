@@ -6,6 +6,7 @@ import {
   WhiteboardSelectionService,
 } from './services/internal-services';
 import {
+  CodeEditorComponent,
   EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
@@ -15,6 +16,7 @@ import {
   TestLinkComponent,
   TopbarComponent,
 } from './components';
+import { GrabberDirective, IFrameTrackerDirective, ResizableDirective } from './directives';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
   WHITEBOARD_STORE_NAME,
@@ -25,8 +27,8 @@ import {
 
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
+// import { EditorModule } from './editor/editor.module';
 import { EffectsModule } from '@ngrx/effects';
-import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -45,6 +47,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
   imports: [
     AgGridModule,
     CommonModule,
+    // EditorModule,
     EffectsModule.forFeature([
       WhiteboardGeneralEffects,
       WhiteboardMetadataEffects,
@@ -67,6 +70,9 @@ import { whiteboardFeatureReducers } from './state/reducers';
     TableNodeComponent,
     TestLinkComponent,
     TopbarComponent,
+    CodeEditorComponent,
+    ResizableDirective,
+    GrabberDirective,
   ],
   providers: [
     BufferService,

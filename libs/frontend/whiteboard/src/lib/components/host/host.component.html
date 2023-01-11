@@ -5,8 +5,10 @@
   ></div>
   <div class="loading-backdrop"></div>
 </div>
+<code-editor style="position: absolute; right: 0; top: 0" [(text)]="jsonInputData" mode="sql"></code-editor>
 <whiteboard-topbar></whiteboard-topbar>
 <whiteboard-sidebar></whiteboard-sidebar>
+
 <svg
   #whiteboardContainer
   id="{{ whiteboardHtmlId }}"

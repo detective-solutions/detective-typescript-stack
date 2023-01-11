@@ -5,3 +5,4 @@ export * from './sidebar/sidebar.component';
 export * from './test-link/test-link.component';
 export * from './topbar/topbar.component';
 export * from './node-components';
+export * from './code-editor/code-editor.component';
