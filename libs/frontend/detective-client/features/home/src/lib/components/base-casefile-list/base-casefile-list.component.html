@@ -7,15 +7,15 @@
   </div>
   <table-view
     *ngIf="showTableView$ | async; else showTileView"
-    [tableRows$]="tableItems$"
-    [pageSize]="pageSize"
-    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+    [tableItems$]="tableItems$"
+    [isLoading$]="isLoading$"
+    [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
   ></table-view>
   <ng-template #showTileView>
     <tiles-view
-      [tilesInput$]="tileItems$"
-      [pageSize]="pageSize"
-      [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
+      [tiles$]="tileItems$"
+      [isLoading$]="isLoading$"
+      [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
     ></tiles-view>
   </ng-template>
 </div>

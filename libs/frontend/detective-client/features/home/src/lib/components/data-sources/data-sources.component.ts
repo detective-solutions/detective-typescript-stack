@@ -1,7 +1,7 @@
 import {
   AccessState,
+  IAbstractTableDef,
   ITableCellEvent,
-  ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
@@ -19,10 +19,10 @@ import { ISourceConnection } from '@detective.solutions/shared/data-access';
   styleUrls: ['./data-sources.component.scss'],
 })
 export class DataSourcesComponent implements OnInit, OnDestroy {
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
-
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
+  readonly isLoading$ = new Subject<boolean>();
   dataSources$!: Observable<IGetAllDataSourcesResponse>;
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
 
   readonly pageSize = 10;
@@ -45,18 +45,14 @@ export class DataSourcesComponent implements OnInit, OnDestroy {
     this.dataSources$ = this.dataSourceService.getAllDataSources(this.initialPageOffset, this.pageSize);
 
     this.tableItems$ = this.dataSources$.pipe(
-      map((dataSources: IGetAllDataSourcesResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(dataSources.dataSources),
-          totalElementsCount: dataSources.totalElementsCount,
-        };
-      })
+      map((dataSources: IGetAllDataSourcesResponse) => this.transformToTableStructure(dataSources.dataSources))
     );
 
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.dataSourceService.getAllDataSourcesNextPage(pageOffset, this.pageSize)
+      this.fetchMoreDataOnScroll$.subscribe(() =>
+        // TODO: Use correct function here
+        this.dataSourceService.getAllDataSourcesNextPage(0, this.pageSize)
       )
     );
   }

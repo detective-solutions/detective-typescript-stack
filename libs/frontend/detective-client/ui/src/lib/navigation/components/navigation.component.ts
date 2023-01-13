@@ -2,7 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { ComponentType, OverlayContainer } from '@angular/cdk/overlay';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Observable, Subscription, debounceTime, distinctUntilChanged, filter, map, shareReplay, take } from 'rxjs';
+import { Observable, Subscription, debounceTime, distinctUntilChanged, map, shareReplay, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { FormControl } from '@angular/forms';
@@ -60,7 +60,7 @@ export class NavigationComponent implements OnInit {
   ngOnInit() {
     this.subscriptions.add(
       this.searchFormControl.valueChanges
-        .pipe(debounceTime(this.searchDebounceTime), filter(Boolean), distinctUntilChanged())
+        .pipe(debounceTime(this.searchDebounceTime), distinctUntilChanged())
         .subscribe((searchTerm: string) => this.navigationEventService.searchInput$.next(searchTerm))
     );
   }

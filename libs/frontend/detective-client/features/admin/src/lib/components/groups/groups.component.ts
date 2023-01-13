@@ -3,8 +3,8 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './dialog';
 import { GroupsClickEvent, GroupsDialogComponent } from '../../models';
 import {
+  IAbstractTableDef,
   ITableCellEvent,
-  ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
@@ -25,7 +25,7 @@ import { UsersService } from '../../services';
 })
 export class GroupsComponent implements OnDestroy, OnInit {
   readonly pageSize = 10;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
 
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
@@ -34,7 +34,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
       shareReplay()
     );
 
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
 
   private readonly subscriptions = new Subscription();
@@ -65,19 +65,15 @@ export class GroupsComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.userService.getAllUserGroups(this.initialPageOffset, this.pageSize).pipe(
-      map((userGroups: IGetAllUserGroupsResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(userGroups.userGroup),
-          totalElementsCount: userGroups.totalElementsCount,
-        };
-      })
-    );
+    this.tableItems$ = this.userService
+      .getAllUserGroups(this.initialPageOffset, this.pageSize)
+      .pipe(map((userGroups: IGetAllUserGroupsResponse) => this.transformToTableStructure(userGroups.userGroup)));
 
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.userService.getAllUserGroupsNextPage(pageOffset, this.pageSize)
+      this.fetchMoreDataOnScroll$.subscribe(() =>
+        // TODO: Use correct function here
+        this.userService.getAllUserGroupsNextPage(0, this.pageSize)
       )
     );
 

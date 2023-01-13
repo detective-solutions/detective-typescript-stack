@@ -1,6 +1,12 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
+  IAbstractTableDef,
+  ITableCellEvent,
+  TableCellEventService,
+  TableCellTypes,
+} from '@detective.solutions/frontend/detective-client/ui';
+import {
   IGetAllUsersResponse,
   IGetChangePaymentResponse,
   IGetProductResponse,
@@ -11,12 +17,6 @@ import {
   SubscriptionClickEvent,
   SubscriptionDialogComponent,
 } from '../../models';
-import {
-  ITableCellEvent,
-  ITableInput,
-  TableCellEventService,
-  TableCellTypes,
-} from '@detective.solutions/frontend/detective-client/ui';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, Subscription, combineLatest, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
@@ -47,7 +47,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
 
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
   paymentMethod$!: Observable<IGetSubscriptionPaymentResponse>;
   productInfo$!: Observable<IGetProductResponse>;
@@ -91,14 +91,9 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.tableItems$ = this.subscriptionService.getInvoices().pipe(
-      map((invoices: IInvoiceListResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(invoices.data),
-          totalElementsCount: invoices.count,
-        };
-      })
-    );
+    this.tableItems$ = this.subscriptionService
+      .getInvoices()
+      .pipe(map((invoices: IInvoiceListResponse) => this.transformToTableStructure(invoices.data)));
 
     this.paymentMethod$ = this.subscriptionService.getSubscriptionPaymentMethod().pipe(
       map((payment: IGetSubscriptionPaymentResponse) => {

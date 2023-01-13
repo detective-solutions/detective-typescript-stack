@@ -1,4 +1,4 @@
-import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
+import { APOLLO_FLAGS, APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -29,6 +29,12 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
     ApolloModule,
   ],
   providers: [
+    {
+      provide: APOLLO_FLAGS,
+      useValue: {
+        useInitialLoading: true,
+      },
+    },
     {
       provide: APOLLO_OPTIONS,
       useFactory(httpLink: HttpLink) {

@@ -1,12 +1,12 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { IGetAllMaskingsResponse, IMaskingTableDef, MaskingClickEvent, MaskingDialogComponent } from '../../models';
 import {
+  IAbstractTableDef,
   ITableCellEvent,
-  ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
+import { IGetAllMaskingsResponse, IMaskingTableDef, MaskingClickEvent, MaskingDialogComponent } from '../../models';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './dialog';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
@@ -39,9 +39,9 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     );
 
   readonly pageSize = 10;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
 
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
 
   private readonly subscriptions = new Subscription();
@@ -61,19 +61,15 @@ export class MaskingsComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.maskingService.getAllMaskings(this.initialPageOffset, this.pageSize).pipe(
-      map((maskings: IGetAllMaskingsResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(maskings.maskings),
-          totalElementsCount: maskings.totalElementsCount,
-        };
-      })
-    );
+    this.tableItems$ = this.maskingService
+      .getAllMaskings(this.initialPageOffset, this.pageSize)
+      .pipe(map((maskings: IGetAllMaskingsResponse) => this.transformToTableStructure(maskings.maskings)));
 
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.maskingService.getAllMaskingsNextPage(pageOffset, this.pageSize)
+      this.fetchMoreDataOnScroll$.subscribe(() =>
+        // TODO: Use correct function here
+        this.maskingService.getAllMaskingsNextPage(0, this.pageSize)
       )
     );
 

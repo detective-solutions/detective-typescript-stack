@@ -5,9 +5,5 @@
       {{ t('addGroupButtonText') }}
     </button>
   </div>
-  <table-view
-    [tableRows$]="tableItems$"
-    [pageSize]="pageSize"
-    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
-  ></table-view>
+  <table-view [tableItems$]="tableItems$" [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"></table-view>
 </div>

@@ -8,8 +8,8 @@ import {
 } from '../../models';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
 import {
+  IAbstractTableDef,
   ITableCellEvent,
-  ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
@@ -27,7 +27,7 @@ import { ISourceConnection } from '@detective.solutions/shared/data-access';
 })
 export class ConnectionsComponent implements OnInit, OnDestroy {
   readonly pageSize = 10;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
 
   readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === ConnectionsClickEvent.EDIT_CONNECTION),
@@ -44,7 +44,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
 
   private readonly subscriptions = new Subscription();
@@ -64,19 +64,15 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.connectionsService.getAllConnections(this.initialPageOffset, this.pageSize).pipe(
-      map((connections: IGetAllConnectionsResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(connections.connections),
-          totalElementsCount: connections.totalElementsCount,
-        };
-      })
-    );
+    this.tableItems$ = this.connectionsService
+      .getAllConnections(this.initialPageOffset, this.pageSize)
+      .pipe(map((connections: IGetAllConnectionsResponse) => this.transformToTableStructure(connections.connections)));
 
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.connectionsService.getAllConnectionsNextPage(pageOffset, this.pageSize)
+      this.fetchMoreDataOnScroll$.subscribe(() =>
+        // TODO: Use correct function here
+        this.connectionsService.getAllConnectionsNextPage(0, this.pageSize)
       )
     );
 

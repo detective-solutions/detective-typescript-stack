@@ -8,9 +8,5 @@
       <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}" id="user-limit"></mat-progress-bar>
     </div>
   </div>
-  <table-view
-    [tableRows$]="tableItems$"
-    [pageSize]="pageSize"
-    [fetchMoreDataByOffset$]="fetchMoreDataByOffset$"
-  ></table-view>
+  <table-view [tableItems$]="tableItems$" [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"></table-view>
 </div>

@@ -1,12 +1,12 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { IGetAllUsersResponse, IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import {
+  IAbstractTableDef,
   ITableCellEvent,
-  ITableInput,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
+import { IGetAllUsersResponse, IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, Subject, Subscription, combineLatest, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
@@ -44,9 +44,9 @@ export class UsersComponent implements OnDestroy, OnInit {
       shareReplay()
     );
 
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
 
-  tableItems$!: Observable<ITableInput>;
+  tableItems$!: Observable<IAbstractTableDef[]>;
   totalElementsCount$!: Observable<number>;
   productInfo$!: Observable<{ userLimit: number }>;
   userRatio$!: Observable<number>;
@@ -71,19 +71,15 @@ export class UsersComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.userService.getAllUsers(this.initialPageOffset, this.pageSize).pipe(
-      map((users: IGetAllUsersResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(users.users),
-          totalElementsCount: users.totalElementsCount,
-        };
-      })
-    );
+    this.tableItems$ = this.userService
+      .getAllUsers(this.initialPageOffset, this.pageSize)
+      .pipe(map((users: IGetAllUsersResponse) => this.transformToTableStructure(users.users)));
 
     // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.userService.getAllUsersNextPage(pageOffset, this.pageSize)
+      this.fetchMoreDataOnScroll$.subscribe(() =>
+        // TODO: Use correct function here
+        this.userService.getAllUsersNextPage(0, this.pageSize)
       )
     );
 

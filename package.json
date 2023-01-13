@@ -64,6 +64,7 @@
     "joi": "17.7.0",
     "jwt-decode": "3.1.2",
     "kafkajs": "2.2.3",
+    "ngx-infinite-scroll": "14.0.1",
     "passport": "0.5.3",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
@@ -105,9 +106,9 @@
     "@types/node": "18.11.9",
     "@types/passport-jwt": "3.0.7",
     "@types/passport-local": "1.0.34",
+    "@types/uuid": "8.3.4",
     "@typescript-eslint/eslint-plugin": "5.44.0",
     "@typescript-eslint/parser": "5.44.0",
-    "@types/uuid": "8.3.4",
     "eslint": "8.15.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-ngrx": "2.0.0",
@@ -136,6 +137,9 @@
       "npx nx affected:lint --uncommitted",
       "npx nx affected:test --uncommitted --parallel --maxParallel=5"
     ]
+  },
+  "scarfSettings": {
+    "enabled": false
   },
   "browserslist": [
     "last 1 Chrome version",

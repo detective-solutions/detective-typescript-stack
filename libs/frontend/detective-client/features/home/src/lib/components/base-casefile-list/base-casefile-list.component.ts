@@ -12,8 +12,8 @@ import {
   Observable,
   Subject,
   Subscription,
-  catchError,
   combineLatest,
+  filter,
   map,
   shareReplay,
   take,
@@ -21,46 +21,21 @@ import {
 } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import {
-  GetCasefilesByAuthorGQL,
-  IGetCasefilesByAuthorGQLResponse,
-  ISearchCasefilesByTenantGQLResponse,
-  SearchCasefilesByTenantGQL,
-} from '../../graphql';
-import { ICasefileTableDef, IGetAllCasefilesResponse } from '../../interfaces';
+import { ISearchCasefilesByTenantGQLResponse, SearchCasefilesByTenantGQL } from '../../graphql';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { CasefileCreateDialogComponent } from './dialog';
 import { CasefileDTO } from '@detective.solutions/frontend/shared/data-access';
 import { ComponentType } from '@angular/cdk/portal';
+import { ICasefileTableDef } from '../../interfaces';
 import { QueryRef } from 'apollo-angular';
-import { transformError } from '@detective.solutions/frontend/shared/error-handling';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({ template: '' })
 export class BaseCasefileListComponent implements OnInit, OnDestroy {
-  casefiles$ = new Subject<CasefileDTO[]>();
-  tileItems$ = this.casefiles$.pipe(
-    map((casefiles: CasefileDTO[]) => {
-      return {
-        tiles: this.transformToTileStructure(casefiles),
-        totalElementsCount: this.totalCount,
-      };
-    })
-  );
-  tableItems$ = this.casefiles$.pipe(
-    map((casefiles: CasefileDTO[]) => {
-      return {
-        tableItems: this.transformToTableStructure(casefiles),
-        totalElementsCount: this.totalCount,
-      };
-    })
-  );
-
-  readonly showTableView$!: BehaviorSubject<boolean>;
-  readonly fetchMoreDataByOffset$ = new Subject<number>();
+  readonly isLoading$ = new Subject<boolean>();
+  readonly showTableView$!: Subject<boolean>;
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
@@ -68,10 +43,9 @@ export class BaseCasefileListComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  protected readonly initialPageOffset = 0;
-  protected readonly pageSize = 10;
-  protected readonly subscriptions = new Subscription();
-  protected totalCount!: number;
+  casefiles$ = new BehaviorSubject<CasefileDTO[]>([]);
+  tileItems$ = this.casefiles$.pipe(map((casefiles: CasefileDTO[]) => this.transformToTileStructure(casefiles)));
+  tableItems$ = this.casefiles$.pipe(map((casefiles: CasefileDTO[]) => this.transformToTableStructure(casefiles)));
 
   protected readonly accessRequests$ = this.tableCellEventService.accessRequests$.pipe(
     tap((event: ITableCellEvent) => console.log(event))
@@ -80,8 +54,10 @@ export class BaseCasefileListComponent implements OnInit, OnDestroy {
     tap((event: ITableCellEvent) => console.log(event))
   );
 
+  protected readonly pageSize = 15;
+  protected readonly subscriptions = new Subscription();
+
   private searchCasefilesByTenantWatchQuery!: QueryRef<Response>;
-  private getCasefilesByAuthorWatchQuery!: QueryRef<Response>;
 
   private readonly dialogDefaultConfig = {
     width: '650px',
@@ -96,118 +72,57 @@ export class BaseCasefileListComponent implements OnInit, OnDestroy {
     protected readonly tableCellEventService: TableCellEventService,
     protected readonly translationService: TranslocoService,
     protected readonly searchCasefilesByTenantGQL: SearchCasefilesByTenantGQL,
-    private readonly getCasefilesByAuthorGQL: GetCasefilesByAuthorGQL,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {
     this.showTableView$ = this.navigationEventService.showTableView$;
   }
 
   ngOnInit() {
-    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
-      this.searchCasefiles(authStatus.tenantId, ''); // Make initial request
-
-      // Listen to search input from navigation
-      this.subscriptions.add(
-        this.navigationEventService.searchInput$.subscribe((searchTerm: string) =>
-          this.searchCasefiles(authStatus.tenantId, searchTerm)
-        )
-      );
-
-      // Handle fetching of more data from the corresponding service
-      this.subscriptions.add(
-        this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-          this.getNextCasefilePage(pageOffset, this.pageSize)
-        )
-      );
-
-      // Handle fetching of more data from the corresponding service
-      this.subscriptions.add(
-        this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-          this.getCasefilesByAuthorNextPage(pageOffset, this.pageSize)
-        )
-      );
-
-      this.customOnInit();
-    });
+    // Handle fetching of more data from the corresponding service
+    this.subscriptions.add(
+      this.fetchMoreDataOnScroll$.subscribe((currentOffset: number) => this.getNextCasefilePage(currentOffset))
+    );
+    this.customOnInit();
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
 
-  searchCasefiles(tenantId: string, searchTerm: string) {
+  searchCasefiles(tenantId: string, searchTerm: string, authorId?: string) {
     const searchParameters = {
       tenantId: tenantId,
-      paginationOffset: this.initialPageOffset,
+      paginationOffset: 0,
       pageSize: this.pageSize,
+      filterByCurrentUser: !!authorId,
       searchTerm: this.buildSearchTermRegEx(searchTerm),
+      authorId: authorId ?? undefined,
     };
 
     if (!this.searchCasefilesByTenantWatchQuery) {
-      this.searchCasefilesByTenantWatchQuery = this.searchCasefilesByTenantGQL.watch(searchParameters);
+      this.searchCasefilesByTenantWatchQuery = this.searchCasefilesByTenantGQL.watch(searchParameters, {
+        notifyOnNetworkStatusChange: true,
+        fetchPolicy: 'cache-and-network',
+      });
       this.subscriptions.add(
         this.searchCasefilesByTenantWatchQuery.valueChanges
           .pipe(
-            map((response: any) => response.data),
-            tap((response: ISearchCasefilesByTenantGQLResponse) => {
-              this.totalCount = response.aggregateCasefile.count;
-            }),
-            map((response: ISearchCasefilesByTenantGQLResponse) => response.queryCasefile.map(CasefileDTO.Build))
+            tap(({ loading }) => this.isLoading$.next(loading)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            filter((response: any) => response?.data),
+            map(({ data }: { data: ISearchCasefilesByTenantGQLResponse }) => data.queryCasefile.map(CasefileDTO.Build))
           )
-          .subscribe((casefiles: CasefileDTO[]) => {
-            this.casefiles$.next(casefiles);
-          })
+          .subscribe((casefiles: CasefileDTO[]) => this.casefiles$.next(casefiles))
       );
     } else {
       this.searchCasefilesByTenantWatchQuery.refetch(searchParameters);
     }
   }
 
-  getNextCasefilePage(paginationOffset: number, pageSize: number) {
-    this.searchCasefilesByTenantWatchQuery
-      .fetchMore({
-        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-      })
-      .catch((error) => this.handleError(error));
-  }
-
-  getCasefilesByAuthor(
-    paginationOffset: number,
-    pageSize: number,
-    userId: string
-  ): Observable<IGetAllCasefilesResponse> {
-    this.getCasefilesByAuthorWatchQuery = this.getCasefilesByAuthorGQL.watch({
-      paginationOffset: paginationOffset,
-      pageSize: pageSize,
-      userId: userId,
+  getNextCasefilePage(currentOffset: number) {
+    this.searchCasefilesByTenantWatchQuery.fetchMore({
+      variables: { paginationOffset: currentOffset, pageSize: this.pageSize },
     });
-    return this.getCasefilesByAuthorWatchQuery.valueChanges.pipe(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      map((response: any) => response.data),
-      map((response: IGetCasefilesByAuthorGQLResponse) => {
-        if (!response.queryCasefile || !response.aggregateCasefile) {
-          this.handleError('Database response is missing required key');
-        }
-        return {
-          casefiles: response.queryCasefile,
-          totalElementsCount: response.aggregateCasefile.count,
-        };
-      }),
-      catchError((error) => this.handleError(error))
-    );
-  }
-
-  getCasefilesByAuthorNextPage(paginationOffset: number, pageSize: number) {
-    this.getCasefilesByAuthorWatchQuery
-      .fetchMore({
-        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-      })
-      .catch((error) => this.handleError(error));
-  }
-
-  private handleError(error: string) {
-    this.tableCellEventService.resetLoadingStates$.next(true);
-    return transformError(error);
   }
 
   openNewCasefileDialog(componentToOpen?: ComponentType<CasefileCreateDialogComponent>, config?: MatDialogConfig) {

@@ -5,7 +5,7 @@ import {
   HomeContainerComponent,
   MyCasefilesComponent,
 } from './components';
-import { GetAllDataSourcesGQL, GetCasefilesByAuthorGQL, SearchCasefilesByTenantGQL } from './graphql';
+import { GetAllDataSourcesGQL, SearchCasefilesByTenantGQL } from './graphql';
 import { NavigationModule, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 
@@ -42,7 +42,6 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
       },
     },
     DataSourceService,
-    GetCasefilesByAuthorGQL,
     GetAllDataSourcesGQL,
     SearchCasefilesByTenantGQL,
   ],

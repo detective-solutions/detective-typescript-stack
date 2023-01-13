@@ -12,6 +12,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { DynamicTableCellDirective } from './directives';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TableCellEventService } from './services';
@@ -33,7 +34,7 @@ import { TranslocoModule } from '@ngneat/transloco';
     TextTableCellComponent,
     UserAvatarListTableCellComponent,
   ],
-  imports: [CommonModule, TranslocoModule, RouterModule, TableMaterialModule],
+  imports: [CommonModule, InfiniteScrollModule, TranslocoModule, RouterModule, TableMaterialModule],
   providers: [TableCellEventService],
   exports: [TableComponent],
 })
