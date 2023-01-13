@@ -24,7 +24,7 @@ export const whiteboardMetadataReducer = createReducer(
     ): IWhiteboardMetadataState => {
       return {
         ...state,
-        id: action.casefile.id,
+        id: action.casefile.xid,
         title: action.casefile.title,
         description: action.casefile.description,
         // Deep copy & sort active users by their ids

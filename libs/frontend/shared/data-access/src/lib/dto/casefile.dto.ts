@@ -12,7 +12,7 @@ export class CasefileDTO implements ICasefile {
   static readonly thumbnailPlaceholder = 'assets/images/detective-logo.svg';
 
   constructor(
-    public id: string,
+    public xid: string,
     public title: string,
     public description: string,
     public thumbnail: string,
@@ -29,7 +29,7 @@ export class CasefileDTO implements ICasefile {
 
   static Build(casefileInput: ICasefile) {
     return new CasefileDTO(
-      casefileInput.id,
+      casefileInput.xid,
       casefileInput.title,
       casefileInput.description ?? '',
       casefileInput.thumbnail ?? CasefileDTO.thumbnailPlaceholder,

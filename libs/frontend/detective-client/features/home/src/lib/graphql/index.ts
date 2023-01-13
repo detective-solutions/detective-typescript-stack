@@ -1,2 +1,2 @@
-export * from './get-all-data-sources.gql';
 export * from './search-casefiles-by-tenant.gql';
+export * from './search-data-sources-by-tenant.gql';
