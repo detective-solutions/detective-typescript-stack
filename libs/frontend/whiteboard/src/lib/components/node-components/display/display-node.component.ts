@@ -3,6 +3,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { WhiteboardNodeActions } from '../../../state';
+import { InitialSetup } from '../../../models';
 
 @Component({
   selector: '[displayNode]',
@@ -38,10 +39,10 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
 
   refreshPages() {
     if (!this.checkForExpiry()) {
-      this.whiteboardFacade.getDisplayLocation(this.xid, this.fileName).subscribe((response: any) => {
-        this.pages = response.pages;
-        this.pageCount = response.pageCount;
-        this.setExpiry(response.exp);
+      this.whiteboardFacade.getDisplayLocation(this.xid, this.fileName).subscribe((response: InitialSetup) => {
+        this.pages = response.pages ?? [''];
+        this.pageCount = response.pageCount ?? 0;
+        this.setExpiry(response.exp ?? '');
         this.setImageLink();
       });
     }

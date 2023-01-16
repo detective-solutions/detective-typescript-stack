@@ -19,8 +19,8 @@ export const environment = {
   provisioningAllProductListV1: '/subscription/config',
   provisioningChangePaymentV1: '/payment/change',
   provisioningSendInviteV1: '/invite/user',
-  uploadApiAccessV1: 'upload/access',
-  uploadApiFileV1: 'upload/file',
+  uploadApiAccessV1: '/access',
+  uploadApiFileV1: '/file',
   webSocketApiPathV1: '/v1/ws',
   whiteboardPath: '/casefile',
   authMode: 'custom', // Cannot use AuthMode enum due to circular dependency

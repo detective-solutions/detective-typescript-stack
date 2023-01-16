@@ -41,7 +41,7 @@ export class DisplayService {
       formData.append('file', event.dataTransfer.files[0], event.dataTransfer.files[0].name);
     }
 
-    return this.httpClient.post<any>(
+    return this.httpClient.post<UploadResponse>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiFileV1}`,
       formData,
       {

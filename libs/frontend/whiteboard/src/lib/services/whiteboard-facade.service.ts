@@ -92,7 +92,7 @@ export class WhiteboardFacadeService {
     return this.displayService.requestPresignedURL(xid, fileName);
   }
 
-  uploadFile(event: Event): Observable<UploadResponse> {
+  uploadFile(event: any): Observable<UploadResponse> {
     return this.displayService.fileUpload(event);
   }
 
