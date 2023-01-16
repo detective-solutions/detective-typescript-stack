@@ -30,9 +30,11 @@ $sidebar-assets-menu-height: 450px;
 }
 
 .mat-menu-panel {
-  margin-top: -65px;
+  /*margin-top: -65px;*/
+  top: 20%;
+  transform: translateY(-50%);
   margin-left: 75px;
-  min-width: 250px !important;
+  min-width: 280px !important;
   max-width: fit-content !important;
 
   .assets-menu-wrapper {

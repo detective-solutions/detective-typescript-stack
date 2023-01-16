@@ -1,8 +1,9 @@
 .editor-wrapper {
-  width: 300px;
+  width: 500px;
   top: 54px;
   float: right;
   position: relative;
+  visibility: block;
 
   .app-ace-editor {
     width: 100%;

@@ -1,5 +1,11 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { IMessage, ITableNodeTemporaryData, MessageEventType } from '@detective.solutions/shared/data-access';
+import {
+  IMessage,
+  ITableNode,
+  ITableNodeTemporaryData,
+  ITableWhiteboardNode,
+  MessageEventType,
+} from '@detective.solutions/shared/data-access';
 import { filter, map, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
@@ -64,12 +70,16 @@ export class TableNodeComponent extends BaseNodeComponent {
         })
     );
 
-    // const isTemporaryTableDataAvailable =
-    //   !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
-    // if (isTemporaryTableDataAvailable) {
-    //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
-    //   // when it is handled by the state mechanism
-    //   this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
-    // }
+    const isTemporaryTableDataAvailable =
+      !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
+    if (isTemporaryTableDataAvailable) {
+      //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
+      //   // when it is handled by the state mechanism
+      this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
+    }
+  }
+
+  toggleEditor() {
+    console.log('Hello there');
   }
 }

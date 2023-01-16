@@ -1,17 +1,5 @@
 /* eslint-disable sort-imports */
-import {
-  ChangeDetectionStrategy,
-  SkipSelf,
-  Host,
-  HostListener,
-  EventEmitter,
-  Component,
-  ElementRef,
-  OnInit,
-  Output,
-  ViewChild,
-  Directive,
-} from '@angular/core';
+import { SkipSelf, Host, HostListener, ElementRef, OnInit, Directive } from '@angular/core';
 
 @Directive({
   selector: '[resizable]',
