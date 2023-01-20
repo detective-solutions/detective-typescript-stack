@@ -5,10 +5,15 @@ import {
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { IAuthServerResponse, IJwtTokenInput, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
+import {
+  IAuthServerResponse,
+  IJwtTokenInput,
+  IJwtTokenPayload,
+  TenantStatus,
+} from '@detective.solutions/shared/data-access';
 import { JwtUserInfo, UserService } from '@detective.solutions/backend/users';
 
-import { AuthModuleEnvironment } from './interfaces/auth-environment.enum';
+import { AuthEnvironment } from '@detective.solutions/backend/shared/data-access';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,9 +29,16 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, inputPassword: string): Promise<JwtUserInfo> {
-    const user = await this.userService.getJwtUserInfoByEmail(email);
-    if (!user) {
+    const jwtUserInfo = await this.userService.getJwtUserInfoByEmail(email);
+    if (!jwtUserInfo) {
       this.logger.warn('Provided email does not exist in the database. Returning Unauthorized (401)');
+      throw new UnauthorizedException();
+    }
+
+    if (jwtUserInfo.tenantStatus !== TenantStatus.ACTIVE) {
+      this.logger.warn(
+        `Requested user is part of inactive tenant ${jwtUserInfo.tenantId}. Returning Unauthorized (401)`
+      );
       throw new UnauthorizedException();
     }
 
@@ -36,7 +48,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return jwtUserInfo;
   }
 
   async login(jwtUserInfo: JwtUserInfo, ipAddress: string): Promise<IAuthServerResponse> {
@@ -94,6 +106,13 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
+    if (jwtUserInfo.tenantStatus !== TenantStatus.ACTIVE) {
+      this.logger.warn(
+        `Requested user is part of inactive tenant ${jwtUserInfo.tenantId}. Returning Unauthorized (401)`
+      );
+      throw new UnauthorizedException();
+    }
+
     return this.getTokens(jwtUserInfo, requestIpAddress);
   }
 
@@ -112,13 +131,13 @@ export class AuthService {
     // Token secrets will be automatically cached after the first retrieval
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_SECRET),
-        expiresIn: this.config.get<string>(AuthModuleEnvironment.ACCESS_TOKEN_EXPIRY),
+        secret: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET),
+        expiresIn: this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_EXPIRY),
       }),
 
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_SECRET),
-        expiresIn: this.config.get<string>(AuthModuleEnvironment.REFRESH_TOKEN_EXPIRY),
+        secret: this.config.get<string>(AuthEnvironment.REFRESH_TOKEN_SECRET),
+        expiresIn: this.config.get<string>(AuthEnvironment.REFRESH_TOKEN_EXPIRY),
         jwtid: jwtId,
       }),
     ]);

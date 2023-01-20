@@ -4,6 +4,13 @@
     "userAvatarAltAttribute": "detective user avatar",
     "inviteButtonText": "Invite"
   },
+  "sidebar": {
+    "assets": {
+      "searchBarPlaceholder": "Search",
+      "dataSourceHeader": "Data",
+      "dataSourceIconAltText": "Data source icon"
+    }
+  },
   "toastMessages": {
     "webSocketConnection": {
       "reconnecting": "Lost connection to the server. Reconnecting ...",

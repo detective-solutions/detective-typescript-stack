@@ -1,5 +1,7 @@
+export * from './lib/auth';
 export * from './lib/casefile';
 export * from './lib/embedding';
+export * from './lib/kafka';
 export * from './lib/messages';
 export * from './lib/table';
 export * from './lib/tenant';

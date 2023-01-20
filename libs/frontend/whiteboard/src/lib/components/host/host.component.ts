@@ -41,6 +41,7 @@ import {
 
 import { DomSanitizer } from '@angular/platform-browser';
 import { IWhiteboardContextState } from '../../state/interfaces';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
@@ -83,6 +84,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cursorTimeoutInterval = 7000;
   readonly whiteboardHtmlId = 'whiteboard';
 
+  private cdkOverlay: HTMLElement;
   private readonly subscriptions = new Subscription();
 
   // Reset element selection when clicking blank space on the whiteboard
@@ -101,8 +103,13 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly store: Store,
     private readonly sanitizer: DomSanitizer,
-    private readonly toastService: ToastService
-  ) {}
+    private readonly toastService: ToastService,
+    private readonly overlayContainer: OverlayContainer,
+  ) {
+    // As the overlay is not part of Angular Material, we need to inject the theme class manually
+    this.cdkOverlay = this.overlayContainer.getContainerElement();
+    this.cdkOverlay.classList.add('default-theme'); // TODO: Inject a theme service to provide the current theme
+  }
 
   ngOnInit() {
     // Bind Angular change detection to each graph tick for render sync
@@ -140,6 +147,26 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     event.preventDefault();
 
     // TODO: Add interface for drag data transfer object
+    this.store
+      .select(selectWhiteboardContextState)
+      .pipe(take(1))
+      .subscribe((context: IWhiteboardContextState) => {
+        this.store.dispatch(
+          WhiteboardNodeActions.WhiteboardNodeAdded({
+            addedNode: this.buildNodeByType(event, context),
+            addedManually: true,
+          })
+        );
+      });
+  }
+
+  buildNodeByType(event: DragEvent, whiteboardContext: IWhiteboardContextState): AnyWhiteboardNode {
+    // TODO: Add interface for drag data transfer object
+    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
+    if (!dragDataTransfer) {
+      console.error('Could not extract drag data for adding whiteboard node');
+    }
+    const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
     const now = formatDate(new Date());
     const isFile = event.dataTransfer?.files.length !== 0;

@@ -8,5 +8,6 @@
 .default-theme {
   @include mat.core-theme($default-theme);
   @include mat.tooltip-theme($default-theme);
+  @include mat.progress-spinner-theme($default-theme);
   @include custom-components-theme($default-theme);
 }
