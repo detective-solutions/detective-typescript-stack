@@ -280,7 +280,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
           if (!dragDataTransfer) {
             console.error('Could not extract drag data for adding whiteboard node');
-            return defaultNode;
           }
 
           if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
