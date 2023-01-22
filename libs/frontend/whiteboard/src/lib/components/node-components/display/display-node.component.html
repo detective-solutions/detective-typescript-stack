@@ -1,0 +1,32 @@
+<svg:g id="{{ node.id }}" class="node-container" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
+  <svg:g *ngIf="selected$ | async" node-selection-halo [nodeWidth]="node.width" [nodeHeight]="node.height"></svg:g>
+  <foreignObject *ngIf="selected$ | async" [attr.x]="node.width" [attr.width]="75" [attr.height]="node.height">
+    <div class="node-actions-wrapper display-actions">
+      <div fxFlex fxLayout="column" fxLayoutAlign="center center">
+        <button mat-icon-button (click)="nextPage()">
+          <mat-icon fxFlex>keyboard_arrow_up</mat-icon>
+        </button>
+        <span fxLayoutAlign="center center">{{ currentIndex + 1 }} of {{ pageCount }}</span>
+        <button mat-icon-button (click)="previousPage()">
+          <mat-icon fxFlex>keyboard_arrow_down</mat-icon>
+        </button>
+        <button mat-icon-button (click)="toggleLock()">
+          <mat-icon *ngIf="node.locked" fxFlex>lock</mat-icon>
+          <mat-icon *ngIf="!node.locked" fxFlex>lock_open</mat-icon>
+        </button>
+        <button mat-icon-button (click)="delete()">
+          <mat-icon fxFlex>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </foreignObject>
+  <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
+    <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
+    <node-header [title]="node.title" [isBlocked$]="isBlocked$"></node-header>
+    <img
+      class="page-content"
+      src="{{ currentLink }}"
+      alt="test"
+    />
+  </foreignObject>
+</svg:g>

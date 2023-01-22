@@ -3,11 +3,12 @@ import { AnyWhiteboardNode, WhiteboardOptions } from '@detective.solutions/share
 import {
   BufferService,
   D3AdapterService,
+  DisplayService,
   DragService,
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
-import { ForceDirectedGraph, Link, NodeComponent } from '../models';
+import { ForceDirectedGraph, InitialSetup, Link, NodeComponent, UploadResponse } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 import { WhiteboardGeneralActions, selectAllWhiteboardNodes } from '../state';
 
@@ -87,11 +88,20 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
+  getDisplayLocation(xid: string, fileName: string): Observable<InitialSetup> {
+    return this.displayService.requestPresignedURL(xid, fileName);
+  }
+
+  uploadFile(event: any): Observable<UploadResponse> {
+    return this.displayService.fileUpload(event);
+  }
+
   constructor(
     private readonly store: Store,
     private readonly actions$: Actions,
     private readonly bufferService: BufferService,
     private readonly d3AdapterService: D3AdapterService,
+    private readonly displayService: DisplayService,
     private readonly dragService: DragService,
     private readonly webSocketService: WebSocketService,
     private readonly whiteboardSelectionService: WhiteboardSelectionService

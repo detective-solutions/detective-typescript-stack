@@ -11,13 +11,13 @@ export interface IGetCasefilesByAuthorGQLResponse {
 export class GetCasefilesByAuthorGQL extends Query<Response> {
   override document = gql`
     query getCasefilesByAuthor($paginationOffset: Int!, $pageSize: Int!, $userId: String!) {
-      queryCasefile(offset: $paginationOffset, first: $pageSize, filter: { has: "author" }, order: { asc: title })
-        @cascade(fields: ["author"]) {
+      queryCasefile(offset: $paginationOffset, first: $pageSize, order: { asc: title }) @cascade(fields: ["author"]) {
         id: xid
         title
         description
         thumbnail
         author(filter: { xid: { eq: $userId } }) {
+          xid
           firstname
           lastname
         }
