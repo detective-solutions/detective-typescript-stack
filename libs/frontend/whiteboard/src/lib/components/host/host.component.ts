@@ -173,22 +173,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     ];
     const dataTransfer = event.dataTransfer || { files: [] };
 
-    const defaultNode = TableWhiteboardNode.Build({
-      id: '99999999-9999-9999-9999-999999999999',
-      title: 'error',
-      x: convertedDOMPoint.x,
-      y: convertedDOMPoint.y,
-      width: defaultWidth,
-      height: defaultHeight,
-      locked: false,
-      lastUpdatedBy: ' ',
-      lastUpdated: now,
-      created: now,
-      entity: {
-        id: ' ',
-      },
-    });
-
     if (isFile) {
       this.toastService.showToast(
         `Upload file ${dataTransfer.files[0].name} this might take a while`,
@@ -227,9 +211,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
                     height: defaultHeight,
                     locked: false,
                     file: { file, url },
-                    author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-                    editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
-                    lastUpdatedBy: '78b4daab-dfe4-4bad-855f-ac575cc59730',
+                    author: context.userId,
+                    editors: [{ id: context.userId }],
+                    lastUpdatedBy: context.userId,
                     lastUpdated: now,
                     created: now,
                   });
@@ -318,8 +302,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               width: defaultWidth,
               height: 50,
               locked: false,
-              author: '78b4daab-dfe4-4bad-855f-ac575cc59730',
-              editors: [{ id: '78b4daab-dfe4-4bad-855f-ac575cc59730' }],
+              author: context.userId,
+              editors: [{ id: context.userId }],
               lastUpdatedBy: context.userId,
               lastUpdated: now,
               created: now,
