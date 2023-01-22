@@ -34,7 +34,7 @@ $sidebar-assets-menu-height: 450px;
   top: 20%;
   transform: translateY(-50%);
   margin-left: 75px;
-  min-width: 280px !important;
+  min-width: 300px !important;
   max-width: fit-content !important;
 
   .assets-menu-wrapper {
@@ -44,7 +44,20 @@ $sidebar-assets-menu-height: 450px;
     align-items: center;
   }
 
+  .assets-menu-search-box {
+    width: 95%;
+
+    .mat-form-field {
+      width: 100%;
+    }
+  }
+
   .assets-menu-header {
+    text-align: left;
+    width: 90%;
+    h3 {
+      float: left;
+    }
     button {
       position: absolute;
       top: 17px;
@@ -72,14 +85,16 @@ $sidebar-assets-menu-height: 450px;
 
       .assets-menu-list-item {
         padding-right: 10px;
+        height: 60px;
 
         img {
-          width: 50px;
-          height: 50px;
+          width: 40px;
+          height: 40px;
           padding-right: 5px;
         }
 
         &:hover {
+          background-color: rgb(241, 241, 241);
           cursor: grab;
         }
       }
