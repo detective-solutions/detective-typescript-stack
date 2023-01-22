@@ -104,7 +104,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly store: Store,
     private readonly sanitizer: DomSanitizer,
     private readonly toastService: ToastService,
-    private readonly overlayContainer: OverlayContainer,
+    private readonly overlayContainer: OverlayContainer
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
     this.cdkOverlay = this.overlayContainer.getContainerElement();
@@ -145,22 +145,10 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onElementDrop(event: DragEvent) {
     event.preventDefault();
-
-    // TODO: Add interface for drag data transfer object
-    this.store
-      .select(selectWhiteboardContextState)
-      .pipe(take(1))
-      .subscribe((context: IWhiteboardContextState) => {
-        this.store.dispatch(
-          WhiteboardNodeActions.WhiteboardNodeAdded({
-            addedNode: this.buildNodeByType(event, context),
-            addedManually: true,
-          })
-        );
-      });
+    this.buildNodeByType(event);
   }
 
-  buildNodeByType(event: DragEvent, whiteboardContext: IWhiteboardContextState): AnyWhiteboardNode {
+  buildNodeByType(event: DragEvent) {
     // TODO: Add interface for drag data transfer object
     const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
     if (!dragDataTransfer) {
@@ -168,7 +156,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
-    const now = formatDate(new Date());
     const isFile = event.dataTransfer?.files.length !== 0;
     const defaultMargin = 50;
     const defaultWidth = 900;
@@ -185,6 +172,22 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
       '',
     ];
     const dataTransfer = event.dataTransfer || { files: [] };
+
+    const defaultNode = TableWhiteboardNode.Build({
+      id: '99999999-9999-9999-9999-999999999999',
+      title: 'error',
+      x: convertedDOMPoint.x,
+      y: convertedDOMPoint.y,
+      width: defaultWidth,
+      height: defaultHeight,
+      locked: false,
+      lastUpdatedBy: ' ',
+      lastUpdated: now,
+      created: now,
+      entity: {
+        id: ' ',
+      },
+    });
 
     if (isFile) {
       this.toastService.showToast(
@@ -277,6 +280,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
           if (!dragDataTransfer) {
             console.error('Could not extract drag data for adding whiteboard node');
+            return defaultNode;
           }
 
           if (dragDataTransfer.type === WhiteboardNodeType.TABLE) {
