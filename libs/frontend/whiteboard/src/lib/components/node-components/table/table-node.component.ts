@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import {
   IMessage,
   ITableNode,
@@ -23,6 +23,8 @@ import { WhiteboardNodeActions } from '../../../state';
 })
 export class TableNodeComponent extends BaseNodeComponent {
   // Use this observable for column updates to correctly toggle the table loading screen
+  @Output() editorEvent = new EventEmitter();
+
   readonly colDefUpdates$ = this.nodeTemporaryData$.pipe(
     filter((temporaryData: ITableNodeTemporaryData) => !!temporaryData?.colDefs && temporaryData?.colDefs.length >= 0),
     map((temporaryData: ITableNodeTemporaryData) => temporaryData.colDefs)
@@ -80,6 +82,6 @@ export class TableNodeComponent extends BaseNodeComponent {
   }
 
   toggleEditor() {
-    console.log('Hello there');
+    this.editorEvent.emit({ editorState: true, code: `SELECT * FROM 'myTable';` });
   }
 }

@@ -31,24 +31,24 @@ export class ResizableDirective implements OnInit {
 export class GrabberDirective {
   _startOffsetX = 0;
 
-  @HostListener('mousedown', ['$event']) mousedown = (e: MouseEvent) => {
-    this._startOffsetX = e.clientX;
+  @HostListener('mousedown', ['$event']) mousedown = (event: MouseEvent) => {
+    this._startOffsetX = event.clientX;
     document.addEventListener('mousemove', this._boundDragging);
     document.addEventListener('mouseup', this._boundDragEnd);
     this.resizable.dragStart();
   };
 
-  readonly _boundDragging = (e: any) => this._dragging(e);
-  readonly _boundDragEnd = (e: any) => this._dragEnd(e);
+  readonly _boundDragging = (event: MouseEvent) => this._dragging(event);
+  readonly _boundDragEnd = (event: MouseEvent) => this._dragEnd(event);
 
   constructor(private elm: ElementRef, @Host() @SkipSelf() private resizable: ResizableDirective) {}
 
-  private _dragging(e: MouseEvent) {
-    const diff = this._startOffsetX - e.clientX;
+  private _dragging(event: MouseEvent) {
+    const diff = this._startOffsetX - event.clientX;
     this.resizable.dragging(diff);
   }
 
-  private _dragEnd(e: MouseEvent) {
+  private _dragEnd(event: MouseEvent) {
     this._startOffsetX = 0;
     document.removeEventListener('mousemove', this._boundDragging);
     document.removeEventListener('mouseup', this._boundDragEnd);

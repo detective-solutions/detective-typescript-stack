@@ -26,12 +26,13 @@ import { CdkDragMove } from '@angular/cdk/drag-drop';
 export class CodeEditorComponent implements AfterViewInit, OnChanges {
   @ViewChild('editor') editorRef!: ElementRef;
   @Output() textChange = new EventEmitter<string>();
+  @Output() editorArrowEvent = new EventEmitter();
   @Input() text!: string;
   @Input() readOnly = false;
   @Input() mode = 'sql';
   @Input() prettify = true;
   editor!: Ace.Editor;
-  // All possible options can be found at:
+
   // https://github.com/ajaxorg/ace/wiki/Configuring-Ace
   options = {
     showPrintMargin: false,
@@ -42,7 +43,7 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
     fontFamily: "'Roboto Mono Regular', monospace",
   };
 
-  public editorWidth = 600;
+  public editorWidth = 700;
   offsetX = 0;
 
   ngAfterViewInit() {
@@ -69,6 +70,15 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
       }
     }
   }
+
+  onResizeEditor(event: CdkDragMove) {
+    this.editorWidth += event.pointerPosition.x;
+  }
+
+  toggleVisibility() {
+    this.editorArrowEvent.emit({ editorState: false });
+  }
+
   private initEditor_(): void {
     this.editor = edit(this.editorRef.nativeElement);
     this.editor.setOptions(this.options);
@@ -93,10 +103,5 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
   }
   private setEditorMode_(): void {
     this.editor.getSession().setMode(`ace/mode/${this.mode}`);
-  }
-
-  onResizeEditor(e: CdkDragMove) {
-    console.log('e', e);
-    this.editorWidth += e.pointerPosition.x;
   }
 }

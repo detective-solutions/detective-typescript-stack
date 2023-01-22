@@ -5,7 +5,13 @@
   ></div>
   <div class="loading-backdrop"></div>
 </div>
-<code-editor style="position: absolute; right: 0; top: 0" [(text)]="jsonInputData" mode="sql"></code-editor>
+<code-editor
+  style="position: absolute; right: 0; top: 0"
+  [(text)]="currentCode"
+  mode="sql"
+  [ngStyle]="editorVisibility ? { visibility: 'visible' } : { visibility: 'hidden' }"
+  (editorArrowEvent)="receivedEditorToggleState($event)"
+></code-editor>
 <whiteboard-topbar></whiteboard-topbar>
 <whiteboard-sidebar></whiteboard-sidebar>
 
@@ -21,7 +27,7 @@
     <g id="embedding-sibling-wrapper"></g>
     <ng-container *ngFor="let node of whiteboardNodes$ | async">
       <ng-container [ngSwitch]="node.type">
-        <g *ngSwitchCase="nodeType.TABLE" tableNode [node]="node"></g>
+        <g *ngSwitchCase="nodeType.TABLE" tableNode [node]="node" (editorEvent)="receivedEditorToggle($event)"></g>
         <g *ngSwitchCase="nodeType.EMBEDDING" embeddingNode [node]="node"></g>
       </ng-container>
     </ng-container>

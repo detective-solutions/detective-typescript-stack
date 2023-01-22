@@ -44,6 +44,7 @@ import {
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
+import { EditorEvent } from '../code-editor/models';
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
@@ -73,7 +74,6 @@ export interface CodeModel {
 })
 export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   title = 'angular-code-editor';
-  jsonInputData = '';
   yamlInputData = '';
   appModuleTsData = '';
   scssData = '';
@@ -87,6 +87,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
 
   collaborationCursors: IWhiteboardCollaborationCursor[] = [];
+
+  currentCode = ' ';
+  editorVisibility = false;
 
   readonly whiteboardNodes$ = this.whiteboardFacade.whiteboardNodes$.pipe(
     // Buffer node updates while user is dragging
@@ -173,6 +176,19 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           })
         );
       });
+  }
+
+  receivedEditorToggle(data: EditorEvent) {
+    this.editorVisibility = data.editorState ?? false;
+    this.currentCode = data.code ?? ' ';
+  }
+
+  receivedEditorToggleState(data: EditorEvent) {
+    this.editorVisibility = data.editorState ?? false;
+  }
+
+  getCurrentCode(): string {
+    return this.currentCode;
   }
 
   buildNodeByType(event: DragEvent, whiteboardContext: IWhiteboardContextState): AnyWhiteboardNode {
