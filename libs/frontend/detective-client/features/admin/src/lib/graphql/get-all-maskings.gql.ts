@@ -10,24 +10,24 @@ export interface IGetAllMaskingsGQLResponse {
 @Injectable()
 export class GetAllMaskingsGQL extends Query<Response> {
   override document = gql`
-    query Masking($xid: String, $paginationOffset: Int, $pageSize: Int) {
+    query Masking($id: String, $paginationOffset: Int, $pageSize: Int) {
       queryMasking(offset: $paginationOffset, first: $pageSize, order: { asc: name }) {
-        xid
+        id: xid
         name
-        tenant(filter: { xid: { eq: $xid } }) {
-          xid
+        tenant(filter: { xid: { eq: $id } }) {
+          id: xid
         }
         description
         table {
-          xid
+          id: xid
           name
           dataSource {
-            xid
+            id: xid
             name
           }
         }
         groups {
-          xid
+          id: xid
           name
         }
         lastUpdatedBy {

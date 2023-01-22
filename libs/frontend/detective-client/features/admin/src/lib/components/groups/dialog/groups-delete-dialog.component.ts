@@ -20,10 +20,10 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 })
 export class GroupsDeleteComponent {
   readonly maskingsToDelete!: IMaskingDeleteInput;
-  readonly groupToBeDeleted$ = this.userService.getUserGroupById(this.dialogInputData.id);
+  readonly groupToBeDeleted$ = this.usersService.getUserGroupById(this.dialogInputData.id);
   readonly groupName$ = this.groupToBeDeleted$.pipe(map((group: IUserGroup) => group.name));
 
-  readonly maskingsToBeDeleted$ = this.userService.getMaskingsOfUserGroup(this.dialogInputData.id);
+  readonly maskingsToBeDeleted$ = this.usersService.getMaskingsOfUserGroup(this.dialogInputData.id);
   readonly relatedMaskings$ = this.maskingsToBeDeleted$.pipe(map((maskings: IMasking[]) => maskings));
 
   isSubmitting = false;
@@ -36,7 +36,7 @@ export class GroupsDeleteComponent {
     private readonly toastService: ToastService,
     private readonly maskingService: MaskingService,
     private readonly dialogRef: MatDialogRef<GroupsDeleteComponent>,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly logger: LogService
   ) {
     this.relatedMaskings$.subscribe(
@@ -48,9 +48,9 @@ export class GroupsDeleteComponent {
     const maskingDeleteInput: IMaskingDeleteInput[] = [];
     maskings.forEach((masking: IMasking) => {
       maskingDeleteInput.push({
-        masking: masking.xid,
-        rows: masking.rows?.map((mask: IMask) => mask.xid ?? '') ?? [],
-        columns: masking.columns?.map((mask: IMask) => mask.xid ?? '') ?? [],
+        masking: masking.id,
+        rows: masking.rows?.map((mask: IMask) => mask.id ?? '') ?? [],
+        columns: masking.columns?.map((mask: IMask) => mask.id ?? '') ?? [],
       });
     });
     return maskingDeleteInput;
@@ -58,7 +58,7 @@ export class GroupsDeleteComponent {
 
   deleteUserGroup() {
     this.isSubmitting = true;
-    this.userService
+    this.usersService
       .deleteUserGroup(this.dialogInputData.id)
       .pipe(
         take(1),
@@ -93,7 +93,7 @@ export class GroupsDeleteComponent {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
           this.dialogRef.close();
         });
-      this.userService.refreshUserGroups();
+      this.usersService.refreshUserGroups();
     } else {
       this.logger.error('Group could not be deleted');
       this.translationService

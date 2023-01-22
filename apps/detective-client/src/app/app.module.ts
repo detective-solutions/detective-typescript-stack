@@ -33,6 +33,7 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
       provide: APOLLO_FLAGS,
       useValue: {
         useInitialLoading: true,
+        useMutationLoading: true,
       },
     },
     {
@@ -46,7 +47,7 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
             addTypename: false,
             typePolicies: {
               Query: {
-                keyFields: ['xid'],
+                keyFields: ['id'],
                 fields: {
                   queryCasefile: offsetLimitPagination(),
                   queryMasking: offsetLimitPagination(),

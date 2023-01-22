@@ -15,59 +15,59 @@ export class CreateNewMaskingGQL extends Mutation<Response> {
     mutation addMasking($masking: [AddMaskingInput!]!) {
       addMasking(input: $masking, upsert: true) {
         masking {
-          xid
+          id: xid
           name
           tenant {
-            xid
+            id: xid
           }
           description
           author {
-            xid
+            id: xid
           }
           groups {
-            xid
+            id: xid
           }
           table {
-            xid
+            id: xid
           }
           columns {
-            xid
+            id: xid
             columnName
             visible
             replaceType
             author {
-              xid
+              id: xid
             }
             editors {
-              xid
+              id: xid
             }
             lastUpdatedBy {
-              xid
+              id: xid
             }
             lastUpdated
             created
           }
           rows {
-            xid
+            id: xid
             columnName
             valueName
             visible
             replaceType
             customReplaceValue
             author {
-              xid
+              id: xid
             }
             editors {
-              xid
+              id: xid
             }
             lastUpdatedBy {
-              xid
+              id: xid
             }
             lastUpdated
             created
           }
           lastUpdatedBy {
-            xid
+            id: xid
           }
           lastUpdated
           created
@@ -83,20 +83,20 @@ export class CreateNewRowMaskGQL extends Mutation<Response> {
     mutation addRowMask($rowMask: [AddRowMaskInput!]!) {
       addRowMask(input: $rowMask) {
         rowMask {
-          xid
+          id: xid
           columnName
           valueName
           visible
           replaceType
           customReplaceValue
           author {
-            xid
+            id: xid
           }
           editors {
-            xid
+            id: xid
           }
           lastUpdatedBy {
-            xid
+            id: xid
           }
           lastUpdated
           created
@@ -112,18 +112,18 @@ export class CreateNewColumnMaskGQL extends Mutation<Response> {
     mutation addColumnMask($columnMask: [AddColumnMaskInput!]!) {
       addColumnMask(input: $columnMask) {
         columnMask {
-          xid
+          id: xid
           columnName
           visible
           replaceType
           author {
-            xid
+            id: xid
           }
           editors {
-            xid
+            id: xid
           }
           lastUpdatedBy {
-            xid
+            id: xid
           }
           lastUpdated
           created

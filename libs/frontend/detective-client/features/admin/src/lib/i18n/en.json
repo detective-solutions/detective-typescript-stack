@@ -7,7 +7,8 @@
       "maskings": "Maskings",
       "subscriptions": "Subscription"
     },
-    "sidenavBottomItem": "Home"
+    "sidenavBottomItem": "Home",
+    "sidenavBottomItemTitle": "Go back to the home view"
   },
   "connections": {
     "addConnectionButtonText": "New connection",

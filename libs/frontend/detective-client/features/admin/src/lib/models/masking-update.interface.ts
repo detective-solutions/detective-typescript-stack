@@ -1,13 +1,13 @@
 import { IMaskSubTableDataDef } from './maskings-table.interface';
 
 export interface IMaskDeleteInput {
-  columns: { xid: string }[];
-  rows: { xid: string }[];
+  columns: { id: string }[];
+  rows: { id: string }[];
 }
 
 export interface IMaskingUpdateInput {
   masking: {
-    xid: string;
+    id: string;
     name: string;
     description: string;
   };

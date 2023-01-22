@@ -1,42 +1,43 @@
-import { IUserWithXid } from '../user/user.interface';
+import { IUser } from '../user';
+
 export interface IUserGroupColumn {
   name: string;
 }
 export interface IMask {
-  xid?: string;
+  id: string;
   columnName?: string;
   valueName?: string;
   visible?: boolean;
   replaceType?: string;
   customReplaceValue?: string;
-  author?: IUserWithXid;
-  editors?: [IUserWithXid];
-  lastUpdatedBy?: IUserWithXid;
-  lastUpdated?: string;
-  created?: string;
+  author?: string;
+  editors?: IUser[];
+  lastUpdatedBy: string;
+  lastUpdated: string;
+  created: string;
 }
 
 export interface IMasking {
-  xid: string;
+  id: string;
   name: string;
   tenant: {
-    xid: string;
+    id: string;
   };
   description: string;
   table: {
-    xid: string;
+    id: string;
     name: string;
     dataSource: {
-      xid: string;
+      id: string;
       name: string;
     };
   };
-  groups?: { xid: string; name: string }[];
+  groups?: { id: string; name: string }[];
   columns?: IMask[];
   rows?: IMask[];
-  author?: IUserWithXid;
-  editors?: [IUserWithXid];
-  lastUpdatedBy?: IUserWithXid;
+  author?: string;
+  editors?: IUser[];
+  lastUpdatedBy?: string;
   lastUpdated?: string;
   created?: string;
 }

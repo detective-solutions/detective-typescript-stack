@@ -21,7 +21,7 @@ import { Store } from '@ngrx/store';
 import { selectWhiteboardContextState } from '../../state';
 
 interface IAssetsMenuTable {
-  xid: string;
+  id: string;
   name: string;
   iconSrc: string;
 }
@@ -67,7 +67,6 @@ export class SidebarComponent implements OnInit {
   onDragStart(event: DragEvent) {
     const isTable = this.tableOccurrence.find((elementRef: ElementRef) => elementRef.nativeElement === event.target);
     if (isTable) {
-      console.log(isTable.nativeElement.dataset);
       event.dataTransfer?.setDragImage(this.assetsMenuIcon.nativeElement, 0, 0);
       event.dataTransfer?.setData(
         'text/plain',
@@ -106,6 +105,7 @@ export class SidebarComponent implements OnInit {
         this.searchTablesByTenantWatchQuery.valueChanges
           .pipe(
             tap(() => (this.isLoading = true)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             map((response: any) => response.data),
             map(
               (response: ISearchTablesByTenantGQLResponse) =>
@@ -119,6 +119,7 @@ export class SidebarComponent implements OnInit {
                   .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
             )
           )
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .subscribe((response: any) => {
             this.assetsMenuTables$.next(response as IAssetsMenuTable[]);
             this.isLoading = false;

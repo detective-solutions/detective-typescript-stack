@@ -16,14 +16,14 @@ import { MaskingService } from '../../../services';
   templateUrl: 'masking-delete-dialog.component.html',
 })
 export class MaskingDeleteDialogComponent {
-  readonly maskingToBeDeleted$ = this.maskingService.getMaskingById(this.dialogInputData.xid);
+  readonly maskingToBeDeleted$ = this.maskingService.getMaskingById(this.dialogInputData.id);
   readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IMasking) => value.name));
 
   isSubmitting = false;
   selectedMasking!: IMasking;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogInputData: { xid: string },
+    @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService,
@@ -31,7 +31,7 @@ export class MaskingDeleteDialogComponent {
     private readonly dialogRef: MatDialogRef<MaskingDeleteDialogComponent>,
     private readonly logger: LogService
   ) {
-    this.maskingService.getMaskingById(this.dialogInputData.xid).subscribe((selectedMasking: IMasking) => {
+    this.maskingService.getMaskingById(this.dialogInputData.id).subscribe((selectedMasking: IMasking) => {
       this.selectedMasking = selectedMasking;
     });
   }
@@ -41,8 +41,8 @@ export class MaskingDeleteDialogComponent {
     const rows = this.selectedMasking.rows ?? [];
 
     return {
-      columns: columns.map((mask: IMask) => mask.xid ?? ''),
-      rows: rows.map((mask: IMask) => mask.xid ?? ''),
+      columns: columns.map((mask: IMask) => mask.id ?? ''),
+      rows: rows.map((mask: IMask) => mask.id ?? ''),
     };
   }
 
@@ -52,7 +52,7 @@ export class MaskingDeleteDialogComponent {
     const children = this.getMaskIdsToDelete();
     this.maskingService
       .deleteMasking({
-        masking: this.dialogInputData.xid,
+        masking: this.dialogInputData.id,
         columns: children.columns,
         rows: children.rows,
       })

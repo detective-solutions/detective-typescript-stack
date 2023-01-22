@@ -107,7 +107,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   showSubmitButton = false;
   tableColumns$!: IDropDownValues[];
   selectedMasking$!: IMasking;
-  isAddDialog = !this.dialogInputData?.xid;
+  isAddDialog = !this.dialogInputData?.id;
   masksToDelete: IMaskDeleteInput = { columns: [], rows: [] };
   readonly defaultDropDownValues = [{ key: '', value: '' }];
   readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.connectionsService.getAllConnections(
@@ -117,7 +117,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   userGroups$: IDropDownValues[] = this.defaultDropDownValues;
   connectorTables$: IDropDownValues[] = this.defaultDropDownValues;
   displayedColumns: string[] = MaskingAddEditDialogComponent.COLUMNS_SCHEMA.map((col) => col.key);
-  availableColumns$: ITableColumns[] = [{ table: '', columns: [{ xid: '', columnName: '' }] }];
+  availableColumns$: ITableColumns[] = [{ table: '', columns: [{ id: '', columnName: '' }] }];
   columnsSchema: IMaskSubTableDef[] = MaskingAddEditDialogComponent.COLUMNS_SCHEMA;
   dropDownValues: IMaskSubTableDataDropdown = {
     columnName: this.tableColumns$,
@@ -153,7 +153,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   private readonly subscriptions = new Subscription();
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogInputData: { xid: string },
+    @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly maskingService: MaskingService,
@@ -175,14 +175,13 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
 
     this.dynamicFormControlService.selectionChanged$.subscribe((event: IDropDownValues) => {
       if (event.key === 'table') {
-        const xid: string = String(event.value) || '';
-        this.updateAvailableColumns(xid);
+        this.updateAvailableColumns(event.value || '');
       }
     });
 
-    this.existingFormFieldData$ = this.maskingService.getMaskingById(this.dialogInputData?.xid).pipe(
+    this.existingFormFieldData$ = this.maskingService.getMaskingById(this.dialogInputData?.id).pipe(
       tap((response: IMasking) => {
-        this.connector = response.table.dataSource.xid;
+        this.connector = response.table.dataSource.id;
         this.selectedMasking$ = response;
         this.isSubmitting = true;
         this.dataSource = [];
@@ -320,10 +319,10 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
 
     if (formGroup.valid && this.isAddDialog) {
       const masking = {
-        table: { xid: formGroup.value.table },
-        groups: [{ xid: formGroup.value.groups }],
+        table: { id: formGroup.value.table },
+        groups: [{ id: formGroup.value.groups }],
         name: formGroup.value.name,
-        tenant: { xid: this.userService.getTenant() },
+        tenant: { id: this.userService.getTenant() },
         description: formGroup.value.description,
       };
 
@@ -345,7 +344,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     } else if (formGroup.valid && this.isAddDialog === false) {
       const set = {
         masking: {
-          xid: this.dialogInputData?.xid,
+          id: this.dialogInputData?.id,
           name: formGroup.value.name,
           description: formGroup.value.description,
         },
@@ -390,10 +389,10 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     if (!maskToDelete.isNew) {
       switch (maskToDelete.filterType) {
         case MaskingService.COLUMN_MASK_NAME:
-          this.masksToDelete.columns.push({ xid: maskToDelete.id });
+          this.masksToDelete.columns.push({ id: maskToDelete.id });
           break;
         case MaskingService.ROW_MASK_NAME:
-          this.masksToDelete.rows.push({ xid: maskToDelete.id });
+          this.masksToDelete.rows.push({ id: maskToDelete.id });
           break;
         default:
           break;
@@ -406,7 +405,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     data.forEach((mask: IMask) => {
       this.dataSource.push({
         filterType: maskType,
-        id: mask.xid ?? '',
+        id: mask.id ?? '',
         columnName: mask.columnName ?? '',
         visible: mask.visible ?? true,
         valueName: mask.valueName ?? '',
@@ -421,7 +420,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     this.connectionsService.getTablesOfConnection(this.connector).subscribe((x) => {
       const tables: IDropDownValues[] = [];
       x.connectedTables.forEach((data: IConnectionTable) => {
-        tables.push({ key: data.xid, value: data.name });
+        tables.push({ key: data.id, value: data.name });
       });
       this.connectorTables$ = tables;
     });

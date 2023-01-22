@@ -191,7 +191,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           height: defaultNodeHeight,
           locked: false,
           author: whiteboardContext.userId,
-          editors: [{ id: whiteboardContext.userId }],
+          editors: [whiteboardContext.userId],
           lastUpdatedBy: whiteboardContext.userId,
           lastUpdated: now,
           created: now,

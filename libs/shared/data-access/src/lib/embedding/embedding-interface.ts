@@ -1,5 +1,3 @@
-import { IUser } from '../user';
-
 export interface IEmbedding {
   id: string;
   title: string;
@@ -9,7 +7,7 @@ export interface IEmbedding {
   height: number;
   locked: boolean;
   author: string;
-  editors?: IUser[];
+  editors?: string[];
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;

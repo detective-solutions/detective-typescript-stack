@@ -1,4 +1,4 @@
 export interface ITableColumns {
   table: string;
-  columns: { xid: string; columnName: string }[];
+  columns: { id: string; columnName: string }[];
 }

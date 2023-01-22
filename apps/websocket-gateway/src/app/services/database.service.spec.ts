@@ -357,7 +357,7 @@ describe('DatabaseService', () => {
         .spyOn(DatabaseService.prototype, 'getTableOccurrenceToCasefileMutation')
         .mockResolvedValue({
           uid: '1xus',
-          xid: uuidv4(),
+          id: uuidv4(),
           title: 'title',
           entity: { uid: '1xu1' },
           casefile: { uid: 'ux1d', 'Casefile.tables': { uid: '2xu1' } },

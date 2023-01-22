@@ -37,5 +37,3 @@ export * from './groups-add-edit-input.interface';
 export * from './groups-modification.interface';
 export * from './users-table.interface';
 export * from './users-dialog-components.type';
-export * from './user-role-update-response.interface';
-export * from './users-modification.interface';

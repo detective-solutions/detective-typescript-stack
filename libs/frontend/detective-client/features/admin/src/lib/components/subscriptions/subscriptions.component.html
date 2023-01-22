@@ -9,7 +9,7 @@
         <small class="subscription-chip">{{ productInfo.name }}</small>
         Plan
       </p>
-      <p>{{ activeUsers$ | async }} {{ t('of') }} {{ productInfo.userLimit }} {{ t('users') }}</p>
+      <!-- <p>{{ activeUsers$ | async }} {{ t('of') }} {{ productInfo.userLimit }} {{ t('users') }}</p> -->
       <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}"></mat-progress-bar>
     </div>
     <div fxFlex="50" class="info-section" fxFlex.xs="55">

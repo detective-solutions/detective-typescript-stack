@@ -12,11 +12,9 @@
       <mat-form-field>
         <mat-label>{{ t('sourceConnectionDropdownLabel') }}</mat-label>
         <mat-select formControlName="connector">
-          <mat-option
-            *ngFor="let connection of (availableConnections$ | async)!.connections"
-            [value]="connection.xid"
-            >{{ connection.name }}</mat-option
-          >
+          <mat-option *ngFor="let connection of (availableConnections$ | async)!.connections" [value]="connection.id">{{
+            connection.name
+          }}</mat-option>
         </mat-select>
       </mat-form-field>
     </form>

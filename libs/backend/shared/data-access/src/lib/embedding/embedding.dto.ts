@@ -36,7 +36,7 @@ export class EmbeddingDTO implements IEmbedding {
   author!: string;
 
   // TODO: Add validation
-  editors!: IUser[];
+  editors!: string[];
 
   @IsUUID()
   @IsOptional()

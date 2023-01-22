@@ -12,8 +12,8 @@ export interface IMaskingTableDef extends IAbstractTableDef {
 }
 
 export interface IMaskSubTableDataDef {
-  filterType: string;
   id: string;
+  filterType: string;
   columnName: string;
   visible: boolean;
   valueName: string;

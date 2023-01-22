@@ -32,7 +32,7 @@ import { Injectable } from '@angular/core';
 import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
-import { UsersService } from './user.service';
+import { UsersService } from './users.service';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -62,8 +62,8 @@ export class MaskingService {
     private readonly logger: LogService
   ) {}
 
-  getMaskingById(xid: string): Observable<IMasking> {
-    this.getMaskingByIdWatchQuery = this.getMaskingByIdGQL.watch({ xid: xid }, { fetchPolicy: 'network-only' });
+  getMaskingById(maskingId: string): Observable<IMasking> {
+    this.getMaskingByIdWatchQuery = this.getMaskingByIdGQL.watch({ id: maskingId }, { fetchPolicy: 'network-only' });
     return this.getMaskingByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetMaskingByIdGQLResponse) => response.getMasking)
@@ -74,7 +74,7 @@ export class MaskingService {
     if (!this.getAllMaskingWatchQuery) {
       this.getAllMaskingWatchQuery = this.getAllMaskingGQL.watch(
         {
-          xid: this.userService.getTenant(),
+          id: this.userService.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -94,8 +94,8 @@ export class MaskingService {
     );
   }
 
-  getColumnsByTableId(xid: string): Observable<IGetAllColumnsResponse> {
-    this.getColumnsByTableIdWatchQuery = this.getColumnsByTableIdGQL.watch({ xid: xid });
+  getColumnsByTableId(tableId: string): Observable<IGetAllColumnsResponse> {
+    this.getColumnsByTableIdWatchQuery = this.getColumnsByTableIdGQL.watch({ id: tableId });
     return this.getColumnsByTableIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetAllColumnsResponse) => response)
@@ -106,7 +106,7 @@ export class MaskingService {
     if (!this.getUserGroupsWatchQuery) {
       this.getUserGroupsWatchQuery = this.getUserGroupsGQL.watch(
         {
-          xid: this.userService.getTenant(),
+          id: this.userService.getTenant(),
           paginationOffset: 0,
           pageSize: 1000,
         },
@@ -126,7 +126,7 @@ export class MaskingService {
     const alreadyLoadedMaskingCount = (currentResult as IGetAllMaskingsGQLResponse)?.queryMasking?.length;
     if (alreadyLoadedMaskingCount) {
       this.getAllMaskingWatchQuery.refetch({
-        xid: this.userService.getTenant(),
+        id: this.userService.getTenant(),
         paginationOffset: 0,
         pageSize: alreadyLoadedMaskingCount,
       });
@@ -148,29 +148,29 @@ export class MaskingService {
     return stringBool === 'true' ? true : false;
   }
 
-  getRowMaskObject(mask: any, user: string, date: string) {
+  getRowMaskObject(mask: any, userId: string, date: string) {
     return {
-      xid: mask.id,
+      id: mask.id,
       columnName: mask.columnName,
       valueName: mask.valueName,
       visible: this.getBooleanFromString(mask.visible),
       replaceType: mask.replaceType,
       customReplaceValue: mask.customReplaceType,
-      author: { xid: user },
-      lastUpdatedBy: { xid: user },
+      author: userId,
+      lastUpdatedBy: userId,
       lastUpdated: date,
       created: date,
     };
   }
 
-  getColumnMaskObject(mask: any, user: string, date: string) {
+  getColumnMaskObject(mask: any, userId: string, date: string) {
     return {
-      xid: mask.id,
+      id: mask.id,
       columnName: mask.columnName,
       visible: this.getBooleanFromString(mask.visible),
       replaceType: mask.replaceType,
-      author: { xid: user },
-      lastUpdatedBy: { xid: user },
+      author: userId,
+      lastUpdatedBy: userId,
       lastUpdated: date,
       created: date,
     };
@@ -187,11 +187,11 @@ export class MaskingService {
       (mask: IMaskSubTableDataDef) => mask.filterType === MaskingService.ROW_MASK_NAME
     );
 
-    const columns = filteredColumns.map((mask: IMask) => {
+    const columns = filteredColumns.map((mask: IMaskSubTableDataDef) => {
       return this.getColumnMaskObject(mask, user, date);
     });
 
-    const rows = filteredRows.map((mask: IMask) => {
+    const rows = filteredRows.map((mask: IMaskSubTableDataDef) => {
       return this.getRowMaskObject(mask, user, date);
     });
 
@@ -201,7 +201,7 @@ export class MaskingService {
           patch: {
             filter: {
               xid: {
-                eq: update.masking.xid,
+                eq: update.masking.id,
               },
             },
             set: {
@@ -222,7 +222,7 @@ export class MaskingService {
         },
         {
           refetchQueries: [
-            { query: this.getMaskingByIdGQL.document, variables: { xid: update.masking.xid } },
+            { query: this.getMaskingByIdGQL.document, variables: { id: update.masking.id } },
             { query: this.getAllMaskingGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
           ],
         }
@@ -231,13 +231,13 @@ export class MaskingService {
         map((response: any) => response.data),
         map((response: IUpdateMaskingGQLResponse) => {
           if (!Object.keys(response).includes('error')) {
-            const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.xid);
+            const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.id);
             this.deleteColumnOrRowMask(columnMaskIDToDelete, MaskingService.COLUMN_MASK_NAME);
 
-            const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.xid);
+            const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.id);
             this.deleteColumnOrRowMask(rowMaskIDToDelete, MaskingService.ROW_MASK_NAME);
           } else {
-            console.log('no deletion on mask level', Object.keys(response));
+            console.log('No deletion on mask level', Object.keys(response));
           }
           return response;
         })
@@ -333,10 +333,10 @@ export class MaskingService {
 
     const masking = payload.masking;
 
-    masking.xid = uuidv4();
-    masking.author = { xid: user };
+    masking.id = uuidv4();
+    masking.author = { id: user };
     masking.lastUpdated = date;
-    masking.lastUpdatedBy = { xid: user };
+    masking.lastUpdatedBy = { id: user };
     masking.created = date;
     masking.columns = columnMasks;
     masking.rows = rowMasks;

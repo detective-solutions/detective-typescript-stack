@@ -17,9 +17,9 @@ export class SearchDataSourcesByTenantGQL extends Query<Response> {
         order: { asc: name }
         filter: { name: { regexp: $searchTerm }, or: { description: { alloftext: $searchTerm } } }
       ) @cascade {
-        xid
+        id: xid
         tenant(filter: { xid: { eq: $tenantId } }) {
-          xid
+          id: xid
         }
         name
         description

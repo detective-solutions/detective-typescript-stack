@@ -12,10 +12,10 @@ export class GetTablesBySourceConnectionIdGQL extends Query<Response> {
     query getTablesOfSourceConnectionById($id: String!) {
       getSourceConnection(xid: $id) {
         connectedTables {
-          xid
+          id: xid
           name
           columns {
-            xid
+            id: xid
             columnName
           }
         }

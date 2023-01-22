@@ -76,7 +76,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     this.subscriptions.add(
       this.editButtonClicks$.subscribe((maskingId: string) =>
         this.openMaskingDialog(MaskingAddEditDialogComponent, {
-          data: { xid: maskingId },
+          data: { id: maskingId },
         })
       )
     );
@@ -84,7 +84,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     this.subscriptions.add(
       this.deleteButtonClicks$.subscribe((maskingId: string) =>
         this.openMaskingDialog(MaskingDeleteDialogComponent, {
-          data: { xid: maskingId },
+          data: { id: maskingId },
           width: '500px',
         })
       )
@@ -113,7 +113,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
             maskingInfo: {
               columnName: '',
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
                 name: maskings.name,
                 description: String(maskings.description),
@@ -122,7 +122,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
             table: {
               columnName: translation['tableNameColumn'],
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
                 text: String(maskings.table.name),
               },
@@ -130,7 +130,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
             userGroups: {
               columnName: translation['userGroupsColumn'],
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
                 text: String(maskings.groups?.map((group) => group.name).join(', ')),
               },
@@ -138,15 +138,15 @@ export class MaskingsComponent implements OnDestroy, OnInit {
             lastUpdatedBy: {
               columnName: translation['lastUpdatedByColumn'],
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: `${maskings.lastUpdatedBy?.firstname} ${maskings.lastUpdatedBy?.lastname}`,
+                text: maskings.lastUpdatedBy,
               },
             },
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
                 date: String(maskings.lastUpdated),
               },
@@ -154,7 +154,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
             actions: {
               columnName: '',
               cellData: {
-                id: maskings.xid,
+                id: maskings.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
                   { icon: 'edit', clickEventKey: MaskingClickEvent.EDIT_MASKING },

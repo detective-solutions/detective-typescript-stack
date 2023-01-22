@@ -7,7 +7,6 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import {
-  IGetAllUsersResponse,
   IGetChangePaymentResponse,
   IGetProductResponse,
   IGetSubscriptionPaymentResponse,
@@ -18,7 +17,7 @@ import {
   SubscriptionDialogComponent,
 } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Observable, Subscription, combineLatest, filter, map, shareReplay, take } from 'rxjs';
+import { Observable, Subscription, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { SubscriptionCancelDialogComponent, SubscriptionUpgradeDialogComponent } from './dialog';
 
@@ -31,10 +30,6 @@ import { SubscriptionService } from '../../services';
   styleUrls: ['./subscriptions.component.scss'],
 })
 export class SubscriptionsComponent implements OnInit, OnDestroy {
-  readonly activeUsers$: Observable<number> = this.subscriptionService
-    .getAllUsers()
-    .pipe(map((response: IGetAllUsersResponse) => response.totalElementsCount));
-
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
@@ -82,13 +77,6 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
           priceTag: SubscriptionService.convertAmountToCurrencyString(product.price, product.currency) || '',
         };
       })
-    );
-
-    this.userRatio$ = combineLatest(
-      [this.activeUsers$, this.productInfo$],
-      (active: number, limit: IGetProductResponse) => {
-        return (active / limit.userLimit) * 100;
-      }
     );
 
     this.tableItems$ = this.subscriptionService

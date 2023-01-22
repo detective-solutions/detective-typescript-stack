@@ -1,29 +1,23 @@
+import { BehaviorSubject, Observable, catchError, map } from 'rxjs';
 import {
   CreateUserGroupGQL,
-  DeleteUserGQL,
   DeleteUserGroupGQL,
   GetAllUserGroupsGQL,
   GetAllUsersGQL,
   GetMaskingByUserGroupIdGQL,
-  GetUserByIdGQL,
   GetUserGroupByIdGQL,
   ICreateUserGroupGQLResponse,
-  IDeleteUserGQLResponse,
   IDeleteUserGroupGQLResponse,
   IGetMaskingByUserGroupIdGQLResponse,
-  IGetUserByIdGQLResponse,
   IGetUserGroupByIdGQLResponse,
   IGetUserGroupsGQLResponse,
   IGetUsersGQLResponse,
   IUpdateUserGroupGQLResponse,
-  IUpdateUserRoleGQLResponse,
   UpdateUserGroupGQL,
-  UpdateUserRoleGQL,
 } from '../graphql';
 import { IGetAllUsersResponse, UserGroupCreateInput, UserGroupEditInput } from '../models';
-import { IJwtTokenPayload, IMasking, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
+import { IJwtTokenPayload, IMasking, IUserGroup } from '@detective.solutions/shared/data-access';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
-import { Observable, catchError, map } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { IGetAllUserGroupsResponse } from '../models/get-all-user-groups-response.interface';
@@ -38,22 +32,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
-  private getAllUserGroupsWatchQuery!: QueryRef<Response>;
+  readonly isLoading$ = new BehaviorSubject<boolean>(false);
+
   private getAllUsersWatchQuery!: QueryRef<Response>;
-  private getUserByIdWatchQuery!: QueryRef<Response>;
+  private getAllUserGroupsWatchQuery!: QueryRef<Response>;
+  private getUserGroupByIdWatchQuery!: QueryRef<Response>;
   private getMaskingsOfUserGroupWatchQuery!: QueryRef<Response>;
 
   constructor(
     private readonly getAllUserGroupsGQL: GetAllUserGroupsGQL,
     private readonly getUserGroupByIdGQL: GetUserGroupByIdGQL,
     private readonly getAllUsersGQL: GetAllUsersGQL,
-    private readonly getUserByIdGQL: GetUserByIdGQL,
-    private readonly deleteUserGQL: DeleteUserGQL,
     private readonly createUserGroupGQL: CreateUserGroupGQL,
     private readonly updateUserGroupGQL: UpdateUserGroupGQL,
     private readonly authService: AuthService,
     private readonly deleteUserGroupGQL: DeleteUserGroupGQL,
-    private readonly updateUserRoleGQL: UpdateUserRoleGQL,
     private readonly getMaskingsOfUserGroupById: GetMaskingByUserGroupIdGQL,
     private readonly tableCellEventService: TableCellEventService,
     private readonly logger: LogService
@@ -75,7 +68,7 @@ export class UsersService {
     if (!this.getAllUsersWatchQuery) {
       this.getAllUsersWatchQuery = this.getAllUsersGQL.watch(
         {
-          xid: this.getTenant(),
+          id: this.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -95,85 +88,11 @@ export class UsersService {
     );
   }
 
-  getUserById(id: string): Observable<IUser> {
-    this.getUserByIdWatchQuery = this.getUserByIdGQL.watch({ id: id });
-    return this.getUserByIdWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetUserByIdGQLResponse) => response.getUser)
-    );
-  }
-
-  updateUserRole(id: string, roleData: { role: string; lastUpdated: string }): Observable<IUpdateUserRoleGQLResponse> {
-    return this.updateUserRoleGQL
-      .mutate(
-        {
-          patch: {
-            filter: {
-              xid: {
-                eq: id,
-              },
-            },
-            set: roleData,
-          },
-        },
-        {
-          refetchQueries: [{ query: this.getAllUsersGQL.document, variables: { paginationOffset: 0, pageSize: 100 } }],
-        }
-      )
-      .pipe(
-        map((response: any) => response.data),
-        map((response: IUpdateUserRoleGQLResponse) => response)
-      );
-  }
-
-  deleteUser(id: string): Observable<IDeleteUserGQLResponse> {
-    return this.deleteUserGQL
-      .mutate(
-        {
-          filter: {
-            xid: {
-              eq: id,
-            },
-          },
-        },
-        {
-          refetchQueries: [{ query: this.getAllUsersGQL.document, variables: { paginationOffset: 0, pageSize: 100 } }],
-        }
-      )
-      .pipe(
-        map((response: any) => response.data),
-        map((response: IDeleteUserGQLResponse) => response)
-      );
-  }
-
-  refreshUsers() {
-    const currentResult = this.getAllUsersWatchQuery.getCurrentResult()?.data as any;
-    const alreadyLoadedUserCount = (currentResult as IGetUsersGQLResponse)?.queryUser?.length;
-    if (alreadyLoadedUserCount) {
-      this.getAllUsersWatchQuery.refetch({
-        xid: this.getTenant(),
-        paginationOffset: 0,
-        pageSize: alreadyLoadedUserCount,
-      });
-    } else {
-      this.logger.error('Could not determine currently loaded masking count. Reusing values of last query...');
-      this.getAllUsersWatchQuery.refetch();
-    }
-  }
-
-  getAllUsersNextPage(paginationOffset: number, pageSize: number) {
-    this.getAllUsersWatchQuery
-      .fetchMore({
-        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-      })
-      .catch((error) => this.handleError(error));
-  }
-
   getAllUserGroups(paginationOffset: number, pageSize: number): Observable<IGetAllUserGroupsResponse> {
     if (!this.getAllUserGroupsWatchQuery) {
       this.getAllUserGroupsWatchQuery = this.getAllUserGroupsGQL.watch(
         {
-          xid: this.getTenant(),
+          id: this.getTenant(),
           paginationOffset: paginationOffset,
           pageSize: pageSize,
         },
@@ -193,9 +112,9 @@ export class UsersService {
     );
   }
 
-  getUserGroupById(xid: string): Observable<IUserGroup> {
-    this.getUserByIdWatchQuery = this.getUserGroupByIdGQL.watch({ xid: xid });
-    return this.getUserByIdWatchQuery.valueChanges.pipe(
+  getUserGroupById(userGroupId: string): Observable<IUserGroup> {
+    this.getUserGroupByIdWatchQuery = this.getUserGroupByIdGQL.watch({ userGroupId });
+    return this.getUserGroupByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetUserGroupByIdGQLResponse) => {
         return response.getUserGroup;
@@ -203,13 +122,13 @@ export class UsersService {
     );
   }
 
-  deleteUserGroup(id: string): Observable<IDeleteUserGroupGQLResponse> {
+  deleteUserGroup(userGroupId: string): Observable<IDeleteUserGroupGQLResponse> {
     return this.deleteUserGroupGQL
       .mutate(
         {
           filter: {
             xid: {
-              eq: id,
+              eq: userGroupId,
             },
           },
         },
@@ -231,7 +150,7 @@ export class UsersService {
 
     const userGroup = update;
     userGroup.lastUpdated = date;
-    userGroup.lastUpdatedBy = { xid: user };
+    userGroup.lastUpdatedBy = { id: user };
 
     return this.updateUserGroupGQL
       .mutate(
@@ -239,7 +158,7 @@ export class UsersService {
           patch: {
             filter: {
               xid: {
-                eq: update.xid,
+                eq: update.id,
               },
             },
             set: {
@@ -258,7 +177,7 @@ export class UsersService {
         },
         {
           refetchQueries: [
-            { query: this.getUserGroupByIdGQL.document, variables: { xid: update.xid } },
+            { query: this.getUserGroupByIdGQL.document, variables: { id: update.id } },
             { query: this.getAllUserGroupsGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
           ],
         }
@@ -276,11 +195,11 @@ export class UsersService {
 
     const userGroup = payload;
 
-    userGroup.xid = uuidv4();
-    userGroup.author = { xid: user };
+    userGroup.id = uuidv4();
+    userGroup.author = { id: user };
     userGroup.lastUpdated = date;
-    userGroup.tenant = { xid: tenant };
-    userGroup.lastUpdatedBy = { xid: user };
+    userGroup.tenant = { id: tenant };
+    userGroup.lastUpdatedBy = { id: user };
     userGroup.created = date;
 
     return this.createUserGroupGQL
@@ -300,8 +219,8 @@ export class UsersService {
       );
   }
 
-  getMaskingsOfUserGroup(xid: string): Observable<IMasking[]> {
-    this.getMaskingsOfUserGroupWatchQuery = this.getMaskingsOfUserGroupById.watch({ xid: xid });
+  getMaskingsOfUserGroup(userGroupId: string): Observable<IMasking[]> {
+    this.getMaskingsOfUserGroupWatchQuery = this.getMaskingsOfUserGroupById.watch({ userGroupId });
     return this.getMaskingsOfUserGroupWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetMaskingByUserGroupIdGQLResponse) => response.queryMasking)
@@ -313,7 +232,7 @@ export class UsersService {
     const alreadyLoadedUserGroupCount = (currentResult as IGetUserGroupsGQLResponse)?.queryUserGroup?.length;
     if (alreadyLoadedUserGroupCount) {
       this.getAllUserGroupsWatchQuery.refetch({
-        xid: this.getTenant(),
+        id: this.getTenant(),
         paginationOffset: 0,
         pageSize: alreadyLoadedUserGroupCount,
       });

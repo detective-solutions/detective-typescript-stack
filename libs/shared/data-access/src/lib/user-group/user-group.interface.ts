@@ -1,13 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-
 export interface IMember {
-  xid: string;
+  id: string;
   firstname: string;
   lastname: string;
 }
 
 export interface IUserGroup {
-  xid?: string;
+  id: string;
   name?: string;
   description?: string;
   members?: IMember[];
@@ -16,6 +14,6 @@ export interface IUserGroup {
   };
   lastUpdated?: string;
   tenant?: {
-    xid: string;
+    id: string;
   };
 }

@@ -47,10 +47,10 @@ export class GroupsAddEditDialogComponent implements OnInit {
 
   readonly searchBox = new UntypedFormControl('');
   readonly isAddDialog = !this.dialogInputData?.id;
-  readonly existingFormFieldData$ = this.userService.getUserGroupById(this.dialogInputData?.id).pipe(
+  readonly existingFormFieldData$ = this.usersService.getUserGroupById(this.dialogInputData?.id).pipe(
     map((response: IUserGroup) => {
       response.members?.forEach((element: IMember) => {
-        this.addRow(element.xid, `${element.firstname} ${element.lastname}`, false);
+        this.addRow(element.id, `${element.firstname} ${element.lastname}`, false);
       });
       this.isSubmitting = true;
       return response;
@@ -69,14 +69,14 @@ export class GroupsAddEditDialogComponent implements OnInit {
 
   private userOptions$!: Observable<IDropDownUser[]>;
   private readonly subscriptions = new Subscription();
-  private usersToDelete: { xid: string }[] = [];
+  private usersToDelete: { id: string }[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly dialogRef: MatDialogRef<GroupsAddEditDialogComponent>,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly logger: LogService
@@ -89,10 +89,10 @@ export class GroupsAddEditDialogComponent implements OnInit {
   ngOnInit() {
     this.newFormFiledData = this.generateAddForm();
 
-    this.userOptions$ = this.userService.getAllUsers(0, 10000).pipe(
+    this.userOptions$ = this.usersService.getAllUsers(0, 10000).pipe(
       map((users: IGetAllUsersResponse) => {
         return users.users.map((user: IUser) => {
-          return { xid: user.id, name: `${user.firstname} ${user.lastname}` };
+          return { id: user.id, name: `${user.firstname} ${user.lastname}` };
         });
       })
     );
@@ -120,7 +120,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
     const members = this.dataSource
       .filter((member: GroupMember) => member.isNew)
       .map((member: GroupMember) => {
-        return { xid: member.id };
+        return { id: member.id };
       });
 
     if (formGroup.valid && this.isAddDialog) {
@@ -130,7 +130,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
         members: members,
       };
 
-      this.userService
+      this.usersService
         .createUserGroup(payload)
         .pipe(
           take(1),
@@ -144,14 +144,14 @@ export class GroupsAddEditDialogComponent implements OnInit {
         });
     } else if (formGroup.valid && !this.isAddDialog) {
       const update = {
-        xid: this.dialogInputData.id,
+        id: this.dialogInputData.id,
         name: formGroup.value.name,
         description: formGroup.value.description,
         members: members,
         toDeleteMembers: this.usersToDelete,
       };
 
-      this.userService
+      this.usersService
         .updateUserGroup(update)
         .pipe(
           take(1),
@@ -182,7 +182,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
   removeRow(id: string) {
     const userToDelete = this.dataSource.filter((member: GroupMember) => member.id === id)[0];
     if (!userToDelete.isNew) {
-      this.usersToDelete.push({ xid: userToDelete.id });
+      this.usersToDelete.push({ id: userToDelete.id });
     }
 
     this.dataSource = this.dataSource.filter((member: GroupMember) => member.id !== id);
@@ -258,7 +258,7 @@ export class GroupsAddEditDialogComponent implements OnInit {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
           this.dialogRef.close();
         });
-      this.userService.refreshUserGroups();
+      this.usersService.refreshUserGroups();
     } else {
       this.logger.error('Group could not be edited');
       this.translationService

@@ -5,13 +5,13 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class GetAllColumnsGQL extends Query<Response> {
   override document = gql`
-    query ColumnDefinition($xid: String) {
+    query ColumnDefinition($id: String) {
       queryColumnDefinition @cascade {
-        xid
+        id: xid
         columnName
         columnType
-        schemaTable(filter: { xid: { eq: $xid } }) {
-          xid
+        schemaTable(filter: { xid: { eq: $id } }) {
+          id: xid
         }
       }
     }

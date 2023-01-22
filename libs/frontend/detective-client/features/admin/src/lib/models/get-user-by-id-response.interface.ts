@@ -1,8 +1,8 @@
 export interface IGetUserByIdResponse {
-  xid: string;
+  id: string;
   email: string;
   tenants: {
-    xid: string;
+    id: string;
   };
   role: string;
   firstname: string;

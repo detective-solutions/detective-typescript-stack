@@ -4,7 +4,7 @@ import { IUser } from '../user';
 import { IUserQueryOccurrence } from '../user-query';
 
 export interface ICasefile {
-  xid: string;
+  id: string;
   title: string;
   description?: string;
   thumbnail?: string;

@@ -57,7 +57,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
 
   constructor(
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly tableCellEventService: TableCellEventService,
     private readonly matDialog: MatDialog,
     private readonly translationService: TranslocoService,
@@ -65,7 +65,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.userService
+    this.tableItems$ = this.usersService
       .getAllUserGroups(this.initialPageOffset, this.pageSize)
       .pipe(map((userGroups: IGetAllUserGroupsResponse) => this.transformToTableStructure(userGroups.userGroup)));
 
@@ -73,7 +73,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
     this.subscriptions.add(
       this.fetchMoreDataOnScroll$.subscribe(() =>
         // TODO: Use correct function here
-        this.userService.getAllUserGroupsNextPage(0, this.pageSize)
+        this.usersService.getAllUserGroupsNextPage(0, this.pageSize)
       )
     );
 
@@ -117,7 +117,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
             groupName: {
               columnName: '',
               cellData: {
-                id: groups.xid,
+                id: groups.id,
                 type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
                 name: groups.name,
                 description: String(groups.description),
@@ -126,7 +126,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
             members: {
               columnName: translation['roleColumn'],
               cellData: {
-                id: groups.xid,
+                id: groups.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
                 text: String(groups.memberCount?.count),
               },
@@ -134,7 +134,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: groups.xid,
+                id: groups.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
                 date: String(groups.lastUpdated),
               },
@@ -142,7 +142,7 @@ export class GroupsComponent implements OnDestroy, OnInit {
             actions: {
               columnName: '',
               cellData: {
-                id: groups.xid,
+                id: groups.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
                   { icon: 'edit', clickEventKey: GroupsClickEvent.EDIT_GROUP },

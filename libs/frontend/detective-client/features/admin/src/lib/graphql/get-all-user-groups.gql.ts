@@ -14,17 +14,17 @@ export interface IGetUserGroupsAsDropDownValuesGQLResponse {
 @Injectable()
 export class GetAllUserGroupsGQL extends Query<Response> {
   override document = gql`
-    query UserGroup($xid: String, $paginationOffset: Int, $pageSize: Int) {
+    query UserGroup($userGroupId: String, $paginationOffset: Int, $pageSize: Int) {
       queryUserGroup(offset: $paginationOffset, first: $pageSize, order: { asc: name }) @cascade(fields: ["tenant"]) {
-        xid
+        id: xid
         name
         description
         memberCount: membersAggregate {
           count
         }
         lastUpdated
-        tenant(filter: { xid: { eq: $xid } }) {
-          xid
+        tenant(filter: { xid: { eq: $userGroupId } }) {
+          id: xid
         }
       }
       aggregateUserGroup {
@@ -37,12 +37,12 @@ export class GetAllUserGroupsGQL extends Query<Response> {
 @Injectable()
 export class GetAllUserGroupsAsDropDownValuesGQL extends Query<Response> {
   override document = gql`
-    query UserGroup($xid: String) {
+    query UserGroup($id: String) {
       queryUserGroup {
-        key: xid
+        id: xid
         value: name
-        tenant(filter: { xid: { eq: $xid } }) {
-          xid
+        tenant(filter: { xid: { eq: $id } }) {
+          id: xid
         }
       }
     }

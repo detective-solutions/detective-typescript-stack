@@ -15,50 +15,50 @@ export class UpdateMaskingGQL extends Mutation<Response> {
     mutation updateMasking($patch: UpdateMaskingInput!) {
       updateMasking(input: $patch) {
         masking {
-          xid
+          id: xid
           name
           description
           columns {
-            xid
+            id: xid
             columnName
             visible
             replaceType
             author {
-              xid
+              id: xid
             }
             editors {
-              xid
+              id: xid
             }
             lastUpdatedBy {
-              xid
+              id: xid
             }
             lastUpdated
             created
           }
           rows {
-            xid
+            id: xid
             columnName
             valueName
             visible
             replaceType
             customReplaceValue
             author {
-              xid
+              id: xid
             }
             editors {
-              xid
+              id: xid
             }
             lastUpdatedBy {
-              xid
+              id: xid
             }
             lastUpdated
             created
           }
           lastUpdatedBy {
-            xid
+            id: xid
           }
           lastUpdatedBy {
-            xid
+            id: xid
           }
           lastUpdated
         }

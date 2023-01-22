@@ -24,14 +24,14 @@ export class SearchCasefilesByTenantGQL extends Query<Response> {
         order: { asc: title }
         filter: { title: { regexp: $searchTerm }, or: { description: { alloftext: $searchTerm } } }
       ) @cascade {
-        xid
+        id: xid
         tenant(filter: { xid: { eq: $tenantId } }) {
-          xid
+          id: xid
         }
         title
         description
         author(filter: { xid: { eq: $authorId } }) @include(if: $filterByCurrentUser) {
-          xid
+          id: xid
           firstname
           lastname
         }

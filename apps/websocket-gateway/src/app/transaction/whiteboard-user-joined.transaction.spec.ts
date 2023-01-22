@@ -57,6 +57,7 @@ const testUserForWhiteboard: IUserForWhiteboard = {
   firstname: 'John',
   lastname: 'Doe',
   title: 'Data Scientist',
+  role: UserRole.BASIC,
   avatarUrl: 'http://localhost/testImage',
 };
 

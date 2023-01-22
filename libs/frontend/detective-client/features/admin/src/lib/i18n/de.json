@@ -7,7 +7,8 @@
       "maskings": "Masken",
       "subscriptions": "Subscription"
     },
-    "sidenavBottomItem": "Home"
+    "sidenavBottomItem": "Home",
+    "sidenavBottomItemTitle": "Zurück zur Home-Ansicht"
   },
   "connections": {
     "addConnectionButtonText": "Neue Verbindung anlegen",

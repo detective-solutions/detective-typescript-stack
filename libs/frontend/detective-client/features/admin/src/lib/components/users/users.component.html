@@ -1,12 +1,19 @@
-<div class="user-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.users'">
+<div class="users-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.users'">
   <div class="user-limit-wrapper">
-    <div fxFlex="50" class="info-section" fxFlex.xs="55">
+    <div *ngIf="usersInfo$ | async as usersInfo; else isLoadingUsersInfo" class="user-limit user-limit-loaded">
       <p>
-        {{ activeUsers$ | async }} {{ t('utils.of') }} {{ (this.productInfo$ | async)?.userLimit }}
+        {{ usersInfo.currentUsersCount }} {{ t('utils.of') }} {{ usersInfo.userLimit }}
         {{ t('utils.users') }}
       </p>
-      <mat-progress-bar mode="determinate" value="{{ userRatio$ | async }}" id="user-limit"></mat-progress-bar>
+      <mat-progress-bar [value]="usersRatio$ | async" mode="determinate"></mat-progress-bar>
     </div>
+    <ng-template #isLoadingUsersInfo>
+      <mat-progress-bar class="user-limit user-limit-loading"></mat-progress-bar>
+    </ng-template>
   </div>
-  <table-view [tableItems$]="tableItems$" [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"></table-view>
+  <table-view
+    [tableItems$]="tableItems$"
+    [isLoading$]="isLoading$"
+    [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
+  ></table-view>
 </div>

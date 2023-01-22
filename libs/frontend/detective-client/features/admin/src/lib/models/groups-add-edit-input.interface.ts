@@ -1,29 +1,29 @@
 export interface UserGroupCreateInput {
+  id?: string;
   name: string;
   description: string;
   members: {
-    xid: string;
+    id: string;
   }[];
-  xid?: string;
-  author?: { xid: string };
+  author?: { id: string };
   lastUpdated?: string;
-  tenant?: { xid: string };
-  lastUpdatedBy?: { xid: string };
+  tenant?: { id: string };
+  lastUpdatedBy?: { id: string };
   created?: string;
 }
 
 export interface UserGroupEditInput {
-  xid: string;
+  id: string;
   name: string;
   description: string;
   members: {
-    xid: string;
+    id: string;
   }[];
   toDeleteMembers: {
-    xid: string;
+    id: string;
   }[];
   lastUpdated?: string;
   lastUpdatedBy?: {
-    xid: string;
+    id: string;
   };
 }

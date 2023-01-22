@@ -1,6 +1,7 @@
 {
   "navigation": {
-    "searchbarPlaceholder": "Nach Casefiles suchen",
+    "searchbarPlaceholder": "Suchen",
+    "searchbarClearButtonTitle": "Suche zurücksetzen",
     "inviteButtonText": "Einladen",
     "inviteModal": {
       "inviteDialogHeader": "Einladen",
@@ -12,6 +13,10 @@
       "account": { "buttonText": "Konto verwalten" },
       "documentation": { "buttonText": "API & Dokumentation" },
       "logout": { "buttonText": "Abmelden" }
+    },
+    "sidenav": {
+      "toggleButtonTitle": "Seitenleiste einblenden",
+      "closeButtonTitle": "Seitenleiste schließen"
     }
   },
   "tiles": {

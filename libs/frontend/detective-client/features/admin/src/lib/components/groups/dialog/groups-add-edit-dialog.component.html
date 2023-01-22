@@ -35,7 +35,7 @@
       <mat-option
         class="auto-complete-option"
         *ngFor="let option of this.filteredOptions | async"
-        (click)="addRow(option.xid, option.name)"
+        (click)="addRow(option.id, option.name)"
       >
         {{ option.name }}
       </mat-option>

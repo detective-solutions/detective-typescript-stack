@@ -3,7 +3,7 @@ import { ICasefile } from './casefile.interface';
 export type ICasefileForHome = Pick<
   ICasefile,
   | 'tables'
-  | 'xid'
+  | 'id'
   | 'title'
   | 'description'
   | 'thumbnail'
