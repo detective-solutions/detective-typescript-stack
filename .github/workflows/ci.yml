@@ -110,7 +110,7 @@ jobs:
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
             TARGET_TAGS=${BASE_TAG}
           fi
-          echo "::set-output name=target-tags::${TARGET_TAGS}"
+          echo "target-tags=${TARGET_TAGS}" >> $GITHUB_OUTPUT
 
       - name: Login to quay.io
         uses: docker/login-action@v2.1.0
