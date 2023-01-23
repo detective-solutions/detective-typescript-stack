@@ -87,16 +87,16 @@ export class UsersComponent implements OnDestroy, OnInit {
   };
 
   constructor(
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
-    private readonly searchUsersByTenantGQL: SearchUsersByTenantGQL,
-    private readonly getUserByIdGQL: GetUserByIdGQL,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly subscriptionService: SubscriptionService,
-    private readonly navigationEventService: NavigationEventService,
-    private readonly tableCellEventService: TableCellEventService,
+    private readonly getUserByIdGQL: GetUserByIdGQL,
     private readonly matDialog: MatDialog,
-    private readonly translationService: TranslocoService,
-    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
+    private readonly navigationEventService: NavigationEventService,
+    private readonly searchUsersByTenantGQL: SearchUsersByTenantGQL,
+    private readonly subscriptionService: SubscriptionService,
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly translationService: TranslocoService
   ) {}
 
   ngOnInit() {
