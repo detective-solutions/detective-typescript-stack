@@ -1,9 +1,9 @@
 import {
   AdminContainerComponent,
   ConnectionsComponent,
-  GroupsComponent,
   MaskingsComponent,
   SubscriptionsComponent,
+  UserGroupsComponent,
   UsersComponent,
 } from './components';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
@@ -28,13 +28,14 @@ import {
   GetTablesBySourceConnectionIdGQL,
   GetUserByIdGQL,
   GetUserGroupByIdGQL,
+  SearchUserGroupsByTenantGQL,
   SearchUsersByTenantGQL,
   UpdateMaskingGQL,
   UpdateUserGroupGQL,
   UpdateUserRoleGQL,
 } from './graphql';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/groups/dialog';
+import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/user-groups/dialog';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -64,7 +65,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     UsersComponent,
     UsersDeleteDialogComponent,
     UserEditDialogComponent,
-    GroupsComponent,
+    UserGroupsComponent,
     GroupsDeleteComponent,
     GroupsAddEditDialogComponent,
     MaskingsComponent,
@@ -109,6 +110,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     GetAllUserGroupsAsDropDownValuesGQL,
     GetAllColumnsGQL,
     SearchUsersByTenantGQL,
+    SearchUserGroupsByTenantGQL,
     CreateNewMaskingGQL,
     GetAllUserGroupsGQL,
     GetUserGroupByIdGQL,

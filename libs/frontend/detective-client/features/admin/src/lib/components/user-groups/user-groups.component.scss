@@ -1,7 +1,7 @@
 @import 'variables';
 
-.user-wrapper {
-  .add-group-button-wrapper {
+.user-groups-wrapper {
+  .add-user-group-button-wrapper {
     display: flex;
 
     button {
@@ -25,7 +25,7 @@
   }
 
   &.is-mobile {
-    .add-masking-button-wrapper {
+    .add-user-group-button-wrapper {
       justify-content: center;
 
       button {

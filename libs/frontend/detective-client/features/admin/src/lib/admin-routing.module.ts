@@ -3,10 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AdminContainerComponent } from './components/admin-container.component';
 import { ConnectionsComponent } from './components/connections/connections.component';
-import { GroupsComponent } from './components/groups/groups.component';
 import { MaskingsComponent } from './components/maskings/masking.component';
 import { NgModule } from '@angular/core';
 import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
+import { UserGroupsComponent } from './components/user-groups/user-groups.component';
 import { UsersComponent } from './components/users/users.component';
 
 const routes: Routes = [
@@ -17,7 +17,7 @@ const routes: Routes = [
       { path: '', redirectTo: '/admin/connections', pathMatch: 'full' },
       { path: 'connections', component: ConnectionsComponent },
       { path: 'users', component: UsersComponent },
-      { path: 'groups', component: GroupsComponent },
+      { path: 'groups', component: UserGroupsComponent },
       { path: 'maskings', component: MaskingsComponent },
       { path: 'subscriptions', component: SubscriptionsComponent },
     ],

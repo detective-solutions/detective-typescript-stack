@@ -15,6 +15,7 @@ export * from './get-connection-by-id.gql';
 export * from './get-tables-by-connection-id.gql';
 export * from './create-new-masking.gql';
 export * from './delete-masking.gql';
+export * from './search-user-groups-by-tenant-id.gql';
 export * from './search-users-by-tenant-id.gql';
 export * from './update-masking.gql';
 export * from './update-user-group.gql';

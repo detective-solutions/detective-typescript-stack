@@ -1,9 +1,0 @@
-<div class="user-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.groups'">
-  <div class="add-group-button-wrapper">
-    <button mat-stroked-button (click)="openUserGroupDialog()">
-      <mat-icon>add</mat-icon>
-      {{ t('addGroupButtonText') }}
-    </button>
-  </div>
-  <table-view [tableItems$]="tableItems$" [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"></table-view>
-</div>

@@ -50,8 +50,7 @@
       "deleteButtonText": "Ich möchte diese Person entfernen",
       "deleteDialogTextStart": "Sie sind dabei",
       "deleteDialogTextHighlight": "{{userName}}",
-      "deleteDialogTextEnd": "aus detective zu entfernen.",
-      "deleteButtonText": "Yes I want to remove this user"
+      "deleteDialogTextEnd": "aus detective zu entfernen."
     },
     "utils": {
       "of": "von",
@@ -64,8 +63,8 @@
       "formSubmitError": "Nutzer konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
-  "groups": {
-    "addGroupButtonText": "Neue Gruppe",
+  "userGroups": {
+    "addUserGroupButtonText": "Neue Gruppe",
     "columnNames": {
       "memberCountColumn": "Anzahl der Gruppenmitglieder",
       "lastUpdatedColumn": "Zuletzt aktualisiert"

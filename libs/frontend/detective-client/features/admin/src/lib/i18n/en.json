@@ -63,8 +63,8 @@
       "formSubmitError": "Could not submit user data. Please contact support"
     }
   },
-  "groups": {
-    "addGroupButtonText": "New Group",
+  "userGroups": {
+    "addUserGroupButtonText": "New Group",
     "columnNames": {
       "memberCountColumn": "Group members",
       "lastUpdatedColumn": "Last updated"
