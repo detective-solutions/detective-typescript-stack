@@ -51,7 +51,6 @@ export class UsersComponent implements OnDestroy, OnInit {
   readonly users$ = new BehaviorSubject<UserDTO[]>([]);
   readonly currentUsersCount$ = new BehaviorSubject<number>(0);
   readonly usersRatio$ = new BehaviorSubject<number>(0);
-
   readonly usersInfo$ = combineLatest([this.currentUsersCount$, this.subscriptionService.getProductDescription()]).pipe(
     tap(([currentUsersCount, subscriptionInfo]) => {
       this.usersRatio$.next((currentUsersCount / subscriptionInfo.userLimit) * 100);

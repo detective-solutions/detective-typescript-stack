@@ -8,7 +8,7 @@
       <mat-progress-bar [value]="usersRatio$ | async" mode="determinate"></mat-progress-bar>
     </div>
     <ng-template #isLoadingUsersInfo>
-      <mat-progress-bar class="user-limit user-limit-loading"></mat-progress-bar>
+      <mat-progress-bar mode="query" class="user-limit user-limit-loading"></mat-progress-bar>
     </ng-template>
   </div>
   <table-view
