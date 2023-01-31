@@ -1,10 +1,10 @@
 import { Query, gql } from 'apollo-angular';
 
-import { IUser } from '@detective.solutions/shared/data-access';
+import { IUserGroup } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 
 export interface ISearchUserGroupsByTenantGQLResponse {
-  queryUserGroup: IUser[];
+  queryUserGroup: IUserGroup[];
 }
 
 @Injectable()

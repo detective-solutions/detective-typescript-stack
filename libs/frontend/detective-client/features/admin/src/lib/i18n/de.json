@@ -70,18 +70,17 @@
       "lastUpdatedColumn": "Zuletzt aktualisiert"
     },
     "addEditDialog": {
-      "addUserLabel": "Person hinzufügen",
       "addDialogHeader": "Neue Gruppe anlegen",
       "editDialogHeader": "Gruppe bearbeiten",
-      "saveButtonText": "Speichern",
-      "optionalFieldsPanelName": "Erweiterte Einstellungen",
+      "displayNameTitle": "Name",
+      "displayNameDescription": "Beschreibung",
+      "addUserLabel": "Mitglied hinzufügen",
       "subTable": {
-        "username": "Gruppenmitglied",
+        "username": "Mitglieder",
         "id": " ",
-        "displayNameTitle": "Name",
-        "displayNameDescription": "Beschreibung",
         "RemoveUserButton": "Entfernen"
-      }
+      },
+      "saveButtonText": "Speichern"
     },
     "deleteDialog": {
       "deleteDialogHeader": "Gruppe entfernen",

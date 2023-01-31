@@ -4,7 +4,7 @@
     [formFieldDefinition]="formFieldDefinition"
     [form]="form"
   ></dynamic-form-field>
-  <mat-accordion *ngIf="optionalFormFields.length > 0">
+  <mat-accordion *ngIf="optionalFormFields.length > 0 && enableSubFormForOptionalFields">
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>{{ optionalFieldsPanelName }}</mat-panel-title>

@@ -1,2 +1,2 @@
-export * from './groups-add-edit-dialog.component';
-export * from './groups-delete-dialog.component';
+export * from './user-groups-add-edit-dialog.component';
+export * from './user-groups-delete-dialog.component';

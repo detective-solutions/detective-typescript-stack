@@ -1,10 +1,24 @@
 import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
-import { BehaviorSubject, Observable, Subject, Subscription, filter, map, shareReplay, take, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  filter,
+  map,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './dialog';
-import { GroupsClickEvent, GroupsDialogComponent } from '../../models';
-import { ISearchUserGroupsByTenantGQLResponse, SearchUserGroupsByTenantGQL } from '../../graphql';
+import {
+  GetUserGroupByIdGQL,
+  IGetUserGroupByIdGQLResponse,
+  ISearchUserGroupsByTenantGQLResponse,
+  SearchUserGroupsByTenantGQL,
+} from '../../graphql';
 import {
   ITableCellEvent,
   NavigationEventService,
@@ -13,10 +27,12 @@ import {
 } from '@detective.solutions/frontend/detective-client/ui';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
+import { UserGroupsAddEditDialogComponent, UserGroupsDeleteComponent } from './dialog';
+import { UserGroupsClickEvent as UserGroupsClickEvent, UserGroupsDialogComponent } from '../../models';
 
 import { ComponentType } from '@angular/cdk/portal';
-import { IGroupTableDef } from '../../models/groups-table.interface';
 import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { IUserGroupsTableDef } from '../../models/user-groups-table-definition.interface';
 import { QueryRef } from 'apollo-angular';
 import { UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
 import { buildSearchTermRegEx } from '@detective.solutions/frontend/shared/utils';
@@ -33,12 +49,13 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
   readonly tableItems$ = this.userGroups$.pipe(
     map((userGroups: UserGroupDTO[]) => this.transformToTableStructure(userGroups))
   );
+  readonly addButtonClicks$ = new Subject<void>();
   readonly deleteButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
-    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === GroupsClickEvent.DELETE_GROUP),
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === UserGroupsClickEvent.DELETE_USER_GROUP),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
   readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
-    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === GroupsClickEvent.EDIT_GROUP),
+    filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === UserGroupsClickEvent.EDIT_USER_GROUP),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
@@ -49,8 +66,9 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     );
 
   private searchUserGroupsByTenantWatchQuery!: QueryRef<Response>;
+  private getUserGroupByIdWatchQuery!: QueryRef<Response>;
 
-  private readonly pageSize = 10;
+  private readonly pageSize = 15;
   private readonly subscriptions = new Subscription();
   private readonly dialogDefaultConfig = {
     width: '650px',
@@ -62,6 +80,7 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
+    private readonly getUserGroupByIdGQL: GetUserGroupByIdGQL,
     private readonly matDialog: MatDialog,
     private readonly navigationEventService: NavigationEventService,
     private readonly searchUserGroupsByTenantGQL: SearchUserGroupsByTenantGQL,
@@ -87,20 +106,31 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     );
 
     this.subscriptions.add(
-      this.editButtonClicks$.subscribe((userGroupId: string) =>
-        this.openUserGroupDialog(GroupsAddEditDialogComponent, {
-          data: { id: userGroupId },
+      this.addButtonClicks$.subscribe(() =>
+        this.openUserGroupDialog(UserGroupsAddEditDialogComponent, {
+          data: { searchQuery: this.searchUserGroupsByTenantWatchQuery },
         })
       )
     );
 
     this.subscriptions.add(
-      this.deleteButtonClicks$.subscribe((userGroupId: string) =>
-        this.openUserGroupDialog(GroupsDeleteComponent, {
-          data: { id: userGroupId },
-          width: '500px',
-        })
-      )
+      this.editButtonClicks$
+        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId)))
+        .subscribe((userGroup: UserGroupDTO) =>
+          this.openUserGroupDialog(UserGroupsAddEditDialogComponent, {
+            data: { userGroup, searchQuery: this.searchUserGroupsByTenantWatchQuery },
+          })
+        )
+    );
+
+    this.subscriptions.add(
+      this.deleteButtonClicks$
+        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId)))
+        .subscribe((userGroup: UserGroupDTO) =>
+          this.openUserGroupDialog(UserGroupsDeleteComponent, {
+            data: { userGroup, searchQuery: this.searchUserGroupsByTenantWatchQuery },
+          })
+        )
     );
   }
 
@@ -136,8 +166,8 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     }
   }
 
-  openUserGroupDialog(componentToOpen?: ComponentType<GroupsDialogComponent>, config?: MatDialogConfig) {
-    this.matDialog.open(componentToOpen ?? GroupsAddEditDialogComponent, {
+  openUserGroupDialog(componentToOpen?: ComponentType<UserGroupsDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? UserGroupsAddEditDialogComponent, {
       ...this.dialogDefaultConfig,
       ...config,
     });
@@ -149,51 +179,72 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     });
   }
 
-  private transformToTableStructure(originalMasking: IUserGroup[]): IGroupTableDef[] {
-    const tempTableItems = [] as IGroupTableDef[];
+  private getUserGroupById(userGroupId: string): Observable<UserGroupDTO> {
+    return this.authService.authStatus$.pipe(
+      switchMap((authStatus: IAuthStatus) => {
+        if (!this.getUserGroupByIdWatchQuery) {
+          this.getUserGroupByIdWatchQuery = this.getUserGroupByIdGQL.watch(
+            { tenantId: authStatus.tenantId, userGroupId },
+            { notifyOnNetworkStatusChange: true }
+          );
+          return this.getUserGroupByIdWatchQuery.valueChanges;
+        } else {
+          return this.getUserGroupByIdWatchQuery.refetch({ tenantId: authStatus.tenantId, userGroupId });
+        }
+      }),
+      tap(({ loading }) => this.isLoading$.next(loading)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter((response: any) => response?.data),
+      map(({ data }: { data: IGetUserGroupByIdGQLResponse }) => data.getUserGroup),
+      map(UserGroupDTO.Build)
+    );
+  }
+
+  private transformToTableStructure(userGroups: IUserGroup[]): IUserGroupsTableDef[] {
+    const tempTableItems = [] as IUserGroupsTableDef[];
     this.translationService
-      .selectTranslateObject(`${this.translationScope.scope}.groups.columnNames`)
+      .selectTranslateObject(`${this.translationScope.scope}.userGroups.columnNames`)
       .pipe(take(1))
       .subscribe((translation: { [key: string]: string }) => {
-        originalMasking.forEach((groups: IUserGroup) => {
+        userGroups.forEach((userGroup: IUserGroup) => {
           tempTableItems.push({
             groupName: {
               columnName: '',
               cellData: {
-                id: groups.id,
+                id: userGroup.id,
                 type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
-                name: groups.name,
-                description: String(groups.description),
+                name: userGroup.name,
+                description: String(userGroup.description),
               },
             },
             members: {
-              columnName: translation['roleColumn'],
+              columnName: translation['memberCountColumn'],
               cellData: {
-                id: groups.id,
+                id: userGroup.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(groups.memberCount?.count),
+                text: String(userGroup.memberCount?.count),
               },
             },
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: groups.id,
+                id: userGroup.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
-                date: String(groups.lastUpdated),
+                date: String(userGroup.lastUpdated),
               },
             },
             actions: {
               columnName: '',
               cellData: {
-                id: groups.id,
+                id: userGroup.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
-                  { icon: 'edit', clickEventKey: GroupsClickEvent.EDIT_GROUP },
-                  { icon: 'delete', clickEventKey: GroupsClickEvent.DELETE_GROUP },
+                  { icon: 'edit', clickEventKey: UserGroupsClickEvent.EDIT_USER_GROUP },
+                  { icon: 'delete', clickEventKey: UserGroupsClickEvent.DELETE_USER_GROUP },
                 ],
               },
             },
-          } as IGroupTableDef);
+          } as IUserGroupsTableDef);
         });
       });
     return tempTableItems;

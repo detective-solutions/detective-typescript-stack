@@ -17,6 +17,7 @@ export * from './create-new-masking.gql';
 export * from './delete-masking.gql';
 export * from './search-user-groups-by-tenant-id.gql';
 export * from './search-users-by-tenant-id.gql';
+export * from './search-user-group-members-by-tenant-id.gql';
 export * from './update-masking.gql';
 export * from './update-user-group.gql';
 export * from './update-user-role.gql';

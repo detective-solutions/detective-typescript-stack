@@ -10,7 +10,7 @@ export interface IGetMaskingByUserGroupIdGQLResponse {
 @Injectable()
 export class GetMaskingByUserGroupIdGQL extends Query<Response> {
   override document = gql`
-    query queryMaskingByUserGroup($id: String!) {
+    query getMaskingByUserGroupId($userGroupId: String!) {
       queryMasking @cascade(fields: ["groups"]) {
         id: xid
         name
@@ -20,7 +20,7 @@ export class GetMaskingByUserGroupIdGQL extends Query<Response> {
         columns {
           id: xid
         }
-        groups(filter: { xid: { eq: $id } }) {
+        groups(filter: { xid: { eq: $userGroupId } }) {
           id: xid
         }
       }

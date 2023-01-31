@@ -19,6 +19,7 @@
     <ng-container *ngIf="formFieldDefinitionsByConnectorType$ | async as formFieldDefinitions">
       <dynamic-form
         [formFieldDefinitions]="formFieldDefinitions"
+        [enableSubFormForOptionalFields]="true"
         [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
       ></dynamic-form>
     </ng-container>
@@ -29,6 +30,7 @@
       <ng-container *ngIf="existingFormFieldData$ | async as formFieldDefinitions">
         <dynamic-form
           [formFieldDefinitions]="formFieldDefinitions"
+          [enableSubFormForOptionalFields]="true"
           [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
         ></dynamic-form>
       </ng-container>

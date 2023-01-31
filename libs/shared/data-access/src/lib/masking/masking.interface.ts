@@ -1,8 +1,5 @@
 import { IUser } from '../user';
 
-export interface IUserGroupColumn {
-  name: string;
-}
 export interface IMask {
   id: string;
   columnName?: string;

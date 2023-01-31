@@ -6,7 +6,7 @@ export interface IUser {
   id: string;
   email?: string;
   tenantIds?: ITenant[];
-  role: UserRole;
+  role?: UserRole;
   firstname?: string;
   lastname?: string;
   title?: string;
@@ -16,9 +16,4 @@ export interface IUser {
   lastUpdatedBy?: IUser;
   lastUpdated?: string;
   created?: string;
-}
-
-export interface IDropDownUser {
-  id: string;
-  name: string;
 }

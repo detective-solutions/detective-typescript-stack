@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 
 export interface IDeleteMaskingGQLResponse {
   deleteMasking: {
-    message: string;
+    msg: string;
   };
 }
 

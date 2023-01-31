@@ -26,12 +26,12 @@ import {
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
+import { IUser, UserRole } from '@detective.solutions/shared/data-access';
 import { IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { ComponentType } from '@angular/cdk/portal';
-import { IUser } from '@detective.solutions/shared/data-access';
 import { QueryRef } from 'apollo-angular';
 import { SubscriptionService } from '../../services';
 import { UserDTO } from '@detective.solutions/frontend/shared/data-access';
@@ -211,7 +211,7 @@ export class UsersComponent implements OnDestroy, OnInit {
               cellData: {
                 id: user.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: capitalize(user.role),
+                text: capitalize(user.role ?? UserRole.NONE),
               },
             },
             lastUpdated: {

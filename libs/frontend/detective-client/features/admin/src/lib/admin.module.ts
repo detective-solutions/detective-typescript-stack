@@ -16,7 +16,7 @@ import {
   DeleteMaskingGQL,
   DeleteRowMaskGQL,
   DeleteUserByIdGQL,
-  DeleteUserGroupGQL,
+  DeleteUserGroupByIdGQL,
   GetAllColumnsGQL,
   GetAllConnectionsGQL,
   GetAllMaskingsGQL,
@@ -28,6 +28,7 @@ import {
   GetTablesBySourceConnectionIdGQL,
   GetUserByIdGQL,
   GetUserGroupByIdGQL,
+  SearchUserGroupMembersByTenantIdGQL,
   SearchUserGroupsByTenantGQL,
   SearchUsersByTenantGQL,
   UpdateMaskingGQL,
@@ -35,7 +36,6 @@ import {
   UpdateUserRoleGQL,
 } from './graphql';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/user-groups/dialog';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -43,6 +43,7 @@ import {
   SubscriptionUpgradeDialogComponent,
 } from './components/subscriptions/dialog';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { UserGroupsAddEditDialogComponent, UserGroupsDeleteComponent } from './components/user-groups/dialog';
 
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
@@ -66,8 +67,8 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     UsersDeleteDialogComponent,
     UserEditDialogComponent,
     UserGroupsComponent,
-    GroupsDeleteComponent,
-    GroupsAddEditDialogComponent,
+    UserGroupsDeleteComponent,
+    UserGroupsAddEditDialogComponent,
     MaskingsComponent,
     MaskingAddEditDialogComponent,
     MaskingDeleteDialogComponent,
@@ -111,6 +112,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     GetAllColumnsGQL,
     SearchUsersByTenantGQL,
     SearchUserGroupsByTenantGQL,
+    SearchUserGroupMembersByTenantIdGQL,
     CreateNewMaskingGQL,
     GetAllUserGroupsGQL,
     GetUserGroupByIdGQL,
@@ -119,7 +121,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     DeleteUserByIdGQL,
     CreateUserGroupGQL,
     UpdateUserGroupGQL,
-    DeleteUserGroupGQL,
+    DeleteUserGroupByIdGQL,
     UpdateUserRoleGQL,
     GetMaskingByUserGroupIdGQL,
   ],

@@ -50,7 +50,7 @@
       "deleteDialogTextStart": "You are about to remove",
       "deleteDialogTextHighlight": "{{userName}}",
       "deleteDialogTextEnd": "from detective.",
-      "deleteButtonText": "Yes I want to remove this user"
+      "deleteButtonText": "Yes, I want to remove this user"
     },
     "utils": {
       "of": "of",
@@ -64,29 +64,28 @@
     }
   },
   "userGroups": {
-    "addUserGroupButtonText": "New Group",
+    "addUserGroupButtonText": "New user group",
     "columnNames": {
       "memberCountColumn": "Group members",
       "lastUpdatedColumn": "Last updated"
     },
     "addEditDialog": {
-      "addUserLabel": "Add Person",
       "addDialogHeader": "Add group",
       "editDialogHeader": "Edit group",
-      "saveButtonText": "Save",
-      "optionalFieldsPanelName": "Advanced settings",
+      "displayNameTitle": "Name",
+      "displayNameDescription": "Description",
+      "addUserLabel": "Add member",
       "subTable": {
         "username": "Members",
         "id": " ",
-        "displayNameTitle": "Name",
-        "displayNameDescription": "Description",
         "RemoveUserButton": "Remove"
-      }
+      },
+      "saveButtonText": "Save"
     },
     "deleteDialog": {
-      "deleteDialogHeader": "Remove Group",
-      "deleteDialogText": "You are about to delete {{groupName}} and the following maskings.",
-      "deleteButtonText": "Yes I want to remove this user group and its related maskings"
+      "deleteDialogHeader": "Remove group",
+      "deleteDialogText": "You are about to delete the user group {{userGroupName}} and the following maskings:",
+      "deleteButtonText": "Yes, I want to remove this user group and its related maskings"
     },
     "toastMessages": {
       "actionSuccessful": "Action performed successfully",
@@ -130,7 +129,6 @@
         "ColumnTitleValueName": "Value",
         "ColumnTitleMethod": "Method",
         "ColumnTitleCustomReplaceType": "Custom Value",
-        "ColumnTitleIsEdit": " ",
         "true": "Yes",
         "false": "No",
         "displayNameTable": "Table",
@@ -151,7 +149,7 @@
           "phoneNumber": "Phone number",
           "postalCode": "Postal Code",
           "singleName": "Simple Name",
-          "firstAndLastname": "first- and last name",
+          "firstAndLastname": "first and last name",
           "email": "Email",
           "fullAddress": "Address",
           "addressStreetnameAndNumber": "Full address",
@@ -177,7 +175,7 @@
       "currency": "Currency",
       "status": "Paid",
       "invoice_pdf": "Invoice",
-      "download": "Download"
+      "download": "Download Invoice"
     },
     "cancelDialog": {
       "cancelDialogHeader": "Delete account",
@@ -187,7 +185,7 @@
     },
     "upgradeDialog": {
       "upgradeDialogHeader": "Choose your upgrade",
-      "upgradeDialogText": "You can modify your subscriptions any time. This way you have the full flexbility",
+      "upgradeDialogText": "You can modify your subscriptions any time. This way you have the full flexibility.",
       "cancelUpgradeButtonText": "Cancel",
       "upgradeNowButtonText": "Upgrade",
       "userLimit": "User"

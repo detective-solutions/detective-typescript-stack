@@ -1,22 +1,15 @@
-import { IUserGroup } from '@detective.solutions/shared/data-access';
+import { IUserGroup, UserGroupMember } from '@detective.solutions/shared/data-access';
+
+import { UserDTO } from './user.dto';
 
 export class UserGroupDTO implements IUserGroup {
   constructor(
     public id = '',
     public name = '',
     public description = '',
-    public memberCount = {
-      count: 0,
-    },
-    public memebers = [
-      {
-        id: '',
-        firstname: '',
-        lastname: '',
-      },
-    ],
-    public lastUpdated = '',
-    public tenant = { id: '' }
+    public memberCount = { count: 0 },
+    public members: UserGroupMember[] = [],
+    public lastUpdated = ''
   ) {}
 
   static Build(userGroupInput: IUserGroup) {
@@ -28,9 +21,8 @@ export class UserGroupDTO implements IUserGroup {
       userGroupInput.name,
       userGroupInput.description,
       userGroupInput.memberCount,
-      userGroupInput.members,
-      userGroupInput.lastUpdated,
-      userGroupInput.tenant
+      userGroupInput.members?.map(UserDTO.Build) ?? [],
+      userGroupInput.lastUpdated
     );
   }
 }

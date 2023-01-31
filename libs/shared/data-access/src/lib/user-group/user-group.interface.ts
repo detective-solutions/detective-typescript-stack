@@ -1,19 +1,10 @@
-export interface IMember {
-  id: string;
-  firstname: string;
-  lastname: string;
-}
+import { UserGroupMember } from './user-group-member.type';
 
 export interface IUserGroup {
   id: string;
   name?: string;
   description?: string;
-  members?: IMember[];
-  memberCount?: {
-    count: number;
-  };
+  memberCount?: { count: number };
+  members?: UserGroupMember[];
   lastUpdated?: string;
-  tenant?: {
-    id: string;
-  };
 }
