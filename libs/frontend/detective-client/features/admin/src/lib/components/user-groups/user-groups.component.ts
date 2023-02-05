@@ -138,7 +138,7 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     this.subscriptions.unsubscribe();
   }
 
-  searchUserGroups(tenantId: string, searchTerm: string) {
+  private searchUserGroups(tenantId: string, searchTerm: string) {
     const searchParameters = {
       tenantId: tenantId,
       paginationOffset: 0,
@@ -166,13 +166,6 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
     }
   }
 
-  openUserGroupDialog(componentToOpen?: ComponentType<UserGroupsDialogComponent>, config?: MatDialogConfig) {
-    this.matDialog.open(componentToOpen ?? UserGroupsAddEditDialogComponent, {
-      ...this.dialogDefaultConfig,
-      ...config,
-    });
-  }
-
   private getNextUserGroupsPage(currentOffset: number) {
     this.searchUserGroupsByTenantWatchQuery.fetchMore({
       variables: { paginationOffset: currentOffset, pageSize: this.pageSize },
@@ -198,6 +191,13 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
       map(({ data }: { data: IGetUserGroupByIdGQLResponse }) => data.getUserGroup),
       map(UserGroupDTO.Build)
     );
+  }
+
+  private openUserGroupDialog(componentToOpen?: ComponentType<UserGroupsDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? UserGroupsAddEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
+    });
   }
 
   private transformToTableStructure(userGroups: IUserGroup[]): IUserGroupsTableDef[] {
