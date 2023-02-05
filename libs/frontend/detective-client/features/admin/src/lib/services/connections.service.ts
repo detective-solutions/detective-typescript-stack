@@ -95,14 +95,6 @@ export class ConnectionsService {
     }
   }
 
-  getAllConnectionsNextPage(paginationOffset: number, pageSize: number) {
-    this.getAllConnectionsWatchQuery
-      .fetchMore({
-        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-      })
-      .catch((error) => this.handleError(error));
-  }
-
   getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
     return this.httpClient.get<IConnectorTypesResponse[]>(`${ConnectionsService.catalogBasePath}/connector/list`);
   }
