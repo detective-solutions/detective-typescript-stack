@@ -9,8 +9,9 @@ export interface IGetConnectionByIdGQLResponse {
 @Injectable()
 export class GetConnectionByIdGQL extends Query<Response> {
   override document = gql`
-    query getSourceConnectionById($id: String!) {
-      getSourceConnection(xid: $id) {
+    query getSourceConnectionById($connectionId: String!) {
+      getSourceConnection(xid: $connectionId) {
+        id: xid
         name
       }
     }

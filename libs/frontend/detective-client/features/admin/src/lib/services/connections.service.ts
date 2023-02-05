@@ -1,9 +1,7 @@
 import {
   GetAllConnectionsGQL,
-  GetConnectionByIdGQL,
   GetTablesBySourceConnectionIdGQL,
   IGetAllConnectionsGQLResponse,
-  IGetConnectionByIdGQLResponse,
   IGetTablesBySourceConnectionIdGQLResponse,
 } from '../graphql';
 import {
@@ -13,7 +11,6 @@ import {
   IConnectorSchemaResponse,
   IConnectorTypesResponse,
   IGetAllConnectionsResponse,
-  IGetConnectionByIdResponse,
 } from '../models';
 import { ISourceConnectionTables, SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
@@ -29,28 +26,18 @@ import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class ConnectionsService {
-  private static catalogBasePath = `${environment.baseApiPath}${environment.catalogApiPathV1}`;
+  private static catalogServiceBasePath = `${environment.baseApiPath}${environment.catalogApiPathV1}`;
 
-  private getConnectionByIdWatchQuery!: QueryRef<Response>;
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
   private getAllTablesWatchQuery!: QueryRef<Response>;
 
   constructor(
-    private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
     private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly httpClient: HttpClient,
     private readonly tableCellEventService: TableCellEventService,
     private readonly logger: LogService
   ) {}
-
-  getConnectionById(id: string): Observable<IGetConnectionByIdResponse> {
-    this.getConnectionByIdWatchQuery = this.getConnectionByIdGQL.watch({ id: id });
-    return this.getConnectionByIdWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetConnectionByIdGQLResponse) => response.getSourceConnection)
-    );
-  }
 
   getTablesOfConnection(id: string): Observable<ISourceConnectionTables> {
     this.getAllTablesWatchQuery = this.getTablesBySourceConnectionIdGQL.watch({ id: id });
@@ -96,24 +83,26 @@ export class ConnectionsService {
   }
 
   getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
-    return this.httpClient.get<IConnectorTypesResponse[]>(`${ConnectionsService.catalogBasePath}/connector/list`);
+    return this.httpClient.get<IConnectorTypesResponse[]>(
+      `${ConnectionsService.catalogServiceBasePath}/connector/list`
+    );
   }
 
   getConnectorProperties(connectorType: string): Observable<{ properties: IConnectorPropertiesResponse[] }> {
     return this.httpClient.get<{ properties: IConnectorPropertiesResponse[] }>(
-      `${ConnectionsService.catalogBasePath}/connector/schema/${connectorType}`
+      `${ConnectionsService.catalogServiceBasePath}/connector/schema/${connectorType}`
     );
   }
 
   getExistingConnectorPropertiesById(connectionId: string): Observable<IConnectorSchemaResponse> {
     return this.httpClient.get<IConnectorSchemaResponse>(
-      `${ConnectionsService.catalogBasePath}/schema/${connectionId}`
+      `${ConnectionsService.catalogServiceBasePath}/schema/${connectionId}`
     );
   }
 
   addConnection(connectionType: string, payload: any): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
-      `${ConnectionsService.catalogBasePath}/${connectionType}/insert`,
+      `${ConnectionsService.catalogServiceBasePath}/${connectionType}/insert`,
       payload
     );
   }
@@ -124,19 +113,20 @@ export class ConnectionsService {
     payload: any
   ): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
-      `${ConnectionsService.catalogBasePath}/${connectionType}/update/${connectionId}`,
+      `${ConnectionsService.catalogServiceBasePath}/${connectionType}/update/${connectionId}`,
       payload
     );
   }
 
-  deleteConnection(connectionId: string, connectionName: string): Observable<IConnectionsDeleteResponse> {
-    return this.httpClient.post<IConnectionsDeleteResponse>(`${ConnectionsService.catalogBasePath}/delete`, {
-      source_connection_xid: connectionId,
-      source_connection_name: connectionName,
+  deleteConnection(connection: SourceConnectionDTO): Observable<IConnectionsDeleteResponse> {
+    console.log(connection);
+    return this.httpClient.post<IConnectionsDeleteResponse>(`${ConnectionsService.catalogServiceBasePath}/delete`, {
+      source_connection_xid: connection.id,
+      source_connection_name: connection.name,
     });
   }
 
-  private handleError(error: string) {
+  private handleError(error: string): Observable<never> {
     this.tableCellEventService.resetLoadingStates$.next(true);
     return transformError(error);
   }

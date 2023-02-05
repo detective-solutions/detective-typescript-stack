@@ -1,10 +1,26 @@
 import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
-import { BehaviorSubject, Observable, Subject, Subscription, filter, map, shareReplay, take, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  filter,
+  map,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ConnectionDialogComponent, ConnectionsClickEvent, IConnectionsTableDef } from '../../models';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
-import { ISearchConnectionsByTenantGQLResponse, SearchConnectionsByTenantGQL } from '../../graphql';
+import {
+  GetConnectionByIdGQL,
+  IGetConnectionByIdGQLResponse,
+  ISearchConnectionsByTenantGQLResponse,
+  SearchConnectionsByTenantGQL,
+} from '../../graphql';
 import {
   ITableCellEvent,
   NavigationEventService,
@@ -49,9 +65,8 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  totalElementsCount$!: Observable<number>;
-
   private searchConnectionsByTenantWatchQuery!: QueryRef<Response>;
+  private getConnectionByIdWatchQuery!: QueryRef<Response>;
 
   private readonly pageSize = 15;
   private readonly subscriptions = new Subscription();
@@ -61,14 +76,15 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   };
 
   constructor(
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly tableCellEventService: TableCellEventService,
-    private readonly searchConnectionsByTenantIdGql: SearchConnectionsByTenantGQL,
-    private readonly navigationEventService: NavigationEventService,
+    private readonly getConnectionByIdGql: GetConnectionByIdGQL,
     private readonly matDialog: MatDialog,
-    private readonly translationService: TranslocoService,
-    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
+    private readonly navigationEventService: NavigationEventService,
+    private readonly searchConnectionsByTenantIdGql: SearchConnectionsByTenantGQL,
+    private readonly tableCellEventService: TableCellEventService,
+    private readonly translationService: TranslocoService
   ) {}
 
   ngOnInit() {
@@ -89,6 +105,14 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
+      this.addButtonClicks$.subscribe(() =>
+        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
+          data: { searchQuery: this.searchConnectionsByTenantWatchQuery },
+        })
+      )
+    );
+
+    this.subscriptions.add(
       this.editButtonClicks$.subscribe((connectionId: string) =>
         this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
           data: { id: connectionId },
@@ -97,12 +121,14 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.deleteButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
-          data: { id: connectionId },
-          width: '500px',
-        })
-      )
+      this.deleteButtonClicks$
+        .pipe(switchMap((connectionId: string) => this.getConnectionpById(connectionId)))
+        .subscribe((connection: SourceConnectionDTO) =>
+          this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
+            data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },
+            width: '500px',
+          })
+        )
     );
   }
 
@@ -110,7 +136,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  searchConnections(tenantId: string, searchTerm: string) {
+  private searchConnections(tenantId: string, searchTerm: string) {
     const searchParameters = {
       tenantId: tenantId,
       paginationOffset: 0,
@@ -138,16 +164,37 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  openConnectionsDialog(componentToOpen?: ComponentType<ConnectionDialogComponent>, config?: MatDialogConfig) {
-    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, {
-      ...this.dialogDefaultConfig,
-      ...config,
-    });
-  }
-
   private getNextConnectionsPage(currentOffset: number) {
     this.searchConnectionsByTenantWatchQuery.fetchMore({
       variables: { paginationOffset: currentOffset, pageSize: this.pageSize },
+    });
+  }
+
+  private getConnectionpById(connectionId: string): Observable<SourceConnectionDTO> {
+    return this.authService.authStatus$.pipe(
+      switchMap((authStatus: IAuthStatus) => {
+        if (!this.getConnectionByIdWatchQuery) {
+          this.getConnectionByIdWatchQuery = this.getConnectionByIdGql.watch(
+            { tenantId: authStatus.tenantId, connectionId },
+            { notifyOnNetworkStatusChange: true }
+          );
+          return this.getConnectionByIdWatchQuery.valueChanges;
+        } else {
+          return this.getConnectionByIdWatchQuery.refetch({ tenantId: authStatus.tenantId, userGroupId: connectionId });
+        }
+      }),
+      tap(({ loading }) => this.isLoading$.next(loading)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter((response: any) => response?.data),
+      map(({ data }: { data: IGetConnectionByIdGQLResponse }) => data.getSourceConnection),
+      map(SourceConnectionDTO.Build)
+    );
+  }
+
+  private openConnectionsDialog(componentToOpen?: ComponentType<ConnectionDialogComponent>, config?: MatDialogConfig) {
+    this.matDialog.open(componentToOpen ?? ConnectionsAddEditDialogComponent, {
+      ...this.dialogDefaultConfig,
+      ...config,
     });
   }
 
