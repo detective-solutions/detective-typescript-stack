@@ -33,6 +33,6 @@ export class HomeContainerComponent {
     icon: 'manage_accounts',
     translationKey: 'home.navigation.sidenavBottomItem',
     route: '/admin',
-    title: 'Navigate to the admin section',
+    title: 'home.navigation.sidenavBottomItemTitle',
   };
 }

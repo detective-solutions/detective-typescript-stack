@@ -5,7 +5,8 @@
       "allCasefiles": "Alle Casefiles",
       "dataSources": "Datenquellen"
     },
-    "sidenavBottomItem": "Admin"
+    "sidenavBottomItem": "Admin",
+    "sidenavBottomItemTitle": "Zur Administrationsansicht wechseln"
   },
   "casefileList": {
     "createCasefileButtonText": "Neue Casefile erstellen",
