@@ -96,10 +96,6 @@ export class CacheService {
         this.removeTimeoutCacheById(casefileId);
       }, 5000);
 
-      // TODO: Remove me!
-      console.log('ADDED TIMEOUT TO CACHE');
-      console.log(this.timeoutCache);
-
       // Save timeout temporarily to be able to remove it if a user returns to casefile
       this.timeoutCache.push({ casefileId, timeout: casefileTimeout });
       return 'OK';
@@ -254,10 +250,6 @@ export class CacheService {
   private removeTimeoutCacheById(casefileId: string) {
     // Check if a deletion timeout exists for given id. If yes, remove it.
     const timeoutCache = this.timeoutCache.find((timeoutCache) => timeoutCache.casefileId === casefileId);
-    // TODO: Remove me!
-    console.log(this.timeoutCache);
-    console.log('TIMEOUT CACHE FOUND');
-    console.log(timeoutCache);
     if (timeoutCache) {
       clearInterval(timeoutCache.timeout);
       this.timeoutCache = this.timeoutCache.filter((timeoutCache) => timeoutCache.casefileId !== casefileId);
