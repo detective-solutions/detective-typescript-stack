@@ -1,6 +1,6 @@
-import { IDropDownValues, IUserGroup } from '@detective.solutions/shared/data-access';
 import { Query, gql } from 'apollo-angular';
 
+import { IUserGroup } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 
 export interface IGetUserGroupsGQLResponse {
@@ -8,9 +8,6 @@ export interface IGetUserGroupsGQLResponse {
   aggregateUserGroup: { count: number };
 }
 
-export interface IGetUserGroupsAsDropDownValuesGQLResponse {
-  queryUserGroup: IDropDownValues[];
-}
 @Injectable()
 export class GetAllUserGroupsGQL extends Query<Response> {
   override document = gql`
@@ -29,21 +26,6 @@ export class GetAllUserGroupsGQL extends Query<Response> {
       }
       aggregateUserGroup {
         count
-      }
-    }
-  `;
-}
-
-@Injectable()
-export class GetAllUserGroupsAsDropDownValuesGQL extends Query<Response> {
-  override document = gql`
-    query UserGroup($id: String) {
-      queryUserGroup {
-        id: xid
-        value: name
-        tenant(filter: { xid: { eq: $id } }) {
-          id: xid
-        }
       }
     }
   `;

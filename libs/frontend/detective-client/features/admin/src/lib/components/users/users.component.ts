@@ -27,7 +27,7 @@ import {
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
 import { IUser, UserRole } from '@detective.solutions/shared/data-access';
-import { IUserTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
+import { IUsersTableDef, UsersClickEvent, UsersDialogComponent } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
@@ -188,8 +188,8 @@ export class UsersComponent implements OnDestroy, OnInit {
     );
   }
 
-  private transformToTableStructure(originalUsers: IUser[]): IUserTableDef[] {
-    const tempTableItems = [] as IUserTableDef[];
+  private transformToTableStructure(originalUsers: IUser[]): IUsersTableDef[] {
+    const tempTableItems = [] as IUsersTableDef[];
     this.translationService
       .selectTranslateObject(`${this.translationScope.scope}.users.columnNames`)
       .pipe(take(1))
@@ -233,7 +233,7 @@ export class UsersComponent implements OnDestroy, OnInit {
                 ],
               },
             },
-          } as IUserTableDef);
+          } as IUsersTableDef);
         });
       });
     return tempTableItems;
