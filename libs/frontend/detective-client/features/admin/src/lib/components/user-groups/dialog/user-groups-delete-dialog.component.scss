@@ -7,6 +7,11 @@
     mat-list {
       font-style: italic;
 
+      .mat-list-item {
+        display: flex;
+        justify-content: center;
+      }
+
       .mat-list-icon {
         color: rgba(0, 0, 0, 0.54);
       }
