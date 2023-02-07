@@ -20,7 +20,7 @@ export class CacheService {
 
   readonly logger = new Logger(CacheService.name);
 
-  private timeoutCache: { casefileId: string; timeout: number }[] = [];
+  private timeoutCache: { casefileId: string; timeout: NodeJS.Timeout }[] = [];
   private client: RedisClientType<RedisDefaultModules>;
 
   constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {
@@ -89,7 +89,8 @@ export class CacheService {
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
       // Create timeout to prevent deleting cache instantly if users return in the meantime
-      const casefileTimeout = window.setTimeout(async () => {
+      const casefileTimeout = setTimeout(async () => {
+        console.log('Handling timeout...'); // TODO: Remove me!
         await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
         await this.deleteCasefile(casefileId);
         this.removeTimeoutCacheById(casefileId);
