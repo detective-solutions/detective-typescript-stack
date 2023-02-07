@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
-import { ConnectionsService } from '../../../services';
+import { CatalogService } from '../../../services';
 import { IConnectionsDeleteResponse } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { QueryRef } from 'apollo-angular';
@@ -22,7 +22,7 @@ export class ConnectionsDeleteDialogComponent {
     @Inject(MAT_DIALOG_DATA)
     public dialogInputData: { connection: SourceConnectionDTO; searchQuery: QueryRef<Response> },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
-    private readonly connectionsService: ConnectionsService,
+    private readonly catalogService: CatalogService,
     private readonly dialogRef: MatDialogRef<ConnectionsDeleteDialogComponent>,
     private readonly logger: LogService,
     private readonly translationService: TranslocoService,
@@ -31,7 +31,7 @@ export class ConnectionsDeleteDialogComponent {
 
   deleteConnection() {
     this.isLoading$.next(true);
-    this.connectionsService
+    this.catalogService
       .deleteConnection(this.dialogInputData.connection)
       .pipe(
         take(1),

@@ -13,7 +13,6 @@ import {
   IGetAllConnectionsResponse,
 } from '../models';
 import { ISourceConnectionTables, SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
-import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
 import { Observable, catchError, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
@@ -21,11 +20,12 @@ import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
+import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
-export class ConnectionsService {
+export class CatalogService {
   private static catalogServiceBasePath = `${environment.baseApiPath}${environment.catalogApiPathV1}`;
 
   private getAllConnectionsWatchQuery!: QueryRef<Response>;
@@ -35,8 +35,7 @@ export class ConnectionsService {
     private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
     private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly httpClient: HttpClient,
-    private readonly tableCellEventService: TableCellEventService,
-    private readonly logger: LogService
+    private readonly tableCellEventService: TableCellEventService
   ) {}
 
   getTablesOfConnection(id: string): Observable<ISourceConnectionTables> {
@@ -70,39 +69,25 @@ export class ConnectionsService {
     );
   }
 
-  refreshConnections() {
-    const currentResult = this.getAllConnectionsWatchQuery.getCurrentResult()?.data as any;
-    const alreadyLoadedConnectionCount = (currentResult as IGetAllConnectionsGQLResponse)?.querySourceConnection
-      ?.length;
-    if (alreadyLoadedConnectionCount) {
-      this.getAllConnectionsWatchQuery.refetch({ paginationOffset: 0, pageSize: alreadyLoadedConnectionCount });
-    } else {
-      this.logger.error('Could not determine currently loaded connection count. Reusing values of last query...');
-      this.getAllConnectionsWatchQuery.refetch();
-    }
-  }
-
   getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
-    return this.httpClient.get<IConnectorTypesResponse[]>(
-      `${ConnectionsService.catalogServiceBasePath}/connector/list`
-    );
+    return this.httpClient.get<IConnectorTypesResponse[]>(`${CatalogService.catalogServiceBasePath}/connector/list`);
   }
 
   getConnectorProperties(connectorType: string): Observable<{ properties: IConnectorPropertiesResponse[] }> {
     return this.httpClient.get<{ properties: IConnectorPropertiesResponse[] }>(
-      `${ConnectionsService.catalogServiceBasePath}/connector/schema/${connectorType}`
+      `${CatalogService.catalogServiceBasePath}/connector/schema/${connectorType}`
     );
   }
 
   getExistingConnectorPropertiesById(connectionId: string): Observable<IConnectorSchemaResponse> {
     return this.httpClient.get<IConnectorSchemaResponse>(
-      `${ConnectionsService.catalogServiceBasePath}/schema/${connectionId}`
+      `${CatalogService.catalogServiceBasePath}/schema/${connectionId}`
     );
   }
 
   addConnection(connectionType: string, payload: any): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
-      `${ConnectionsService.catalogServiceBasePath}/${connectionType}/insert`,
+      `${CatalogService.catalogServiceBasePath}/${connectionType}/insert`,
       payload
     );
   }
@@ -113,14 +98,13 @@ export class ConnectionsService {
     payload: any
   ): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
-      `${ConnectionsService.catalogServiceBasePath}/${connectionType}/update/${connectionId}`,
+      `${CatalogService.catalogServiceBasePath}/${connectionType}/update/${connectionId}`,
       payload
     );
   }
 
   deleteConnection(connection: SourceConnectionDTO): Observable<IConnectionsDeleteResponse> {
-    console.log(connection);
-    return this.httpClient.post<IConnectionsDeleteResponse>(`${ConnectionsService.catalogServiceBasePath}/delete`, {
+    return this.httpClient.post<IConnectionsDeleteResponse>(`${CatalogService.catalogServiceBasePath}/delete`, {
       source_connection_xid: connection.id,
       source_connection_name: connection.name,
     });

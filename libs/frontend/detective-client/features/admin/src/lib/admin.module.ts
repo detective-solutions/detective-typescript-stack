@@ -6,8 +6,8 @@ import {
   UserGroupsComponent,
   UsersComponent,
 } from './components';
+import { CatalogService, MaskingService, SubscriptionService, UsersService } from './services';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { ConnectionsService, MaskingService, SubscriptionService, UsersService } from './services';
 import {
   CreateNewColumnMaskGQL,
   CreateNewMaskingGQL,
@@ -94,7 +94,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
         loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
       },
     },
-    ConnectionsService,
+    CatalogService,
     MaskingService,
     SubscriptionService,
     UsersService,

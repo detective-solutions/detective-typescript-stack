@@ -113,11 +113,13 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.editButtonClicks$.subscribe((connectionId: string) =>
-        this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
-          data: { id: connectionId },
-        })
-      )
+      this.editButtonClicks$
+        .pipe(switchMap((connectionId: string) => this.getConnectionpById(connectionId)))
+        .subscribe((connection: SourceConnectionDTO) =>
+          this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
+            data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },
+          })
+        )
     );
 
     this.subscriptions.add(

@@ -7,7 +7,7 @@ import {
   DynamicFormError,
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
-import { ConnectionsService, MaskingService, UsersService } from '../../../services';
+import { CatalogService, MaskingService, UsersService } from '../../../services';
 import { EMPTY, Observable, Subscription, catchError, delay, map, take, tap } from 'rxjs';
 import {
   IConnectorPropertiesResponse,
@@ -110,7 +110,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   isAddDialog = !this.dialogInputData?.id;
   masksToDelete: IMaskDeleteInput = { columns: [], rows: [] };
   readonly defaultDropDownValues = [{ key: '', value: '' }];
-  readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.connectionsService.getAllConnections(
+  readonly availableConnections$: Observable<IGetAllConnectionsResponse> = this.catalogService.getAllConnections(
     0,
     500
   );
@@ -159,7 +159,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     private readonly maskingService: MaskingService,
     private readonly userService: UsersService,
     private readonly dynamicFormControlService: DynamicFormControlService,
-    private readonly connectionsService: ConnectionsService,
+    private readonly catalogService: CatalogService,
     private readonly formBuilder: UntypedFormBuilder,
     private readonly toastService: ToastService,
     private readonly logger: LogService,
@@ -417,7 +417,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
   }
 
   updateAvailableTables() {
-    this.connectionsService.getTablesOfConnection(this.connector).subscribe((x) => {
+    this.catalogService.getTablesOfConnection(this.connector).subscribe((x) => {
       const tables: IDropDownValues[] = [];
       x.connectedTables.forEach((data: IConnectionTable) => {
         tables.push({ key: data.id, value: data.name });
