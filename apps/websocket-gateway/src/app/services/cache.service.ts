@@ -90,7 +90,6 @@ export class CacheService {
     if (activeUsers.length === 0) {
       // Create timeout to prevent deleting cache instantly if users return in the meantime
       const casefileTimeout = setTimeout(async () => {
-        console.log('Handling timeout...'); // TODO: Remove me!
         await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
         await this.deleteCasefile(casefileId);
         this.removeTimeoutCacheById(casefileId);
