@@ -185,7 +185,6 @@ export class WebSocketService implements OnDestroy {
   }
 
   private buildWebSocketUrl(whiteboardContext: IWhiteboardContextState) {
-    console.log(this.authService.getAccessToken());
     const basePathV1 = `${buildWebSocketHost()}${environment.baseApiPath}${environment.webSocketApiPathV1}`;
     return `${basePathV1}/tenant/${whiteboardContext.tenantId}/casefile/${
       whiteboardContext.casefileId
