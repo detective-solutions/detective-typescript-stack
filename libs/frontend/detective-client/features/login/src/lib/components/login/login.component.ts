@@ -1,46 +1,31 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoginEmailValidation, LoginPasswordValidation } from '@detective.solutions/frontend/shared/utils';
-import { Subscription, filter, take } from 'rxjs';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { filter, take } from 'rxjs';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
+import { Component } from '@angular/core';
+import { UntypedFormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy {
-  redirectUrl!: string;
-  loginForm!: UntypedFormGroup;
-  loginError = '';
+export class LoginComponent {
   hidePassword = true;
+  readonly loginForm = this.formBuilder.group({
+    email: ['', LoginEmailValidation],
+    password: ['', LoginPasswordValidation],
+  });
 
-  private readonly subscriptions = new Subscription();
+  private readonly redirectUrl = this.route.snapshot.queryParams['redirectUrl'] ?? '';
 
   constructor(
     private readonly formBuilder: UntypedFormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {}
-
-  ngOnInit() {
-    this.redirectUrl = this.route.snapshot.queryParams['redirectUrl'] ?? '';
-    this.buildLoginForm();
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.unsubscribe();
-  }
-
-  buildLoginForm() {
-    this.loginForm = this.formBuilder.group({
-      email: ['', LoginEmailValidation],
-      password: ['', LoginPasswordValidation],
-    });
-  }
 
   login() {
     if (this.loginForm.valid) {
