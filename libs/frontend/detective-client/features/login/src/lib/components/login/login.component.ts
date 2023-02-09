@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoginEmailValidation, LoginPasswordValidation } from '@detective.solutions/frontend/shared/utils';
-import { Subscription, debounceTime, filter, take } from 'rxjs';
+import { Subscription, filter, take } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 
 import { AuthService } from '@detective.solutions/frontend/shared/auth';
@@ -46,13 +46,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.loginForm.valid) {
       this.authService
         .login(this.loginForm.value.email, this.loginForm.value.password)
-        .pipe(debounceTime(1000), take(1))
-        .subscribe();
-
-      this.authService.authStatus$
         .pipe(
-          filter((authStatus) => authStatus.isAuthenticated),
-          take(1)
+          take(1),
+          filter((authStatus) => authStatus.isAuthenticated)
         )
         .subscribe(() => this.router.navigateByUrl(this.redirectUrl));
     } else {
