@@ -8,7 +8,7 @@
   },
   "scripts": {
     "ng": "npx nx",
-    "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main",
+    "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2021 browser module main",
     "start": "npx nx serve",
     "build": "npx nx build --prod && npm run transloco:optimize",
     "test": "npx nx test",
