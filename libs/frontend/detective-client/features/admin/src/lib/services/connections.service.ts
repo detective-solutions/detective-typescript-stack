@@ -13,14 +13,13 @@ import {
   IGetAllConnectionsResponse,
 } from '../models';
 import { ISourceConnectionTables, SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
-import { Observable, catchError, map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QueryRef } from 'apollo-angular';
 import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { environment } from '@detective.solutions/frontend/shared/environments';
-import { transformError } from '@detective.solutions/frontend/shared/error-handling';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -64,8 +63,7 @@ export class CatalogService {
           connections: response.querySourceConnection.map(SourceConnectionDTO.Build),
           totalElementsCount: response.aggregateSourceConnection.count,
         };
-      }),
-      catchError((error) => this.handleError(error))
+      })
     );
   }
 
@@ -108,10 +106,5 @@ export class CatalogService {
       source_connection_xid: connection.id,
       source_connection_name: connection.name,
     });
-  }
-
-  private handleError(error: string): Observable<never> {
-    this.tableCellEventService.resetLoadingStates$.next(true);
-    return transformError(error);
   }
 }
