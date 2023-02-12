@@ -100,7 +100,6 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
       );
     });
 
-    // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
       this.fetchMoreDataOnScroll$.subscribe((currentOffset: number) => this.getNextUserGroupsPage(currentOffset))
     );
@@ -115,17 +114,17 @@ export class UserGroupsComponent implements OnDestroy, OnInit {
 
     this.subscriptions.add(
       this.editButtonClicks$
-        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId)))
-        .subscribe((userGroup: UserGroupDTO) =>
+        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId).pipe(take(1))))
+        .subscribe((userGroup: UserGroupDTO) => {
           this.openUserGroupDialog(UserGroupsAddEditDialogComponent, {
             data: { userGroup, searchQuery: this.searchUserGroupsByTenantWatchQuery },
-          })
-        )
+          });
+        })
     );
 
     this.subscriptions.add(
       this.deleteButtonClicks$
-        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId)))
+        .pipe(switchMap((userGroupId: string) => this.getUserGroupById(userGroupId).pipe(take(1))))
         .subscribe((userGroup: UserGroupDTO) =>
           this.openUserGroupDialog(UserGroupsDeleteComponent, {
             data: { userGroup, searchQuery: this.searchUserGroupsByTenantWatchQuery },

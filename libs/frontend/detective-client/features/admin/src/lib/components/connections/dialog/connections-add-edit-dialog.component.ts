@@ -5,7 +5,7 @@ import {
   DynamicFormError,
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { EMPTY, Observable, Subject, Subscription, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
 import { IConnectionsAddEditResponse, IConnectorPropertiesResponse, IConnectorSchemaResponse } from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -23,7 +23,7 @@ import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-a
   styleUrls: ['connections-add-edit-dialog.component.scss'],
   templateUrl: 'connections-add-edit-dialog.component.html',
 })
-export class ConnectionsAddEditDialogComponent {
+export class ConnectionsAddEditDialogComponent implements OnDestroy {
   private static readonly connectorTypeFormFieldName = 'connectorType';
 
   readonly isAddDialog = !this.dialogInputData.connection;
@@ -35,7 +35,9 @@ export class ConnectionsAddEditDialogComponent {
   readonly availableConnectorTypes$ = this.catalogService.getAvailableConnectorTypes();
   readonly existingFormFieldData$ = of(this.isAddDialog).pipe(
     filter((isAddDialog: boolean) => !isAddDialog),
-    switchMap(() => this.catalogService.getExistingConnectorPropertiesById(this.dialogInputData.connection.id)),
+    switchMap(() =>
+      this.catalogService.getExistingConnectorPropertiesById(this.dialogInputData.connection.id).pipe(take(1))
+    ),
     tap((response: IConnectorSchemaResponse) => (this.currentConnectorType = response.connectorType)),
     map((formFieldData: { properties: IConnectorPropertiesResponse[] }) =>
       this.getFormFieldByType(formFieldData.properties)
@@ -46,7 +48,9 @@ export class ConnectionsAddEditDialogComponent {
     .get(ConnectionsAddEditDialogComponent.connectorTypeFormFieldName)
     ?.valueChanges.pipe(
       tap((selectedConnectorType: string) => (this.currentConnectorType = selectedConnectorType)),
-      switchMap((selectedConnectorType: string) => this.catalogService.getConnectorProperties(selectedConnectorType)),
+      switchMap((selectedConnectorType: string) =>
+        this.catalogService.getConnectorProperties(selectedConnectorType).pipe(take(1))
+      ),
       map((formFieldData: { properties: IConnectorPropertiesResponse[] }) =>
         this.getFormFieldByType(formFieldData.properties)
       ),
@@ -69,6 +73,10 @@ export class ConnectionsAddEditDialogComponent {
     private readonly logger: LogService
   ) {
     this.subscriptions.add(this.dynamicFormControlService.formSubmit$.subscribe(() => this.submitForm()));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
   submitForm() {

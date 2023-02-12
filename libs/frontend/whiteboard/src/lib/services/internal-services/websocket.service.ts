@@ -82,7 +82,7 @@ export class WebSocketService implements OnDestroy {
               }),
               filter((isConnected: boolean) => !isConnected),
               filter(() => this.authService.hasExpiredToken(this.authService.getAccessToken())),
-              switchMap(() => this.authService.refreshTokens())
+              switchMap(() => this.authService.refreshTokens().pipe(take(1)))
             )
             .subscribe(() => {
               // Set websocket url with updated access token
@@ -210,7 +210,7 @@ export class WebSocketService implements OnDestroy {
           .refreshTokens()
           .pipe(
             tap(() => this.logger.info(`${WebSocketService.loggingPrefix} Refreshing access tokens`)),
-            switchMap(() => this.store.select(selectWhiteboardContextState)),
+            switchMap(() => this.store.select(selectWhiteboardContextState).pipe(take(1))),
             take(1)
           )
           .subscribe(

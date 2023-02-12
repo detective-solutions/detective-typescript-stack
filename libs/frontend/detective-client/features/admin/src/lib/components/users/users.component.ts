@@ -116,19 +116,23 @@ export class UsersComponent implements OnDestroy, OnInit {
     );
 
     this.subscriptions.add(
-      this.editButtonClicks$.pipe(switchMap((userId: string) => this.getUserById(userId))).subscribe((user: IUser) =>
-        this.openUserDialog(UserEditDialogComponent, {
-          data: { user, searchQuery: this.searchUsersByTenantWatchQuery },
-        })
-      )
+      this.editButtonClicks$
+        .pipe(switchMap((userId: string) => this.getUserById(userId).pipe(take(1))))
+        .subscribe((user: IUser) =>
+          this.openUserDialog(UserEditDialogComponent, {
+            data: { user, searchQuery: this.searchUsersByTenantWatchQuery },
+          })
+        )
     );
 
     this.subscriptions.add(
-      this.deleteButtonClicks$.pipe(switchMap((userId: string) => this.getUserById(userId))).subscribe((user: IUser) =>
-        this.openUserDialog(UsersDeleteDialogComponent, {
-          data: { user, searchQuery: this.searchUsersByTenantWatchQuery },
-        })
-      )
+      this.deleteButtonClicks$
+        .pipe(switchMap((userId: string) => this.getUserById(userId).pipe(take(1))))
+        .subscribe((user: IUser) =>
+          this.openUserDialog(UsersDeleteDialogComponent, {
+            data: { user, searchQuery: this.searchUsersByTenantWatchQuery },
+          })
+        )
     );
   }
 

@@ -111,7 +111,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
 
     this.subscriptions.add(
       this.editButtonClicks$
-        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId)))
+        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId).pipe(take(1))))
         .subscribe((masking: MaskingDTO) =>
           this.openMaskingDialog(MaskingAddEditDialogComponent, {
             data: { masking, searchQuery: this.searchMaskingsByTenantWatchQuery },
@@ -121,7 +121,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
 
     this.subscriptions.add(
       this.deleteButtonClicks$
-        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId)))
+        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId).pipe(take(1))))
         .subscribe((masking: MaskingDTO) =>
           this.openMaskingDialog(MaskingDeleteDialogComponent, {
             data: { masking, searchQuery: this.searchMaskingsByTenantWatchQuery },

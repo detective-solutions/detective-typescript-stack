@@ -98,7 +98,8 @@ export class UserGroupsDeleteComponent {
                 tap(({ loading }) => this.isLoading$.next(loading)),
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 filter((response: any) => response?.data),
-                map(({ data }: { data: IDeleteMaskingGQLResponse }) => data.deleteMasking)
+                map(({ data }: { data: IDeleteMaskingGQLResponse }) => data.deleteMasking),
+                take(1)
               )
               .subscribe((response: { msg: string }) => console.log('Masking deleted: ', response));
           });

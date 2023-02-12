@@ -114,7 +114,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.editButtonClicks$
-        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId)))
+        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId).pipe(take(1))))
         .subscribe((connection: SourceConnectionDTO) =>
           this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
             data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },
@@ -124,7 +124,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.deleteButtonClicks$
-        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId)))
+        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId).pipe(take(1))))
         .subscribe((connection: SourceConnectionDTO) =>
           this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
             data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },

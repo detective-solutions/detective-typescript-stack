@@ -1,5 +1,5 @@
 import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
   CreateUserGroupGQL,
   ICreateUserGroupGQLResponse,
@@ -44,7 +44,7 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrls: ['user-groups-add-edit-dialog.component.scss'],
   templateUrl: 'user-groups-add-edit-dialog.component.html',
 })
-export class UserGroupsAddEditDialogComponent implements OnInit {
+export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
   addUserGroupFormFields!: TextBoxFormField[];
   editUserGroupFormFields!: TextBoxFormField[];
 
@@ -73,7 +73,7 @@ export class UserGroupsAddEditDialogComponent implements OnInit {
     debounceTime(400),
     distinctUntilChanged(),
     filter(Boolean),
-    switchMap((searchTerm: string) => this.searchForPotentialNewMembers(searchTerm.trim()))
+    switchMap((searchTerm: string) => this.searchForPotentialNewMembers(searchTerm.trim()).pipe(take(1)))
   );
 
   private searchUsersNotAssociatedWithUserGroupWatchQuery!: QueryRef<Response>;
@@ -105,6 +105,10 @@ export class UserGroupsAddEditDialogComponent implements OnInit {
       });
     }
     this.subscriptions.add(this.dynamicFormControlService.formSubmit$.subscribe(() => this.submitUserGroup()));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
   submitUserGroup() {
