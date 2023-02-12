@@ -80,10 +80,10 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly getConnectionByIdGql: GetConnectionByIdGQL,
+    private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
     private readonly matDialog: MatDialog,
     private readonly navigationEventService: NavigationEventService,
-    private readonly searchConnectionsByTenantIdGql: SearchConnectionsByTenantGQL,
+    private readonly searchConnectionsByTenantIdGQL: SearchConnectionsByTenantGQL,
     private readonly tableCellEventService: TableCellEventService,
     private readonly translationService: TranslocoService
   ) {}
@@ -147,7 +147,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     };
 
     if (!this.searchConnectionsByTenantWatchQuery) {
-      this.searchConnectionsByTenantWatchQuery = this.searchConnectionsByTenantIdGql.watch(searchParameters, {
+      this.searchConnectionsByTenantWatchQuery = this.searchConnectionsByTenantIdGQL.watch(searchParameters, {
         notifyOnNetworkStatusChange: true,
       });
       this.subscriptions.add(
@@ -176,7 +176,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     return this.authService.authStatus$.pipe(
       switchMap((authStatus: IAuthStatus) => {
         if (!this.getConnectionByIdWatchQuery) {
-          this.getConnectionByIdWatchQuery = this.getConnectionByIdGql.watch(
+          this.getConnectionByIdWatchQuery = this.getConnectionByIdGQL.watch(
             { tenantId: authStatus.tenantId, connectionId },
             { notifyOnNetworkStatusChange: true }
           );

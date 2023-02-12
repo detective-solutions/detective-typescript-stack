@@ -15,7 +15,6 @@ import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transl
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
-import { IMaskingDeleteInput } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { QueryRef } from 'apollo-angular';
 import { UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
@@ -28,11 +27,12 @@ import { UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
 export class UserGroupsDeleteComponent {
   readonly isLoading$ = new Subject<boolean>();
   readonly relatedMaskings$ = this.getMaskings().pipe(
-    filter(Boolean),
-    tap((maskings: IMasking[]) => this.generateMaskingDeleteInput(maskings))
+    tap((maskingsToDelete: IMasking[]) => {
+      this.maskingsToDelete = maskingsToDelete;
+    })
   );
 
-  private maskingsToDelete!: IMaskingDeleteInput[];
+  private maskingsToDelete!: IMasking[];
   private getMaskingsOfUserGroupByIdWatchQuery!: QueryRef<Response>;
 
   constructor(
@@ -47,16 +47,6 @@ export class UserGroupsDeleteComponent {
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService
   ) {}
-
-  generateMaskingDeleteInput(maskings: IMasking[]) {
-    this.maskingsToDelete = maskings.map((masking: IMasking) => {
-      return {
-        masking: masking.id,
-        rows: masking.rows?.map((mask: IMask) => mask.id ?? '') ?? [],
-        columns: masking.columns?.map((mask: IMask) => mask.id ?? '') ?? [],
-      };
-    });
-  }
 
   deleteUserGroup() {
     this.isLoading$.next(true);
@@ -77,17 +67,17 @@ export class UserGroupsDeleteComponent {
       )
       .subscribe((response: IDeleteUserGroupByIdGQLResponse) => {
         if (!Object.keys(response).includes('error')) {
-          this.maskingsToDelete.forEach((maskingToDelete: IMaskingDeleteInput) => {
+          this.maskingsToDelete.forEach((maskingToDelete: IMasking) => {
             this.deleteMaskingGQL
               .mutate({
                 filter: {
                   xid: {
-                    eq: maskingToDelete.masking,
+                    eq: maskingToDelete.id,
                   },
                 },
                 remove: {
-                  columns: maskingToDelete.columns,
-                  rows: maskingToDelete.rows,
+                  columns: maskingToDelete.columns?.map((mask: IMask) => mask.id) ?? [],
+                  rows: maskingToDelete.rows?.map((mask: IMask) => mask.id) ?? [],
                 },
               })
               .pipe(
@@ -103,7 +93,6 @@ export class UserGroupsDeleteComponent {
         this.handleResponse(response);
       });
   }
-
   private getMaskings(): Observable<IMasking[]> {
     return this.authService.authStatus$.pipe(
       switchMap((authStatus: IAuthStatus) => {

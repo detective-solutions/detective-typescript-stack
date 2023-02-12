@@ -13,7 +13,6 @@ export * from './users-click-events.enum';
 export * from './masking-create.interface';
 export * from './delete-masking-response.interface';
 export * from './maskings-table.interface';
-export * from './masking-delete.interface';
 export * from './masking-update.interface';
 export * from './invoice-table.interface';
 export * from './masking-click-event.enum';

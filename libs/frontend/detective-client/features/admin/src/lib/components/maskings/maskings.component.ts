@@ -76,11 +76,11 @@ export class MaskingsComponent implements OnDestroy, OnInit {
   constructor(
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly getMaskingByIdGql: GetMaskingByIdGQL,
+    private readonly getMaskingByIdGQL: GetMaskingByIdGQL,
     private readonly tableCellEventService: TableCellEventService,
     private readonly navigationEventService: NavigationEventService,
     private readonly matDialog: MatDialog,
-    private readonly searchMaskingsByTenantIdGql: SearchMaskingsByTenantIdGQL,
+    private readonly searchMaskingsByTenantIdGQL: SearchMaskingsByTenantIdGQL,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
@@ -144,7 +144,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     };
 
     if (!this.searchMaskingsByTenantWatchQuery) {
-      this.searchMaskingsByTenantWatchQuery = this.searchMaskingsByTenantIdGql.watch(searchParameters, {
+      this.searchMaskingsByTenantWatchQuery = this.searchMaskingsByTenantIdGQL.watch(searchParameters, {
         notifyOnNetworkStatusChange: true,
       });
       this.subscriptions.add(
@@ -173,7 +173,7 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     return this.authService.authStatus$.pipe(
       switchMap((authStatus: IAuthStatus) => {
         if (!this.getMaskingByIdWatchQuery) {
-          this.getMaskingByIdWatchQuery = this.getMaskingByIdGql.watch(
+          this.getMaskingByIdWatchQuery = this.getMaskingByIdGQL.watch(
             { tenantId: authStatus.tenantId, maskingId },
             { notifyOnNetworkStatusChange: true }
           );
