@@ -4,7 +4,7 @@ import { MockModule, MockService, ngMocks } from 'ng-mocks';
 import { Apollo } from 'apollo-angular';
 import { GetAllMaskingsGQL } from '../../graphql';
 import { MaskingService } from '../../services';
-import { MaskingsComponent } from './masking.component';
+import { MaskingsComponent } from './maskings.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TableModule } from '@detective.solutions/frontend/detective-client/ui';

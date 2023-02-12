@@ -33,9 +33,9 @@ import { v4 as uuidv4 } from 'uuid';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Component({
-  selector: 'masking-add-edit-dialog',
-  styleUrls: ['masking-add-edit-dialog.component.scss'],
-  templateUrl: 'masking-add-edit-dialog.component.html',
+  selector: 'maskings-add-edit-dialog',
+  styleUrls: ['maskings-add-edit-dialog.component.scss'],
+  templateUrl: 'maskings-add-edit-dialog.component.html',
 })
 export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestroy {
   private static COLUMNS_SCHEMA = [

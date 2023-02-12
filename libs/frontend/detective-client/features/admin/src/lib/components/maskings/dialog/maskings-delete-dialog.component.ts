@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { EMPTY, catchError, map, take } from 'rxjs';
+import { EMPTY, Subject, catchError, map, take } from 'rxjs';
 import { IMask, IMasking } from '@detective.solutions/shared/data-access';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
@@ -11,16 +11,16 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
 import { MaskingService } from '../../../services';
 
 @Component({
-  selector: 'masking-delete-dialog',
-  styleUrls: ['masking-delete-dialog.component.scss'],
-  templateUrl: 'masking-delete-dialog.component.html',
+  selector: 'maskings-delete-dialog',
+  styleUrls: ['maskings-delete-dialog.component.scss'],
+  templateUrl: 'maskings-delete-dialog.component.html',
 })
 export class MaskingDeleteDialogComponent {
+  readonly isLoading$ = new Subject<boolean>();
   readonly maskingToBeDeleted$ = this.maskingService.getMaskingById(this.dialogInputData.id);
   readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IMasking) => value.name));
 
-  isSubmitting = false;
-  selectedMasking!: IMasking;
+  private selectedMasking!: IMasking;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
@@ -47,7 +47,7 @@ export class MaskingDeleteDialogComponent {
   }
 
   deleteMasking() {
-    this.isSubmitting = true;
+    this.isLoading$.next(true);
 
     const children = this.getMaskIdsToDelete();
     this.maskingService
@@ -67,7 +67,7 @@ export class MaskingDeleteDialogComponent {
   }
 
   private handleResponse(response: IDeleteMaskingGQLResponse) {
-    this.isSubmitting = false;
+    this.isLoading$.next(false);
     if (!Object.keys(response).includes('error')) {
       this.translationService
         .selectTranslate('maskings.toastMessages.actionSuccessful', {}, this.translationScope)
@@ -94,7 +94,7 @@ export class MaskingDeleteDialogComponent {
       this.logger.error('Encountered an error while fetching the form data');
     }
     if (errorType === DynamicFormError.FORM_SUBMIT_ERROR) {
-      this.isSubmitting = false;
+      this.isLoading$.next(false);
       translationKey = 'maskings.toastMessages.formSubmitError';
       this.logger.error('Encountered an error while submitting the form data');
     }

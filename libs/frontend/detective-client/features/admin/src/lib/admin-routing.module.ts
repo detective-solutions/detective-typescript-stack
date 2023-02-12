@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AdminContainerComponent } from './components/admin-container.component';
 import { ConnectionsComponent } from './components/connections/connections.component';
-import { MaskingsComponent } from './components/maskings/masking.component';
+import { MaskingsComponent } from './components/maskings/maskings.component';
 import { NgModule } from '@angular/core';
 import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
 import { UserGroupsComponent } from './components/user-groups/user-groups.component';

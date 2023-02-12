@@ -21,7 +21,7 @@ import { QueryRef } from 'apollo-angular';
 import { UserGroupDTO } from '@detective.solutions/frontend/shared/data-access';
 
 @Component({
-  selector: 'user-group-delete-dialog',
+  selector: 'user-groups-delete-dialog',
   styleUrls: ['user-groups-delete-dialog.component.scss'],
   templateUrl: 'user-groups-delete-dialog.component.html',
 })
@@ -32,8 +32,7 @@ export class UserGroupsDeleteComponent {
     tap((maskings: IMasking[]) => this.generateMaskingDeleteInput(maskings))
   );
 
-  maskingsToDelete!: IMaskingDeleteInput[];
-
+  private maskingsToDelete!: IMaskingDeleteInput[];
   private getMaskingsOfUserGroupByIdWatchQuery!: QueryRef<Response>;
 
   constructor(

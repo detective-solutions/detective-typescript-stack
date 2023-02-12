@@ -37,8 +37,8 @@ import { buildSearchTermRegEx } from '@detective.solutions/frontend/shared/utils
 
 @Component({
   selector: 'maskings',
-  templateUrl: './masking.component.html',
-  styleUrls: ['./masking.component.scss'],
+  templateUrl: './maskings.component.html',
+  styleUrls: ['./maskings.component.scss'],
 })
 export class MaskingsComponent implements OnDestroy, OnInit {
   readonly isLoading$ = new Subject<boolean>();

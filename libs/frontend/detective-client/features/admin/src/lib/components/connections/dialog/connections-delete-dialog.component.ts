@@ -16,7 +16,7 @@ import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-a
   templateUrl: 'connections-delete-dialog.component.html',
 })
 export class ConnectionsDeleteDialogComponent {
-  isLoading$ = new Subject<boolean>();
+  readonly isLoading$ = new Subject<boolean>();
 
   constructor(
     @Inject(MAT_DIALOG_DATA)
