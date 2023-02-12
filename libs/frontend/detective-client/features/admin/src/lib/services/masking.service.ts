@@ -15,23 +15,15 @@ import {
 } from '../graphql';
 import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-masking-by-id.gql';
 import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/data-access';
-import {
-  IGetAllMaskingsResponse,
-  IMaskSubTableDataDef,
-  IMaskingCreateInput,
-  IMaskingDeleteInput,
-  IMaskingUpdateInput,
-} from '../models';
-import { LogService, transformError } from '@detective.solutions/frontend/shared/error-handling';
-import { Observable, catchError, map } from 'rxjs';
+import { IMaskSubTableDataDef, IMaskingCreateInput, IMaskingDeleteInput, IMaskingUpdateInput } from '../models';
+import { Observable, map } from 'rxjs';
 
 import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
 import { GetAllColumnsGQL } from '../graphql/get-all-columns-by-table-id.gql';
 import { IGetAllColumnsResponse } from '../models/get-all-columns-by-table-id-response.interface';
 import { Injectable } from '@angular/core';
-import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
+import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { QueryRef } from 'apollo-angular';
-import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
 import { UsersService } from './users.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -57,7 +49,6 @@ export class MaskingService {
     private readonly getUserGroupsGQL: GetAllUserGroupsAsDropDownValuesGQL,
     private readonly getColumnsByTableIdGQL: GetAllColumnsGQL,
     private readonly createNewMaskingGQL: CreateNewMaskingGQL,
-    private readonly tableCellEventService: TableCellEventService,
     private readonly userService: UsersService,
     private readonly logger: LogService
   ) {}
@@ -67,30 +58,6 @@ export class MaskingService {
     return this.getMaskingByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetMaskingByIdGQLResponse) => response.getMasking)
-    );
-  }
-
-  getAllMaskings(paginationOffset: number, pageSize: number): Observable<IGetAllMaskingsResponse> {
-    if (!this.getAllMaskingWatchQuery) {
-      this.getAllMaskingWatchQuery = this.getAllMaskingGQL.watch(
-        {
-          id: this.userService.getTenant(),
-          paginationOffset: paginationOffset,
-          pageSize: pageSize,
-        },
-        { pollInterval: 1000 }
-      );
-    }
-
-    return this.getAllMaskingWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetAllMaskingsGQLResponse) => {
-        return {
-          maskings: response.queryMasking.map(MaskingDTO.Build),
-          totalElementsCount: response.aggregateMasking.count,
-        };
-      }),
-      catchError((error) => this.handleError(error))
     );
   }
 
@@ -116,8 +83,7 @@ export class MaskingService {
 
     return this.getUserGroupsWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
-      map((response: IGetUserGroupsAsDropDownValuesGQLResponse) => response.queryUserGroup),
-      catchError((error) => this.handleError(error))
+      map((response: IGetUserGroupsAsDropDownValuesGQLResponse) => response.queryUserGroup)
     );
   }
 
@@ -136,14 +102,6 @@ export class MaskingService {
     }
   }
 
-  getAllMaskingsNextPage(paginationOffset: number, pageSize: number) {
-    this.getAllMaskingWatchQuery
-      .fetchMore({
-        variables: { paginationOffset: paginationOffset, pageSize: pageSize },
-      })
-      .catch((error) => this.handleError(error));
-  }
-
   getBooleanFromString(stringBool: string): boolean {
     return stringBool === 'true' ? true : false;
   }
@@ -156,8 +114,8 @@ export class MaskingService {
       visible: this.getBooleanFromString(mask.visible),
       replaceType: mask.replaceType,
       customReplaceValue: mask.customReplaceType,
-      author: userId,
-      lastUpdatedBy: userId,
+      author: { id: userId },
+      lastUpdatedBy: { id: userId },
       lastUpdated: date,
       created: date,
     };
@@ -169,15 +127,15 @@ export class MaskingService {
       columnName: mask.columnName,
       visible: this.getBooleanFromString(mask.visible),
       replaceType: mask.replaceType,
-      author: userId,
-      lastUpdatedBy: userId,
+      author: { id: userId },
+      lastUpdatedBy: { id: userId },
       lastUpdated: date,
       created: date,
     };
   }
 
   updateMasking(update: IMaskingUpdateInput): Observable<IUpdateMaskingGQLResponse> {
-    const user = this.userService.getAuthor();
+    const userId = this.userService.getAuthor();
     const date = new Date().toISOString();
 
     const filteredColumns = update.masks.filter(
@@ -188,11 +146,11 @@ export class MaskingService {
     );
 
     const columns = filteredColumns.map((mask: IMaskSubTableDataDef) => {
-      return this.getColumnMaskObject(mask, user, date);
+      return this.getColumnMaskObject(mask, userId, date);
     });
 
     const rows = filteredRows.map((mask: IMaskSubTableDataDef) => {
-      return this.getRowMaskObject(mask, user, date);
+      return this.getRowMaskObject(mask, userId, date);
     });
 
     return this.updateMaskingGQL
@@ -210,7 +168,7 @@ export class MaskingService {
               columns: columns,
               rows: rows,
               lastUpdatedBy: {
-                xid: user,
+                xid: userId,
               },
               lastUpdated: date,
             },
@@ -356,10 +314,5 @@ export class MaskingService {
         map((response: any) => response.data),
         map((response: ICreateNewMaskingGQLResponse) => response)
       );
-  }
-
-  private handleError(error: string) {
-    this.tableCellEventService.resetLoadingStates$.next(true);
-    return transformError(error);
   }
 }

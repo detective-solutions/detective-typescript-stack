@@ -1,4 +1,6 @@
+import { ITenant } from '../tenant';
 import { IUser } from '../user';
+import { IUserGroup } from '../user-group';
 
 export interface IMask {
   id: string;
@@ -7,9 +9,9 @@ export interface IMask {
   visible?: boolean;
   replaceType?: string;
   customReplaceValue?: string;
-  author?: string;
-  editors?: IUser[];
-  lastUpdatedBy: string;
+  author?: Partial<IUser>;
+  editors?: Partial<IUser>[];
+  lastUpdatedBy: Partial<IUser>;
   lastUpdated: string;
   created: string;
 }
@@ -17,9 +19,7 @@ export interface IMask {
 export interface IMasking {
   id: string;
   name: string;
-  tenant: {
-    id: string;
-  };
+  tenant: Pick<ITenant, 'id'>;
   description: string;
   table: {
     id: string;
@@ -29,12 +29,12 @@ export interface IMasking {
       name: string;
     };
   };
-  groups?: { id: string; name: string }[];
+  groups?: Partial<IUserGroup>[] | undefined;
   columns?: IMask[];
   rows?: IMask[];
-  author?: string;
-  editors?: IUser[];
-  lastUpdatedBy?: string;
+  author?: Partial<IUser>;
+  editors?: Partial<IUser>[];
+  lastUpdatedBy?: Partial<IUser>;
   lastUpdated?: string;
   created?: string;
 }

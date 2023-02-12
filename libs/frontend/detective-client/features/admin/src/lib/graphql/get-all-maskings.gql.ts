@@ -31,6 +31,7 @@ export class GetAllMaskingsGQL extends Query<Response> {
           name
         }
         lastUpdatedBy {
+          id: xid
           firstname
           lastname
         }

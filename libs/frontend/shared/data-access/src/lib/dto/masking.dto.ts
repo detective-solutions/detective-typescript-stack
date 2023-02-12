@@ -1,12 +1,25 @@
-import { IMask, IMasking } from '@detective.solutions/shared/data-access';
+import { IMask, IMasking, ITenant, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 
 export class MaskingDTO implements IMasking {
+  get authorFullName(): string {
+    if (!this.author?.firstname || !this.author?.lastname) {
+      throw new Error('');
+    } else {
+      return `${this.author.firstname} ${this.author.lastname}`;
+    }
+  }
+  get lastEditorFullName(): string {
+    if (!this.lastUpdatedBy?.firstname || !this.lastUpdatedBy.lastname) {
+      throw new Error('');
+    } else {
+      return `${this.lastUpdatedBy.firstname} ${this.lastUpdatedBy.lastname}`;
+    }
+  }
+
   constructor(
     public id: string,
     public name: string,
-    public tenant: {
-      id: string;
-    },
+    public tenant: Pick<ITenant, 'id'>,
     public description: string,
     public table: {
       id: string;
@@ -18,13 +31,10 @@ export class MaskingDTO implements IMasking {
     },
     public columns?: IMask[],
     public rows?: IMask[],
-    public groups?: {
-      id: string;
-      name: string;
-    }[],
-    public author?: string | undefined,
+    public groups?: Partial<IUserGroup>[] | undefined,
+    public author?: Partial<IUser> | undefined,
     public created?: string | undefined,
-    public lastUpdatedBy?: string | undefined,
+    public lastUpdatedBy?: Partial<IUser> | undefined,
     public lastUpdated?: string | undefined
   ) {}
 

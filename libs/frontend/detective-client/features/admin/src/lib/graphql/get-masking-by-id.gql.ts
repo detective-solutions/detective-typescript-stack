@@ -1,19 +1,19 @@
 import { Query, gql } from 'apollo-angular';
+import { IMasking } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
-import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetMaskingByIdGQLResponse {
-  getMasking: MaskingDTO;
+  getMasking: IMasking;
 }
 
 @Injectable()
 export class GetMaskingByIdGQL extends Query<Response> {
   override document = gql`
-    query getMaskingById($id: String!) {
-      getMasking(xid: $id) {
+    query getMaskingById($tenantId: String!, $maskingId: String!) {
+      getMasking(xid: $maskingId) {
         id: xid
         name
-        tenant {
+        tenant(filter: { xid: { eq: $tenantId } }) {
           id: xid
         }
         description

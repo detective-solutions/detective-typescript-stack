@@ -1,20 +1,39 @@
+import { AuthService, IAuthStatus } from '@detective.solutions/frontend/shared/auth';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  filter,
+  map,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
-  IAbstractTableDef,
+  GetMaskingByIdGQL,
+  IGetMaskingByIdGQLResponse,
+  ISearchMaskingsByTenantGQLResponse,
+  SearchMaskingsByTenantIdGQL,
+} from '../../graphql';
+import { IMaskingTableDef, MaskingClickEvent, MaskingDialogComponent } from '../../models';
+import {
   ITableCellEvent,
+  NavigationEventService,
   TableCellEventService,
   TableCellTypes,
 } from '@detective.solutions/frontend/detective-client/ui';
-import { IGetAllMaskingsResponse, IMaskingTableDef, MaskingClickEvent, MaskingDialogComponent } from '../../models';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './dialog';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 
 import { ComponentType } from '@angular/cdk/portal';
-import { IMasking } from '@detective.solutions/shared/data-access';
-import { MaskingService } from '../../services';
+import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
+import { QueryRef } from 'apollo-angular';
+import { buildSearchTermRegEx } from '@detective.solutions/frontend/shared/utils';
 
 @Component({
   selector: 'maskings',
@@ -22,6 +41,12 @@ import { MaskingService } from '../../services';
   styleUrls: ['./masking.component.scss'],
 })
 export class MaskingsComponent implements OnDestroy, OnInit {
+  readonly isLoading$ = new Subject<boolean>();
+  readonly fetchMoreDataOnScroll$ = new Subject<number>();
+  readonly maskings$ = new BehaviorSubject<MaskingDTO[]>([]);
+  readonly tableItems$ = this.maskings$.pipe(map((maskings: MaskingDTO[]) => this.transformToTableStructure(maskings)));
+
+  readonly addButtonClicks$ = new Subject<void>();
   readonly editButtonClicks$ = this.tableCellEventService.iconButtonClicks$.pipe(
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === MaskingClickEvent.EDIT_MASKING),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
@@ -30,7 +55,6 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     filter((tableCellEvent: ITableCellEvent) => tableCellEvent.value === MaskingClickEvent.DELETE_MASKING),
     map((tableCellEvent: ITableCellEvent) => tableCellEvent.id)
   );
-
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
@@ -38,56 +62,72 @@ export class MaskingsComponent implements OnDestroy, OnInit {
       shareReplay()
     );
 
-  readonly pageSize = 10;
-  readonly fetchMoreDataOnScroll$ = new Subject<number>();
+  private searchMaskingsByTenantWatchQuery!: QueryRef<Response>;
+  private getMaskingByIdWatchQuery!: QueryRef<Response>;
 
-  tableItems$!: Observable<IAbstractTableDef[]>;
-  totalElementsCount$!: Observable<number>;
-
+  private readonly pageSize = 15;
   private readonly subscriptions = new Subscription();
-  private readonly initialPageOffset = 0;
   private readonly dialogDefaultConfig = {
     width: '60%',
     minWidth: '400px',
+    autoFocus: false, // Prevent autofocus on dialog button
   };
 
   constructor(
+    private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly maskingService: MaskingService,
+    private readonly getMaskingByIdGql: GetMaskingByIdGQL,
     private readonly tableCellEventService: TableCellEventService,
+    private readonly navigationEventService: NavigationEventService,
     private readonly matDialog: MatDialog,
+    private readonly searchMaskingsByTenantIdGql: SearchMaskingsByTenantIdGQL,
     private readonly translationService: TranslocoService,
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
   ) {}
 
   ngOnInit() {
-    this.tableItems$ = this.maskingService
-      .getAllMaskings(this.initialPageOffset, this.pageSize)
-      .pipe(map((maskings: IGetAllMaskingsResponse) => this.transformToTableStructure(maskings.maskings)));
+    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
+      // Fetch initial data
+      this.searchMaskings(authStatus.tenantId, '');
+      // Listen to search input from navigation
+      this.subscriptions.add(
+        this.navigationEventService.searchInput$.subscribe((searchTerm: string) =>
+          this.searchMaskings(authStatus.tenantId, searchTerm)
+        )
+      );
+    });
 
-    // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
-      this.fetchMoreDataOnScroll$.subscribe(() =>
-        // TODO: Use correct function here
-        this.maskingService.getAllMaskingsNextPage(0, this.pageSize)
-      )
+      this.fetchMoreDataOnScroll$.subscribe((currentOffset: number) => this.getNextMaskingsPage(currentOffset))
     );
 
     this.subscriptions.add(
-      this.editButtonClicks$.subscribe((maskingId: string) =>
+      this.addButtonClicks$.subscribe(() =>
         this.openMaskingDialog(MaskingAddEditDialogComponent, {
-          data: { id: maskingId },
+          data: { searchQuery: this.searchMaskingsByTenantWatchQuery },
         })
       )
     );
 
     this.subscriptions.add(
-      this.deleteButtonClicks$.subscribe((maskingId: string) =>
-        this.openMaskingDialog(MaskingDeleteDialogComponent, {
-          data: { id: maskingId },
-          width: '500px',
-        })
-      )
+      this.editButtonClicks$
+        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId)))
+        .subscribe((masking: MaskingDTO) =>
+          this.openMaskingDialog(MaskingAddEditDialogComponent, {
+            data: { masking, searchQuery: this.searchMaskingsByTenantWatchQuery },
+          })
+        )
+    );
+
+    this.subscriptions.add(
+      this.deleteButtonClicks$
+        .pipe(switchMap((maskingId: string) => this.getMaskingById(maskingId)))
+        .subscribe((masking: MaskingDTO) =>
+          this.openMaskingDialog(MaskingDeleteDialogComponent, {
+            data: { masking, searchQuery: this.searchMaskingsByTenantWatchQuery },
+            width: '500px',
+          })
+        )
     );
   }
 
@@ -95,66 +135,121 @@ export class MaskingsComponent implements OnDestroy, OnInit {
     this.subscriptions.unsubscribe();
   }
 
-  openMaskingDialog(componentToOpen?: ComponentType<MaskingDialogComponent>, config?: MatDialogConfig) {
+  private searchMaskings(tenantId: string, searchTerm: string) {
+    const searchParameters = {
+      tenantId,
+      paginationOffset: 0,
+      pageSize: this.pageSize,
+      searchTerm: buildSearchTermRegEx(searchTerm),
+    };
+
+    if (!this.searchMaskingsByTenantWatchQuery) {
+      this.searchMaskingsByTenantWatchQuery = this.searchMaskingsByTenantIdGql.watch(searchParameters, {
+        notifyOnNetworkStatusChange: true,
+      });
+      this.subscriptions.add(
+        this.searchMaskingsByTenantWatchQuery.valueChanges
+          .pipe(
+            tap(({ loading }) => this.isLoading$.next(loading)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            filter((response: any) => response?.data)
+          )
+          .subscribe(({ data }: { data: ISearchMaskingsByTenantGQLResponse }) => {
+            this.maskings$.next(data.queryMasking.map(MaskingDTO.Build));
+          })
+      );
+    } else {
+      this.searchMaskingsByTenantWatchQuery.refetch(searchParameters);
+    }
+  }
+
+  private getNextMaskingsPage(currentOffset: number) {
+    this.searchMaskingsByTenantWatchQuery.fetchMore({
+      variables: { paginationOffset: currentOffset, pageSize: this.pageSize },
+    });
+  }
+
+  private getMaskingById(maskingId: string): Observable<MaskingDTO> {
+    return this.authService.authStatus$.pipe(
+      switchMap((authStatus: IAuthStatus) => {
+        if (!this.getMaskingByIdWatchQuery) {
+          this.getMaskingByIdWatchQuery = this.getMaskingByIdGql.watch(
+            { tenantId: authStatus.tenantId, maskingId },
+            { notifyOnNetworkStatusChange: true }
+          );
+          return this.getMaskingByIdWatchQuery.valueChanges;
+        } else {
+          return this.getMaskingByIdWatchQuery.refetch({ tenantId: authStatus.tenantId, maskingId });
+        }
+      }),
+      tap(({ loading }) => this.isLoading$.next(loading)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter((response: any) => response?.data),
+      map(({ data }: { data: IGetMaskingByIdGQLResponse }) => data.getMasking),
+      map(MaskingDTO.Build)
+    );
+  }
+
+  private openMaskingDialog(componentToOpen?: ComponentType<MaskingDialogComponent>, config?: MatDialogConfig) {
     this.matDialog.open(componentToOpen ?? MaskingAddEditDialogComponent, {
       ...this.dialogDefaultConfig,
       ...config,
     });
   }
 
-  private transformToTableStructure(originalMasking: IMasking[]): IMaskingTableDef[] {
+  private transformToTableStructure(originalMasking: MaskingDTO[]): IMaskingTableDef[] {
     const tempTableItems = [] as IMaskingTableDef[];
     this.translationService
       .selectTranslateObject(`${this.translationScope.scope}.maskings.columnNames`)
       .pipe(take(1))
       .subscribe((translation: { [key: string]: string }) => {
-        originalMasking.forEach((maskings: IMasking) => {
+        originalMasking.forEach((masking: MaskingDTO) => {
           tempTableItems.push({
             maskingInfo: {
               columnName: '',
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.MULTI_TABLE_CELL_WITHOUT_THUMBNAIL,
-                name: maskings.name,
-                description: String(maskings.description),
+                name: masking.name,
+                description: String(masking.description),
               },
             },
             table: {
               columnName: translation['tableNameColumn'],
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.table.name),
+                text: String(masking.table.name),
               },
             },
             userGroups: {
               columnName: translation['userGroupsColumn'],
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: String(maskings.groups?.map((group) => group.name).join(', ')),
+                text: String(masking.groups?.map((group) => group.name).join(', ')),
               },
             },
             lastUpdatedBy: {
               columnName: translation['lastUpdatedByColumn'],
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.TEXT_TABLE_CELL,
-                text: maskings.lastUpdatedBy,
+                text: masking.lastEditorFullName,
               },
             },
             lastUpdated: {
               columnName: translation['lastUpdatedColumn'],
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.DATE_TABLE_CELL,
-                date: String(maskings.lastUpdated),
+                date: String(masking.lastUpdated),
               },
             },
             actions: {
               columnName: '',
               cellData: {
-                id: maskings.id,
+                id: masking.id,
                 type: TableCellTypes.ICON_BUTTON_TABLE_CELL,
                 buttons: [
                   { icon: 'edit', clickEventKey: MaskingClickEvent.EDIT_MASKING },
