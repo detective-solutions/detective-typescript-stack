@@ -9,9 +9,12 @@ export interface IGetConnectionByIdGQLResponse {
 @Injectable()
 export class GetConnectionByIdGQL extends Query<Response> {
   override document = gql`
-    query getSourceConnectionById($connectionId: String!) {
+    query getSourceConnectionById($tenantId: String!, $connectionId: String!) {
       getSourceConnection(xid: $connectionId) {
         id: xid
+        tenant(filter: { xid: { eq: $tenantId } }) {
+          id: xid
+        }
         name
       }
     }

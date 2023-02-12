@@ -73,6 +73,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
   private readonly dialogDefaultConfig = {
     width: '650px',
     minWidth: '400px',
+    autoFocus: false, // Prevent autofocus on dialog button
   };
 
   constructor(
@@ -99,7 +100,6 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
       );
     });
 
-    // Handle fetching of more data from the corresponding service
     this.subscriptions.add(
       this.fetchMoreDataOnScroll$.subscribe((currentOffset: number) => this.getNextConnectionsPage(currentOffset))
     );
@@ -114,7 +114,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.editButtonClicks$
-        .pipe(switchMap((connectionId: string) => this.getConnectionpById(connectionId)))
+        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId)))
         .subscribe((connection: SourceConnectionDTO) =>
           this.openConnectionsDialog(ConnectionsAddEditDialogComponent, {
             data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },
@@ -124,7 +124,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.deleteButtonClicks$
-        .pipe(switchMap((connectionId: string) => this.getConnectionpById(connectionId)))
+        .pipe(switchMap((connectionId: string) => this.getConnectionById(connectionId)))
         .subscribe((connection: SourceConnectionDTO) =>
           this.openConnectionsDialog(ConnectionsDeleteDialogComponent, {
             data: { connection, searchQuery: this.searchConnectionsByTenantWatchQuery },
@@ -140,7 +140,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
 
   private searchConnections(tenantId: string, searchTerm: string) {
     const searchParameters = {
-      tenantId: tenantId,
+      tenantId,
       paginationOffset: 0,
       pageSize: this.pageSize,
       searchTerm: buildSearchTermRegEx(searchTerm),
@@ -172,7 +172,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getConnectionpById(connectionId: string): Observable<SourceConnectionDTO> {
+  private getConnectionById(connectionId: string): Observable<SourceConnectionDTO> {
     return this.authService.authStatus$.pipe(
       switchMap((authStatus: IAuthStatus) => {
         if (!this.getConnectionByIdWatchQuery) {
@@ -182,7 +182,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
           );
           return this.getConnectionByIdWatchQuery.valueChanges;
         } else {
-          return this.getConnectionByIdWatchQuery.refetch({ tenantId: authStatus.tenantId, userGroupId: connectionId });
+          return this.getConnectionByIdWatchQuery.refetch({ tenantId: authStatus.tenantId, connectionId });
         }
       }),
       tap(({ loading }) => this.isLoading$.next(loading)),
