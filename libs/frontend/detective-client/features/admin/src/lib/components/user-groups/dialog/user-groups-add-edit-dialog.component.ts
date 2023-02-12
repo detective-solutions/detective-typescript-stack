@@ -23,6 +23,7 @@ import {
   distinctUntilChanged,
   filter,
   map,
+  of,
   switchMap,
   take,
   tap,
@@ -72,8 +73,7 @@ export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
   readonly proposedNewMembers$ = this.memberSearchFormControl.valueChanges.pipe(
     debounceTime(400),
     distinctUntilChanged(),
-    filter(Boolean),
-    switchMap((searchTerm: string) => this.searchForPotentialNewMembers(searchTerm.trim()).pipe(take(1)))
+    switchMap((searchTerm: string) => (searchTerm ? this.searchForPotentialNewMembers(searchTerm.trim()) : of([])))
   );
 
   private searchUsersNotAssociatedWithUserGroupWatchQuery!: QueryRef<Response>;
