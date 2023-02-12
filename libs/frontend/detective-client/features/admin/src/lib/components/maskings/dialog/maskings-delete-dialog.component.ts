@@ -1,14 +1,15 @@
 import { Component, Inject } from '@angular/core';
-import { EMPTY, Subject, catchError, map, take } from 'rxjs';
-import { IMask, IMasking } from '@detective.solutions/shared/data-access';
+import { DeleteMaskingGQL, IDeleteMaskingGQLResponse } from '../../../graphql';
+import { EMPTY, Observable, Subject, catchError, filter, map, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { DynamicFormError } from '@detective.solutions/frontend/shared/dynamic-form';
-import { IDeleteMaskingGQLResponse } from '../../../graphql';
+import { IMask } from '@detective.solutions/shared/data-access';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
-import { MaskingService } from '../../../services';
+import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
+import { QueryRef } from 'apollo-angular';
 
 @Component({
   selector: 'maskings-delete-dialog',
@@ -17,51 +18,38 @@ import { MaskingService } from '../../../services';
 })
 export class MaskingDeleteDialogComponent {
   readonly isLoading$ = new Subject<boolean>();
-  readonly maskingToBeDeleted$ = this.maskingService.getMaskingById(this.dialogInputData.id);
-  readonly maskingName$ = this.maskingToBeDeleted$.pipe(map((value: IMasking) => value.name));
-
-  private selectedMasking!: IMasking;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
+    @Inject(MAT_DIALOG_DATA) public dialogInputData: { masking: MaskingDTO; searchQuery: QueryRef<Response> },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
+    private readonly deleteMaskingGQL: DeleteMaskingGQL,
     private readonly translationService: TranslocoService,
     private readonly toastService: ToastService,
-    private readonly maskingService: MaskingService,
     private readonly dialogRef: MatDialogRef<MaskingDeleteDialogComponent>,
     private readonly logger: LogService
-  ) {
-    this.maskingService.getMaskingById(this.dialogInputData.id).subscribe((selectedMasking: IMasking) => {
-      this.selectedMasking = selectedMasking;
-    });
-  }
-
-  getMaskIdsToDelete() {
-    const columns = this.selectedMasking.columns ?? [];
-    const rows = this.selectedMasking.rows ?? [];
-
-    return {
-      columns: columns.map((mask: IMask) => mask.id ?? ''),
-      rows: rows.map((mask: IMask) => mask.id ?? ''),
-    };
-  }
+  ) {}
 
   deleteMasking() {
     this.isLoading$.next(true);
-
-    const children = this.getMaskIdsToDelete();
-    this.maskingService
-      .deleteMasking({
-        masking: this.dialogInputData.id,
-        columns: children.columns,
-        rows: children.rows,
+    return this.deleteMaskingGQL
+      .mutate({
+        filter: {
+          xid: {
+            eq: this.dialogInputData.masking.id,
+          },
+        },
+        remove: {
+          columns: this.dialogInputData.masking.columns?.map((mask: IMask) => mask.id) ?? [],
+          rows: this.dialogInputData.masking.rows?.map((mask: IMask) => mask.id) ?? [],
+        },
       })
       .pipe(
+        tap(({ loading }) => this.isLoading$.next(loading)),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        filter((response: any) => response?.data),
+        map(({ data }: { data: IDeleteMaskingGQLResponse }) => data),
         take(1),
-        catchError((error: Error) => {
-          this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-          return EMPTY;
-        })
+        catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
       )
       .subscribe((response: IDeleteMaskingGQLResponse) => this.handleResponse(response));
   }
@@ -76,7 +64,7 @@ export class MaskingDeleteDialogComponent {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
           this.dialogRef.close();
         });
-      this.maskingService.refreshMaskings();
+      this.dialogInputData.searchQuery.refetch();
     } else {
       this.logger.error('Masking could not be edited');
       this.translationService
@@ -86,7 +74,7 @@ export class MaskingDeleteDialogComponent {
     }
   }
 
-  private handleError(errorType: DynamicFormError, error: Error) {
+  private handleError(errorType: DynamicFormError, error: Error): Observable<never> {
     let translationKey;
     this.logger.error(String(error));
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
@@ -107,5 +95,6 @@ export class MaskingDeleteDialogComponent {
           this.toastService.showToast(translation, 'Close', ToastType.ERROR);
         });
     }
+    return EMPTY;
   }
 }

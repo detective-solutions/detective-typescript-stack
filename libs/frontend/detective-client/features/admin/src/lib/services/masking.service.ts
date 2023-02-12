@@ -1,12 +1,10 @@
 import {
   DeleteColumnMaskGQL,
-  DeleteMaskingGQL,
   DeleteRowMaskGQL,
   GetAllMaskingsGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
   ICreateNewMaskingGQLResponse,
   IDeleteColumnMaskGQLResponse,
-  IDeleteMaskingGQLResponse,
   IDeleteRowMaskGQLResponse,
   IGetAllMaskingsGQLResponse,
   IGetUserGroupsAsDropDownValuesGQLResponse,
@@ -15,7 +13,7 @@ import {
 } from '../graphql';
 import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-masking-by-id.gql';
 import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/data-access';
-import { IMaskSubTableDataDef, IMaskingCreateInput, IMaskingDeleteInput, IMaskingUpdateInput } from '../models';
+import { IMaskSubTableDataDef, IMaskingCreateInput, IMaskingUpdateInput } from '../models';
 import { Observable, map } from 'rxjs';
 
 import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
@@ -42,7 +40,6 @@ export class MaskingService {
   constructor(
     private readonly getMaskingByIdGQL: GetMaskingByIdGQL,
     private readonly updateMaskingGQL: UpdateMaskingGQL,
-    private readonly deleteMaskingGQL: DeleteMaskingGQL,
     private readonly deleteRowMaskGQL: DeleteRowMaskGQL,
     private readonly deleteColumnMaskGQL: DeleteColumnMaskGQL,
     private readonly getAllMaskingGQL: GetAllMaskingsGQL,
@@ -241,32 +238,6 @@ export class MaskingService {
           break;
       }
     }
-  }
-
-  deleteMasking(set: IMaskingDeleteInput): Observable<IDeleteMaskingGQLResponse> {
-    return this.deleteMaskingGQL
-      .mutate(
-        {
-          filter: {
-            xid: {
-              eq: set.masking,
-            },
-          },
-          remove: {
-            columns: set.columns,
-            rows: set.rows,
-          },
-        },
-        {
-          refetchQueries: [
-            { query: this.getAllMaskingGQL.document, variables: { paginationOffset: 0, pageSize: 100 } },
-          ],
-        }
-      )
-      .pipe(
-        map((response: any) => response.data),
-        map((response: IDeleteMaskingGQLResponse) => response)
-      );
   }
 
   createMasksFromCurrentData(payload: IMaskingCreateInput): Observable<ICreateNewMaskingGQLResponse> {

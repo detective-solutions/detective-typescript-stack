@@ -1,7 +1,7 @@
 <div class="maskings-delete-dialog-wrapper" *transloco="let t; read: 'admin.maskings.deleteDialog'">
   <h1 mat-dialog-title align="center">{{ t('deleteDialogHeader') }}</h1>
   <div mat-dialog-content align="center">
-    {{ t('deleteDialogText', { maskingName: (this.maskingName$ | async) }) }}
+    {{ t('deleteDialogText', { maskingName: this.dialogInputData.masking.name }) }}
   </div>
   <div mat-dialog-actions align="center">
     <button mat-raised-button color="accent" (click)="deleteMasking()">
