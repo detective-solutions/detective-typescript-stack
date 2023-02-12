@@ -143,10 +143,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
-      catchError((error) => {
-        this.handleError(DynamicFormError.FORM_INIT_ERROR, error);
-        return EMPTY;
-      })
+      catchError((error) => this.handleError(DynamicFormError.FORM_INIT_ERROR, error))
     );
 
   private connector!: string;
@@ -191,10 +188,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
       map(this.getFormFieldByType),
       tap(() => (this.isSubmitting = false)),
       tap(() => (this.showSubmitButton = true)),
-      catchError((error) => {
-        this.handleError(DynamicFormError.FORM_INIT_ERROR, error);
-        return EMPTY;
-      })
+      catchError((error) => this.handleError(DynamicFormError.FORM_INIT_ERROR, error))
     );
   }
 
@@ -333,10 +327,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         })
         .pipe(
           take(1),
-          catchError((error: Error) => {
-            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-            return EMPTY;
-          })
+          catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
         .subscribe((response: ICreateNewMaskingGQLResponse) => {
           this.handleResponse(response);
@@ -356,10 +347,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
         .updateMasking(set)
         .pipe(
           take(1),
-          catchError((error: Error) => {
-            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-            return EMPTY;
-          })
+          catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
         .subscribe((response: IUpdateMaskingGQLResponse) => {
           this.handleResponse(response);
@@ -533,7 +521,7 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
     }
   }
 
-  private handleError(errorType: DynamicFormError, error: Error) {
+  private handleError(errorType: DynamicFormError, error: Error): Observable<never> {
     let translationKey;
     this.logger.error(String(error));
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
@@ -554,5 +542,6 @@ export class MaskingAddEditDialogComponent implements AfterViewChecked, OnDestro
           this.toastService.showToast(translation, 'Close', ToastType.ERROR);
         });
     }
+    return EMPTY;
   }
 }

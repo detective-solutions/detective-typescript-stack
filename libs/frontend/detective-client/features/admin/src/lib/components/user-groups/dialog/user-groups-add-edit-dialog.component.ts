@@ -143,10 +143,7 @@ export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
           filter((response: any) => response?.data),
           take(1),
           map(({ data }: { data: ICreateUserGroupGQLResponse }) => data),
-          catchError((error: Error) => {
-            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-            return EMPTY;
-          })
+          catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
         .subscribe((response: ICreateUserGroupGQLResponse) => this.handleResponse(response));
     } else {
@@ -183,10 +180,7 @@ export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
           filter((response: any) => response?.data),
           take(1),
           map(({ data }: { data: IUpdateUserGroupGQLResponse }) => data),
-          catchError((error: Error) => {
-            this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-            return EMPTY;
-          })
+          catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
         .subscribe((response: IUpdateUserGroupGQLResponse) => this.handleResponse(response));
     }
@@ -290,7 +284,7 @@ export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleError(errorType: DynamicFormError, error: Error) {
+  private handleError(errorType: DynamicFormError, error: Error): Observable<never> {
     let translationKey;
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
       translationKey = 'userGroups.toastMessages.formInitError';
@@ -311,5 +305,6 @@ export class UserGroupsAddEditDialogComponent implements OnInit, OnDestroy {
           this.toastService.showToast(translation, 'Close', ToastType.ERROR);
         });
     }
+    return EMPTY;
   }
 }

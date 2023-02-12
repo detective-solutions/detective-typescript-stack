@@ -73,10 +73,7 @@ export class UserGroupsDeleteComponent {
         filter((response: any) => response?.data),
         map(({ data }: { data: IDeleteUserGroupByIdGQLResponse }) => data),
         take(1),
-        catchError((error: Error) => {
-          this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error);
-          return EMPTY;
-        })
+        catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
       )
       .subscribe((response: IDeleteUserGroupByIdGQLResponse) => {
         if (!Object.keys(response).includes('error')) {
@@ -150,7 +147,7 @@ export class UserGroupsDeleteComponent {
     }
   }
 
-  private handleError(errorType: DynamicFormError, error: Error) {
+  private handleError(errorType: DynamicFormError, error: Error): Observable<never> {
     let translationKey;
     if (errorType === DynamicFormError.FORM_INIT_ERROR) {
       translationKey = 'userGroups.toastMessages.formInitError';
@@ -171,5 +168,6 @@ export class UserGroupsDeleteComponent {
           this.toastService.showToast(translation, 'Close', ToastType.ERROR);
         });
     }
+    return EMPTY;
   }
 }
