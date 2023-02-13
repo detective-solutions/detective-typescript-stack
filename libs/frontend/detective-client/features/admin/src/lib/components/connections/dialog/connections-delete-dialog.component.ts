@@ -48,7 +48,7 @@ export class ConnectionsDeleteDialogComponent {
         .pipe(take(1))
         .subscribe((translation: string) => {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
-          this.dialogInputData.searchQuery.refetch();
+          this.dialogInputData.searchQuery.refetch(); // Update parent view
         });
     }
 
@@ -65,15 +65,13 @@ export class ConnectionsDeleteDialogComponent {
   }
 
   private handleError(error: Error): Observable<never> {
+    this.isLoading$.next(false);
     this.logger.error('Encountered an error while submitting connection deletion request');
     console.error(error);
     this.translationService
       .selectTranslate('connections.toastMessages.formSubmitError', {}, this.translationScope)
       .pipe(take(1))
-      .subscribe((translation: string) => {
-        this.isLoading$.next(false);
-        this.toastService.showToast(translation, 'Close', ToastType.ERROR);
-      });
+      .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     return EMPTY;
   }
 }

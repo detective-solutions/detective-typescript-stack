@@ -93,9 +93,7 @@ export class UsersDeleteDialogComponent implements OnInit {
       this.translationService
         .selectTranslate(translationKey, {}, this.translationScope)
         .pipe(take(1))
-        .subscribe((translation: string) => {
-          this.toastService.showToast(translation, 'Close', ToastType.ERROR);
-        });
+        .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
     return EMPTY;
   }

@@ -62,9 +62,9 @@ export class MaskingDeleteDialogComponent {
         .pipe(take(1))
         .subscribe((translation: string) => {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
+          this.dialogInputData.searchQuery.refetch(); // Update parent view
           this.dialogRef.close();
         });
-      this.dialogInputData.searchQuery.refetch();
     } else {
       this.logger.error('Masking could not be edited');
       this.translationService
@@ -91,9 +91,7 @@ export class MaskingDeleteDialogComponent {
       this.translationService
         .selectTranslate(translationKey, {}, this.translationScope)
         .pipe(take(1))
-        .subscribe((translation: string) => {
-          this.toastService.showToast(translation, 'Close', ToastType.ERROR);
-        });
+        .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
     return EMPTY;
   }

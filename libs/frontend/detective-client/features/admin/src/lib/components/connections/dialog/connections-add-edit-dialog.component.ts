@@ -165,9 +165,9 @@ export class ConnectionsAddEditDialogComponent implements OnDestroy {
         .pipe(take(1))
         .subscribe((translation: string) => {
           this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
+          this.dialogInputData.searchQuery.refetch(); // Update parent view
           this.dialogRef.close();
         });
-      this.dialogInputData.searchQuery.refetch();
     }
 
     // TODO: Handle error code in response and fetch error message to display
