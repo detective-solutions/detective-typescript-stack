@@ -18,10 +18,11 @@ export class DisplayService {
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders();
 
+    console.log(`send token ${token}`);
     headers
       .set('Authentication', token)
-      .set('Access-Control-Allow-Origin', '*')
-      .set('Content-Type', 'multipart/form-data');
+      .set('Content-Type', 'multipart/form-data')
+      .set('Access-Control-Allow-Origin', '*');
 
     return headers;
   }
@@ -43,6 +44,7 @@ export class DisplayService {
 
     return this.httpClient.post<UploadResponse>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiFileV1}`,
+      // 'http://localhost:3007/v1/upload/file',
       formData,
       {
         headers: this.getHeaders(),

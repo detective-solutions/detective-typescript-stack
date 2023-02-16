@@ -150,10 +150,16 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   buildNodeByType(event: DragEvent) {
     // TODO: Add interface for drag data transfer object
-    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
-    if (!dragDataTransfer) {
-      console.error('Could not extract drag data for adding whiteboard node');
+    console.log(event.dataTransfer);
+
+    let dragDataTransfer;
+
+    try {
+      dragDataTransfer = JSON.parse(event.dataTransfer!.getData('text/plain'));
+    } catch {
+      dragDataTransfer = '';
     }
+
     const now = formatDate(new Date());
     const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
     const isFile = event.dataTransfer?.files.length !== 0;
@@ -174,6 +180,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     const dataTransfer = event.dataTransfer || { files: [] };
 
     if (isFile) {
+      console.log(dataTransfer.files);
       this.toastService.showToast(
         `Upload file ${dataTransfer.files[0].name} this might take a while`,
         '',
