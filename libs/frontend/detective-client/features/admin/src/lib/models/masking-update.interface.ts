@@ -1,9 +1,5 @@
 import { IMaskSubTableDataDef } from './maskings-table.interface';
-
-export interface IMaskDeleteInput {
-  columns: { id: string }[];
-  rows: { id: string }[];
-}
+import { IMasking } from '@detective.solutions/shared/data-access';
 
 export interface IMaskingUpdateInput {
   masking: {
@@ -12,5 +8,5 @@ export interface IMaskingUpdateInput {
     description: string;
   };
   masks: IMaskSubTableDataDef[];
-  toDelete: IMaskDeleteInput;
+  toDelete: Partial<IMasking>;
 }

@@ -1,71 +1,22 @@
 import {
-  GetAllConnectionsGQL,
-  GetTablesBySourceConnectionIdGQL,
-  IGetAllConnectionsGQLResponse,
-  IGetTablesBySourceConnectionIdGQLResponse,
-} from '../graphql';
-import {
   IConnectionsAddEditResponse,
   IConnectionsDeleteResponse,
   IConnectorPropertiesResponse,
   IConnectorSchemaResponse,
   IConnectorTypesResponse,
-  IGetAllConnectionsResponse,
 } from '../models';
-import { ISourceConnectionTables, SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
-import { Observable, map } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { QueryRef } from 'apollo-angular';
-import { TableCellEventService } from '@detective.solutions/frontend/detective-client/ui';
+import { Observable } from 'rxjs';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CatalogService {
   private static catalogServiceBasePath = `${environment.baseApiPath}${environment.catalogApiPathV1}`;
 
-  private getAllConnectionsWatchQuery!: QueryRef<Response>;
-  private getAllTablesWatchQuery!: QueryRef<Response>;
-
-  constructor(
-    private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
-    private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
-    private readonly httpClient: HttpClient,
-    private readonly tableCellEventService: TableCellEventService
-  ) {}
-
-  getTablesOfConnection(id: string): Observable<ISourceConnectionTables> {
-    this.getAllTablesWatchQuery = this.getTablesBySourceConnectionIdGQL.watch({ id: id });
-    return this.getAllTablesWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetTablesBySourceConnectionIdGQLResponse) => response.getSourceConnection)
-    );
-  }
-
-  getAllConnections(paginationOffset: number, pageSize: number): Observable<IGetAllConnectionsResponse> {
-    if (!this.getAllConnectionsWatchQuery) {
-      this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch(
-        {
-          paginationOffset: paginationOffset,
-          pageSize: pageSize,
-        },
-        { pollInterval: 10000 }
-      );
-    }
-
-    return this.getAllConnectionsWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetAllConnectionsGQLResponse) => {
-        return {
-          connections: response.querySourceConnection.map(SourceConnectionDTO.Build),
-          totalElementsCount: response.aggregateSourceConnection.count,
-        };
-      })
-    );
-  }
+  constructor(private readonly httpClient: HttpClient) {}
 
   getAvailableConnectorTypes(): Observable<IConnectorTypesResponse[]> {
     return this.httpClient.get<IConnectorTypesResponse[]>(`${CatalogService.catalogServiceBasePath}/connector/list`);
@@ -83,6 +34,8 @@ export class CatalogService {
     );
   }
 
+  // TODO: Remove any type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addConnection(connectionType: string, payload: any): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
       `${CatalogService.catalogServiceBasePath}/${connectionType}/insert`,
@@ -90,6 +43,8 @@ export class CatalogService {
     );
   }
 
+  // TODO: Remove any type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateConnection(
     connectionType: string,
     connectionId: string,

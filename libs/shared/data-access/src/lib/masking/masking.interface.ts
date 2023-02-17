@@ -11,9 +11,9 @@ export interface IMask {
   customReplaceValue?: string;
   author?: Partial<IUser>;
   editors?: Partial<IUser>[];
-  lastUpdatedBy: Partial<IUser>;
-  lastUpdated: string;
-  created: string;
+  lastUpdatedBy?: Partial<IUser>;
+  lastUpdated?: string;
+  created?: string;
 }
 
 export interface IMasking {

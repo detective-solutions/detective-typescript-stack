@@ -1,10 +1,5 @@
-.add-edit-dialog-wrapper {
-  .add-mask-button {
-    width: 90%;
-  }
-}
-
-.mat-dialog-content {
+.mat-dialog-content,
+.add-masking-button {
   width: 90%;
 
   .mat-form-field {
@@ -25,7 +20,7 @@
     float: right;
   }
 
-  .help-button {
+  .maskings-help-button {
     margin: 10px;
     color: #ccc;
 

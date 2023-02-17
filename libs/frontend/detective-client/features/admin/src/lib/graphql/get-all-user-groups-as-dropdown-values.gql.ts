@@ -10,13 +10,13 @@ export interface IGetUserGroupsAsDropDownValuesGQLResponse {
 @Injectable()
 export class GetAllUserGroupsAsDropDownValuesGQL extends Query<Response> {
   override document = gql`
-    query UserGroup($id: String) {
+    query UserGroup($tenantId: String) {
       queryUserGroup {
         id: xid
-        value: name
-        tenant(filter: { xid: { eq: $id } }) {
+        tenant(filter: { xid: { eq: $tenantId } }) {
           id: xid
         }
+        value: name
       }
     }
   `;

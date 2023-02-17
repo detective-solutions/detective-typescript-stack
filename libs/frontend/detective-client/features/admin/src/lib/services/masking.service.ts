@@ -2,23 +2,19 @@ import {
   DeleteColumnMaskGQL,
   DeleteRowMaskGQL,
   GetAllMaskingsGQL,
-  GetAllUserGroupsAsDropDownValuesGQL,
   ICreateNewMaskingGQLResponse,
   IDeleteColumnMaskGQLResponse,
   IDeleteRowMaskGQLResponse,
   IGetAllMaskingsGQLResponse,
-  IGetUserGroupsAsDropDownValuesGQLResponse,
   IUpdateMaskingGQLResponse,
   UpdateMaskingGQL,
 } from '../graphql';
 import { GetMaskingByIdGQL, IGetMaskingByIdGQLResponse } from '../graphql/get-masking-by-id.gql';
-import { IDropDownValues, IMask, IMasking } from '@detective.solutions/shared/data-access';
+import { IMask, IMasking } from '@detective.solutions/shared/data-access';
 import { IMaskSubTableDataDef, IMaskingCreateInput, IMaskingUpdateInput } from '../models';
 import { Observable, map } from 'rxjs';
 
 import { CreateNewMaskingGQL } from '../graphql/create-new-masking.gql';
-import { GetAllColumnsGQL } from '../graphql/get-all-columns-by-table-id.gql';
-import { IGetAllColumnsResponse } from '../models/get-all-columns-by-table-id-response.interface';
 import { Injectable } from '@angular/core';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { QueryRef } from 'apollo-angular';
@@ -34,8 +30,6 @@ export class MaskingService {
 
   private getMaskingByIdWatchQuery!: QueryRef<Response>;
   private getAllMaskingWatchQuery!: QueryRef<Response>;
-  private getUserGroupsWatchQuery!: QueryRef<Response>;
-  private getColumnsByTableIdWatchQuery!: QueryRef<Response>;
 
   constructor(
     private readonly getMaskingByIdGQL: GetMaskingByIdGQL,
@@ -43,8 +37,6 @@ export class MaskingService {
     private readonly deleteRowMaskGQL: DeleteRowMaskGQL,
     private readonly deleteColumnMaskGQL: DeleteColumnMaskGQL,
     private readonly getAllMaskingGQL: GetAllMaskingsGQL,
-    private readonly getUserGroupsGQL: GetAllUserGroupsAsDropDownValuesGQL,
-    private readonly getColumnsByTableIdGQL: GetAllColumnsGQL,
     private readonly createNewMaskingGQL: CreateNewMaskingGQL,
     private readonly userService: UsersService,
     private readonly logger: LogService
@@ -55,32 +47,6 @@ export class MaskingService {
     return this.getMaskingByIdWatchQuery.valueChanges.pipe(
       map((response: any) => response.data),
       map((response: IGetMaskingByIdGQLResponse) => response.getMasking)
-    );
-  }
-
-  getColumnsByTableId(tableId: string): Observable<IGetAllColumnsResponse> {
-    this.getColumnsByTableIdWatchQuery = this.getColumnsByTableIdGQL.watch({ id: tableId });
-    return this.getColumnsByTableIdWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetAllColumnsResponse) => response)
-    );
-  }
-
-  getAvailableUserGroups(): Observable<IDropDownValues[]> {
-    if (!this.getUserGroupsWatchQuery) {
-      this.getUserGroupsWatchQuery = this.getUserGroupsGQL.watch(
-        {
-          id: this.userService.getTenant(),
-          paginationOffset: 0,
-          pageSize: 1000,
-        },
-        { pollInterval: 1000 }
-      );
-    }
-
-    return this.getUserGroupsWatchQuery.valueChanges.pipe(
-      map((response: any) => response.data),
-      map((response: IGetUserGroupsAsDropDownValuesGQLResponse) => response.queryUserGroup)
     );
   }
 
@@ -186,11 +152,14 @@ export class MaskingService {
         map((response: any) => response.data),
         map((response: IUpdateMaskingGQLResponse) => {
           if (!Object.keys(response).includes('error')) {
-            const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.id);
-            this.deleteColumnOrRowMask(columnMaskIDToDelete, MaskingService.COLUMN_MASK_NAME);
-
-            const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.id);
-            this.deleteColumnOrRowMask(rowMaskIDToDelete, MaskingService.ROW_MASK_NAME);
+            if (update.toDelete.columns) {
+              const columnMaskIDToDelete = update.toDelete.columns.map((col) => col.id);
+              this.deleteColumnOrRowMask(columnMaskIDToDelete, MaskingService.COLUMN_MASK_NAME);
+            }
+            if (update.toDelete.rows) {
+              const rowMaskIDToDelete = update.toDelete.rows.map((row) => row.id);
+              this.deleteColumnOrRowMask(rowMaskIDToDelete, MaskingService.ROW_MASK_NAME);
+            }
           } else {
             console.log('No deletion on mask level', Object.keys(response));
           }
