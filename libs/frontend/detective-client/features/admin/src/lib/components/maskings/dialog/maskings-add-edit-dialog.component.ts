@@ -243,7 +243,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       {
         propertyName: 'table',
         displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameTable'),
-        description: 'Which table is the masking for', // TODO: Translate
+        description: this.getTranslation('maskings.addEditDialog.subTable.displayNameTable.displayNameTableTooltip'),
         default: this.isAddDialog ? '' : this.dialogInputData.masking.table.name,
         options: this.isAddDialog ? undefined : this.connectorTables,
         type: this.isAddDialog ? 'dropdown' : 'string',
@@ -253,7 +253,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       {
         propertyName: 'groups',
         displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameGroups'),
-        description: 'For which user groups', // TODO: Translate
+        description: this.getTranslation('maskings.addEditDialog.subTable.displayNameGroupsTooltip'),
         default: this.isAddDialog ? '' : (this.dialogInputData.masking.groups ?? [])[0].name ?? '',
         options: this.isAddDialog ? this.userGroupsAsDropdownValues : [],
         type: this.isAddDialog ? 'dropdown' : 'string',
@@ -263,7 +263,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       {
         propertyName: 'name',
         displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameTitle'),
-        description: 'The name of the masking displayed later on', // TODO: Translate
+        description: this.getTranslation('maskings.addEditDialog.subTable.displayNameTitleTooltip'),
         default: this.isAddDialog ? '' : this.dialogInputData.masking.name,
         type: 'string',
         required: true,
@@ -271,7 +271,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       {
         propertyName: 'description',
         displayName: this.getTranslation('maskings.addEditDialog.subTable.displayNameDescription'),
-        description: 'When and and how this masking should be applied', // TODO: Translate
+        description: this.getTranslation('maskings.addEditDialog.subTable.displayNameDescriptionTooltip'),
         default: this.isAddDialog ? this.dialogInputData.masking.description : '',
         type: 'string',
         required: true,
