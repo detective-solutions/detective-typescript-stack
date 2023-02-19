@@ -5,7 +5,6 @@ export * from './connections-table.interface';
 export * from './connector-properties-response.interface';
 export * from './connector-schema-response.interface';
 export * from './connector-types-response.interface';
-export * from './table-columns.interface';
 export * from './connections-delete-response.interface';
 export * from './users-click-events.enum';
 export * from './masking-create.interface';

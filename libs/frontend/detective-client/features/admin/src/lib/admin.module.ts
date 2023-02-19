@@ -6,7 +6,7 @@ import {
   UserGroupsComponent,
   UsersComponent,
 } from './components';
-import { CatalogService, MaskingService, SubscriptionService, UsersService } from './services';
+import { CatalogService, SubscriptionService } from './services';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
 import {
   CreateNewColumnMaskGQL,
@@ -19,9 +19,7 @@ import {
   DeleteUserGroupByIdGQL,
   GetAllColumnsGQL,
   GetAllConnectionsGQL,
-  GetAllMaskingsGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
-  GetAllUserGroupsGQL,
   GetConnectionByIdGQL,
   GetMaskingByUserGroupIdGQL,
   GetTablesBySourceConnectionIdGQL,
@@ -95,9 +93,7 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
       },
     },
     CatalogService,
-    MaskingService,
     SubscriptionService,
-    UsersService,
     GetAllConnectionsGQL,
     GetTablesBySourceConnectionIdGQL,
     GetConnectionByIdGQL,
@@ -108,7 +104,6 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     DeleteMaskingGQL,
     DeleteRowMaskGQL,
     DeleteColumnMaskGQL,
-    GetAllMaskingsGQL,
     GetAllUserGroupsAsDropDownValuesGQL,
     GetAllColumnsGQL,
     SearchConnectionsByTenantGQL,
@@ -117,7 +112,6 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     SearchUserGroupsByTenantGQL,
     SearchUsersByTenantGQL,
     CreateNewMaskingGQL,
-    GetAllUserGroupsGQL,
     GetUserGroupByIdGQL,
     GetUserByIdGQL,
     DeleteUserByIdGQL,

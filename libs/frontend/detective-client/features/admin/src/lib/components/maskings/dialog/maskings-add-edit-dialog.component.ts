@@ -8,19 +8,25 @@ import {
   DynamicFormError,
   TextBoxFormField,
 } from '@detective.solutions/frontend/shared/dynamic-form';
-import { EMPTY, Observable, Subject, Subscription, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
 import {
+  CreateNewMaskingGQL,
+  DeleteColumnMaskGQL,
+  DeleteRowMaskGQL,
   GetAllColumnsGQL,
   GetAllConnectionsGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
   GetTablesBySourceConnectionIdGQL,
   ICreateNewMaskingGQLResponse,
+  IDeleteColumnMaskGQLResponse,
+  IDeleteRowMaskGQLResponse,
   IGetAllColumnsGQLResponse,
   IGetAllConnectionsGQLResponse,
   IGetTablesBySourceConnectionIdGQLResponse,
   IGetUserGroupsAsDropDownValuesGQLResponse,
   IUpdateMaskingGQLResponse,
+  UpdateMaskingGQL,
 } from '../../../graphql';
+import { EMPTY, Observable, Subject, Subscription, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
 import { IColumn, IDropDownValues, IMask } from '@detective.solutions/shared/data-access';
 import {
   IConnectionTable,
@@ -28,9 +34,14 @@ import {
   MaskingDTO,
   SourceConnectionDTO,
 } from '@detective.solutions/frontend/shared/data-access';
-import { IConnectorPropertiesResponse, IMaskSubTableDataDef, IMaskSubTableDataDropdown } from '../../../models';
+import {
+  IConnectorPropertiesResponse,
+  IMaskSubTableDataDef,
+  IMaskSubTableDataDropdown,
+  IMaskingCreateInput,
+  IMaskingUpdateInput,
+} from '../../../models';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaskingService, UsersService } from '../../../services';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
@@ -48,14 +59,16 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: 'maskings-add-edit-dialog.component.html',
 })
 export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, OnDestroy {
-  private static readonly connectorFormFieldName = 'connector';
+  private static readonly CONNECTOR_FORM_FIELD_NAME = 'connector';
+  public static readonly ROW_MASK_NAME = 'row';
+  public static readonly COLUMN_MASK_NAME = 'column';
   private static readonly BINARY_ANSWER = [
     { key: 'subTable.true', value: 'true' },
     { key: 'subTable.false', value: 'false' },
   ];
   private static readonly FILTER_TYPES = [
-    { key: 'subTable.dimensionColumn', value: MaskingService.COLUMN_MASK_NAME },
-    { key: 'subTable.dimensionRow', value: MaskingService.ROW_MASK_NAME },
+    { key: 'subTable.dimensionColumn', value: MaskingAddEditDialogComponent.COLUMN_MASK_NAME },
+    { key: 'subTable.dimensionRow', value: MaskingAddEditDialogComponent.ROW_MASK_NAME },
   ];
   private static readonly MASK_METHODS = [
     { value: 'full', key: 'subTable.maskingMethods.full' },
@@ -112,19 +125,19 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     },
   ];
 
-  private dataSource: IMaskSubTableDataDef[] = [];
+  dataSource: IMaskSubTableDataDef[] = [];
   private tableColumns!: IDropDownValues[];
 
   readonly masksToDelete!: { columns: IMask[]; rows: IMask[] };
   readonly isAddDialog = !this.dialogInputData.masking;
   readonly displayedColumns = this.columnsSchema.map((col) => col.key);
   readonly connectorTypeFormGroup = this.formBuilder.nonNullable.group({
-    connector: MaskingAddEditDialogComponent.connectorFormFieldName,
+    connector: MaskingAddEditDialogComponent.CONNECTOR_FORM_FIELD_NAME,
   });
 
   readonly isLoading$ = new Subject<boolean>();
   readonly formFieldDefinitionsByConnectorType$ = this.connectorTypeFormGroup
-    .get(MaskingAddEditDialogComponent.connectorFormFieldName)
+    .get(MaskingAddEditDialogComponent.CONNECTOR_FORM_FIELD_NAME)
     ?.valueChanges.pipe(
       tap((selectedConnectorType: string) => (this.currentConnectorTypeId = selectedConnectorType)),
       switchMap(this.getAllUserGroupsAsDropdownValues),
@@ -163,11 +176,13 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { masking: MaskingDTO; searchQuery: QueryRef<Response> },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
+    private readonly createNewMaskingGQL: CreateNewMaskingGQL,
+    private readonly deleteColumnMaskGQL: DeleteColumnMaskGQL,
+    private readonly deleteRowMaskGQL: DeleteRowMaskGQL,
     private readonly translationService: TranslocoService,
-    private readonly maskingService: MaskingService,
-    private readonly userService: UsersService,
     private readonly dynamicFormControlService: DynamicFormControlService,
     private readonly formBuilder: UntypedFormBuilder,
+    private readonly updateMaskingGQL: UpdateMaskingGQL,
     private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly getAllUserGroupsAsDropdownValuesGQL: GetAllUserGroupsAsDropDownValuesGQL,
     private readonly getAllColumnsGQL: GetAllColumnsGQL,
@@ -265,48 +280,53 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
   }
 
   submitForm() {
-    this.isLoading$.next(true);
     const formGroup = this.dynamicFormControlService.currentFormGroup;
-
     if (formGroup.valid && this.isAddDialog) {
-      const masking = {
-        table: { id: formGroup.value.table },
-        groups: [{ id: formGroup.value.groups }],
-        name: formGroup.value.name,
-        tenant: { id: this.userService.getTenant() },
-        description: formGroup.value.description,
-      };
-
-      this.maskingService
-        .createMasksFromCurrentData({
-          masking: masking,
-          masks: this.dataSource,
-        })
+      this.authService.authStatus$
         .pipe(
+          tap(() => this.isLoading$.next(true)),
+          switchMap((authStatus: IAuthStatus) => {
+            return this.createMasksFromCurrentData({
+              masking: {
+                table: { id: formGroup.value.table },
+                groups: [{ id: formGroup.value.groups }],
+                name: formGroup.value.name,
+                tenant: { id: authStatus.tenantId },
+                description: formGroup.value.description,
+              },
+              masks: this.dataSource,
+            });
+          }),
           take(1),
           catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
-        .subscribe((response: ICreateNewMaskingGQLResponse) => this.handleResponse(response));
-    } else if (formGroup.valid && this.isAddDialog === false) {
-      const set = {
-        masking: {
-          id: this.dialogInputData.masking.id,
-          name: formGroup.value.name,
-          description: formGroup.value.description,
-        },
-        masks: this.dataSource,
-        toDelete: this.masksToDelete,
-      };
-
-      this.maskingService
-        .updateMasking(set)
+        .subscribe((response: ICreateNewMaskingGQLResponse) => {
+          this.handleResponse(response);
+          this.dataSource = [];
+        });
+    } else if (formGroup.valid && !this.isAddDialog) {
+      this.authService.authStatus$
         .pipe(
+          tap(() => this.isLoading$.next(true)),
+          switchMap(() => {
+            return this.updateMasking({
+              masking: {
+                id: this.dialogInputData.masking.id,
+                name: formGroup.value.name,
+                description: formGroup.value.description,
+              },
+              masks: this.dataSource,
+              toDelete: this.masksToDelete,
+            });
+          }),
           take(1),
           catchError((error: Error) => this.handleError(DynamicFormError.FORM_SUBMIT_ERROR, error))
         )
-        .subscribe((response: IUpdateMaskingGQLResponse) => this.handleResponse(response));
+        .subscribe((response: IUpdateMaskingGQLResponse) => {
+          this.handleResponse(response);
+          this.dataSource = [];
+        });
     }
-    this.dataSource = [];
   }
 
   addRow() {
@@ -328,10 +348,10 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     const maskToDelete = this.dataSource.filter((mask) => mask.id === id)[0];
     if (!maskToDelete.isNew) {
       switch (maskToDelete.filterType) {
-        case MaskingService.COLUMN_MASK_NAME:
+        case MaskingAddEditDialogComponent.COLUMN_MASK_NAME:
           this.masksToDelete.columns.push({ id: maskToDelete.id });
           break;
-        case MaskingService.ROW_MASK_NAME:
+        case MaskingAddEditDialogComponent.ROW_MASK_NAME:
           this.masksToDelete.rows.push({ id: maskToDelete.id });
           break;
         default:
@@ -341,7 +361,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     this.dataSource = this.dataSource.filter((mask) => mask.id !== id);
   }
 
-  createMasksFromFetch(data: IMask[], maskType: string = MaskingService.ROW_MASK_NAME) {
+  createMasksFromFetch(data: IMask[], maskType: string = MaskingAddEditDialogComponent.ROW_MASK_NAME) {
     data.forEach((mask: IMask) => {
       this.dataSource.push({
         filterType: maskType,
@@ -401,6 +421,174 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
 
   openMaskingDocumentation() {
     window.open(`${environment.productDoc}${environment.productDocMasking}`, '_blank');
+  }
+
+  private updateMasking(maskingInput: IMaskingUpdateInput): Observable<IUpdateMaskingGQLResponse> {
+    return this.authService.authStatus$.pipe(
+      switchMap((authStatus: IAuthStatus) => {
+        const filteredColumns = maskingInput.masks.filter(
+          (mask: IMaskSubTableDataDef) => mask.filterType === MaskingAddEditDialogComponent.COLUMN_MASK_NAME
+        );
+        const columnMasks = filteredColumns.map((mask: IMaskSubTableDataDef) => {
+          return this.getColumnMaskObject(mask, authStatus.userId, now);
+        });
+        const filteredRows = maskingInput.masks.filter(
+          (mask: IMaskSubTableDataDef) => mask.filterType === MaskingAddEditDialogComponent.ROW_MASK_NAME
+        );
+        const rowMasks = filteredRows.map((mask: IMaskSubTableDataDef) => {
+          return this.getRowMaskObject(mask, authStatus.userId, now);
+        });
+        const now = new Date().toISOString();
+        return this.updateMaskingGQL.mutate({
+          patch: {
+            filter: {
+              xid: {
+                eq: maskingInput.masking.id,
+              },
+            },
+            set: {
+              name: maskingInput.masking.name,
+              description: maskingInput.masking.description,
+              columns: columnMasks,
+              rows: rowMasks,
+              lastUpdatedBy: {
+                xid: authStatus.userId,
+              },
+              lastUpdated: now,
+            },
+            remove: {
+              columns: maskingInput.toDelete.columns,
+              rows: maskingInput.toDelete.rows,
+            },
+          },
+        });
+      }),
+      tap(({ loading }) => this.isLoading$.next(loading)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter((response: any) => response?.data),
+      map((response: any) => response.data),
+      map((response: IUpdateMaskingGQLResponse) => {
+        if (!Object.keys(response).includes('error')) {
+          if (maskingInput.toDelete.columns) {
+            const columnMaskIdToDelete = maskingInput.toDelete.columns.map((col) => col.id);
+            this.deleteColumnOrRowMask(columnMaskIdToDelete, MaskingAddEditDialogComponent.COLUMN_MASK_NAME);
+          }
+          if (maskingInput.toDelete.rows) {
+            const rowMaskIdToDelete = maskingInput.toDelete.rows.map((row) => row.id);
+            this.deleteColumnOrRowMask(rowMaskIdToDelete, MaskingAddEditDialogComponent.ROW_MASK_NAME);
+          }
+        } else {
+          console.log('No deletion on mask level', Object.keys(response));
+        }
+        return response;
+      })
+    );
+  }
+
+  private getColumnMaskObject(mask: any, userId: string, date: string) {
+    return {
+      id: mask.id,
+      columnName: mask.columnName,
+      visible: Boolean(mask.visible),
+      replaceType: mask.replaceType,
+      author: { id: userId },
+      lastUpdatedBy: { id: userId },
+      lastUpdated: date,
+      created: date,
+    };
+  }
+
+  private getRowMaskObject(mask: any, userId: string, date: string) {
+    return {
+      id: mask.id,
+      columnName: mask.columnName,
+      valueName: mask.valueName,
+      visible: Boolean(mask.visible),
+      replaceType: mask.replaceType,
+      customReplaceValue: mask.customReplaceType,
+      author: { id: userId },
+      lastUpdatedBy: { id: userId },
+      lastUpdated: date,
+      created: date,
+    };
+  }
+
+  private deleteColumnOrRowMask(
+    masksToDelete: string[],
+    maskType: string = MaskingAddEditDialogComponent.COLUMN_MASK_NAME
+  ) {
+    const filter = {
+      filter: {
+        xid: {
+          in: masksToDelete,
+        },
+      },
+    };
+
+    if (masksToDelete.length > 0) {
+      switch (maskType) {
+        case MaskingAddEditDialogComponent.COLUMN_MASK_NAME:
+          this.deleteColumnMaskGQL.mutate(filter).pipe(
+            map((response: any) => response.data),
+            map((response: IDeleteColumnMaskGQLResponse) => {
+              if (!Object.keys(response).includes('error')) {
+                this.logger.error(`deletion for column masks ${masksToDelete} completed`);
+              } else {
+                this.logger.error(`error for column mask deletion ${masksToDelete}`);
+              }
+            })
+          );
+          break;
+        case MaskingAddEditDialogComponent.ROW_MASK_NAME:
+          this.deleteRowMaskGQL.mutate(filter).pipe(
+            map((response: any) => response.data),
+            map((response: IDeleteRowMaskGQLResponse) => {
+              if (!Object.keys(response).includes('error')) {
+                this.logger.error(`deletion for row masks ${masksToDelete} completed`);
+              } else {
+                this.logger.error(`error for row mask deletion ${masksToDelete}`);
+              }
+            })
+          );
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  private createMasksFromCurrentData(payload: IMaskingCreateInput): Observable<ICreateNewMaskingGQLResponse> {
+    return this.authService.authStatus$.pipe(
+      switchMap((authStatus: IAuthStatus) => {
+        const columnMasks: IMask[] = [];
+        const rowMasks: IMask[] = [];
+        const user = authStatus.userId;
+        const now = new Date().toISOString();
+
+        payload.masks.forEach((subTableData: IMaskSubTableDataDef) => {
+          switch (subTableData.filterType) {
+            case MaskingAddEditDialogComponent.ROW_MASK_NAME:
+              rowMasks.push(this.getRowMaskObject(subTableData, user, now));
+              break;
+            case MaskingAddEditDialogComponent.COLUMN_MASK_NAME:
+              columnMasks.push(this.getColumnMaskObject(subTableData, user, now));
+              break;
+            case '':
+              console.log('Skipping: ', subTableData);
+          }
+        });
+
+        const masking = payload.masking;
+        masking.id = uuidv4();
+        masking.author = { id: user };
+        masking.lastUpdated = now;
+        masking.lastUpdatedBy = { id: user };
+        masking.created = now;
+        masking.columns = columnMasks;
+        masking.rows = rowMasks;
+        return this.createNewMaskingGQL.mutate({ masking }).pipe(map((response: any) => response.data));
+      })
+    );
   }
 
   private getFormFieldByType(formFieldData: IConnectorPropertiesResponse[]): BaseFormField<string | boolean>[] {

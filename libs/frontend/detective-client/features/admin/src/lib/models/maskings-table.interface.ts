@@ -22,12 +22,6 @@ export interface IMaskSubTableDataDef {
   isNew: boolean;
 }
 
-export interface IMaskSubTableDef {
-  key: string;
-  type: string;
-  label: string;
-}
-
 export interface IMaskSubTableDataDropdown {
   columnName: IDropDownValues[];
   visible: IDropDownValues[];
