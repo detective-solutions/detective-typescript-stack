@@ -1,28 +1,26 @@
 @import 'variables';
 
-.subscriptions-wrapper {
-  .top-row {
-    padding-left: 30px;
-    padding-right: 30px;
-    float: center;
+.top-row {
+  padding-left: 30px;
+  padding-right: 30px;
+  float: center;
 
-    .info-section {
-      padding: 15px;
-    }
+  .info-section {
+    padding: 15px;
+  }
 
-    .subscription-chip {
-      background-color: black;
-      border-radius: 10px;
-      padding: 8px 30px 8px 30px;
-      margin-right: 20px;
-      font-weight: bold;
-      color: white;
-    }
+  .subscription-chip {
+    background-color: black;
+    border-radius: 10px;
+    padding: 8px 30px 8px 30px;
+    margin-right: 20px;
+    font-weight: bold;
+    color: white;
+  }
 
-    .add-connection-button-wrapper {
-      button {
-        margin-right: 15px;
-      }
+  .subscription-change-buttons-wrapper {
+    button {
+      margin-right: 15px;
     }
   }
 }

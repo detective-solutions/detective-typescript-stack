@@ -17,7 +17,7 @@ import {
   SubscriptionDialogComponent,
 } from '../../models';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Observable, Subscription, filter, map, shareReplay, take } from 'rxjs';
+import { Observable, Subject, Subscription, filter, map, shareReplay, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { SubscriptionCancelDialogComponent, SubscriptionUpgradeDialogComponent } from './dialog';
 
@@ -30,6 +30,7 @@ import { SubscriptionService } from '../../services';
   styleUrls: ['./subscriptions.component.scss'],
 })
 export class SubscriptionsComponent implements OnInit, OnDestroy {
+  readonly isLoading$ = new Subject<boolean>();
   readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
@@ -57,12 +58,12 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   };
 
   constructor(
+    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly subscriptionService: SubscriptionService,
     private readonly translationService: TranslocoService,
     private readonly matDialog: MatDialog,
-    private readonly tableCellEventService: TableCellEventService,
-    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope
+    private readonly tableCellEventService: TableCellEventService
   ) {}
 
   ngOnInit() {

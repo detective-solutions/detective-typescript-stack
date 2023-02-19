@@ -1,8 +1,4 @@
-<div
-  class="subscriptions-wrapper"
-  [class.is-mobile]="isMobile$ | async"
-  *transloco="let t; read: 'admin.subscriptions.utils'"
->
+<div [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.subscriptions.utils'">
   <div class="top-row" fxLayout="row" fxLayout.xs="column" fxFlexFill *ngIf="productInfo$ | async as productInfo">
     <div fxFlex="50" class="info-section" fxFlex.xs="55">
       <p>
@@ -26,14 +22,12 @@
           **** {{ (paymentMethod$ | async)?.number }}</span
         >
       </p>
-      <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="add-connection-button-wrapper">
+      <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="subscription-change-buttons-wrapper">
         <button mat-stroked-button (click)="changePayment()">change payment</button>
         <button mat-stroked-button (click)="openCancelDialog()">cancel</button>
       </span>
     </div>
     <div fxFlex="50" class="info-section" fxFlex.xs="55"></div>
   </div>
-  <div class="invoice-row">
-    <table-view [tableItems$]="tableItems$"></table-view>
-  </div>
+  <table-view [tableItems$]="tableItems$" [isLoading$]="this.isLoading$"></table-view>
 </div>
