@@ -4,6 +4,7 @@ export * from './get-all-maskings-by-user-group-id.gql';
 export * from './get-user-by-id.gql';
 export * from './get-connection-by-id.gql';
 export * from './get-all-user-groups-as-dropdown-values.gql';
+export * from './get-all-users-count.gql';
 export * from './get-user-group-by-id.gql';
 export * from './create-new-user-group.gql';
 export * from './delete-user.gql';

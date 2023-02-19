@@ -15,7 +15,7 @@ import {
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
-  GetUserByIdGQL,
+  GetAllUsersCountGQL,
   IGetUserByIdGQLResponse,
   ISearchUsersByTenantGQLResponse,
   SearchUsersByTenantGQL,
@@ -89,7 +89,7 @@ export class UsersComponent implements OnDestroy, OnInit {
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly getUserByIdGQL: GetUserByIdGQL,
+    private readonly getUserByIdGQL: GetAllUsersCountGQL,
     private readonly matDialog: MatDialog,
     private readonly navigationEventService: NavigationEventService,
     private readonly searchUsersByTenantGQL: SearchUsersByTenantGQL,
