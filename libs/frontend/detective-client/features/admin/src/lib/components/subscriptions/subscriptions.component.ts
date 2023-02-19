@@ -166,9 +166,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     this.subscriptionService
       .getChangePaymentPortal()
       .pipe(take(1))
-      .subscribe((response: IGetChangePaymentResponse) => {
-        window.open(response.url, '_blank');
-      });
+      .subscribe((response: IGetChangePaymentResponse) => window.open(response.url, '_blank'));
   }
 
   private transformToTableStructure(originalInvoiceData: IInvoice[]): IInvoiceTableDef[] {
@@ -176,7 +174,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
     this.translationService
       .selectTranslateObject(`${this.translationScope.scope}.subscriptions.columnNames`)
       .pipe(take(1))
-      .subscribe((translation: { [key: string]: string }) => {
+      .subscribe((translation: { [key: string]: string }) =>
         originalInvoiceData.forEach((invoice: IInvoice) => {
           tempTableItems.push({
             period: {
@@ -228,8 +226,8 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
               },
             },
           } as IInvoiceTableDef);
-        });
-      });
+        })
+      );
     return tempTableItems;
   }
 }
