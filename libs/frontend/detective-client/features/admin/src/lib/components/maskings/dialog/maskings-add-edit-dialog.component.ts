@@ -232,8 +232,8 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       tap(({ loading }) => this.isLoading$.next(loading)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filter((response: any) => response?.data),
-      map(({ querySourceConnection }: IGetAllConnectionsGQLResponse) =>
-        querySourceConnection.map(SourceConnectionDTO.Build)
+      map(({ data }: { data: IGetAllConnectionsGQLResponse }) =>
+        data.querySourceConnection.map(SourceConnectionDTO.Build)
       )
     );
   }
@@ -386,7 +386,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       .pipe(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filter((response: any) => response?.data),
-        map((response: IGetTablesBySourceConnectionIdGQLResponse) => response.getSourceConnection),
+        map(({ data }: { data: IGetTablesBySourceConnectionIdGQLResponse }) => data.getSourceConnection),
         take(1)
       )
       .subscribe(
@@ -405,7 +405,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       .pipe(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filter((response: any) => response?.data),
-        map((response: IGetAllColumnsGQLResponse) => response.queryColumnDefinition)
+        map(({ data }: { data: IGetAllColumnsGQLResponse }) => data.queryColumnDefinition)
       )
       .subscribe(
         (response: IColumn[]) =>
@@ -466,9 +466,8 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       tap(({ loading }) => this.isLoading$.next(loading)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filter((response: any) => response?.data),
-      map((response: any) => response.data),
-      map((response: IUpdateMaskingGQLResponse) => {
-        if (!Object.keys(response).includes('error')) {
+      map(({ data }: { data: IUpdateMaskingGQLResponse }) => {
+        if (!Object.keys(data).includes('error')) {
           if (maskingInput.toDelete.columns) {
             const columnMaskIdToDelete = maskingInput.toDelete.columns.map((col) => col.id);
             this.deleteColumnOrRowMask(columnMaskIdToDelete, MaskingAddEditDialogComponent.COLUMN_MASK_NAME);
@@ -478,9 +477,9 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
             this.deleteColumnOrRowMask(rowMaskIdToDelete, MaskingAddEditDialogComponent.ROW_MASK_NAME);
           }
         } else {
-          console.log('No deletion on mask level', Object.keys(response));
+          console.log('No deletion on mask level', Object.keys(data));
         }
-        return response;
+        return data;
       })
     );
   }
@@ -669,7 +668,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
       tap(({ loading }) => this.isLoading$.next(loading)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filter((response: any) => response?.data),
-      map((response: IGetUserGroupsAsDropDownValuesGQLResponse) => response.queryUserGroup)
+      map(({ data }: { data: IGetUserGroupsAsDropDownValuesGQLResponse }) => data.queryUserGroup)
     );
   }
 
