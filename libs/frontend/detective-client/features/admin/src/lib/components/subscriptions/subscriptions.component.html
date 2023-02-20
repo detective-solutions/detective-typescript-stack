@@ -30,8 +30,8 @@
         >
       </p>
       <span fxLayoutAlign="left" fxHide.sm fxHide.xs class="subscription-change-buttons-wrapper">
-        <button mat-stroked-button (click)="changePayment()">Change payment</button>
-        <button mat-stroked-button (click)="openCancelDialog()">Cancel</button>
+        <button mat-stroked-button (click)="changePayment()">{{ t('changePaymentButtonText') }}</button>
+        <button mat-stroked-button (click)="openCancelDialog()">{{ t('cancelButtonText') }}</button>
       </span>
     </div>
     <div fxFlex="50" class="info-section" fxFlex.xs="55"></div>

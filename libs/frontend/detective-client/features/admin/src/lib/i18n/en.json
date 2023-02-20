@@ -196,7 +196,9 @@
     },
     "utils": {
       "of": "of",
-      "users": "users"
+      "users": "users",
+      "changePaymentButtonText": "Change payment",
+      "cancelButtonText": "Cancel"
     },
     "toastMessages": {
       "actionSuccessful": "Action performed successfully",

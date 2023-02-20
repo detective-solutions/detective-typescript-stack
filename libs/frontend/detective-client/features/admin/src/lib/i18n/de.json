@@ -148,16 +148,16 @@
         "dimensionRow": "Zeile",
         "maskingMethods": {
           "full": "Sternchen",
-          "full email": "Sternchen Email",
-          "credit card": "Kreditkarte",
-          "provider email": "Nur Email Provider",
-          "phone number": "Telefonnummer",
-          "postal code": "Postleitzahl",
-          "single name": "Einfacher Name",
-          "first- and lastname": "Vor- und Nachnahme",
+          "fullEmail": "Sternchen Email",
+          "creditCard": "Kreditkarte",
+          "providerEmail": "Nur Email Provider",
+          "phoneNumber": "Telefonnummer",
+          "postalCode": "Postleitzahl",
+          "singleName": "Einfacher Name",
+          "firstAndLastname": "Vor- und Nachnahme",
           "email": "Email",
-          "full address": "Ganze Adresse",
-          "address streetname and number": "Ganze Adresse mit Hausnummer",
+          "fullAddress": "Ganze Adresse",
+          "addressStreetnameAndNumber": "Ganze Adresse mit Hausnummer",
           "decimal": "Dezimalzahl",
           "number": "Nummer",
           "custom": "Eigener Wert"
@@ -185,19 +185,21 @@
     "cancelDialog": {
       "cancelDialogHeader": "Account löschen",
       "cancelDialogText": "Sie sind dabei die Account zu löschen und den Zugriff auf ihre Diskussionen zu verlieren",
-      "cancelExecuteButtonText": "Abonement kündigen",
+      "cancelExecuteButtonText": "Abonnement kündigen",
       "cancelCancelButtonText": "Abbrechen"
     },
     "upgradeDialog": {
       "upgradeDialogHeader": "Wähle dein Upgrade",
-      "upgradeDialogText": "Du kannst dein Abonement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
+      "upgradeDialogText": "Du kannst dein Abonnement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
       "cancelUpgradeButtonText": "Abbrechen",
       "upgradeNowButtonText": "Ausführen",
-      "userLimit": "Nuzter"
+      "userLimit": "Nutzer"
     },
     "utils": {
       "of": "von",
-      "users": "Nutzern"
+      "users": "Nutzern",
+      "changePaymentButtonText": "Zahlungsmittel ändern",
+      "cancelButtonText": "Kündigen"
     },
     "toastMessages": {
       "actionSuccessful": "Aktion erfolgreich ausgeführt",
