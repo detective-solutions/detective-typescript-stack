@@ -57,12 +57,10 @@ export class WebSocketService implements OnDestroy {
           this.authService.logout(true);
         }
 
-        this.logger.debug(
-          `${WebSocketService.loggingPrefix} Establishing connection to ${this.buildWebSocketUrl(whiteboardContext)}`
-        );
-
+        const webSocketUrl = this.buildWebSocketUrl(whiteboardContext);
+        this.logger.debug(`${WebSocketService.loggingPrefix} Establishing connection to ${webSocketUrl}`);
         this.currentWebSocket$ = initRxWebSocketWrapper<any>({
-          url: this.buildWebSocketUrl(whiteboardContext),
+          url: webSocketUrl,
           reconnectInterval: 4000,
           reconnectAttempts: 3,
         });
@@ -82,7 +80,7 @@ export class WebSocketService implements OnDestroy {
               }),
               filter((isConnected: boolean) => !isConnected),
               filter(() => this.authService.hasExpiredToken(this.authService.getAccessToken())),
-              switchMap(() => this.authService.refreshTokens())
+              switchMap(() => this.authService.refreshTokens().pipe(take(1)))
             )
             .subscribe(() => {
               // Set websocket url with updated access token
@@ -210,7 +208,7 @@ export class WebSocketService implements OnDestroy {
           .refreshTokens()
           .pipe(
             tap(() => this.logger.info(`${WebSocketService.loggingPrefix} Refreshing access tokens`)),
-            switchMap(() => this.store.select(selectWhiteboardContextState)),
+            switchMap(() => this.store.select(selectWhiteboardContextState).pipe(take(1))),
             take(1)
           )
           .subscribe(

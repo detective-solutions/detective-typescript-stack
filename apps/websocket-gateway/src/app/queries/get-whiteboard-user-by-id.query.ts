@@ -9,7 +9,7 @@ export interface IGetUserById {
 // Make sure the query matches the API response interface above
 export const getWhiteboardUserByIdQuery = `
   query ${getWhiteboardUserByIdQueryName}($id: string) {
-    ${getWhiteboardUserByIdQueryName}(func: eq(User.xid, $id)) {
+    ${getWhiteboardUserByIdQueryName}(func: eq(User.id, $id)) {
       id: User.xid
       email: User.email
       firstname: User.firstname

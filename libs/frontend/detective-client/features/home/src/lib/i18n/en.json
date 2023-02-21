@@ -5,7 +5,8 @@
       "allCasefiles": "All Casefiles",
       "dataSources": "Data Sources"
     },
-    "sidenavBottomItem": "Admin"
+    "sidenavBottomItem": "Admin",
+    "sidenavBottomItemTitle": "Navigate to the admin section"
   },
   "casefileList": {
     "createCasefileButtonText": "New Casefile",

@@ -3,8 +3,6 @@ import { MockModule, ngMocks } from 'ng-mocks';
 import { TableCellEventService, TableModule, TilesModule } from '@detective.solutions/frontend/detective-client/ui';
 
 import { Apollo } from 'apollo-angular';
-import { CasefileService } from '../../services';
-import { GetAllCasefilesGQL } from '../../graphql';
 import { MyCasefilesComponent } from './my-casefiles.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -19,7 +17,7 @@ xdescribe('MyCasefilesComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NoopAnimationsModule, RouterTestingModule, MockModule(TableModule), MockModule(TilesModule)],
       declarations: [MyCasefilesComponent],
-      providers: [CasefileService, Apollo, GetAllCasefilesGQL, TableCellEventService],
+      providers: [Apollo, TableCellEventService],
     }).compileComponents();
   });
 

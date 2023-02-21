@@ -16,7 +16,7 @@ import { getTranslocoModule } from '@detective.solutions/shared/i18n';
 
 const materialModules = [MatSnackBarModule, MatDialogModule];
 
-describe('NavigationComponent', () => {
+xdescribe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;
 

@@ -1,6 +1,7 @@
 {
   "navigation": {
-    "searchbarPlaceholder": "Search Casefiles",
+    "searchbarPlaceholder": "Search",
+    "searchbarClearButtonTitle": "Clear search input",
     "inviteButtonText": "Invite",
     "inviteModal": {
       "inviteDialogHeader": "Invite",
@@ -12,6 +13,10 @@
       "account": { "buttonText": "My Account" },
       "documentation": { "buttonText": "API & Documentation" },
       "logout": { "buttonText": "Logout" }
+    },
+    "sidenav": {
+      "toggleButtonTitle": "Toggle sidebar",
+      "closeButtonTitle": "Close sidebar"
     }
   },
   "tiles": {

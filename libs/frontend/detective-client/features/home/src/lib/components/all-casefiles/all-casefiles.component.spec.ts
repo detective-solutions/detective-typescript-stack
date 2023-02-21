@@ -4,8 +4,6 @@ import { TableCellEventService, TableModule, TilesModule } from '@detective.solu
 
 import { AllCasefilesComponent } from './all-casefiles.component';
 import { Apollo } from 'apollo-angular';
-import { CasefileService } from '../../services';
-import { GetAllCasefilesGQL } from '../../graphql';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
@@ -19,7 +17,7 @@ xdescribe('AllCasefilesComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NoopAnimationsModule, RouterTestingModule, MockModule(TableModule), MockModule(TilesModule)],
       declarations: [AllCasefilesComponent],
-      providers: [CasefileService, Apollo, GetAllCasefilesGQL, TableCellEventService],
+      providers: [Apollo, TableCellEventService],
     }).compileComponents();
   });
 

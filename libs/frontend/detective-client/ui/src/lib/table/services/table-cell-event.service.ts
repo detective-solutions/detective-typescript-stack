@@ -15,5 +15,4 @@ export class TableCellEventService {
   readonly favorized$ = this.tableCellEvents$.pipe(
     filter((event: ITableCellEvent) => event.type === TableCellEventType.FAVORIZE && event.value !== undefined)
   );
-  readonly resetLoadingStates$ = new Subject<boolean>();
 }

@@ -2,14 +2,14 @@ import { Mutation, gql } from 'apollo-angular';
 
 import { Injectable } from '@angular/core';
 
-export interface IDeleteUserGQLResponse {
+export interface IDeleteUserByIdGQLResponse {
   deleteUser: {
     msg: string;
   };
 }
 
 @Injectable()
-export class DeleteUserGQL extends Mutation<Response> {
+export class DeleteUserByIdGQL extends Mutation<Response> {
   override document = gql`
     mutation deleteUser($filter: UserFilter!) {
       deleteUser(filter: $filter) {

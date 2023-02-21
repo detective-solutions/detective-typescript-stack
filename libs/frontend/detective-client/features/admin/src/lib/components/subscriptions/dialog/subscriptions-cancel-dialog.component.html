@@ -12,4 +12,4 @@
     </button>
   </div>
 </div>
-<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

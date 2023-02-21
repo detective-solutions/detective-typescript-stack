@@ -2,7 +2,6 @@ import {
   IEmbeddingNode,
   IEmbeddingNodeTemporaryData,
   IEmbeddingWhiteboardNode,
-  IUser,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
@@ -18,7 +17,7 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
     public height: number,
     public locked: boolean,
     public author: string,
-    public editors: IUser[] | undefined,
+    public editors: string[] | undefined,
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,

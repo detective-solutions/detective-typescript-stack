@@ -2,9 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockModule, MockService, ngMocks } from 'ng-mocks';
 
 import { Apollo } from 'apollo-angular';
+import { CatalogService } from '../../services';
 import { ConnectionsComponent } from './connections.component';
-import { ConnectionsService } from '../../services';
-import { GetAllConnectionsGQL } from '../../graphql';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TableModule } from '@detective.solutions/frontend/detective-client/ui';
@@ -21,7 +20,7 @@ xdescribe('ConnectionsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MockModule(TableModule), materialModules],
       declarations: [ConnectionsComponent],
-      providers: [MockService(ConnectionsService), GetAllConnectionsGQL, Apollo],
+      providers: [MockService(CatalogService), Apollo],
     }).compileComponents();
   });
 

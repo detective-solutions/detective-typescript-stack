@@ -33,11 +33,10 @@ export class InviteDialogComponent {
     this.dialogRef.close();
   }
 
-  sendInvite(inviteInput: ISendInviteInput): void {
-    const token: string = this.authService.getAccessToken();
-    const headers = new HttpHeaders().set('Authentication', token);
-    headers.set('Access-Control-Allow-Origin', '*');
-
+  sendInvite(inviteInput: ISendInviteInput) {
+    const headers = new HttpHeaders()
+      .set('Authentication', this.authService.getAccessToken())
+      .set('Access-Control-Allow-Origin', '*');
     this.httpClient
       .post<StatusResponse>(
         `${environment.devApiHost}${environment.provisioningApiPathV1}${environment.provisioningSendInviteV1}`,
@@ -45,8 +44,10 @@ export class InviteDialogComponent {
         { headers: headers }
       )
       .pipe(take(1))
-      .subscribe((subscriptionState: StatusResponse) => this.handleResponse('update subscription', subscriptionState));
-    this.dialogRef.close();
+      .subscribe((subscriptionState: StatusResponse) => {
+        this.handleResponse('update subscription', subscriptionState);
+        this.closeModal();
+      });
   }
 
   private handleResponse(actionName: string, response: StatusResponse) {
@@ -66,6 +67,6 @@ export class InviteDialogComponent {
       .subscribe((translation: string) => {
         this.toastService.showToast(translation, 'Close', toastType);
       });
-    this.dialogRef.close();
+    this.closeModal();
   }
 }

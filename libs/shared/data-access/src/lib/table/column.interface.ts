@@ -1,8 +1,8 @@
 export interface IColumn {
-  xid: string;
+  id: string;
   columnName: string;
   columnType: string;
   schemaTable: {
-    xid: string;
+    id: string;
   };
 }

@@ -1,10 +1,12 @@
 <div class="component-wrapper" *transloco="let t; read: 'tiles'">
   <div
-    *ngIf="tilesInput$ | async as tilesInput; else isLoading"
+    *ngIf="tiles$ | async as tiles; else isLoading"
     class="tiles-container"
     fxLayout="row wrap"
     matchTileHeight="tile"
-    (scroll)="onScroll($event)"
+    infinite-scroll
+    [scrollWindow]="false"
+    (scrolled)="onScroll()"
   >
     <div
       class="tile-wrapper"
@@ -31,7 +33,7 @@
       fxFlex.md="50%"
       fxFlex.lg="25%"
       fxFlex.xl="16.666%"
-      *ngFor="let tile of tilesInput.tiles"
+      *ngFor="let tile of tiles; trackBy: trackTileById"
     >
       <mat-card class="tile" fxLayout="column" fxLayoutAlign="space-between center">
         <mat-card-title>{{ tile.title }}</mat-card-title>
@@ -55,7 +57,7 @@
       </mat-card>
     </div>
   </div>
-  <mat-progress-bar *ngIf="isFetchingMoreData" mode="query" color="accent"></mat-progress-bar>
+  <mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>
   <ng-template #isLoading>
     <div class="loading-spinner"></div>
   </ng-template>

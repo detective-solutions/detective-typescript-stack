@@ -1,0 +1,21 @@
+<div class="casefile-list-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'home.casefileList'">
+  <div *ngIf="showTableView$ | async" class="create-casefile-button-wrapper">
+    <button mat-stroked-button (click)="openNewCasefileDialog()">
+      <mat-icon>add</mat-icon>
+      {{ t('createCasefileButtonText') }}
+    </button>
+  </div>
+  <table-view
+    *ngIf="showTableView$ | async; else showTileView"
+    [tableItems$]="tableItems$"
+    [isLoading$]="isLoading$"
+    [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
+  ></table-view>
+  <ng-template #showTileView>
+    <tiles-view
+      [tiles$]="tileItems$"
+      [isLoading$]="isLoading$"
+      [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
+    ></tiles-view>
+  </ng-template>
+</div>

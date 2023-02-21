@@ -15,17 +15,17 @@ export class CreateUserGroupGQL extends Mutation<Response> {
     mutation addUserGroup($userGroup: [AddUserGroupInput!]!) {
       addUserGroup(input: $userGroup, upsert: true) {
         userGroup {
-          xid
+          id: xid
           name
           description
           author {
-            xid
+            id: xid
           }
           tenant {
-            xid
+            id: xid
           }
           members {
-            xid
+            id: xid
           }
           lastUpdated
           created

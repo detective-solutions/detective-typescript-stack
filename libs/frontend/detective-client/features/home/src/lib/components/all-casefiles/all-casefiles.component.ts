@@ -1,48 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { ITableInput, ITilesInput } from '@detective.solutions/frontend/detective-client/ui';
-import { Observable, map } from 'rxjs';
-
-import { BaseCasefileListComponent } from '../base';
-import { IGetAllCasefilesResponse } from '../../interfaces';
+import { BaseCasefileListComponent } from '../base-casefile-list';
+import { Component } from '@angular/core';
+import { IAuthStatus } from '@detective.solutions/frontend/shared/auth';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'all-casefiles',
-  templateUrl: './all-casefiles.component.html',
-  styleUrls: ['../base/base-casefile-list.component.scss'],
+  templateUrl: '../base-casefile-list/base-casefile-list.component.html',
+  styleUrls: ['../base-casefile-list/base-casefile-list.component.scss'],
 })
-export class AllCasefilesComponent extends BaseCasefileListComponent implements OnInit {
-  casefiles$!: Observable<IGetAllCasefilesResponse>;
-  tileItems$!: Observable<ITilesInput>;
-  tableItems$!: Observable<ITableInput>;
-
-  readonly pageSize = 10;
-
-  ngOnInit() {
-    this.casefiles$ = this.casefileService.getAllCasefiles(this.initialPageOffset, this.pageSize);
-
-    this.tileItems$ = this.casefiles$.pipe(
-      map((response: IGetAllCasefilesResponse) => {
-        return {
-          tiles: this.transformToTileStructure(response.casefiles),
-          totalElementsCount: response.totalElementsCount,
-        };
-      })
-    );
-
-    this.tableItems$ = this.casefiles$.pipe(
-      map((response: IGetAllCasefilesResponse) => {
-        return {
-          tableItems: this.transformToTableStructure(response.casefiles),
-          totalElementsCount: response.totalElementsCount,
-        };
-      })
-    );
-
-    // Handle fetching of more data from the corresponding service
-    this.subscriptions.add(
-      this.fetchMoreDataByOffset$.subscribe((pageOffset: number) =>
-        this.casefileService.getAllCasefilesNextPage(pageOffset, this.pageSize)
-      )
-    );
+export class AllCasefilesComponent extends BaseCasefileListComponent {
+  protected override customOnInit() {
+    this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
+      // Fetch initial data
+      this.searchCasefiles(authStatus.tenantId, '');
+      // Listen to search input from navigation
+      this.subscriptions.add(
+        this.navigationEventService.searchInput$.subscribe((searchTerm: string) =>
+          this.searchCasefiles(authStatus.tenantId, searchTerm)
+        )
+      );
+    });
   }
 }

@@ -1,8 +1,8 @@
-<div class="delete-dialog-wrapper" *transloco="let t; read: 'admin.users.deleteDialog'">
+<ng-container *transloco="let t; read: 'admin.users.deleteDialog'">
   <h1 mat-dialog-title align="center">{{ t('deleteDialogHeader') }}</h1>
   <div mat-dialog-content align="center">
     {{ t('deleteDialogTextStart') }}
-    <b>{{ t('deleteDialogTextHighlight', { userName: this.userName$ | async }) }}</b>
+    <b>{{ t('deleteDialogTextHighlight', { userName: this.user.fullName }) }}</b>
     {{ t('deleteDialogTextEnd') }}
   </div>
   <div mat-dialog-actions align="center">
@@ -10,5 +10,5 @@
       {{ t('deleteButtonText') }}
     </button>
   </div>
-</div>
-<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
+</ng-container>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

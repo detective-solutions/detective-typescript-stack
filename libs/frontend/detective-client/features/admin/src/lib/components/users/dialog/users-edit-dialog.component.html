@@ -1,22 +1,23 @@
-<div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.users.editDialog'">
-  <h1 mat-dialog-title>{{ t('editDialogHeader') }}</h1>
-  <div class="user-edit-wrapper" *ngIf="isLoaded">
+<ng-container *transloco="let t; read: 'admin.users.editDialog'">
+  <h1 mat-dialog-title align="center">{{ t('editDialogHeader') }}</h1>
+  <div mat-dialog-content *ngIf="userToEdit" align="center">
     <div class="user-name">
-      {{ this.currentUser.firstname }} {{ this.currentUser.lastname }}<br />
-      <small>{{ this.currentUser.email }}</small>
+      <p>{{ userToEdit.fullName }}</p>
+      <small>{{ userToEdit.email }}</small>
     </div>
-    <form [formGroup]="userRoleForm">
+    <form [formGroup]="userEditForm">
       <mat-form-field>
         <mat-label>{{ t('roleSelection') }}</mat-label>
-        <mat-select id="role" formControlName="role">
-          <mat-option [value]="item.roleId" id="roleOptions" *ngFor="let item of roles">
-            {{ item.name }}
+        <mat-select formControlName="role">
+          <mat-option *ngFor="let role of availableRoles" [value]="role">
+            {{ role | titlecase }}
           </mat-option>
         </mat-select>
       </mat-form-field>
     </form>
   </div>
   <div mat-dialog-actions align="center">
-    <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
+    <button mat-raised-button color="accent" (click)="updateUser()">{{ t('saveButtonText') }}</button>
   </div>
-</div>
+</ng-container>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

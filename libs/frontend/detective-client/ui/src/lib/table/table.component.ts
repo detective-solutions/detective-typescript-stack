@@ -1,11 +1,9 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IAbstractTableDef, IMatColumnDef, ITableInput } from './models';
-import { Observable, Subject, Subscription, map, shareReplay, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { IAbstractTableDef, IMatColumnDef } from './models';
+import { Observable, Subject, map, shareReplay } from 'rxjs';
 
-import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatTableDataSource } from '@angular/material/table';
-import { TableCellEventService } from './services';
 
 @Component({
   selector: 'table-view',
@@ -13,80 +11,48 @@ import { TableCellEventService } from './services';
   styleUrls: ['./table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TableComponent implements OnInit, OnDestroy {
-  @Input() tableRows$!: Observable<ITableInput>;
-  @Input() pageSize = 10;
-  @Input() fetchMoreDataByOffset$!: Subject<number>;
+export class TableComponent implements OnInit {
+  @Input() tableItems$!: Observable<IAbstractTableDef[]>;
+  @Input() isLoading$!: Subject<boolean>;
+  @Input() fetchMoreDataOnScroll$!: Subject<number>;
 
-  tableDataSource: MatTableDataSource<IAbstractTableDef> = new MatTableDataSource();
-  columnDefinitions: IMatColumnDef[] = [];
-  columnIds: string[] = [];
-  totalElementsCount = 0;
-  isFetchingMoreData = false;
+  tableDataSource$!: Observable<MatTableDataSource<IAbstractTableDef>>;
 
-  private currentPageOffset = 0;
-  private alreadyLoadedElementsCount = 0;
-  private readonly loadingScrollBuffer = 100;
-  private readonly subscriptions = new Subscription();
-
-  isMobile$: Observable<boolean> = this.breakpointObserver
+  readonly isMobile$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Small, Breakpoints.Handset])
     .pipe(
       map((result) => result.matches),
       shareReplay()
     );
 
-  constructor(
-    private readonly breakpointObserver: BreakpointObserver,
-    private readonly tableCellEventService: TableCellEventService,
-    private readonly logService: LogService
-  ) {}
+  columnDefinitions!: IMatColumnDef[];
+  columnIds: string[] = [];
+
+  private alreadyLoadedTableItems = 0;
+  private isAllDataLoaded = false;
+
+  constructor(private readonly breakpointObserver: BreakpointObserver) {}
 
   ngOnInit() {
-    this.subscriptions.add(
-      this.tableRows$
-        .pipe(
-          tap(() => {
-            if (this.isFetchingMoreData) {
-              this.isFetchingMoreData = false;
-            }
-          })
-        )
-        .subscribe((tableInput: ITableInput) => {
-          this.columnDefinitions = this.createMatColumnDefs(tableInput.tableItems);
-          this.columnIds = this.extractColumnIds(this.columnDefinitions);
-          this.totalElementsCount = tableInput.totalElementsCount;
-          this.alreadyLoadedElementsCount = tableInput.tableItems.length;
-          this.tableDataSource = new MatTableDataSource(tableInput.tableItems);
-        })
-    );
+    this.tableDataSource$ = this.tableItems$.pipe(
+      map((tableItems: IAbstractTableDef[]) => {
+        this.isAllDataLoaded = this.alreadyLoadedTableItems === tableItems.length;
+        this.alreadyLoadedTableItems = tableItems.length;
 
-    // Handle resetting of fetching state flag in case of an error
-    this.subscriptions.add(
-      this.tableCellEventService.resetLoadingStates$.subscribe(() => {
-        this.isFetchingMoreData = false;
-        this.logService.debug('Resetting loading indicator due to error');
+        this.columnDefinitions = this.createMatColumnDefs(tableItems);
+        this.columnIds = this.extractColumnIds(this.columnDefinitions);
+        return new MatTableDataSource(tableItems);
       })
     );
   }
 
-  ngOnDestroy() {
-    this.subscriptions.unsubscribe();
+  trackColumnById(_index: number, item: IMatColumnDef) {
+    return item.id;
   }
 
-  onScroll(e: Event) {
-    const currentScrollLocation = (e.target as HTMLElement).scrollTop;
-    const limit =
-      (e.target as HTMLElement).scrollHeight - (e.target as HTMLElement).offsetHeight - this.loadingScrollBuffer;
-
-    // If the user has scrolled between the bottom and the loadingScrollBuffer range, add more data
-    if (currentScrollLocation > limit) {
-      // Check if all available data was already fetched
-      if (!this.isFetchingMoreData && this.alreadyLoadedElementsCount < this.totalElementsCount) {
-        this.currentPageOffset += this.pageSize;
-        this.fetchMoreDataByOffset$.next(this.currentPageOffset);
-        this.isFetchingMoreData = true;
-      }
+  onScroll() {
+    if (!this.isAllDataLoaded) {
+      this.fetchMoreDataOnScroll$.next(this.alreadyLoadedTableItems);
     }
   }
 
