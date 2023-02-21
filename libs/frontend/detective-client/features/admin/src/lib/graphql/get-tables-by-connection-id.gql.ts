@@ -9,13 +9,13 @@ export interface IGetTablesBySourceConnectionIdGQLResponse {
 @Injectable()
 export class GetTablesBySourceConnectionIdGQL extends Query<Response> {
   override document = gql`
-    query getTablesOfSourceConnectionById($id: String!) {
-      getSourceConnection(xid: $id) {
+    query getTablesOfSourceConnectionById($sourceConnectionId: String!) {
+      getSourceConnection(xid: $sourceConnectionId) {
         connectedTables {
-          xid
+          id: xid
           name
           columns {
-            xid
+            id: xid
             columnName
           }
         }

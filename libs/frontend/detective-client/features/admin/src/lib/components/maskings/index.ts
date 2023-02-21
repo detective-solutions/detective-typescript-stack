@@ -1,1 +1,1 @@
-export * from './masking.component';
+export * from './maskings.component';

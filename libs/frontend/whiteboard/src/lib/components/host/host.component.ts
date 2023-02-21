@@ -303,7 +303,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
               height: 50,
               locked: false,
               author: context.userId,
-              editors: [{ id: context.userId }],
+              editors: [context.userId],
               lastUpdatedBy: context.userId,
               lastUpdated: now,
               created: now,

@@ -15,7 +15,7 @@ export class GetUserByIdGQL extends Query<Response> {
         id: xid
         email
         tenants {
-          xid
+          id: xid
         }
         role
         firstname

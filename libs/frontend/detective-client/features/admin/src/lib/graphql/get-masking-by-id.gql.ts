@@ -1,56 +1,56 @@
 import { Query, gql } from 'apollo-angular';
+import { IMasking } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
-import { MaskingDTO } from '@detective.solutions/frontend/shared/data-access';
 
 export interface IGetMaskingByIdGQLResponse {
-  getMasking: MaskingDTO;
+  getMasking: IMasking;
 }
 
 @Injectable()
 export class GetMaskingByIdGQL extends Query<Response> {
   override document = gql`
-    query getMaskingById($xid: String!) {
-      getMasking(xid: $xid) {
-        xid
+    query getMaskingById($tenantId: String!, $maskingId: String!) {
+      getMasking(xid: $maskingId) {
+        id: xid
         name
-        tenant {
-          xid
+        tenant(filter: { xid: { eq: $tenantId } }) {
+          id: xid
         }
         description
         table {
-          xid
+          id: xid
           name
           dataSource {
-            xid
+            id: xid
             name
           }
         }
         groups {
-          xid
+          id: xid
           name
         }
         author {
-          xid
+          id: xid
           firstname
           lastname
         }
         columns {
-          xid
+          id: xid
           columnName
           visible
           replaceType
           author {
-            xid
+            id: xid
             firstname
             lastname
           }
           editors {
-            xid
+            id: xid
             firstname
             lastname
           }
           lastUpdatedBy {
-            xid
+            id: xid
             firstname
             lastname
           }
@@ -58,24 +58,24 @@ export class GetMaskingByIdGQL extends Query<Response> {
           created
         }
         rows {
-          xid
+          id: xid
           columnName
           valueName
           visible
           replaceType
           customReplaceValue
           author {
-            xid
+            id: xid
             firstname
             lastname
           }
           editors {
-            xid
+            id: xid
             firstname
             lastname
           }
           lastUpdatedBy {
-            xid
+            id: xid
             firstname
             lastname
           }
@@ -83,7 +83,7 @@ export class GetMaskingByIdGQL extends Query<Response> {
           created
         }
         lastUpdatedBy {
-          xid
+          id: xid
           firstname
           lastname
         }

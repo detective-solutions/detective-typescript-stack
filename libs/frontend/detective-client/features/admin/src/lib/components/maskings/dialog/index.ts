@@ -1,2 +1,2 @@
-export * from './masking-delete-dialog.component';
-export * from './masking-add-edit-dialog.component';
+export * from './maskings-delete-dialog.component';
+export * from './maskings-add-edit-dialog.component';

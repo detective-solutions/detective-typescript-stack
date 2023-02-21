@@ -1,11 +1,11 @@
 import { Component, Inject } from '@angular/core';
+import { EMPTY, Subject, catchError, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SubscriptionService } from '../../../services';
-import { take } from 'rxjs';
 
 @Component({
   selector: 'subscriptions-cancel-dialog',
@@ -13,7 +13,7 @@ import { take } from 'rxjs';
   templateUrl: 'subscriptions-cancel-dialog.component.html',
 })
 export class SubscriptionCancelDialogComponent {
-  isSubmitting = false;
+  readonly isLoading$ = new Subject<boolean>();
 
   constructor(
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
@@ -25,14 +25,21 @@ export class SubscriptionCancelDialogComponent {
   ) {}
 
   cancelSubscription() {
-    this.isSubmitting = true;
+    this.isLoading$.next(true);
     this.subscriptionService
       .cancelSubscription()
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        catchError(() => {
+          this.isLoading$.next(false);
+          return EMPTY;
+        })
+      )
       .subscribe((subscriptionState: StatusResponse) => {
         this.handleResponse('cancel subscription', subscriptionState);
+        this.isLoading$.next(false);
+        this.closeModal();
       });
-    this.dialogRef.close();
   }
 
   closeModal() {
@@ -55,7 +62,7 @@ export class SubscriptionCancelDialogComponent {
       .pipe(take(1))
       .subscribe((translation: string) => {
         this.toastService.showToast(translation, 'Close', toastType);
+        this.closeModal();
       });
-    this.dialogRef.close();
   }
 }

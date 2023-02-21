@@ -36,13 +36,3 @@ export class UserDTO implements IUser {
     return this.firstname && this.lastname ? `${this.firstname} ${this.lastname}` : '';
   }
 }
-
-export class UserIdDTO implements IUser {
-  constructor(public id = '') {}
-  static Build(userIdInput: IUser) {
-    if (!userIdInput) {
-      return new UserIdDTO();
-    }
-    return new UserIdDTO(userIdInput.id);
-  }
-}

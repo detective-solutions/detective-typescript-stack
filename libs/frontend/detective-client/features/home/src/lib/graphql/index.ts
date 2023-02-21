@@ -1,3 +1,2 @@
-export * from './get-all-casefiles.gql';
-export * from './get-all-data-sources.gql';
-export * from './get-casefiles-by-author.gql';
+export * from './search-casefiles-by-tenant.gql';
+export * from './search-data-sources-by-tenant.gql';

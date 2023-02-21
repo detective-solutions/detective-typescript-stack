@@ -1,0 +1,13 @@
+<div class="user-groups-wrapper" [class.is-mobile]="isMobile$ | async" *transloco="let t; read: 'admin.userGroups'">
+  <div class="add-user-group-button-wrapper">
+    <button mat-stroked-button (click)="addButtonClicks$.next()">
+      <mat-icon>add</mat-icon>
+      {{ t('addUserGroupButtonText') }}
+    </button>
+  </div>
+  <table-view
+    [tableItems$]="tableItems$"
+    [isLoading$]="isLoading$"
+    [fetchMoreDataOnScroll$]="fetchMoreDataOnScroll$"
+  ></table-view>
+</div>

@@ -1,0 +1,100 @@
+.mat-dialog-content {
+  width: 90%;
+
+  form,
+  mat-form-field {
+    width: 100%;
+
+    mat-icon {
+      padding: 2px;
+      color: #ccc;
+      vertical-align: bottom;
+      margin-right: 8px;
+    }
+  }
+}
+
+.mat-dialog-actions {
+  button {
+    margin: 15px 0;
+    width: 100px;
+  }
+}
+
+.mat-progress-bar {
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+}
+
+.mat-table {
+  width: 90%;
+  margin-left: 40px;
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: scroll;
+  text-align: left;
+  table-layout: fixed;
+
+  .mat-header-cell {
+    text-align: left;
+    font-size: 12px;
+    margin: auto;
+    padding: 2px;
+    width: 10px;
+  }
+
+  .mat-cell {
+    margin: auto;
+    font-size: 12px;
+    width: 10px;
+    padding: 2px;
+  }
+
+  .btn-edit {
+    font-size: 12px;
+    float: right;
+  }
+
+  .mat-input {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    border-bottom: 1px solid black;
+    width: 98%;
+
+    &:focus {
+      outline: none;
+    }
+    &:focus ~ .bar:before {
+      width: 100%;
+    }
+  }
+}
+
+.auto-complete-option {
+  background-color: #fafafa;
+  &:hover {
+    background-color: #f0f0f0 !important;
+  }
+}
+
+.add-member-input {
+  margin-top: 20px;
+  width: 90%;
+
+  mat-icon {
+    color: rgba(0, 0, 0, 0.2);
+    margin-right: 10px;
+  }
+
+  mat-label {
+    background-color: #fafafa;
+    margin-right: 10px;
+  }
+}
+
+.table-wrapper {
+  max-height: 250px;
+  overflow-y: auto;
+}

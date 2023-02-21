@@ -1,16 +1,12 @@
 import { IMaskSubTableDataDef } from './maskings-table.interface';
-
-export interface IMaskDeleteInput {
-  columns: { xid: string }[];
-  rows: { xid: string }[];
-}
+import { IMasking } from '@detective.solutions/shared/data-access';
 
 export interface IMaskingUpdateInput {
   masking: {
-    xid: string;
+    id: string;
     name: string;
     description: string;
   };
   masks: IMaskSubTableDataDef[];
-  toDelete: IMaskDeleteInput;
+  toDelete: Partial<IMasking>;
 }

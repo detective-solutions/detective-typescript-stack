@@ -1,12 +1,14 @@
 import { Component, Inject } from '@angular/core';
-import { EMPTY, catchError, map, switchMap, take } from 'rxjs';
-import { IConnectionsDeleteResponse, IGetConnectionByIdResponse } from '../../../models';
+import { EMPTY, Observable, Subject, catchError, take } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
-import { ConnectionsService } from '../../../services';
+import { CatalogService } from '../../../services';
+import { IConnectionsDeleteResponse } from '../../../models';
 import { LogService } from '@detective.solutions/frontend/shared/error-handling';
+import { QueryRef } from 'apollo-angular';
+import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 
 @Component({
   selector: 'connections-delete-dialog',
@@ -14,52 +16,40 @@ import { LogService } from '@detective.solutions/frontend/shared/error-handling'
   templateUrl: 'connections-delete-dialog.component.html',
 })
 export class ConnectionsDeleteDialogComponent {
-  // TODO: Use custom service db call to gather info about usage of connection
-  readonly connectionToBeDeleted$ = this.connectionsService.getConnectionById(this.dialogInputData.id);
-  readonly connectionName$ = this.connectionToBeDeleted$.pipe(map((value: IGetConnectionByIdResponse) => value.name));
-
-  isSubmitting = false;
+  readonly isLoading$ = new Subject<boolean>();
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public dialogInputData: { id: string },
+    @Inject(MAT_DIALOG_DATA)
+    public dialogInputData: { connection: SourceConnectionDTO; searchQuery: QueryRef<Response> },
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
-    private readonly translationService: TranslocoService,
-    private readonly toastService: ToastService,
-    private readonly connectionsService: ConnectionsService,
+    private readonly catalogService: CatalogService,
     private readonly dialogRef: MatDialogRef<ConnectionsDeleteDialogComponent>,
-    private readonly logger: LogService
+    private readonly logger: LogService,
+    private readonly translationService: TranslocoService,
+    private readonly toastService: ToastService
   ) {}
 
   deleteConnection() {
-    this.isSubmitting = true;
-    this.connectionName$
+    this.isLoading$.next(true);
+    this.catalogService
+      .deleteConnection(this.dialogInputData.connection)
       .pipe(
-        switchMap((connectionName: string) =>
-          this.connectionsService.deleteConnection(this.dialogInputData.id, connectionName)
-        ),
         take(1),
-        catchError((error: Error) => {
-          this.handleError(error);
-          return EMPTY;
-        })
+        catchError((error: Error) => this.handleError(error))
       )
-      .subscribe((response: IConnectionsDeleteResponse) => {
-        this.handleResponse(response);
-        this.dialogRef.close();
-      });
+      .subscribe((response: IConnectionsDeleteResponse) => this.handleResponse(response));
   }
 
   private handleResponse(response: IConnectionsDeleteResponse) {
-    this.isSubmitting = false;
     // TODO: Unify response in catalog service (differs from add/edit response)
     if (response.description === 'success') {
       this.translationService
         .selectTranslate('connections.toastMessages.actionSuccessful', {}, this.translationScope)
         .pipe(take(1))
-        .subscribe((translation: string) =>
-          this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 })
-        );
-      this.connectionsService.refreshConnections();
+        .subscribe((translation: string) => {
+          this.toastService.showToast(translation, '', ToastType.INFO, { duration: 4000 });
+          this.dialogInputData.searchQuery.refetch(); // Update parent view
+        });
     }
 
     // TODO: Handle error code in response and fetch error message to display
@@ -70,18 +60,18 @@ export class ConnectionsDeleteDialogComponent {
         .pipe(take(1))
         .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
     }
+    this.dialogRef.close();
+    this.isLoading$.next(false);
   }
 
-  private handleError(error: Error) {
-    this.isSubmitting = false;
+  private handleError(error: Error): Observable<never> {
+    this.isLoading$.next(false);
     this.logger.error('Encountered an error while submitting connection deletion request');
     console.error(error);
     this.translationService
       .selectTranslate('connections.toastMessages.formSubmitError', {}, this.translationScope)
       .pipe(take(1))
-      .subscribe((translation: string) => {
-        this.toastService.showToast(translation, 'Close', ToastType.ERROR);
-      });
-    this.dialogRef.close();
+      .subscribe((translation: string) => this.toastService.showToast(translation, 'Close', ToastType.ERROR));
+    return EMPTY;
   }
 }

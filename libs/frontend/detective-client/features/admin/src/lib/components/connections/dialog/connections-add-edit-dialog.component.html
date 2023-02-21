@@ -16,12 +16,12 @@
       </mat-form-field>
     </form>
 
-    <ng-container *ngIf="formFieldDefinitionsByConnectorType$ | async as formFieldDefinitions">
-      <dynamic-form
-        [formFieldDefinitions]="formFieldDefinitions"
-        [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
-      ></dynamic-form>
-    </ng-container>
+    <dynamic-form
+      *ngIf="formFieldDefinitionsByConnectorType$ | async as formFieldDefinitions"
+      [formFieldDefinitions]="formFieldDefinitions"
+      [enableSubFormForOptionalFields]="true"
+      [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
+    ></dynamic-form>
   </div>
 
   <ng-template #editDialog>
@@ -29,14 +29,15 @@
       <ng-container *ngIf="existingFormFieldData$ | async as formFieldDefinitions">
         <dynamic-form
           [formFieldDefinitions]="formFieldDefinitions"
+          [enableSubFormForOptionalFields]="true"
           [optionalFieldsPanelName]="t('optionalFieldsPanelName')"
         ></dynamic-form>
       </ng-container>
     </div>
   </ng-template>
 
-  <div *ngIf="showSubmitButton" mat-dialog-actions align="center">
+  <div mat-dialog-actions align="center">
     <button mat-raised-button color="accent" (click)="submitForm()">{{ t('saveButtonText') }}</button>
   </div>
 </div>
-<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

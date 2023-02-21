@@ -1,5 +1,5 @@
 export * from './connections';
-export * from './groups';
+export * from './user-groups';
 export * from './users';
 export * from './maskings';
 export * from './subscriptions';
