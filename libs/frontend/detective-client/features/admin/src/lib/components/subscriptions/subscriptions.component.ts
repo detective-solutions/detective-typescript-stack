@@ -76,6 +76,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
   private readonly dialogDefaultConfig = {
     width: '650px',
     minWidth: '400px',
+    autoFocus: false, // Prevent autofocus on dialog button
   };
 
   constructor(
@@ -112,10 +113,9 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
 
   openUpgradeDialog(componentToOpen?: ComponentType<SubscriptionDialogComponent>, config?: MatDialogConfig) {
     this.matDialog.open(componentToOpen ?? SubscriptionUpgradeDialogComponent, {
-      ...{
-        width: '850px',
-        minWidth: '600px',
-      },
+      ...this.dialogDefaultConfig,
+      width: '850px',
+      minWidth: '600px',
       ...config,
     });
   }
