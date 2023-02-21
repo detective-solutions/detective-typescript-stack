@@ -34,21 +34,20 @@ export class CatalogService {
     );
   }
 
-  // TODO: Remove any type
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addConnection(connectionType: string, payload: any): Observable<IConnectionsAddEditResponse> {
+  addConnection(
+    connectionType: string,
+    payload: { [key: string]: string | number }
+  ): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
       `${CatalogService.catalogServiceBasePath}/${connectionType}/insert`,
       payload
     );
   }
 
-  // TODO: Remove any type
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateConnection(
     connectionType: string,
     connectionId: string,
-    payload: any
+    payload: { [key: string]: string | number }
   ): Observable<IConnectionsAddEditResponse> {
     return this.httpClient.post<IConnectionsAddEditResponse>(
       `${CatalogService.catalogServiceBasePath}/${connectionType}/update/${connectionId}`,

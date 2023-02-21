@@ -379,9 +379,10 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
 
   updateAvailableTables() {
     if (!this.getTablesBySourceConnectionIdWatchQuery) {
-      this.getTablesBySourceConnectionIdWatchQuery = this.getTablesBySourceConnectionIdGQL
-        // TODO: Add parameter type
-        .watch({ sourceConnectionId: this.currentConnectorTypeId }, { notifyOnNetworkStatusChange: true });
+      this.getTablesBySourceConnectionIdWatchQuery = this.getTablesBySourceConnectionIdGQL.watch(
+        { sourceConnectionId: this.currentConnectorTypeId },
+        { notifyOnNetworkStatusChange: true }
+      );
     }
     return this.getTablesBySourceConnectionIdWatchQuery.valueChanges
       .pipe(
