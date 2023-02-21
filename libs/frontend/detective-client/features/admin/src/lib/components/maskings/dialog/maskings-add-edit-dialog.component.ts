@@ -13,26 +13,25 @@ import {
   DeleteColumnMaskGQL,
   DeleteRowMaskGQL,
   GetAllColumnsGQL,
-  GetAllConnectionsGQL,
+  GetAllSourceConnectionsNonPaginatedGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
   GetTablesBySourceConnectionIdGQL,
   ICreateNewMaskingGQLResponse,
   IDeleteColumnMaskGQLResponse,
   IDeleteRowMaskGQLResponse,
   IGetAllColumnsGQLResponse,
-  IGetAllConnectionsGQLResponse,
+  IGetAllSourceConnectionsNonPaginatedGQLResponse,
   IGetTablesBySourceConnectionIdGQLResponse,
   IGetUserGroupsAsDropDownValuesGQLResponse,
   IUpdateMaskingGQLResponse,
   UpdateMaskingGQL,
 } from '../../../graphql';
 import { EMPTY, Observable, Subject, Subscription, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
-import { IColumn, IDropDownValues, IMask } from '@detective.solutions/shared/data-access';
+import { IColumn, IDropDownValues, IMask, ISourceConnection } from '@detective.solutions/shared/data-access';
 import {
   IConnectionTable,
   ISourceConnectionTables,
   MaskingDTO,
-  SourceConnectionDTO,
 } from '@detective.solutions/frontend/shared/data-access';
 import {
   IConnectorPropertiesResponse,
@@ -91,42 +90,39 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     {
       key: 'filterType',
       type: 'select',
-      label: 'subTable.ColumnTitleFilter',
+      label: 'subTable.columnTitleFilter',
     },
     {
       key: 'columnName',
       type: 'select',
-      label: 'subTable.ColumnTitleColumn',
+      label: 'subTable.columnTitleColumn',
     },
     {
       key: 'visible',
       type: 'select',
-      label: 'subTable.ColumnTitleHide',
+      label: 'subTable.columnTitleHide',
     },
     {
       key: 'valueName',
       type: 'text',
-      label: 'subTable.ColumnTitleValueName',
+      label: 'subTable.columnTitleValueName',
     },
     {
       key: 'replaceType',
       type: 'select',
-      label: 'subTable.ColumnTitleMethod',
+      label: 'subTable.columnTitleMethod',
     },
     {
       key: 'customReplaceType',
       type: 'text',
-      label: 'subTable.ColumnTitleCustomReplaceType',
+      label: 'subTable.columnTitleCustomReplaceType',
     },
     {
       key: 'isEdit',
       type: 'isEdit',
-      label: 'subTable.ColumnTitleIsEdit',
+      label: 'subTable.columnTitleIsEdit',
     },
   ];
-
-  dataSource: IMaskSubTableDataDef[] = [];
-  private tableColumns!: IDropDownValues[];
 
   readonly masksToDelete!: { columns: IMask[]; rows: IMask[] };
   readonly isAddDialog = !this.dialogInputData.masking;
@@ -136,6 +132,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
   });
 
   readonly isLoading$ = new Subject<boolean>();
+  readonly availableConnections$: Observable<ISourceConnection[]> = this.getAllSourceConnections();
   readonly formFieldDefinitionsByConnectorType$ = this.connectorTypeFormGroup
     .get(MaskingAddEditDialogComponent.CONNECTOR_FORM_FIELD_NAME)
     ?.valueChanges.pipe(
@@ -155,9 +152,18 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     catchError((error) => this.handleError(DynamicFormError.FORM_INIT_ERROR, error))
   );
 
+  dataSource: IMaskSubTableDataDef[] = [];
+
   private readonly defaultDropDownValues = [{ key: '', value: '' }];
   private readonly subscriptions = new Subscription();
 
+  private tableColumns!: IDropDownValues[];
+  private userGroupsAsDropdownValues!: IDropDownValues[];
+  private currentConnectorTypeId!: string;
+  private getAllSourceConnectionsWatchQuery!: QueryRef<Response>;
+  private getAllColumnsWatchQuery!: QueryRef<Response>;
+  private getTablesBySourceConnectionIdWatchQuery!: QueryRef<Response>;
+  private getAllUsersAsDropdownValuesWatchQuery!: QueryRef<Response>;
   private connectorTables = this.defaultDropDownValues;
   private maskDataDropdownValues: IMaskSubTableDataDropdown = {
     columnName: this.tableColumns,
@@ -165,12 +171,6 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     filterType: MaskingAddEditDialogComponent.FILTER_TYPES,
     replaceType: MaskingAddEditDialogComponent.MASK_METHODS,
   };
-  private userGroupsAsDropdownValues!: IDropDownValues[];
-  private currentConnectorTypeId!: string;
-  private getAllConnectionsWatchQuery!: QueryRef<Response>;
-  private getAllColumnsWatchQuery!: QueryRef<Response>;
-  private getTablesBySourceConnectionIdWatchQuery!: QueryRef<Response>;
-  private getAllUsersAsDropdownValuesWatchQuery!: QueryRef<Response>;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogInputData: { masking: MaskingDTO; searchQuery: QueryRef<Response> },
@@ -186,7 +186,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     private readonly getTablesBySourceConnectionIdGQL: GetTablesBySourceConnectionIdGQL,
     private readonly getAllUserGroupsAsDropdownValuesGQL: GetAllUserGroupsAsDropDownValuesGQL,
     private readonly getAllColumnsGQL: GetAllColumnsGQL,
-    private readonly getAllConnectionsGQL: GetAllConnectionsGQL,
+    private readonly getAllSourceConnectionsGQL: GetAllSourceConnectionsNonPaginatedGQL,
     private readonly toastService: ToastService,
     private readonly logger: LogService,
     private readonly dialogRef: MatDialogRef<MaskingAddEditDialogComponent>
@@ -224,17 +224,18 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     return translatedWord;
   }
 
-  getAllSourceConnections(): Observable<SourceConnectionDTO[]> {
-    if (!this.getAllConnectionsWatchQuery) {
-      this.getAllConnectionsWatchQuery = this.getAllConnectionsGQL.watch();
+  getAllSourceConnections(): Observable<ISourceConnection[]> {
+    if (!this.getAllSourceConnectionsWatchQuery) {
+      this.getAllSourceConnectionsWatchQuery = this.getAllSourceConnectionsGQL.watch(
+        {},
+        { notifyOnNetworkStatusChange: true }
+      );
     }
-    return this.getAllConnectionsWatchQuery.valueChanges.pipe(
+    return this.getAllSourceConnectionsWatchQuery.valueChanges.pipe(
       tap(({ loading }) => this.isLoading$.next(loading)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filter((response: any) => response?.data),
-      map(({ data }: { data: IGetAllConnectionsGQLResponse }) =>
-        data.querySourceConnection.map(SourceConnectionDTO.Build)
-      )
+      map(({ data }: { data: IGetAllSourceConnectionsNonPaginatedGQLResponse }) => data.querySourceConnection)
     );
   }
 
@@ -380,7 +381,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
     if (!this.getTablesBySourceConnectionIdWatchQuery) {
       this.getTablesBySourceConnectionIdWatchQuery = this.getTablesBySourceConnectionIdGQL
         // TODO: Add parameter type
-        .watch({ sourceConnectionId: this.currentConnectorTypeId });
+        .watch({ sourceConnectionId: this.currentConnectorTypeId }, { notifyOnNetworkStatusChange: true });
     }
     return this.getTablesBySourceConnectionIdWatchQuery.valueChanges
       .pipe(
@@ -399,7 +400,7 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
 
   updateAvailableColumns(tableId: string) {
     if (!this.getAllColumnsWatchQuery) {
-      this.getAllColumnsWatchQuery = this.getAllColumnsGQL.watch({ tableId });
+      this.getAllColumnsWatchQuery = this.getAllColumnsGQL.watch({ tableId }, { notifyOnNetworkStatusChange: true });
     }
     return this.getAllColumnsWatchQuery.valueChanges
       .pipe(
@@ -659,9 +660,12 @@ export class MaskingAddEditDialogComponent implements OnInit, AfterViewChecked, 
   private getAllUserGroupsAsDropdownValues() {
     if (!this.getAllUsersAsDropdownValuesWatchQuery) {
       this.authService.authStatus$.pipe(take(1)).subscribe((authStatus: IAuthStatus) => {
-        this.getAllUsersAsDropdownValuesWatchQuery = this.getAllUserGroupsAsDropdownValuesGQL.watch({
-          tenant: authStatus.tenantId,
-        });
+        this.getAllUsersAsDropdownValuesWatchQuery = this.getAllUserGroupsAsDropdownValuesGQL.watch(
+          {
+            tenant: authStatus.tenantId,
+          },
+          { notifyOnNetworkStatusChange: true }
+        );
       });
     }
     return this.getAllUsersAsDropdownValuesWatchQuery.valueChanges.pipe(

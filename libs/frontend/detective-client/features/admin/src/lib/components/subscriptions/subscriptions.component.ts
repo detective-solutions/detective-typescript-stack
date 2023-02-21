@@ -171,7 +171,7 @@ export class SubscriptionsComponent implements OnInit, OnDestroy {
 
   private getAllUsersCount(): Observable<number> {
     if (!this.getAllUsersCountWatchQuery) {
-      this.getAllUsersCountWatchQuery = this.getAllUsersCountGQL.watch();
+      this.getAllUsersCountWatchQuery = this.getAllUsersCountGQL.watch({}, { notifyOnNetworkStatusChange: true });
     }
     return this.getAllUsersCountWatchQuery.valueChanges.pipe(
       tap(({ loading }) => this.isLoading$.next(loading)),

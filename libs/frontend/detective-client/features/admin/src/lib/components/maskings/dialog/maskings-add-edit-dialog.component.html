@@ -7,7 +7,7 @@
       <mat-form-field>
         <mat-label>{{ t('sourceConnectionDropdownLabel') }}</mat-label>
         <mat-select formControlName="connector">
-          <mat-option *ngFor="let connection of getAllSourceConnections() | async" [value]="connection.id">{{
+          <mat-option *ngFor="let connection of availableConnections$ | async" [value]="connection.id">{{
             connection.name
           }}</mat-option>
         </mat-select>

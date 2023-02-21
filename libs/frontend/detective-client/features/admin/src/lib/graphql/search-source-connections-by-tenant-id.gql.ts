@@ -3,14 +3,14 @@ import { Query, gql } from 'apollo-angular';
 import { ISourceConnection } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
 
-export interface ISearchConnectionsByTenantGQLResponse {
+export interface ISearchSourceConnectionsByTenantGQLResponse {
   querySourceConnection: ISourceConnection[];
 }
 
 @Injectable()
-export class SearchConnectionsByTenantGQL extends Query<Response> {
+export class SearchSourceConnectionsByTenantGQL extends Query<Response> {
   override document = gql`
-    query searchConnectionsByTenantId(
+    query searchSourceConnectionsByTenantId(
       $tenantId: String!
       $paginationOffset: Int!
       $pageSize: Int!

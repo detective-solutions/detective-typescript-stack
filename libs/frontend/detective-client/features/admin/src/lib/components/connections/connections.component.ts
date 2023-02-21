@@ -16,10 +16,10 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ConnectionDialogComponent, ConnectionsClickEvent, IConnectionsTableDef } from '../../models';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './dialog';
 import {
-  GetConnectionByIdGQL,
-  IGetConnectionByIdGQLResponse,
-  ISearchConnectionsByTenantGQLResponse,
-  SearchConnectionsByTenantGQL,
+  GetSourceConnectionByIdGQL,
+  IGetSourceConnectionByIdGQLResponse,
+  ISearchSourceConnectionsByTenantGQLResponse,
+  SearchSourceConnectionsByTenantGQL,
 } from '../../graphql';
 import {
   ITableCellEvent,
@@ -80,10 +80,10 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly authService: AuthService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly getConnectionByIdGQL: GetConnectionByIdGQL,
+    private readonly getConnectionByIdGQL: GetSourceConnectionByIdGQL,
     private readonly matDialog: MatDialog,
     private readonly navigationEventService: NavigationEventService,
-    private readonly searchConnectionsByTenantIdGQL: SearchConnectionsByTenantGQL,
+    private readonly searchConnectionsByTenantIdGQL: SearchSourceConnectionsByTenantGQL,
     private readonly tableCellEventService: TableCellEventService,
     private readonly translationService: TranslocoService
   ) {}
@@ -157,7 +157,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             filter((response: any) => response?.data)
           )
-          .subscribe(({ data }: { data: ISearchConnectionsByTenantGQLResponse }) => {
+          .subscribe(({ data }: { data: ISearchSourceConnectionsByTenantGQLResponse }) => {
             this.connections$.next(data.querySourceConnection.map(SourceConnectionDTO.Build));
           })
       );
@@ -188,7 +188,7 @@ export class ConnectionsComponent implements OnInit, OnDestroy {
       tap(({ loading }) => this.isLoading$.next(loading)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filter((response: any) => response?.data),
-      map(({ data }: { data: IGetConnectionByIdGQLResponse }) => data.getSourceConnection),
+      map(({ data }: { data: IGetSourceConnectionByIdGQLResponse }) => data.getSourceConnection),
       map(SourceConnectionDTO.Build)
     );
   }

@@ -1,13 +1,13 @@
 import { Query, gql } from 'apollo-angular';
+import { ISourceConnection } from '@detective.solutions/shared/data-access';
 import { Injectable } from '@angular/core';
-import { SourceConnectionDTO } from '@detective.solutions/frontend/shared/data-access';
 
-export interface IGetConnectionByIdGQLResponse {
-  getSourceConnection: SourceConnectionDTO;
+export interface IGetSourceConnectionByIdGQLResponse {
+  getSourceConnection: ISourceConnection;
 }
 
 @Injectable()
-export class GetConnectionByIdGQL extends Query<Response> {
+export class GetSourceConnectionByIdGQL extends Query<Response> {
   override document = gql`
     query getSourceConnectionById($tenantId: String!, $connectionId: String!) {
       getSourceConnection(xid: $connectionId) {
