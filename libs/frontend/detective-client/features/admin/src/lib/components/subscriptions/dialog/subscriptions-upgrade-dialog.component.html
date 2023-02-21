@@ -3,30 +3,36 @@
   <div mat-dialog-content align="center">
     {{ t('upgradeDialogText') }}
   </div>
-  <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
-    <mat-card
-      #upgradeCard
-      fxFlex="30"
-      fxFlex.xs="35"
-      *ngFor="let plan of (availablePlans$ | async)?.prices"
-      (click)="lockUpgrade(plan.id)"
-    >
-      <mat-card-subtitle>
-        {{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}
-        <span class="material-icons check-icon"> check_circle </span>
-      </mat-card-subtitle>
-      <mat-card-title>{{ plan.nickname }}</mat-card-title>
+  <ng-container *ngIf="availablePlans$ | async as availablePlans; else plansNotLoaded">
+    <div class="upgrade-choice-wrapper" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+      <mat-card
+        #upgradeCard
+        id="{{ plan.id }}"
+        fxFlex="30"
+        fxFlex.xs="35"
+        *ngFor="let plan of availablePlans.prices"
+        (click)="lockUpgrade(plan.id)"
+      >
+        <mat-card-subtitle>
+          {{ getPriceTag(plan.unit_amount, plan.currency, plan.recurring.interval) }}
+          <mat-icon class="check-icon">check_circle</mat-icon>
+        </mat-card-subtitle>
+        <mat-card-title>{{ plan.nickname }}</mat-card-title>
 
-      <mat-card-content height="20px">
-        <p>{{ plan.metadata.description }}</p>
-      </mat-card-content>
-      <mat-card-footer>
-        <ul>
-          <li><mat-icon color="accent">done</mat-icon>{{ plan.metadata.user_limit }} {{ t('userLimit') }}</li>
-        </ul>
-      </mat-card-footer>
-    </mat-card>
-  </div>
+        <mat-card-content height="20px">
+          <p>{{ plan.metadata.description }}</p>
+        </mat-card-content>
+        <mat-card-footer>
+          <ul>
+            <li><mat-icon color="accent">done</mat-icon>{{ plan.metadata.user_limit }} {{ t('userLimit') }}</li>
+          </ul>
+        </mat-card-footer>
+      </mat-card>
+    </div>
+  </ng-container>
+  <ng-template #plansNotLoaded>
+    <mat-progress-bar mode="determinate" color="accent"></mat-progress-bar>
+  </ng-template>
   <div mat-dialog-actions align="center">
     <button mat-raised-button (click)="closeModal()">
       {{ t('cancelUpgradeButtonText') }}
@@ -36,4 +42,4 @@
     </button>
   </div>
 </div>
-<mat-progress-bar *ngIf="isSubmitting" mode="query" color="accent"></mat-progress-bar>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

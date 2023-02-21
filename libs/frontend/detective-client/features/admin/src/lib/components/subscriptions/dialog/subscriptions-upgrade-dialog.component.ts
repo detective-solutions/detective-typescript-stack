@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
-import { Observable, map, take } from 'rxjs';
+import { EMPTY, Subject, catchError, map, take } from 'rxjs';
 import { ProviderScope, TRANSLOCO_SCOPE, TranslocoService } from '@ngneat/transloco';
 import { StatusResponse, ToastService, ToastType } from '@detective.solutions/frontend/shared/ui';
 
@@ -14,9 +14,8 @@ import { SubscriptionService } from '../../../services';
   templateUrl: './subscriptions-upgrade-dialog.component.html',
 })
 export class SubscriptionUpgradeDialogComponent {
-  @ViewChildren('upgradeCard', { read: ElementRef }) upgradeCards!: QueryList<ElementRef>;
-
-  availablePlans$: Observable<IGetAllProductResponse> = this.subscriptionService.getAllProductPlan().pipe(
+  readonly isLoading$ = new Subject<boolean>();
+  readonly availablePlans$ = this.subscriptionService.getAllProductPlan().pipe(
     map((response: IGetAllProductResponse) => {
       return {
         prices: response.prices || [],
@@ -24,8 +23,9 @@ export class SubscriptionUpgradeDialogComponent {
     })
   );
 
-  isSubmitting = false;
-  selectedPlan = '';
+  private selectedPlanId!: string;
+
+  @ViewChildren('upgradeCard', { read: ElementRef }) upgradeCards!: QueryList<ElementRef>;
 
   constructor(
     @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
@@ -41,14 +41,12 @@ export class SubscriptionUpgradeDialogComponent {
   }
 
   lockUpgrade(planId: string) {
-    this.selectedPlan = planId;
-    this.upgradeCards.forEach((card) => {
-      const cardElement = card.nativeElement;
-      if (cardElement.id === this.selectedPlan) {
-        cardElement.classList.add('selected-plan');
-      } else {
-        cardElement.classList.remove('selected-plan');
-      }
+    this.selectedPlanId = planId;
+    const selectedPlanClass = 'selected-plan';
+    this.upgradeCards.forEach((card: ElementRef) => {
+      card.nativeElement.id === this.selectedPlanId
+        ? card.nativeElement.classList.add(selectedPlanClass)
+        : card.nativeElement.classList.remove(selectedPlanClass);
     });
   }
 
@@ -57,13 +55,17 @@ export class SubscriptionUpgradeDialogComponent {
   }
 
   pushUpgrade() {
+    this.isLoading$.next(true);
     this.subscriptionService
-      .updateSubscription(this.selectedPlan)
-      .pipe(take(1))
-      .subscribe((subscriptionState: StatusResponse) => {
-        this.handleResponse('update subscription', subscriptionState);
-      });
-    this.dialogRef.close();
+      .updateSubscription(this.selectedPlanId)
+      .pipe(
+        take(1),
+        catchError(() => {
+          this.isLoading$.next(false);
+          return EMPTY;
+        })
+      )
+      .subscribe((subscriptionState: StatusResponse) => this.handleResponse('update subscription', subscriptionState));
   }
 
   private handleResponse(actionName: string, response: StatusResponse) {
@@ -82,7 +84,8 @@ export class SubscriptionUpgradeDialogComponent {
       .pipe(take(1))
       .subscribe((translation: string) => {
         this.toastService.showToast(translation, 'Close', toastType);
+        this.isLoading$.next(false);
+        this.closeModal();
       });
-    this.dialogRef.close();
   }
 }

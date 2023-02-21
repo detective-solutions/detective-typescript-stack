@@ -39,7 +39,13 @@ $highlight-bg: #fc1767;
 
       .mat-card-footer {
         ul li {
+          display: flex;
+          align-items: center;
           list-style: none;
+
+          mat-icon {
+            padding-right: 10px;
+          }
         }
       }
     }
