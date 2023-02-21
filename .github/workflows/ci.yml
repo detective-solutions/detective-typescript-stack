@@ -82,11 +82,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
-      - name: Install npm dependencies (without scripts)
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
-        run: npm rebuild && npm run prepare --if-present
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Build ${{matrix.app}}
         run: npx nx build ${{matrix.app}} --prod && npm run transloco:optimize
