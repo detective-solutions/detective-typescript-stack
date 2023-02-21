@@ -6,6 +6,7 @@ import {
   WhiteboardSelectionService,
 } from './services/internal-services';
 import {
+  DisplayNodeComponent,
   EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
@@ -15,6 +16,7 @@ import {
   TestLinkComponent,
   TopbarComponent,
 } from './components';
+import { DisplayService, WhiteboardFacadeService } from './services';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
   WHITEBOARD_STORE_NAME,
@@ -26,7 +28,6 @@ import {
 import { AgGridModule } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
-import { IFrameTrackerDirective } from './directives';
 import { KeyboardService } from '@detective.solutions/frontend/shared/ui';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -34,7 +35,6 @@ import { SearchTablesByTenantGQL } from './graphql';
 import { StoreModule } from '@ngrx/store';
 import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardContextResolver } from './resolvers';
-import { WhiteboardFacadeService } from './services';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
@@ -60,11 +60,12 @@ import { whiteboardFeatureReducers } from './state/reducers';
   declarations: [
     EmbeddingNodeComponent,
     HostComponent,
-    IFrameTrackerDirective,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
     SidebarComponent,
     TableNodeComponent,
+    EmbeddingNodeComponent,
+    DisplayNodeComponent,
     TestLinkComponent,
     TopbarComponent,
   ],
@@ -77,6 +78,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardFacadeService,
     WebSocketService,
     WhiteboardSelectionService,
+    DisplayService,
     SearchTablesByTenantGQL,
     {
       provide: TRANSLOCO_SCOPE,

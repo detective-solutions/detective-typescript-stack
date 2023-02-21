@@ -57,12 +57,10 @@ export class WebSocketService implements OnDestroy {
           this.authService.logout(true);
         }
 
-        this.logger.debug(
-          `${WebSocketService.loggingPrefix} Establishing connection to ${this.buildWebSocketUrl(whiteboardContext)}`
-        );
-
+        const webSocketUrl = this.buildWebSocketUrl(whiteboardContext);
+        this.logger.debug(`${WebSocketService.loggingPrefix} Establishing connection to ${webSocketUrl}`);
         this.currentWebSocket$ = initRxWebSocketWrapper<any>({
-          url: this.buildWebSocketUrl(whiteboardContext),
+          url: webSocketUrl,
           reconnectInterval: 4000,
           reconnectAttempts: 3,
         });
