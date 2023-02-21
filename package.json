@@ -66,7 +66,7 @@
     "kafkajs": "2.2.3",
     "ngx-infinite-scroll": "14.0.1",
     "minio": "7.0.32",
-    "passport": "0.5.3",
+    "passport": "0.6.0",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
     "redis": "4.5.1",
