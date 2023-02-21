@@ -189,7 +189,7 @@
     },
     "upgradeDialog": {
       "upgradeDialogHeader": "Choose your upgrade",
-      "upgradeDialogText": "You can modify your subscriptions any time. This way you have the full flexibility.",
+      "upgradeDialogText": "You can modify your subscriptions any time. This way you have full flexibility.",
       "cancelUpgradeButtonText": "Cancel",
       "upgradeNowButtonText": "Upgrade",
       "userLimit": "User"
