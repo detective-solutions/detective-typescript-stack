@@ -154,10 +154,11 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let dragDataTransfer;
 
+    // TODO: Reactivate
     try {
-      dragDataTransfer = JSON.parse(event.dataTransfer!.getData('text/plain'));
+      // dragDataTransfer = JSON.parse(event.dataTransfer.getData('text/plain'));
     } catch {
-      dragDataTransfer = '';
+      // dragDataTransfer = '';
     }
 
     const now = formatDate(new Date());
