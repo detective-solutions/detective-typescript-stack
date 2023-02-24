@@ -82,7 +82,7 @@ export class CacheService {
     // Check if active users are present & filter out the user that left
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
 
-    // TODO: Remove me!
+    // TODO: Remove me after debugging!
     console.log('ACTIVE USERS');
     console.log(activeUsers);
 
