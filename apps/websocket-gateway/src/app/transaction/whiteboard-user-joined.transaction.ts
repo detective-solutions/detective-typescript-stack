@@ -19,6 +19,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     try {
       // Get user info from database
       const newUserInfo = await this.databaseService.getWhiteboardUserById(this.userId);
+      console.log('NEW USER');
+      console.log(newUserInfo);
 
       // Check if casefile is already cached
       let casefileData = await this.cacheService.getCasefileById(this.casefileId);
