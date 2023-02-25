@@ -86,11 +86,7 @@ export class CacheService {
       return null;
     }
 
-    console.log(activeUsers);
-    activeUsers = activeUsers
-      .filter((user: IUserForWhiteboard) => !!user)
-      .filter((user: IUserForWhiteboard) => user.id !== userId);
-    console.log(activeUsers);
+    activeUsers = activeUsers.filter((user: IUserForWhiteboard) => !!user && user.id !== userId);
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {

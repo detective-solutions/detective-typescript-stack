@@ -19,8 +19,6 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     try {
       // Get user info from database
       const newUserInfo = await this.databaseService.getWhiteboardUserById(this.userId);
-      console.log('NEW USER');
-      console.log(newUserInfo);
 
       // Check if casefile is already cached
       let casefileData = await this.cacheService.getCasefileById(this.casefileId);
@@ -50,13 +48,10 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     casefileData: ICachableCasefileForWhiteboard,
     newUserInfo: IUserForWhiteboard
   ): Promise<ICachableCasefileForWhiteboard> {
-    console.log(casefileData.temporary);
     // Add new connected user to casefile temporary data
     const isUserAlreadyCached = casefileData.temporary.activeUsers.some(
       (activeUser: IUserForWhiteboard) => activeUser?.id === newUserInfo?.id
     );
-    console.log('IS USER CACHED');
-    console.log(isUserAlreadyCached);
     if (!isUserAlreadyCached) {
       casefileData.temporary.activeUsers.push(newUserInfo);
       await this.cacheService.insertActiveUsers(casefileData.id, casefileData.temporary.activeUsers);
