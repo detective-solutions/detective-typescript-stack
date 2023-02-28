@@ -40,10 +40,10 @@ export class SidebarComponent implements OnInit {
   @ViewChild('assetsMenuIcon', { read: ElementRef }) assetsMenuIcon!: ElementRef;
   @ViewChild('assetsSearchInput', { read: ElementRef }) assetsSearchInput!: ElementRef;
 
+  isLoading$ = new Subject<boolean>();
   assetsMenuTables$ = new Subject<IAssetsMenuTable[]>();
 
   assetsSearchFormControl = new FormControl<string>('', { nonNullable: true });
-  isLoading = false;
 
   private searchTablesByTenantWatchQuery!: QueryRef<Response>;
   private readonly searchDebounceTime = 500;
@@ -78,7 +78,6 @@ export class SidebarComponent implements OnInit {
       );
       return;
     }
-
     const isEmbedding = event.target === this.embedding.nativeElement;
     if (isEmbedding) {
       event.dataTransfer?.setData('text/plain', JSON.stringify({ type: WhiteboardNodeType.EMBEDDING }));
@@ -100,16 +99,18 @@ export class SidebarComponent implements OnInit {
     };
 
     if (!this.searchTablesByTenantWatchQuery) {
-      this.searchTablesByTenantWatchQuery = this.searchTablesByTenantGQL.watch(searchParameters);
+      this.searchTablesByTenantWatchQuery = this.searchTablesByTenantGQL.watch(searchParameters, {
+        notifyOnNetworkStatusChange: true,
+      });
       this.subscriptions.add(
         this.searchTablesByTenantWatchQuery.valueChanges
           .pipe(
-            tap(() => (this.isLoading = true)),
+            tap(({ loading }) => this.isLoading$.next(loading)),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            map((response: any) => response.data),
+            filter((response: any) => response?.data),
             map(
-              (response: ISearchTablesByTenantGQLResponse) =>
-                response.querySourceConnection
+              ({ data }: { data: ISearchTablesByTenantGQLResponse }) =>
+                data.querySourceConnection
                   .map(SourceConnectionDTO.Build)
                   .filter((sourceConnection: SourceConnectionDTO) => sourceConnection.connectedTables.length > 0)
                   .map((sourceConnection: SourceConnectionDTO) =>
@@ -119,11 +120,7 @@ export class SidebarComponent implements OnInit {
                   .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
             )
           )
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .subscribe((response: any) => {
-            this.assetsMenuTables$.next(response as IAssetsMenuTable[]);
-            this.isLoading = false;
-          })
+          .subscribe((response: IAssetsMenuTable[]) => this.assetsMenuTables$.next(response))
       );
     } else {
       this.searchTablesByTenantWatchQuery.refetch(searchParameters);
