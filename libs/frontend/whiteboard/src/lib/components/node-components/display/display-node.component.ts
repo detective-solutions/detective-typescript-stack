@@ -33,7 +33,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
       )
     );
 
-    this.setCurrentNodeValues();
+    // this.setCurrentNodeValues();
     this.refreshPages();
   }
 
@@ -57,13 +57,13 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   setCurrentNodeValues() {
-    this.currentIndex = (this.node as IDisplayWhiteboardNode).currentIndex;
-    this.pages = (this.node as IDisplayWhiteboardNode).pages;
-    this.fileName = (this.node as IDisplayWhiteboardNode).fileName;
-    this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
-    this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
-    this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
-    this.expires = (this.node as IDisplayWhiteboardNode).expires;
+    // this.currentIndex = (this.node as IDisplayWhiteboardNode).currentIndex;
+    // this.pages = (this.node as IDisplayWhiteboardNode).pages;
+    // this.fileName = (this.node as IDisplayWhiteboardNode).fileName;
+    // this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
+    // this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
+    // this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
+    // this.expires = (this.node as IDisplayWhiteboardNode).expires;
   }
 
   setExpiry(date: string) {

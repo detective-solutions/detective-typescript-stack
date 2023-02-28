@@ -14,11 +14,6 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public id: string,
     public title: string,
     public fileName: string,
-    public pageCount: number,
-    public currentIndex: number,
-    public pages: string[],
-    public currentLink: string,
-    public expires: Date,
     public x: number,
     public y: number,
     public width: number,
@@ -30,7 +25,12 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,
-    public temporary: IDisplayNodeTemporaryData | undefined
+    public pageCount?: number | undefined,
+    public currentIndex?: number | undefined,
+    public pages?: string[] | undefined,
+    public currentLink?: string | undefined,
+    public expires?: Date,
+    public temporary?: IDisplayNodeTemporaryData | undefined
   ) {}
 
   static Build(nodeInput: IDisplayNode): DisplayWhiteboardNode {
@@ -39,11 +39,6 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
         nodeInput.id,
         nodeInput.title,
         nodeInput.fileName,
-        nodeInput.pageCount,
-        nodeInput.currentIndex,
-        nodeInput.pages,
-        nodeInput.currentLink,
-        nodeInput.expires,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,
@@ -55,6 +50,11 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
         nodeInput.lastUpdatedBy,
         nodeInput.lastUpdated,
         nodeInput.created,
+        nodeInput?.pageCount,
+        nodeInput?.currentIndex,
+        nodeInput?.pages,
+        nodeInput?.currentLink,
+        nodeInput?.expires,
         nodeInput?.temporary
       );
     } catch (e) {

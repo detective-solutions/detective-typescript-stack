@@ -6,3 +6,4 @@ export * from './table';
 export * from './can-deactivate.interface';
 export * from './whiteboard-collaboration-cursor.interface';
 export * from './whiteboard-node-component.type';
+export * from './whiteboard-node-drag-data.interface';

@@ -10,11 +10,11 @@ export interface IDisplay {
   id: string;
   title: string;
   fileName: string;
-  pageCount: number;
-  currentIndex: number;
-  pages: string[];
-  currentLink: string;
-  expires: Date;
+  pageCount?: number;
+  currentIndex?: number;
+  pages?: string[];
+  currentLink?: string;
+  expires?: Date;
   x: number;
   y: number;
   width: number;
