@@ -127,7 +127,6 @@ export class AuthService {
     const jwtId = uuidv4(); // Using UUID v4 as JWT Ids for for improved randomness
 
     this.logger.log('Generating authorization tokens');
-    this.logger.debug('ACCESS TOKEN SECRET', this.config.get<string>(AuthEnvironment.ACCESS_TOKEN_SECRET));
 
     // Token secrets will be automatically cached after the first retrieval
     const [accessToken, refreshToken] = await Promise.all([
