@@ -284,7 +284,7 @@ export class DatabaseService {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
       },
       [`${displayWhiteboardNode.type}.entity`]: {
-        uid: (await this.getUidByType(displayWhiteboardNode.entity.id, 'Display')) ?? null,
+        uid: (await this.getUidByType(displayWhiteboardNode.entity?.id, 'Display')) ?? null,
       },
       [`${displayWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
