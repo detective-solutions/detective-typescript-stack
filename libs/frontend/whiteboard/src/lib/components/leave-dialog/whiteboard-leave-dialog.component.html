@@ -1,8 +1,8 @@
-<ng-container>
-  <h1 mat-dialog-title align="center">Hello</h1>
+<ng-container *transloco="let t; read: 'whiteboard.leaveDialog'">
+  <h1 mat-dialog-title align="center">{{ t('dialogText') }}</h1>
   <div mat-dialog-content align="center"></div>
   <div mat-dialog-actions align="center">
-    <button mat-raised-button color="accent" (click)="confirm()">Yes</button>
-    <button mat-raised-button (click)="cancel()">No</button>
+    <button mat-raised-button color="accent" (click)="confirm()">{{ t('confirmButtonText') }}</button>
+    <button mat-raised-button (click)="cancel()">{{ t('cancelButtonText') }}</button>
   </div>
 </ng-container>

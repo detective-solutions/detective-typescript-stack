@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { ProviderScope, TRANSLOCO_SCOPE } from '@ngneat/transloco';
-import { MatDialogRef } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
+import { MatDialogRef } from '@angular/material/dialog';
 import { WhiteboardLeaveGuard } from '../../guards';
 
 @Component({
@@ -11,18 +10,19 @@ import { WhiteboardLeaveGuard } from '../../guards';
 })
 export class WhiteboardLeaveDialogComponent {
   constructor(
-    @Inject(TRANSLOCO_SCOPE) private readonly translationScope: ProviderScope,
     private readonly dialogRef: MatDialogRef<WhiteboardLeaveDialogComponent>,
     private readonly whiteboardLeaveGuard: WhiteboardLeaveGuard
   ) {}
 
   confirm() {
     this.whiteboardLeaveGuard.confirmed$.next(true);
+    this.whiteboardLeaveGuard.confirmed$.next(null);
     this.dialogRef.close();
   }
 
   cancel() {
     this.whiteboardLeaveGuard.confirmed$.next(false);
+    this.whiteboardLeaveGuard.confirmed$.next(null);
     this.dialogRef.close();
   }
 }

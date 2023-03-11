@@ -1,11 +1,13 @@
-export interface UploadResponse {
+import { WhiteboardNodeType } from '@detective.solutions/shared/data-access';
+
+export interface IUploadResponse {
   success: boolean;
   xid: string;
-  setup: InitialSetup;
-  nodeType: 'table' | 'display';
+  setup: IInitialSetup;
+  nodeType: WhiteboardNodeType.TABLE | WhiteboardNodeType.DISPLAY;
 }
 
-export interface InitialSetup {
+export interface IInitialSetup {
   pageCount?: number;
   pages?: string[];
   exp?: string;

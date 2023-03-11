@@ -189,44 +189,24 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
 
         const isFile = event.dataTransfer?.files && event.dataTransfer?.files.length !== 0;
         if (isFile) {
-          // this.whiteboardFacade.uploadFile(event).subscribe((response: UploadResponse) => { // TODO: Move to DisplayNode
           for (let i = 0; i < event.dataTransfer.files.length; i++) {
             const margin = i * (defaultMargin + defaultNodeConfig.width) || 0;
             convertedDOMPoint.x += margin;
 
-            const file = event.dataTransfer.files.item(i);
-            if (!file) {
-              throw new Error(); // TODO: Add error message
+            const fileToUpload = event.dataTransfer.files[i];
+            if (!fileToUpload) {
+              console.error(event);
+              throw new Error('Could not extract file from drag event');
             }
-            const url = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file)) || '';
-            console.log(file);
-            console.log(url);
-
             addedNode = DisplayWhiteboardNode.Build({
               ...defaultNodeConfig,
-              title: file.name,
-              fileName: file.name,
-              // pageCount: response.setup.pageCount || 0,
-              // currentIndex: 0,
-              // pages: response.setup.pages || [],
-              // currentLink: (response.setup.pages || [''])[0],
-              // expires: new Date(),
-              file: { file, url },
+              title: fileToUpload.name,
+              fileName: fileToUpload.name,
               author: context.userId,
               editors: [{ id: context.userId }],
+              temporary: { file: fileToUpload },
             });
           }
-
-          // if (response.nodeType === 'table') {
-          //   addedNode = TableWhiteboardNode.Build({
-          //     ...defaultNodeConfig,
-          //     id: response.xid,
-          //     title: '',
-          //     entity: {
-          //       id: '9ebc4871-7135-11ec-a2d9-287fcf6e439d',
-          //     },
-          //   });
-          // }
         } else {
           const dragData = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '') as IWhiteboardNodeDragData;
           if (!dragData) {
@@ -372,33 +352,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
           );
         })
     );
-
-    // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
-    // this.subscriptions.add(
-    //   this.whiteboardFacade.getWebSocketSubjectAsync$
-    //     .pipe(
-    //       switchMap((webSocketSubject$) =>
-    //         combineLatest([
-    //           webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked),
-    //           this.store.select(selectWhiteboardContextState).pipe(take(1)),
-    //         ])
-    //       ),
-    //       filter(([messageData, context]) => messageData.context.userId !== context.userId),
-    //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //       map(([messageData, _context]) => messageData)
-    //     )
-    //     .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) =>
-    //       // Convert incoming message to ngRx Update type
-    //       this.store.dispatch(
-    //         WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
-    //           update: {
-    //             id: messageData.context.nodeId,
-    //             changes: messageData.body,
-    //           } as Update<IWhiteboardNodeBlockUpdate>,
-    //         })
-    //       )
-    //     )
-    // );
 
     // Listen to WHITEBOARD_NODE_PROPERTIES_UPDATED websocket message event
     this.subscriptions.add(

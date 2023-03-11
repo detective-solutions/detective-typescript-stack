@@ -2,7 +2,6 @@ import {
   IDisplayNode,
   IDisplayNodeTemporaryData,
   IDisplayWhiteboardNode,
-  IFileHandle,
   IUser,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
@@ -19,18 +18,17 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public width: number,
     public height: number,
     public locked: boolean,
-    public file: IFileHandle,
     public author: string,
     public editors: IUser[],
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,
-    public pageCount?: number | undefined,
-    public currentIndex?: number | undefined,
-    public pages?: string[] | undefined,
-    public currentLink?: string | undefined,
-    public expires?: Date,
-    public temporary?: IDisplayNodeTemporaryData | undefined
+    public currentFilePageUrl: string | undefined,
+    public currentPageIndex: number | undefined,
+    public filePageUrls: string[] | undefined,
+    public totalPageCount: number | undefined,
+    public expires: Date | undefined,
+    public temporary: IDisplayNodeTemporaryData | undefined
   ) {}
 
   static Build(nodeInput: IDisplayNode): DisplayWhiteboardNode {
@@ -44,16 +42,15 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
         nodeInput.width,
         nodeInput.height,
         nodeInput.locked,
-        nodeInput.file,
         nodeInput.author,
         nodeInput.editors,
         nodeInput.lastUpdatedBy,
         nodeInput.lastUpdated,
         nodeInput.created,
+        nodeInput?.currentFilePageUrl,
+        nodeInput?.currentPageIndex,
+        nodeInput?.filePageUrls,
         nodeInput?.pageCount,
-        nodeInput?.currentIndex,
-        nodeInput?.pages,
-        nodeInput?.currentLink,
         nodeInput?.expires,
         nodeInput?.temporary
       );

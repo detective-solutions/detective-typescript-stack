@@ -1,1 +1,1 @@
-export * from './display-interface';
+export * from './display-occurrence.interface';

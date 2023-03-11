@@ -6,7 +6,7 @@
         <button mat-icon-button (click)="nextPage()">
           <mat-icon fxFlex>keyboard_arrow_up</mat-icon>
         </button>
-        <span fxLayoutAlign="center center">{{ currentIndex + 1 }} of {{ pageCount }}</span>
+        <span fxLayoutAlign="center center">{{ currentPageIndex + 1 }} of {{ totalPageCount }}</span>
         <button mat-icon-button (click)="previousPage()">
           <mat-icon fxFlex>keyboard_arrow_down</mat-icon>
         </button>
@@ -23,10 +23,11 @@
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
     <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
     <node-header [title]="node.title" [isBlocked$]="isBlocked$"></node-header>
-    <img
-      class="page-content"
-      src="{{ currentLink }}"
-      alt="img"
-    />
+    <ng-container *ngIf="isLoading$ | async; else nodeContent">
+      <div class="loading-spinner"></div>
+    </ng-container>
+    <ng-template #nodeContent>
+      <img class="page-content" src="{{ currentFilePageUrl }}" alt="img" />
+    </ng-template>
   </foreignObject>
 </svg:g>

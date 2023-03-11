@@ -2,6 +2,7 @@ import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
   ICasefileForWhiteboard,
+  IDisplayWhiteboardNode,
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
   IUserForWhiteboard,
@@ -175,6 +176,12 @@ export class DatabaseService {
             );
             break;
           }
+          case WhiteboardNodeType.DISPLAY: {
+            setMutations.push(
+              await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
+            );
+            break;
+          }
           case WhiteboardNodeType.EMBEDDING: {
             setMutations.push(
               await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode, index)
@@ -249,6 +256,33 @@ export class DatabaseService {
       [`${userQueryWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
         'Casefile.queries': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
+      },
+    };
+  }
+
+  // TODO: Add unit tests
+  async getDisplayOccurrenceToCasefileMutation(
+    casefileUid: string,
+    displayWhiteboardNode: IDisplayWhiteboardNode,
+    index: number
+  ): Promise<Record<string, any> | null> {
+    const uid = await this.getUidByType(displayWhiteboardNode.id, 'DisplayOccurrence');
+    const basicMutationJson = await this.createBasicNodeInsertMutation(displayWhiteboardNode);
+    return {
+      uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
+      ...basicMutationJson,
+      [`${displayWhiteboardNode.type}.currentFilePageUrl`]: displayWhiteboardNode.currentFilePageUrl,
+      [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
+      // TODO: Add additional node properties
+      [`${displayWhiteboardNode.type}.author`]: {
+        uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
+      },
+      [`${displayWhiteboardNode.type}.entity`]: {
+        uid: (await this.getUidByType(displayWhiteboardNode.entity.id, 'Display')) ?? null,
+      },
+      [`${displayWhiteboardNode.type}.casefile`]: {
+        uid: casefileUid,
+        'Casefile.displays': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
       },
     };
   }

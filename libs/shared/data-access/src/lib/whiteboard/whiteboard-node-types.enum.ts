@@ -3,5 +3,5 @@ export enum WhiteboardNodeType {
   TABLE = 'TableOccurrence',
   USER_QUERY = 'UserQueryOccurrence',
   EMBEDDING = 'Embedding',
-  DISPLAY = 'Display',
+  DISPLAY = 'DisplayOccurrence',
 }
