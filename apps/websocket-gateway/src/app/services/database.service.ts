@@ -177,6 +177,10 @@ export class DatabaseService {
             break;
           }
           case WhiteboardNodeType.DISPLAY: {
+            // TODO: Remove me!
+            console.log('SAVING DISPLAY');
+            console.log(node);
+
             setMutations.push(
               await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
             );
@@ -271,6 +275,8 @@ export class DatabaseService {
     return {
       uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
+      [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
+      [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
       [`${displayWhiteboardNode.type}.currentFilePageUrl`]: displayWhiteboardNode.currentFilePageUrl,
       [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
       // TODO: Add additional node properties
