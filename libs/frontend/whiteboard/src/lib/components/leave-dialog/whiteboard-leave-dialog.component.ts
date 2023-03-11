@@ -16,13 +16,11 @@ export class WhiteboardLeaveDialogComponent {
 
   confirm() {
     this.whiteboardLeaveGuard.confirmed$.next(true);
-    this.whiteboardLeaveGuard.confirmed$.next(null);
     this.dialogRef.close();
   }
 
   cancel() {
     this.whiteboardLeaveGuard.confirmed$.next(false);
-    this.whiteboardLeaveGuard.confirmed$.next(null);
     this.dialogRef.close();
   }
 }

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, first } from 'rxjs';
+import { Observable, Subject, filter } from 'rxjs';
 
 import { CanDeactivate } from '@angular/router';
 import { ComponentCanDeactivate } from '../models/can-deactivate.interface';
@@ -10,7 +10,7 @@ import { WhiteboardLeaveDialogComponent } from '../components/leave-dialog/white
   providedIn: 'root',
 })
 export class WhiteboardLeaveGuard implements CanDeactivate<ComponentCanDeactivate> {
-  confirmed$: BehaviorSubject<boolean | null> = new BehaviorSubject<boolean | null>(null);
+  confirmed$ = new Subject<boolean>();
 
   constructor(private readonly matDialog: MatDialog) {}
 
@@ -18,6 +18,6 @@ export class WhiteboardLeaveGuard implements CanDeactivate<ComponentCanDeactivat
     if (component.canDeactivate()) {
       this.matDialog.open(WhiteboardLeaveDialogComponent);
     }
-    return this.confirmed$.pipe(first((v: boolean | null) => v !== null)) as Observable<boolean>;
+    return this.confirmed$.pipe(filter((v: boolean) => v));
   }
 }
