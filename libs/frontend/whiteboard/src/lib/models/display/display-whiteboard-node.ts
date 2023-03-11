@@ -26,8 +26,8 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public currentFilePageUrl: string | undefined,
     public currentPageIndex: number | undefined,
     public filePageUrls: string[] | undefined,
-    public totalPageCount: number | undefined,
-    public expires: Date | undefined,
+    public pageCount: number | undefined,
+    public expires: string | undefined,
     public temporary: IDisplayNodeTemporaryData | undefined
   ) {}
 

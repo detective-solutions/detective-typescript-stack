@@ -19,6 +19,6 @@ export interface IDisplayOccurrence {
   currentPageIndex?: number;
   filePageUrls?: string[];
   pageCount?: number;
-  expires?: Date;
+  expires?: string;
   entity?: Partial<IDisplay>;
 }

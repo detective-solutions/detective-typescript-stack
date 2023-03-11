@@ -5,12 +5,12 @@ import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Display Node]';
 
-export const LoadDisplayFiles = createAction(
+export const LoadDisplayNodeData = createAction(
   `${actionPrefix} Uploading file to display`,
   props<{ nodeId: string; file: File }>()
 );
 
-export const DisplayFilesReceived = createAction(
-  `${actionPrefix} Received uploaded file`,
+export const DisplayNodeDataReceived = createAction(
+  `${actionPrefix} Received backend information for uploaded file`,
   props<{ update: Update<IDisplayWhiteboardNode> }>()
 );

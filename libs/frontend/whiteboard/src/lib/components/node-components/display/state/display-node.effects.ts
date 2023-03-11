@@ -1,46 +1,48 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { combineLatest, of, switchMap, take, tap } from 'rxjs';
+import { DisplayNodeDataReceived, LoadDisplayNodeData } from './display-node.actions';
+import { exhaustMap, map } from 'rxjs';
 
+import { IUploadResponse } from '../../../../models';
 import { Injectable } from '@angular/core';
-import { LoadDisplayFiles } from './display-node.actions';
-import { Store } from '@ngrx/store';
 import { WhiteboardFacadeService } from '../../../../services';
 import { WhiteboardNodePropertiesUpdated } from '../../../../state/actions/whiteboard-node.actions';
 import { WhiteboardNodeType } from '@detective.solutions/shared/data-access';
 
 @Injectable()
 export class DisplayNodeEffects {
-  readonly loadDisplayFiles$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(LoadDisplayFiles),
-        switchMap((action) =>
-          combineLatest([this.whiteboardFacade.uploadFile(action.file).pipe(take(1)), of(action).pipe(take(1))])
-        ),
-        tap(([response, action]) => {
-          WhiteboardNodePropertiesUpdated({
-            updates: [
-              {
+  readonly loadDisplayFiles$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(LoadDisplayNodeData),
+      exhaustMap((action) =>
+        this.whiteboardFacade.uploadFile(action.file).pipe(
+          map((response: IUploadResponse) =>
+            DisplayNodeDataReceived({
+              update: {
                 id: action.nodeId,
                 changes: {
                   type:
                     response.nodeType.valueOf() === 'Display' ? WhiteboardNodeType.DISPLAY : WhiteboardNodeType.TABLE,
-                  totalPageCount: response.setup.pageCount,
-                  pages: response.setup.pages,
+                  pageCount: response.setup.pageCount,
+                  filePageUrls: response.setup.pages,
                   expires: response.setup.exp,
                 },
               },
-            ],
-          });
-        })
+            })
+          )
+        )
+      )
+    );
+  });
+
+  readonly loadDisplayFilesSuccess$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(DisplayNodeDataReceived),
+        map((action) => WhiteboardNodePropertiesUpdated({ updates: [action.update] }))
       );
     },
     { dispatch: false }
   );
 
-  constructor(
-    private readonly actions$: Actions,
-    private readonly store: Store,
-    private readonly whiteboardFacade: WhiteboardFacadeService
-  ) {}
+  constructor(private readonly actions$: Actions, private readonly whiteboardFacade: WhiteboardFacadeService) {}
 }

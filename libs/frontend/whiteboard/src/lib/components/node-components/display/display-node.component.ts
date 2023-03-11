@@ -3,7 +3,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { IInitialSetup } from '../../../models';
-import { LoadDisplayFiles } from './state';
+import { LoadDisplayNodeData } from './state';
 import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboard-node.actions';
 
 @Component({
@@ -27,12 +27,12 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     return (this.node as IDisplayWhiteboardNode).filePageUrls ?? [];
   }
 
-  get totalPageCount(): number {
+  get pageCount(): number {
     return (this.node as IDisplayWhiteboardNode).entity?.pageCount ?? 0;
   }
 
-  get expires(): Date {
-    return (this.node as IDisplayWhiteboardNode).expires ?? new Date();
+  get expires(): string {
+    return (this.node as IDisplayWhiteboardNode).expires ?? new Date().toISOString();
   }
 
   get fileName(): string {
@@ -51,7 +51,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
       const fileToUpload = (this.node as IDisplayWhiteboardNode).temporary?.file;
       if (fileToUpload) {
         console.log('DEBUG: UPLOADING FILE');
-        this.store.dispatch(LoadDisplayFiles({ nodeId: this.node.id, file: fileToUpload }));
+        this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: fileToUpload }));
       }
     }
 
@@ -86,7 +86,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
 
   checkForExpiry() {
     const expires = (this.node as IDisplayWhiteboardNode).expires;
-    if (expires && expires < new Date()) {
+    if (expires && expires < new Date().toISOString()) {
       return false;
     } else {
       return true;
@@ -127,7 +127,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   // }
 
   setImageLink() {
-    if (this.filePageUrls.length === this.totalPageCount && this.currentPageIndex) {
+    if (this.filePageUrls.length === this.pageCount && this.currentPageIndex) {
       WhiteboardNodePropertiesUpdated({
         updates: [
           {
@@ -154,7 +154,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
 
   nextPage() {
     this.refreshPages();
-    if (this.currentPageIndex < this.totalPageCount - 1) {
+    if (this.currentPageIndex < this.pageCount - 1) {
       WhiteboardNodePropertiesUpdated({
         updates: [{ id: this.node.id, changes: { currentIndex: this.currentPageIndex + 1 } }],
       });
