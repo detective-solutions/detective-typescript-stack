@@ -34,15 +34,12 @@ export class DisplayNodeEffects {
     );
   });
 
-  readonly loadDisplayFilesSuccess$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(DisplayNodeDataReceived),
-        map((action) => WhiteboardNodePropertiesUpdated({ updates: [action.update] }))
-      );
-    },
-    { dispatch: false }
-  );
+  readonly loadDisplayFilesSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(DisplayNodeDataReceived),
+      map((action) => WhiteboardNodePropertiesUpdated({ updates: [action.update] }))
+    );
+  });
 
   constructor(private readonly actions$: Actions, private readonly whiteboardFacade: WhiteboardFacadeService) {}
 }
