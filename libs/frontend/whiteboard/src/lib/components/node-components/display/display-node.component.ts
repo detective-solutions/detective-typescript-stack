@@ -1,7 +1,7 @@
 import { BehaviorSubject, take } from 'rxjs';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { IDisplayNodeTemporaryData, IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
-import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { IInitialSetup } from '../../../models';
 import { LoadDisplayNodeData } from './state';
 import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboard-node.actions';
@@ -39,6 +39,10 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     return (this.node as IDisplayWhiteboardNode).entity?.fileName ?? '';
   }
 
+  get temporaryData(): IDisplayNodeTemporaryData | undefined {
+    return (this.node as IDisplayWhiteboardNode).temporary;
+  }
+
   protected override customOnInit() {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
@@ -46,13 +50,9 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
       )
     );
 
-    const isFileUploaded = this.currentFilePageUrl && this.currentFilePageUrl?.length !== 0;
-    if (!isFileUploaded) {
-      const fileToUpload = (this.node as IDisplayWhiteboardNode).temporary?.file;
-      if (fileToUpload) {
-        console.log('DEBUG: UPLOADING FILE');
-        this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: fileToUpload }));
-      }
+    const localFile = this.temporaryData?.file;
+    if (localFile && (localFile as File).size > 0) {
+      this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: localFile }));
     }
 
     // this.initializeNode();

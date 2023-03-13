@@ -25,6 +25,7 @@ export class DisplayNodeEffects {
                   pageCount: response.setup.pageCount,
                   filePageUrls: response.setup.pages,
                   expires: response.setup.exp,
+                  entity: { id: this.convertStringToUuid(response.xid) },
                 },
               },
             })
@@ -42,4 +43,18 @@ export class DisplayNodeEffects {
   });
 
   constructor(private readonly actions$: Actions, private readonly whiteboardFacade: WhiteboardFacadeService) {}
+
+  private convertStringToUuid(input: string) {
+    return (
+      input.substr(0, 8) +
+      '-' +
+      input.substr(8, 4) +
+      '-' +
+      input.substr(12, 4) +
+      '-' +
+      input.substr(16, 4) +
+      '-' +
+      input.substr(20)
+    );
+  }
 }

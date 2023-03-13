@@ -49,7 +49,7 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
         nodeInput.created,
         nodeInput?.currentFilePageUrl,
         nodeInput?.currentPageIndex,
-        nodeInput?.filePageUrls,
+        nodeInput?.filePageUrls ?? [],
         nodeInput?.pageCount,
         nodeInput?.expires,
         nodeInput?.temporary
