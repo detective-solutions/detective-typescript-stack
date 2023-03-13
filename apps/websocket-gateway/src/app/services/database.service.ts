@@ -177,17 +177,9 @@ export class DatabaseService {
             break;
           }
           case WhiteboardNodeType.DISPLAY: {
-            // TODO: Remove us!
-            console.log('SAVING DISPLAY');
-            console.log(node);
-            console.log('DISPLAY MUTATION');
-            const displayMutation = await this.getDisplayOccurrenceToCasefileMutation(
-              casefileUid,
-              node as IDisplayWhiteboardNode,
-              index
+            setMutations.push(
+              await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
             );
-            console.log(displayMutation);
-            setMutations.push(displayMutation);
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
