@@ -53,6 +53,22 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
+      displays: Casefile.displays {
+        id: DisplayOccurrence.xid
+        title: DisplayOccurrence.title
+        x: DisplayOccurrence.x
+        y: DisplayOccurrence.y
+        width: DisplayOccurrence.width
+        height: DisplayOccurrence.height
+        locked: DisplayOccurrence.locked
+        currentFilePageUrl
+        currentPageIndex
+        filePageUrls
+        expires
+        DisplayOccurrence.entity @normalize {
+          fileName: Display.fileName
+        }
+      }
       embeddings: Casefile.embeddings @normalize {
         id: Embedding.xid
         title: Embedding.title
