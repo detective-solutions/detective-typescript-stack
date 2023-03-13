@@ -199,8 +199,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
               throw new Error('Could not extract file from drag event');
             }
 
-            console.log('FILE TO UPLOAD', fileToUpload); // TODO: Remove me!
-
             addedNode = DisplayWhiteboardNode.Build({
               ...defaultNodeConfig,
               title: fileToUpload.name,
