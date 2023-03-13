@@ -186,6 +186,7 @@ export class DatabaseService {
               node as IDisplayWhiteboardNode,
               index
             );
+            console.log(displayMutation);
             setMutations.push(displayMutation);
             break;
           }
