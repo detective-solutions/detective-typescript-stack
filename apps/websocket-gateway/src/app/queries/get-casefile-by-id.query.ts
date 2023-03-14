@@ -13,7 +13,7 @@ export const getCasefileByIdQuery = `
       id: Casefile.xid
       title: Casefile.title
       description: Casefile.description
-      tables: Casefile.tables {
+      tables: Casefile.tables @normalize {
         id: TableOccurrence.xid
         title: TableOccurrence.title
         x: TableOccurrence.x
@@ -21,7 +21,7 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        TableOccurrence.lastUpdatedBy @normalize {
+        TableOccurrence.lastUpdatedBy {
           lastUpdatedBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
@@ -66,6 +66,7 @@ export const getCasefileByIdQuery = `
         expires: DisplayOccurrence.expires
         DisplayOccurrence.entity {
           fileName: Display.fileName
+          pageCount: Display.pageCount
         }
       }
       embeddings: Casefile.embeddings @normalize {

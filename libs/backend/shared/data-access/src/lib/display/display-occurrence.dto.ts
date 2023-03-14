@@ -1,4 +1,4 @@
-import { IDisplayOccurrence, IUser } from '@detective.solutions/shared/data-access';
+import { IDisplay, IDisplayOccurrence, IUser } from '@detective.solutions/shared/data-access';
 import {
   IsArray,
   IsBoolean,
@@ -77,7 +77,6 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   @IsOptional()
   expires!: string;
 
-  @IsString()
   @IsNotEmpty()
-  fileName!: string;
+  entity!: Partial<IDisplay>;
 }

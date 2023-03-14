@@ -1,4 +1,5 @@
 import {
+  IDisplay,
   IDisplayNode,
   IDisplayNodeTemporaryData,
   IDisplayWhiteboardNode,
@@ -26,6 +27,7 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public filePageUrls: string[] | undefined,
     public pageCount: number | undefined,
     public expires: string | undefined,
+    public entity: Partial<IDisplay> | undefined,
     public temporary: IDisplayNodeTemporaryData | undefined
   ) {}
 
@@ -48,6 +50,7 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
         nodeInput?.filePageUrls ?? [],
         nodeInput?.pageCount,
         nodeInput?.expires,
+        nodeInput.entity,
         nodeInput?.temporary
       );
     } catch (e) {
