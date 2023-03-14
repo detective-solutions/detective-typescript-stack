@@ -61,10 +61,6 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   @IsOptional()
   created!: string;
 
-  @IsString()
-  @IsOptional()
-  currentFilePageUrl!: string;
-
   @IsNumber()
   @IsOptional()
   currentPageIndex!: number;

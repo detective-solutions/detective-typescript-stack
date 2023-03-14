@@ -61,7 +61,6 @@ export const getCasefileByIdQuery = `
         width: DisplayOccurrence.width
         height: DisplayOccurrence.height
         locked: DisplayOccurrence.locked
-        currentFilePageUrl: DisplayOccurrence.currentFilePageUrl
         currentPageIndex: DisplayOccurrence.currentPageIndex
         filePageUrls: DisplayOccurrence.filePageUrls
         expires: DisplayOccurrence.expires

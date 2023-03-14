@@ -14,7 +14,6 @@ export interface IDisplayOccurrence {
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;
-  currentFilePageUrl?: string;
   currentPageIndex?: number;
   filePageUrls?: string[];
   pageCount?: number;

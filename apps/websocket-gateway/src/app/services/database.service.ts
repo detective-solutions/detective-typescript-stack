@@ -280,11 +280,10 @@ export class DatabaseService {
     return {
       uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
       ...basicMutationJson,
-      [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
-      [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
-      [`${displayWhiteboardNode.type}.currentFilePageUrl`]: displayWhiteboardNode.currentFilePageUrl,
       [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
-      // TODO: Add additional node properties
+      [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
+      [`${displayWhiteboardNode.type}.pageCount`]: displayWhiteboardNode.pageCount,
+      [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
       [`${displayWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
       },

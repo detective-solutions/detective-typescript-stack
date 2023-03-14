@@ -21,10 +21,6 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     return (this.node as IDisplayWhiteboardNode).currentPageIndex ?? 0;
   }
 
-  get currentFilePageUrl(): string {
-    return (this.node as IDisplayWhiteboardNode).currentFilePageUrl ?? '';
-  }
-
   get filePageUrls(): string[] {
     return (this.node as IDisplayWhiteboardNode).filePageUrls ?? [];
   }
@@ -58,6 +54,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     if (localFile && (localFile as File).size > 0) {
       this.uploadFile(localFile);
     } else {
+      console.log('IS FILE EXPIRED: ', this.isFileExpired());
       if (this.isFileExpired()) {
         this.refreshPages();
       } else {
@@ -93,11 +90,12 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   private initializeWithExistingImage() {
-    if (this.currentPageIndex && this.filePageUrls.length !== 0) {
+    if (this.filePageUrls.length !== 0) {
       this.currentPageUrl = this.filePageUrls[this.currentPageIndex];
+      this.isLoading$.next(false);
     } else {
       console.error(this.node);
-      throw new Error('Display node is missing current page index or page URLs');
+      throw new Error('Display node is missing page URLs');
     }
   }
 
@@ -120,6 +118,6 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   }
 
   private isFileExpired() {
-    return this.expires && this.expires > new Date().toISOString();
+    return this.expires && this.expires < new Date().toISOString();
   }
 }
