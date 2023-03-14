@@ -1,16 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { IInitialSetup, IUploadResponse } from '../../models';
+import { IDisplaySetupInformation, IUploadResponse } from '../../models';
 
-import { AuthService } from '@detective.solutions/frontend/shared/auth';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@detective.solutions/frontend/shared/environments';
 
 @Injectable()
 export class DisplayService {
-  files: File[] = [];
-
-  constructor(private readonly httpClient: HttpClient, private readonly authService: AuthService) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   getHeaders(): HttpHeaders {
     const headers = new HttpHeaders();
@@ -18,8 +15,8 @@ export class DisplayService {
     return headers;
   }
 
-  requestPresignedURL(xid: string, fileName: string): Observable<IInitialSetup> {
-    return this.httpClient.post<IInitialSetup>(
+  requestPresignedURL(xid: string, fileName: string): Observable<IDisplaySetupInformation> {
+    return this.httpClient.post<IDisplaySetupInformation>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiAccessV1}`,
       { xid: xid, fileName: fileName },
       { headers: this.getHeaders() }
