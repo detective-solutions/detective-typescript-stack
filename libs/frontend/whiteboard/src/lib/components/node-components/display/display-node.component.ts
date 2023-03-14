@@ -2,7 +2,7 @@ import { BehaviorSubject, take } from 'rxjs';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { IDisplayNodeTemporaryData, IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
-import { IInitialSetup } from '../../../models';
+import { IDisplaySetupInformation } from '../../../models';
 import { LoadDisplayNodeData } from './state';
 import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboard-node.actions';
 
@@ -14,6 +14,8 @@ import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboa
 })
 export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   isLoading$ = new BehaviorSubject<boolean>(true);
+
+  currentPageUrl!: string;
 
   get currentPageIndex(): number {
     return (this.node as IDisplayWhiteboardNode).currentPageIndex ?? 0;
@@ -46,119 +48,78 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
   protected override customOnInit() {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
-        WhiteboardNodePropertiesUpdated({ updates: [{ id: this.node.id, changes: { title: updatedTitle } }] })
+        this.store.dispatch(
+          WhiteboardNodePropertiesUpdated({ updates: [{ id: this.node.id, changes: { title: updatedTitle } }] })
+        )
       )
     );
 
     const localFile = this.temporaryData?.file;
     if (localFile && (localFile as File).size > 0) {
-      this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: localFile }));
-    }
-
-    // this.initializeNode();
-    // this.setCurrentNodeValues();
-    // this.refreshPages();
-  }
-
-  private initializeNode() {
-    // this.whiteboardFacade
-    //   .uploadFile((this.node as IDisplayWhiteboardNode).file)
-    //   .pipe(take(1))
-    //   .subscribe((response: UploadResponse) => {
-    //     this.isInitialized = true;
-    //     console.log('UPLOAD RESPONSE: ', response);
-    //   });
-  }
-
-  refreshPages() {
-    if (!this.checkForExpiry()) {
-      this.whiteboardFacade
-        .getDisplayLocation(this.node.id, this.fileName)
-        .pipe(take(1))
-        .subscribe((response: IInitialSetup) => {
-          (this.node as IDisplayWhiteboardNode).filePageUrls = response.pages ?? [''];
-          // (this.node as IDisplayWhiteboardNode).entity?.pageCount = response.pageCount ?? 0;
-          // this.setExpiry(response.exp ?? '');
-          this.setImageLink();
-        });
-    }
-  }
-
-  checkForExpiry() {
-    const expires = (this.node as IDisplayWhiteboardNode).expires;
-    if (expires && expires < new Date().toISOString()) {
-      return false;
+      this.uploadFile(localFile);
     } else {
-      return true;
-    }
-  }
-
-  setCurrentNodeValues() {
-    // this.currentIndex = (this.node as IDisplayWhiteboardNode).currentIndex;
-    // this.pages = (this.node as IDisplayWhiteboardNode).pages;
-    // this.fileName = (this.node as IDisplayWhiteboardNode).fileName;
-    // this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
-    // this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
-    // this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
-    // this.expires = (this.node as IDisplayWhiteboardNode).expires;
-  }
-
-  // setExpiry(date: string) {
-  //   const year = parseInt(date.slice(0, 4));
-  //   const month = parseInt(date.slice(5, 7));
-  //   const day = parseInt(date.slice(8, 10));
-  //   const hours = parseInt(date.slice(11, 13));
-  //   const minutes = parseInt(date.slice(14, 16));
-  //   const seconds = parseInt(date.slice(17, 19));
-
-  //   this.expires = new Date(year, month, day, hours, minutes, seconds);
-  //   this.store.dispatch(
-  //     WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
-  //       updates: [
-  //         {
-  //           id: this.node.id,
-  //           changes: {
-  //             expires: this.expires,
-  //           },
-  //         },
-  //       ],
-  //     })
-  //   );
-  // }
-
-  setImageLink() {
-    if (this.filePageUrls.length === this.pageCount && this.currentPageIndex) {
-      WhiteboardNodePropertiesUpdated({
-        updates: [
-          {
-            id: this.node.id,
-            changes: {
-              currentIndex: this.currentPageIndex,
-              currentLink: this.filePageUrls[this.currentPageIndex],
-            },
-          },
-        ],
-      });
+      if (this.isFileExpired()) {
+        this.refreshPages();
+      } else {
+        this.initializeWithExistingImage();
+      }
     }
   }
 
   previousPage() {
     this.refreshPages();
     if (this.currentPageIndex > 0) {
-      WhiteboardNodePropertiesUpdated({
-        updates: [{ id: this.node.id, changes: { currentIndex: this.currentPageIndex - 1 } }],
-      });
-      this.setImageLink();
+      this.store.dispatch(
+        WhiteboardNodePropertiesUpdated({
+          updates: [{ id: this.node.id, changes: { currentPageIndex: this.currentPageIndex - 1 } }],
+        })
+      );
     }
   }
 
   nextPage() {
     this.refreshPages();
     if (this.currentPageIndex < this.pageCount - 1) {
-      WhiteboardNodePropertiesUpdated({
-        updates: [{ id: this.node.id, changes: { currentIndex: this.currentPageIndex + 1 } }],
-      });
-      this.setImageLink();
+      this.store.dispatch(
+        WhiteboardNodePropertiesUpdated({
+          updates: [{ id: this.node.id, changes: { currentPageIndex: this.currentPageIndex + 1 } }],
+        })
+      );
     }
+  }
+
+  private uploadFile(localFile: File) {
+    this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: localFile }));
+  }
+
+  private initializeWithExistingImage() {
+    if (this.currentPageIndex && this.filePageUrls.length !== 0) {
+      this.currentPageUrl = this.filePageUrls[this.currentPageIndex];
+    } else {
+      console.error(this.node);
+      throw new Error('Display node is missing current page index or page URLs');
+    }
+  }
+
+  private refreshPages() {
+    this.whiteboardFacade
+      .getDisplayLocation(this.node.id, this.fileName)
+      .pipe(take(1))
+      .subscribe((response: IDisplaySetupInformation) =>
+        this.store.dispatch(
+          WhiteboardNodePropertiesUpdated({
+            updates: [
+              {
+                id: this.node.id,
+                changes: { filePageUrls: response.pages, pageCount: response.pageCount, expires: response.exp },
+              },
+            ],
+          })
+        )
+      );
+  }
+
+  private isFileExpired() {
+    return this.expires && this.expires > new Date().toISOString();
   }
 }

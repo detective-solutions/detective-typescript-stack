@@ -8,7 +8,7 @@ import {
   WebSocketService,
   WhiteboardSelectionService,
 } from './internal-services';
-import { ForceDirectedGraph, IInitialSetup, IUploadResponse, Link, NodeComponent } from '../models';
+import { ForceDirectedGraph, IDisplaySetupInformation, IUploadResponse, Link, NodeComponent } from '../models';
 import { Observable, combineLatest, map, of } from 'rxjs';
 import { WhiteboardGeneralActions, selectAllWhiteboardNodes } from '../state';
 
@@ -88,7 +88,7 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
-  getDisplayLocation(xid: string, fileName: string): Observable<IInitialSetup> {
+  getDisplayLocation(xid: string, fileName: string): Observable<IDisplaySetupInformation> {
     return this.displayService.requestPresignedURL(xid, fileName);
   }
 
