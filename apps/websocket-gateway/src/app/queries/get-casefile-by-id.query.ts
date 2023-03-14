@@ -61,10 +61,10 @@ export const getCasefileByIdQuery = `
         width: DisplayOccurrence.width
         height: DisplayOccurrence.height
         locked: DisplayOccurrence.locked
-        currentFilePageUrl
-        currentPageIndex
-        filePageUrls
-        expires
+        currentFilePageUrl: DisplayOccurrence.currentFilePageUrl
+        currentPageIndex: DisplayOccurrence.currentPageIndex
+        filePageUrls: DisplayOccurrence.filePageUrls
+        expires: DisplayOccurrence.expires
         DisplayOccurrence.entity @normalize {
           fileName: Display.fileName
         }
