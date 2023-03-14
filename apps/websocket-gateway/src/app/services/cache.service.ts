@@ -182,9 +182,6 @@ export class CacheService {
           // Update regular property
           correspondingCachedNode[propertyToUpdate] = updateValue;
         }
-
-        this.logger.debug('Sending updated node to cache:');
-        this.logger.debug(correspondingCachedNode);
       }
     }
 
