@@ -87,6 +87,11 @@ export class DatabaseService {
               return { ...node, type: WhiteboardNodeType.USER_QUERY };
             }) as AnyWhiteboardNode[])
           : []),
+        ...(casefileData.displays
+          ? (casefileData?.displays?.map((node) => {
+              return { ...node, type: WhiteboardNodeType.DISPLAY };
+            }) as AnyWhiteboardNode[])
+          : []),
         ...(casefileData.embeddings
           ? (casefileData?.embeddings?.map((node) => {
               return { ...node, type: WhiteboardNodeType.EMBEDDING };
