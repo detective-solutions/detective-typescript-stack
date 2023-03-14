@@ -1,4 +1,4 @@
-import { IDisplay, IDisplayOccurrence, IUser } from '@detective.solutions/shared/data-access';
+import { IDisplayOccurrence, IUser } from '@detective.solutions/shared/data-access';
 import {
   IsArray,
   IsBoolean,
@@ -42,7 +42,7 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   locked!: boolean;
 
   @IsUUID()
-  @IsNotEmpty()
+  @IsOptional()
   author!: string;
 
   @IsArray()
@@ -54,11 +54,11 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   lastUpdatedBy!: string;
 
   @IsDateString()
-  @IsNotEmpty()
+  @IsOptional()
   lastUpdated!: string;
 
   @IsDateString()
-  @IsNotEmpty()
+  @IsOptional()
   created!: string;
 
   @IsString()
@@ -81,6 +81,7 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   @IsOptional()
   expires!: string;
 
+  @IsString()
   @IsNotEmpty()
-  entity!: IDisplay;
+  fileName!: string;
 }
