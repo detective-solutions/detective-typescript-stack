@@ -22,7 +22,7 @@ export const getCasefileByIdQuery = `
         height: TableOccurrence.height
         locked: TableOccurrence.locked
         TableOccurrence.lastUpdatedBy @normalize {
-          lastUpdateBy: User.xid
+          lastUpdatedBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
@@ -32,7 +32,7 @@ export const getCasefileByIdQuery = `
           description: Table.description
         }
       }
-      queries: Casefile.queries {
+      queries: Casefile.queries @normalize {
         id: UserQueryOccurrence.xid
         name: UserQueryOccurrence.name
         x: UserQueryOccurrence.x
@@ -40,10 +40,10 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
-        UserQueryOccurrence.author @normalize {
+        UserQueryOccurrence.author {
           author: User.xid
         }
-        UserQueryOccurrence.lastUpdatedBy @normalize {
+        UserQueryOccurrence.lastUpdatedBy {
           lastUpdatedBy: User.xid
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
@@ -53,7 +53,7 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
-      displays: Casefile.displays {
+      displays: Casefile.displays @normalize {
         id: DisplayOccurrence.xid
         title: DisplayOccurrence.title
         x: DisplayOccurrence.x
@@ -65,7 +65,7 @@ export const getCasefileByIdQuery = `
         currentPageIndex: DisplayOccurrence.currentPageIndex
         filePageUrls: DisplayOccurrence.filePageUrls
         expires: DisplayOccurrence.expires
-        DisplayOccurrence.entity @normalize {
+        DisplayOccurrence.entity {
           fileName: Display.fileName
         }
       }
