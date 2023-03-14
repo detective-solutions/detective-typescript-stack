@@ -202,7 +202,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
             addedNode = DisplayWhiteboardNode.Build({
               ...defaultNodeConfig,
               title: fileToUpload.name,
-              fileName: fileToUpload.name,
               author: context.userId,
               editors: [{ id: context.userId }],
               temporary: { file: fileToUpload },

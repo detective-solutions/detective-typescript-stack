@@ -54,6 +54,7 @@ describe('DatabaseService', () => {
       description: 'test',
       tables: [],
       queries: [],
+      displays: [],
       embeddings: [],
     };
 

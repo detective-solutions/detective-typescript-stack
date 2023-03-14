@@ -265,7 +265,6 @@ export class DatabaseService {
     };
   }
 
-  // TODO: Add unit tests
   async getDisplayOccurrenceToCasefileMutation(
     casefileUid: string,
     displayWhiteboardNode: IDisplayWhiteboardNode,

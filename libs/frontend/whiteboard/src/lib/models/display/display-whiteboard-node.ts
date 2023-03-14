@@ -12,7 +12,6 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
   constructor(
     public id: string,
     public title: string,
-    public fileName: string,
     public x: number,
     public y: number,
     public width: number,
@@ -36,7 +35,6 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
       return new DisplayWhiteboardNode(
         nodeInput.id,
         nodeInput.title,
-        nodeInput.fileName,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,

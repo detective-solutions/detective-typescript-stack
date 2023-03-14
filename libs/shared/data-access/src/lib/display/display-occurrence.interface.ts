@@ -4,7 +4,6 @@ import { IUser } from '../user';
 export interface IDisplayOccurrence {
   id: string;
   title: string;
-  fileName: string;
   x: number;
   y: number;
   width: number;
