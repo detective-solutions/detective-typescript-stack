@@ -1,5 +1,6 @@
 import {
   ICasefile,
+  IDisplayOccurrence,
   IEmbedding,
   ITableOccurrence,
   IUser,
@@ -24,6 +25,7 @@ export class CasefileDTO implements ICasefile {
     public created: string,
     public tables: ITableOccurrence[],
     public queries: IUserQueryOccurrence[],
+    public displays: IDisplayOccurrence[],
     public embeddings: IEmbedding[]
   ) {}
 
@@ -41,6 +43,7 @@ export class CasefileDTO implements ICasefile {
       casefileInput.created,
       casefileInput.tables,
       casefileInput.queries,
+      casefileInput.displays,
       casefileInput.embeddings
     );
   }
