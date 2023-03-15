@@ -22,7 +22,7 @@ export class DisplayNodeEffects {
                 changes: {
                   type:
                     response.nodeType.valueOf() === 'Display' ? WhiteboardNodeType.DISPLAY : WhiteboardNodeType.TABLE,
-                  pageCount: response.setup.pageCount,
+                  pageCount: Number(response.setup.pageCount),
                   filePageUrls: response.setup.pages,
                   expires: response.setup.exp,
                   entity: { id: this.convertStringToUuid(response.xid) },
