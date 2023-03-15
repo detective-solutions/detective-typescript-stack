@@ -187,9 +187,16 @@ export class DatabaseService {
             break;
           }
           case WhiteboardNodeType.DISPLAY: {
-            setMutations.push(
-              await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
+            const displayMutation = await this.getDisplayOccurrenceToCasefileMutation(
+              casefileUid,
+              node as IDisplayWhiteboardNode,
+              index
             );
+            // TODO: Remove me!
+            this.logger.debug('DISPLAY MUTATION');
+            this.logger.debug(displayMutation);
+
+            setMutations.push(displayMutation);
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
@@ -282,7 +289,7 @@ export class DatabaseService {
       ...basicMutationJson,
       [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
       [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
-      [`${displayWhiteboardNode.type}.pageCount`]: displayWhiteboardNode.pageCount,
+      [`${displayWhiteboardNode.type}.pageCount`]: Number(displayWhiteboardNode.pageCount),
       [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
       [`${displayWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
