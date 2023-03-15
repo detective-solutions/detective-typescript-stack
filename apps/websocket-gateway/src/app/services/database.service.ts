@@ -94,7 +94,7 @@ export class DatabaseService {
           : []),
         ...(casefileData.displays
           ? (casefileData?.displays?.map((node) => {
-              return { ...node, type: WhiteboardNodeType.DISPLAY };
+              return { ...node, pageCount: Number(node.pageCount), type: WhiteboardNodeType.DISPLAY };
             }) as AnyWhiteboardNode[])
           : []),
         ...(casefileData.embeddings
