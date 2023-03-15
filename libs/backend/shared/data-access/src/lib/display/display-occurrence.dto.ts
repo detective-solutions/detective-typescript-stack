@@ -77,6 +77,7 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
   @IsOptional()
   expires!: string;
 
-  @IsNotEmpty()
+  // TODO: Add nested validation for Display
+  @IsOptional()
   entity!: Partial<IDisplay>;
 }
