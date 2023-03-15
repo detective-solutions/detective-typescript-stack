@@ -14,7 +14,6 @@ import { Test } from '@nestjs/testing';
 import { TransactionServiceRefs } from '../models';
 import { WhiteboardNodeAddedTransaction } from './whiteboard-node-added.transaction';
 import { WhiteboardWebSocketGateway } from '../websocket';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
@@ -46,8 +45,8 @@ const testMessageBody: ITableWhiteboardNode = {
   height: 1,
   locked: false,
   lastUpdatedBy: uuidv4(),
-  lastUpdated: formatDate(new Date()),
-  created: formatDate(new Date()),
+  lastUpdated: new Date().toISOString(),
+  created: new Date().toISOString(),
   entity: { id: uuidv4() } as ITable,
   type: WhiteboardNodeType.TABLE,
 };

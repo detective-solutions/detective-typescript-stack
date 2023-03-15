@@ -28,7 +28,6 @@ import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableExc
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
 import { UserForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -376,7 +375,7 @@ export class DatabaseService {
       [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
         uid: (await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User')) ?? null,
       },
-      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated ?? formatDate(new Date()),
+      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated ?? new Date().toISOString(),
       [`${addedWhiteboardNode.type}.created`]: addedWhiteboardNode.created,
       'dgraph.type': addedWhiteboardNode.type,
     };

@@ -59,7 +59,6 @@ import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -169,7 +168,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((context: IWhiteboardContextState) => {
-        const now = formatDate(new Date());
+        const now = new Date().toISOString();
         const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
         const defaultMargin = 50;
 
