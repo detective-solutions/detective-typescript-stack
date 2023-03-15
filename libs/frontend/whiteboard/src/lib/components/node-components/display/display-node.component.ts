@@ -109,7 +109,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
             updates: [
               {
                 id: this.node.id,
-                changes: { filePageUrls: response.pages, pageCount: Number(response.pageCount), expires: response.exp },
+                changes: { filePageUrls: response.pages, pageCount: response.pageCount, expires: response.exp },
               },
             ],
           })

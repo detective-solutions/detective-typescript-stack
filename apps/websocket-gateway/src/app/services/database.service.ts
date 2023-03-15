@@ -94,7 +94,7 @@ export class DatabaseService {
           : []),
         ...(casefileData.displays
           ? (casefileData?.displays?.map((node) => {
-              return { ...node, pageCount: Number(node.pageCount), type: WhiteboardNodeType.DISPLAY };
+              return { ...node, type: WhiteboardNodeType.DISPLAY };
             }) as AnyWhiteboardNode[])
           : []),
         ...(casefileData.embeddings
@@ -289,7 +289,7 @@ export class DatabaseService {
       ...basicMutationJson,
       [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
       [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
-      [`${displayWhiteboardNode.type}.pageCount`]: Number(displayWhiteboardNode.pageCount),
+      [`${displayWhiteboardNode.type}.pageCount`]: displayWhiteboardNode.pageCount,
       [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
       [`${displayWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
