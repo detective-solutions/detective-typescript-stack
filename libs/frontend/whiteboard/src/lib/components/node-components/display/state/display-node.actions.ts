@@ -1,6 +1,6 @@
+import { IDisplayWhiteboardNode, ITableWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { createAction, props } from '@ngrx/store';
 
-import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Display Node]';
@@ -12,5 +12,5 @@ export const LoadDisplayNodeData = createAction(
 
 export const DisplayNodeDataReceived = createAction(
   `${actionPrefix} Received backend information for uploaded file`,
-  props<{ update: Update<IDisplayWhiteboardNode> }>()
+  props<{ update: Update<IDisplayWhiteboardNode | ITableWhiteboardNode> }>()
 );

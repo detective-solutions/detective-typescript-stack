@@ -7,7 +7,7 @@ export interface IEmbedding {
   height: number;
   locked: boolean;
   author: string;
-  editors?: string[];
+  editors: { id: string }[];
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;

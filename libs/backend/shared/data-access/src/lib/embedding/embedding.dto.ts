@@ -36,8 +36,7 @@ export class EmbeddingDTO implements IEmbedding {
   @IsNotEmpty()
   author!: string;
 
-  // TODO: Add validation
-  editors!: string[];
+  editors!: { id: string }[];
 
   @IsUUID()
   @IsOptional()

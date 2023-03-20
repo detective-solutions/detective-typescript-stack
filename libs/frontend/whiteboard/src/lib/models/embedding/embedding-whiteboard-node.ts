@@ -17,7 +17,7 @@ export class EmbeddingWhiteboardNode implements IEmbeddingWhiteboardNode {
     public height: number,
     public locked: boolean,
     public author: string,
-    public editors: string[] | undefined,
+    public editors: { id: string }[],
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,

@@ -25,7 +25,7 @@ export class DisplayNodeEffects {
                   pageCount: response.setup.pageCount,
                   filePageUrls: response.setup.pages,
                   expires: response.setup.exp,
-                  entity: { id: this.convertStringToUuid(response.xid) },
+                  entity: { id: this.convertStringToUuid(response.xid), baseQuery: response.setup.query ?? undefined },
                 },
               },
             })

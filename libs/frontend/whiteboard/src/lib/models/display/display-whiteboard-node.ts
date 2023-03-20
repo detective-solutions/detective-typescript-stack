@@ -3,7 +3,6 @@ import {
   IDisplayNode,
   IDisplayNodeTemporaryData,
   IDisplayWhiteboardNode,
-  IUser,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
@@ -19,7 +18,7 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
     public height: number,
     public locked: boolean,
     public author: string,
-    public editors: IUser[],
+    public editors: { id: string }[],
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,

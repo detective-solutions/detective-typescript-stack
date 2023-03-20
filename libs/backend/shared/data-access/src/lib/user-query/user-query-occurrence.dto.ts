@@ -36,7 +36,7 @@ export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
   author!: string;
 
   @IsNotEmpty()
-  editors!: IUser[];
+  editors!: { id: string }[];
 
   @IsUUID()
   @IsOptional()

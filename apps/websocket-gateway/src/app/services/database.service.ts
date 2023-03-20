@@ -68,10 +68,6 @@ export class DatabaseService {
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response[getCasefileByIdQueryName][0] as ICasefileForWhiteboard;
 
-    // TODO: Remove me!
-    this.logger.debug('CASEFILE DATA:');
-    this.logger.debug(casefileData);
-
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
     // Convert ICasefileForWhiteboard to ICachableCasefileForWhiteboard
@@ -293,6 +289,11 @@ export class DatabaseService {
       [`${displayWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
       },
+      [`${displayWhiteboardNode.type}.editors`]: displayWhiteboardNode.editors.map(async (editor: { id: string }) => {
+        return {
+          uid: (await this.getUidByType(editor.id, 'User')) ?? null,
+        };
+      }),
       [`${displayWhiteboardNode.type}.entity`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.entity?.id, 'Display')) ?? null,
       },

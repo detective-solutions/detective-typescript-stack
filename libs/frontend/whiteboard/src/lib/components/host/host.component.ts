@@ -228,7 +228,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
                 ...defaultNodeConfig,
                 title: '',
                 author: context.userId,
-                editors: [context.userId],
+                editors: [{ id: context.userId }],
               });
               break;
             }

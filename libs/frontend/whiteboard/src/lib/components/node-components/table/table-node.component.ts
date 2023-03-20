@@ -1,12 +1,18 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { IMessage, ITableNodeTemporaryData, MessageEventType } from '@detective.solutions/shared/data-access';
+import {
+  IMessage,
+  ITableNode,
+  ITableNodeTemporaryData,
+  ITableWhiteboardNode,
+  MessageEventType,
+} from '@detective.solutions/shared/data-access';
+import { LoadTableData, LoadTableEntityData, TableDataReceived } from './state';
 import { filter, map, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
 import { CustomLoadingOverlayComponent } from './components';
 import { GridOptions } from 'ag-grid-community';
 import { IQueryResponse as IQueryResponseBody } from './models';
-import { TableNodeActions } from './state';
 import { WhiteboardNodeActions } from '../../../state';
 
 @Component({
@@ -33,6 +39,14 @@ export class TableNodeComponent extends BaseNodeComponent {
     loadingOverlayComponentParams: { loadingMessage: 'Data is loading...' },
   };
 
+  get entityId(): string {
+    return (this.node as ITableWhiteboardNode).entity.id ?? '';
+  }
+
+  get baseQuery(): string {
+    return (this.node as ITableWhiteboardNode).entity.baseQuery ?? '';
+  }
+
   protected override customOnInit() {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
@@ -54,7 +68,7 @@ export class TableNodeComponent extends BaseNodeComponent {
         )
         .subscribe((messageData: IQueryResponseBody) => {
           this.store.dispatch(
-            TableNodeActions.TableDataReceived({
+            TableDataReceived({
               update: {
                 id: this.node.id,
                 changes: { temporary: { colDefs: messageData.tableSchema, rowData: messageData.tableData } },
@@ -64,12 +78,16 @@ export class TableNodeComponent extends BaseNodeComponent {
         })
     );
 
-    // const isTemporaryTableDataAvailable =
-    //   !(this.node as ITableNode).temporary?.colDefs || !(this.node as ITableNode).temporary?.rowData;
-    // if (isTemporaryTableDataAvailable) {
-    //   // It is mandatory to create a deep copy of the node object, because it will be set to read-only
-    //   // when it is handled by the state mechanism
-    //   this.store.dispatch(TableNodeActions.LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
-    // }
+    const isTemporaryTableDataAvailable =
+      (this.node as ITableNode).temporary?.colDefs || (this.node as ITableNode).temporary?.rowData;
+    if (!isTemporaryTableDataAvailable) {
+      // It is mandatory to create a deep copy of the node object, because it will be set to read-only
+      // when it is handled by the state mechanism
+      if (this.baseQuery) {
+        this.store.dispatch(LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
+      } else {
+        this.store.dispatch(LoadTableEntityData({ entityId: this.entityId }));
+      }
+    }
   }
 }

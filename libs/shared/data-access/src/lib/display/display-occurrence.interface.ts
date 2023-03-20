@@ -1,5 +1,4 @@
 import { IDisplay } from './display.interface';
-import { IUser } from '../user';
 
 export interface IDisplayOccurrence {
   id: string;
@@ -10,7 +9,7 @@ export interface IDisplayOccurrence {
   height: number;
   locked: boolean;
   author: string;
-  editors: IUser[];
+  editors: { id: string }[];
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;

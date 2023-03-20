@@ -14,9 +14,9 @@ export interface ICasefile {
   displays: IDisplayOccurrence[];
   embeddings: IEmbedding[];
   views: number;
-  author: IUser;
-  editors: IUser[];
-  lastUpdatedBy: IUser;
+  author: Partial<IUser>;
+  editors: Partial<IUser>[];
+  lastUpdatedBy: Partial<IUser>;
   lastUpdated: string;
   created: string;
 }

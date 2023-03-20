@@ -283,6 +283,7 @@ describe('DatabaseService', () => {
   });
 
   describe('saveCasefile', () => {
+    const userId = uuidv4();
     const cachedCasefile: ICachableCasefileForWhiteboard = {
       id: uuidv4(),
       title: 'testCasefile',
@@ -297,8 +298,9 @@ describe('DatabaseService', () => {
           height: 100,
           x: 100,
           y: 100,
-          author: uuidv4(),
-          lastUpdatedBy: uuidv4(),
+          author: userId,
+          editors: [{ id: userId }],
+          lastUpdatedBy: userId,
           created: new Date().toISOString(),
           lastUpdated: new Date().toISOString(),
         },
@@ -333,8 +335,9 @@ describe('DatabaseService', () => {
           height: 100,
           x: 100,
           y: 100,
-          author: uuidv4(),
-          lastUpdatedBy: uuidv4(),
+          author: userId,
+          editors: [{ id: userId }],
+          lastUpdatedBy: userId,
           created: new Date().toISOString(),
           lastUpdated: new Date().toISOString(),
         },

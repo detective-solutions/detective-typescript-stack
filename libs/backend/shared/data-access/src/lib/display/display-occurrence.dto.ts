@@ -47,7 +47,7 @@ export class DisplayOccurrenceDTO implements IDisplayOccurrence {
 
   @IsArray()
   @IsOptional()
-  editors!: IUser[];
+  editors!: { id: string }[];
 
   @IsUUID()
   @IsOptional()
