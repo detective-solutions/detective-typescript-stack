@@ -83,11 +83,7 @@ export class TableNodeComponent extends BaseNodeComponent {
     if (!isTemporaryTableDataAvailable) {
       // It is mandatory to create a deep copy of the node object, because it will be set to read-only
       // when it is handled by the state mechanism
-      if (this.baseQuery) {
-        this.store.dispatch(LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
-      } else {
-        this.store.dispatch(LoadTableEntityData({ entityId: this.entityId }));
-      }
+      this.store.dispatch(LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
     }
   }
 }

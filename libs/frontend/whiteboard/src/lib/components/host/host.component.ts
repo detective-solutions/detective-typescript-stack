@@ -219,6 +219,7 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
                 title: dragData.title,
                 entity: {
                   id: dragData.entityId,
+                  baseQuery: dragData.baseQuery,
                 },
               });
               break;

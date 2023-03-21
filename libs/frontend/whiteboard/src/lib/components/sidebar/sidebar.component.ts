@@ -23,6 +23,7 @@ import { selectWhiteboardContextState } from '../../state';
 interface IAssetsMenuTable {
   id: string;
   name: string;
+  baseQuery: string;
   iconSrc: string;
 }
 
@@ -74,6 +75,7 @@ export class SidebarComponent implements OnInit {
           type: WhiteboardNodeType.TABLE,
           entityId: isTable.nativeElement.dataset.entityId,
           title: isTable.nativeElement.dataset.name,
+          baseQuery: isTable.nativeElement.dataset.query,
         })
       );
       return;
