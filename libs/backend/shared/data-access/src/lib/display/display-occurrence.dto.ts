@@ -1,4 +1,4 @@
-import { IDisplay, IDisplayOccurrence, IUser } from '@detective.solutions/shared/data-access';
+import { IDisplay, IDisplayOccurrence } from '@detective.solutions/shared/data-access';
 import {
   IsArray,
   IsBoolean,

@@ -1,4 +1,4 @@
-import { IUser, IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
+import { IUserQuery, IUserQueryOccurrence } from '@detective.solutions/shared/data-access';
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UserQueryOccurrenceDTO implements IUserQueryOccurrence {
