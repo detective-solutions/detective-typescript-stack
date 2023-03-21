@@ -173,6 +173,9 @@ export class DatabaseService {
             setMutations.push(
               await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode, index)
             );
+            // TODO: Remove me!
+            console.log('MUTATIONS');
+            console.log(setMutations);
             break;
           }
           case WhiteboardNodeType.USER_QUERY: {
