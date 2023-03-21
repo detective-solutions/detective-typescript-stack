@@ -13,7 +13,7 @@ export const getCasefileByIdQuery = `
       id: Casefile.xid
       title: Casefile.title
       description: Casefile.description
-      tables: Casefile.tables @normalize {
+      tables: Casefile.tables {
         id: TableOccurrence.xid
         title: TableOccurrence.title
         x: TableOccurrence.x
@@ -21,7 +21,7 @@ export const getCasefileByIdQuery = `
         width: TableOccurrence.width
         height: TableOccurrence.height
         locked: TableOccurrence.locked
-        TableOccurrence.lastUpdatedBy {
+        TableOccurrence.lastUpdatedBy @normalize {
           lastUpdatedBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
@@ -29,10 +29,10 @@ export const getCasefileByIdQuery = `
         entity: TableOccurrence.entity {
           id: Table.xid
           name: Table.name
-          description: Table.description
+          baseQuery: Table.baseQuery
         }
       }
-      queries: Casefile.queries @normalize {
+      queries: Casefile.queries {
         id: UserQueryOccurrence.xid
         name: UserQueryOccurrence.name
         x: UserQueryOccurrence.x
@@ -40,10 +40,10 @@ export const getCasefileByIdQuery = `
         width: UserQueryOccurrence.width
         height: UserQueryOccurrence.height
         locked: UserQueryOccurrence.locked
-        UserQueryOccurrence.author {
+        UserQueryOccurrence.author @normalize {
           author: User.xid
         }
-        UserQueryOccurrence.lastUpdatedBy {
+        UserQueryOccurrence.lastUpdatedBy @normalize {
           lastUpdatedBy: User.xid
         }
         lastUpdated: UserQueryOccurrence.lastUpdated
@@ -53,7 +53,7 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
-      displays: Casefile.displays @normalize {
+      displays: Casefile.displays {
         id: DisplayOccurrence.xid
         title: DisplayOccurrence.title
         x: DisplayOccurrence.x
@@ -77,7 +77,7 @@ export const getCasefileByIdQuery = `
           pageCount: Display.pageCount
         }
       }
-      embeddings: Casefile.embeddings @normalize {
+      embeddings: Casefile.embeddings {
         id: Embedding.xid
         title: Embedding.title
         x: Embedding.x
@@ -85,10 +85,10 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        Embedding.author {
+        Embedding.author @normalize {
           author: User.xid
         }
-        Embedding.lastUpdatedBy {
+        Embedding.lastUpdatedBy @normalize {
           lastUpdatedBy: User.xid
         }
         lastUpdated: Embedding.lastUpdated
