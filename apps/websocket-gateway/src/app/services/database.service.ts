@@ -173,9 +173,6 @@ export class DatabaseService {
             setMutations.push(
               await this.getTableOccurrenceToCasefileMutation(casefileUid, node as ITableWhiteboardNode, index)
             );
-            // TODO: Remove me!
-            console.log('MUTATIONS');
-            console.log(setMutations);
             break;
           }
           case WhiteboardNodeType.USER_QUERY: {
@@ -185,16 +182,9 @@ export class DatabaseService {
             break;
           }
           case WhiteboardNodeType.DISPLAY: {
-            const displayMutation = await this.getDisplayOccurrenceToCasefileMutation(
-              casefileUid,
-              node as IDisplayWhiteboardNode,
-              index
+            setMutations.push(
+              await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
             );
-            // TODO: Remove me!
-            this.logger.debug('DISPLAY MUTATION');
-            this.logger.debug(displayMutation);
-
-            setMutations.push(displayMutation);
             break;
           }
           case WhiteboardNodeType.EMBEDDING: {
