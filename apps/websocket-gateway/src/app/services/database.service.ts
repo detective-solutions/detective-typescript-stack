@@ -277,7 +277,6 @@ export class DatabaseService {
       ...basicMutationJson,
       [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
       [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
-      [`${displayWhiteboardNode.type}.pageCount`]: displayWhiteboardNode.pageCount,
       [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
       [`${displayWhiteboardNode.type}.author`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
@@ -289,6 +288,7 @@ export class DatabaseService {
       }),
       [`${displayWhiteboardNode.type}.entity`]: {
         uid: (await this.getUidByType(displayWhiteboardNode.entity?.id, 'Display')) ?? null,
+        pageCount: displayWhiteboardNode.pageCount,
       },
       [`${displayWhiteboardNode.type}.casefile`]: {
         uid: casefileUid,
