@@ -1,10 +1,8 @@
-import { WhiteboardNodeType } from '@detective.solutions/shared/data-access';
-
 export interface IUploadResponse {
   success: boolean;
   xid: string;
   setup: IDisplaySetupInformation;
-  nodeType: WhiteboardNodeType.TABLE | WhiteboardNodeType.DISPLAY;
+  nodeType: 'Display' | 'Table';
 }
 
 export interface IDisplaySetupInformation {
