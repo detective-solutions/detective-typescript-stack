@@ -15,10 +15,10 @@ export class DisplayService {
     return headers;
   }
 
-  requestPresignedURL(xid: string, fileName: string): Observable<IDisplaySetupInformation> {
+  requestPresignedURL(id: string, fileName: string): Observable<IDisplaySetupInformation> {
     return this.httpClient.post<IDisplaySetupInformation>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiAccessV1}`,
-      { xid: xid, fileName: fileName },
+      { xid: id, fileName: fileName },
       { headers: this.getHeaders() }
     );
   }
