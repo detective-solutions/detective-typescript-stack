@@ -54,7 +54,6 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     if (localFile && (localFile as File).size > 0) {
       this.uploadFile(localFile);
     } else {
-      console.log('IS FILE EXPIRED: ', this.isFileExpired());
       if (this.isFileExpired()) {
         this.refreshPages();
       } else {
