@@ -22,10 +22,13 @@ export class DisplayNodeEffects {
                 changes: {
                   type:
                     response.nodeType.valueOf() === 'Display' ? WhiteboardNodeType.DISPLAY : WhiteboardNodeType.TABLE,
-                  pageCount: response.setup.pageCount,
                   filePageUrls: response.setup.pages,
                   expires: response.setup.exp,
-                  entity: { id: this.convertStringToUuid(response.xid), baseQuery: response.setup.query ?? undefined },
+                  entity: {
+                    id: this.convertStringToUuid(response.xid),
+                    pageCount: response.setup.pageCount,
+                    baseQuery: response.setup.query,
+                  },
                 },
               },
             })
