@@ -1,5 +1,5 @@
 import { BehaviorSubject, take } from 'rxjs';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { IDisplayNodeTemporaryData, IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
 import { IDisplaySetupInformation } from '../../../models';
@@ -12,7 +12,7 @@ import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboa
   styleUrls: ['./display-node.component.scss', '../base/base-node.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
+export class DisplayNodeComponent extends BaseNodeComponent {
   isLoading$ = new BehaviorSubject<boolean>(true);
 
   currentPageUrl!: string;
@@ -45,7 +45,9 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
         this.store.dispatch(
-          WhiteboardNodePropertiesUpdated({ updates: [{ id: this.node.id, changes: { title: updatedTitle } }] })
+          WhiteboardNodePropertiesUpdated({
+            updates: [{ id: this.node.id, changes: { title: updatedTitle } }],
+          })
         )
       )
     );
