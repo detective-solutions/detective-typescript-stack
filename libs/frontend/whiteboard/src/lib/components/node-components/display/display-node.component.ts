@@ -100,7 +100,7 @@ export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
 
   private refreshPages() {
     this.whiteboardFacade
-      .getDisplayLocation(this.node.id, this.fileName)
+      .requestNewPresignedUrl(this.node.id, this.fileName)
       .pipe(take(1))
       .subscribe((response: IDisplaySetupInformation) =>
         this.store.dispatch(

@@ -88,8 +88,8 @@ export class WhiteboardFacadeService {
     this.webSocketService.publishMessage(message);
   }
 
-  getDisplayLocation(xid: string, fileName: string): Observable<IDisplaySetupInformation> {
-    return this.displayService.requestPresignedURL(xid, fileName);
+  requestNewPresignedUrl(xid: string, fileName: string): Observable<IDisplaySetupInformation> {
+    return this.displayService.requestNewPresignedUrl(xid, fileName);
   }
 
   uploadFile(file: File): Observable<IUploadResponse> {

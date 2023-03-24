@@ -17,7 +17,7 @@ export class DisplayService {
     return headers;
   }
 
-  requestPresignedURL(id: string, fileName: string): Observable<IDisplaySetupInformation> {
+  requestNewPresignedUrl(id: string, fileName: string): Observable<IDisplaySetupInformation> {
     return this.httpClient.post<IDisplaySetupInformation>(
       `${environment.baseApiPath}${environment.uploadApiPathV1}${environment.uploadApiAccessV1}`,
       { xid: id, fileName: fileName },
