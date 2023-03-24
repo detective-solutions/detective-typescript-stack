@@ -91,9 +91,6 @@ export class DisplayNodeComponent extends BaseNodeComponent {
     if (this.filePageUrls.length !== 0) {
       this.currentPageUrl = this.filePageUrls[this.currentPageIndex];
       this.isLoading$.next(false);
-    } else {
-      console.error(this.node);
-      throw new Error('Display node is missing page URLs');
     }
   }
 
