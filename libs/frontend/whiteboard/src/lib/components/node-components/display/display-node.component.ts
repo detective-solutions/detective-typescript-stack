@@ -56,11 +56,8 @@ export class DisplayNodeComponent extends BaseNodeComponent {
     if (localFile && (localFile as File).size > 0) {
       this.uploadFile(localFile);
     } else {
-      if (this.isFileExpired()) {
-        this.refreshPages();
-      } else {
-        this.initializeWithExistingImage();
-      }
+      this.refreshPages();
+      this.initializeWithExistingImage();
     }
   }
 
@@ -101,21 +98,23 @@ export class DisplayNodeComponent extends BaseNodeComponent {
   }
 
   private refreshPages() {
-    this.whiteboardFacade
-      .requestNewPresignedUrl(this.node.id, this.fileName)
-      .pipe(take(1))
-      .subscribe((response: IDisplaySetupInformation) =>
-        this.store.dispatch(
-          WhiteboardNodePropertiesUpdated({
-            updates: [
-              {
-                id: this.node.id,
-                changes: { filePageUrls: response.pages, pageCount: response.pageCount, expires: response.exp },
-              },
-            ],
-          })
-        )
-      );
+    if (this.isFileExpired()) {
+      this.whiteboardFacade
+        .requestNewPresignedUrl(this.node.id, this.fileName)
+        .pipe(take(1))
+        .subscribe((response: IDisplaySetupInformation) =>
+          this.store.dispatch(
+            WhiteboardNodePropertiesUpdated({
+              updates: [
+                {
+                  id: this.node.id,
+                  changes: { filePageUrls: response.pages, pageCount: response.pageCount, expires: response.exp },
+                },
+              ],
+            })
+          )
+        );
+    }
   }
 
   private isFileExpired() {
