@@ -11,7 +11,9 @@ export class DisplayService {
 
   getHeaders(): HttpHeaders {
     const headers = new HttpHeaders();
-    headers.set('Access-Control-Allow-Origin', '*').set('Content-Type', 'multipart/form-data');
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Content-Type', 'multipart/form-data');
+    headers.set('Cache-Control', 'no-store');
     return headers;
   }
 
