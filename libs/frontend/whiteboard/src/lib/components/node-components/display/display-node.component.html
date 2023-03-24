@@ -22,7 +22,11 @@
   </foreignObject>
   <foreignObject class="node-content" [attr.width]="node.width" [attr.height]="node.height">
     <div *ngIf="(isDragging$ | async) || (isBlocked$ | async)" class="drag-overlay"></div>
-    <node-header [title]="node.title" [isBlocked$]="isBlocked$"></node-header>
+    <node-header
+      [title]="node.title"
+      [isBlocked$]="isBlocked$"
+      (titleChangesOnBlur$)="nodeTitleBlur$.next($event)"
+    ></node-header>
     <ng-container *ngIf="isLoading$ | async; else nodeContent">
       <div class="loading-spinner"></div>
     </ng-container>
