@@ -6,7 +6,7 @@ import {
   ITableWhiteboardNode,
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
-import { LoadTableData, LoadTableEntityData, TableDataReceived } from './state';
+import { LoadTableData, TableDataReceived } from './state';
 import { filter, map, switchMap } from 'rxjs';
 
 import { BaseNodeComponent } from '../base/base-node.component';
