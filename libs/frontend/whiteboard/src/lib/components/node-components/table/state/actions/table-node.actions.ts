@@ -5,11 +5,6 @@ import { Update } from '@ngrx/entity';
 
 const actionPrefix = '[Table Node]';
 
-export const LoadTableEntityData = createAction(
-  `${actionPrefix} Requesting table entity information from backend`,
-  props<{ entityId: string }>()
-);
-
 export const LoadTableData = createAction(
   `${actionPrefix} Requesting table data from backend`,
   props<{ node: ITableWhiteboardNode }>()
