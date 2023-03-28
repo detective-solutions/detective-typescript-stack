@@ -7,7 +7,8 @@
       "maskings": "Masken",
       "subscriptions": "Subscription"
     },
-    "sidenavBottomItem": "Home"
+    "sidenavBottomItem": "Home",
+    "sidenavBottomItemTitle": "Zurück zur Home-Ansicht"
   },
   "connections": {
     "addConnectionButtonText": "Neue Verbindung anlegen",
@@ -49,8 +50,7 @@
       "deleteButtonText": "Ich möchte diese Person entfernen",
       "deleteDialogTextStart": "Sie sind dabei",
       "deleteDialogTextHighlight": "{{userName}}",
-      "deleteDialogTextEnd": "aus detective zu entfernen.",
-      "deleteButtonText": "Yes I want to remove this user"
+      "deleteDialogTextEnd": "aus detective zu entfernen."
     },
     "utils": {
       "of": "von",
@@ -63,25 +63,24 @@
       "formSubmitError": "Nutzer konnten nicht gesendet werden. Bitte kontaktieren Sie den Support"
     }
   },
-  "groups": {
-    "addGroupButtonText": "Neue Gruppe",
+  "userGroups": {
+    "addUserGroupButtonText": "Neue Gruppe",
     "columnNames": {
       "memberCountColumn": "Anzahl der Gruppenmitglieder",
       "lastUpdatedColumn": "Zuletzt aktualisiert"
     },
     "addEditDialog": {
-      "addUserLabel": "Person hinzufügen",
       "addDialogHeader": "Neue Gruppe anlegen",
       "editDialogHeader": "Gruppe bearbeiten",
-      "saveButtonText": "Speichern",
-      "optionalFieldsPanelName": "Erweiterte Einstellungen",
+      "displayNameTitle": "Name",
+      "displayNameDescription": "Beschreibung",
+      "addUserLabel": "Mitglied hinzufügen",
       "subTable": {
-        "username": "Gruppenmitglied",
+        "username": "Mitglieder",
         "id": " ",
-        "displayNameTitle": "Name",
-        "displayNameDescription": "Beschreibung",
         "RemoveUserButton": "Entfernen"
-      }
+      },
+      "saveButtonText": "Speichern"
     },
     "deleteDialog": {
       "deleteDialogHeader": "Gruppe entfernen",
@@ -124,19 +123,23 @@
       "cancelButtonText": "Abbrechen",
       "subTable": {
         "addMaskButton": "Maskierung hinzufügen",
-        "ColumnTitleFilter": "Dimension",
-        "ColumnTitleColumn": "Spalte",
-        "ColumnTitleHide": "Verbergen",
-        "ColumnTitleValueName": "gezielter Wert",
-        "ColumnTitleMethod": "Methode",
-        "ColumnTitleCustomReplaceType": "Eigener Wert",
-        "ColumnTitleIsEdit": " ",
+        "columnTitleFilter": "Dimension",
+        "columnTitleColumn": "Spalte",
+        "columnTitleHide": "Verbergen",
+        "columnTitleValueName": "gezielter Wert",
+        "columnTitleMethod": "Methode",
+        "columnTitleCustomReplaceType": "Eigener Wert",
+        "columnTitleIsEdit": "Editierbar",
         "binaryTrue": "Ja",
         "binaryFalse": "Nein",
         "displayNameTable": "Tabelle",
+        "displayNameTableTooltip": "Für welche Tabelle soll die Maske gelten?",
         "displayNameGroups": "Nutzergruppe",
+        "displayNameGroupsTooltip": "Für welche Nutzergruppe soll die Maske gelten?",
         "displayNameTitle": "Name",
+        "displayNameTitleTooltip": "Der Name der Maske",
         "displayNameDescription": "Beschreibung",
+        "displayNameDescriptionTooltip": "Die Beschreibung der Maske",
         "editMaskButton": "Anpassen",
         "removeMaskButton": "Löschen",
         "doneMaskButton": "Übernehmen",
@@ -145,16 +148,16 @@
         "dimensionRow": "Zeile",
         "maskingMethods": {
           "full": "Sternchen",
-          "full email": "Sternchen Email",
-          "credit card": "Kreditkarte",
-          "provider email": "Nur Email Provider",
-          "phone number": "Telefonnummer",
-          "postal code": "Postleitzahl",
-          "single name": "Einfacher Name",
-          "first- and lastname": "Vor- und Nachnahme",
+          "fullEmail": "Sternchen Email",
+          "creditCard": "Kreditkarte",
+          "providerEmail": "Nur Email Provider",
+          "phoneNumber": "Telefonnummer",
+          "postalCode": "Postleitzahl",
+          "singleName": "Einfacher Name",
+          "firstAndLastname": "Vor- und Nachnahme",
           "email": "Email",
-          "full address": "Ganze Adresse",
-          "address streetname and number": "Ganze Adresse mit Hausnummer",
+          "fullAddress": "Ganze Adresse",
+          "addressStreetnameAndNumber": "Ganze Adresse mit Hausnummer",
           "decimal": "Dezimalzahl",
           "number": "Nummer",
           "custom": "Eigener Wert"
@@ -182,19 +185,21 @@
     "cancelDialog": {
       "cancelDialogHeader": "Account löschen",
       "cancelDialogText": "Sie sind dabei die Account zu löschen und den Zugriff auf ihre Diskussionen zu verlieren",
-      "cancelExecuteButtonText": "Abonement kündigen",
+      "cancelExecuteButtonText": "Abonnement kündigen",
       "cancelCancelButtonText": "Abbrechen"
     },
     "upgradeDialog": {
       "upgradeDialogHeader": "Wähle dein Upgrade",
-      "upgradeDialogText": "Du kannst dein Abonement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
+      "upgradeDialogText": "Du kannst dein Abonnement jederzeit hoch oder auch runter stufen. So hast du die volle Flexibilität",
       "cancelUpgradeButtonText": "Abbrechen",
       "upgradeNowButtonText": "Ausführen",
-      "userLimit": "Nuzter"
+      "userLimit": "Nutzer"
     },
     "utils": {
       "of": "von",
-      "users": "Nutzern"
+      "users": "Nutzern",
+      "changePaymentButtonText": "Zahlungsmittel ändern",
+      "cancelButtonText": "Kündigen"
     },
     "toastMessages": {
       "actionSuccessful": "Aktion erfolgreich ausgeführt",

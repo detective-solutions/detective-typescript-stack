@@ -1,13 +1,13 @@
 import {
   AdminContainerComponent,
   ConnectionsComponent,
-  GroupsComponent,
   MaskingsComponent,
   SubscriptionsComponent,
+  UserGroupsComponent,
   UsersComponent,
 } from './components';
+import { CatalogService, SubscriptionService } from './services';
 import { ConnectionsAddEditDialogComponent, ConnectionsDeleteDialogComponent } from './components/connections/dialog';
-import { ConnectionsService, MaskingService, SubscriptionService, UsersService } from './services';
 import {
   CreateNewColumnMaskGQL,
   CreateNewMaskingGQL,
@@ -15,25 +15,26 @@ import {
   DeleteColumnMaskGQL,
   DeleteMaskingGQL,
   DeleteRowMaskGQL,
-  DeleteUserGQL,
-  DeleteUserGroupGQL,
+  DeleteUserByIdGQL,
+  DeleteUserGroupByIdGQL,
   GetAllColumnsGQL,
-  GetAllConnectionsGQL,
-  GetAllMaskingsGQL,
+  GetAllSourceConnectionsNonPaginatedGQL,
   GetAllUserGroupsAsDropDownValuesGQL,
-  GetAllUserGroupsGQL,
-  GetAllUsersGQL,
-  GetConnectionByIdGQL,
+  GetAllUsersCountGQL,
   GetMaskingByUserGroupIdGQL,
+  GetSourceConnectionByIdGQL,
   GetTablesBySourceConnectionIdGQL,
-  GetUserByIdGQL,
   GetUserGroupByIdGQL,
+  SearchMaskingsByTenantIdGQL,
+  SearchSourceConnectionsByTenantGQL,
+  SearchUserGroupMembersByTenantIdGQL,
+  SearchUserGroupsByTenantGQL,
+  SearchUsersByTenantGQL,
   UpdateMaskingGQL,
   UpdateUserGroupGQL,
   UpdateUserRoleGQL,
 } from './graphql';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GroupsAddEditDialogComponent, GroupsDeleteComponent } from './components/groups/dialog';
 import { MaskingAddEditDialogComponent, MaskingDeleteDialogComponent } from './components/maskings/dialog';
 import { NavigationModule, TableModule } from '@detective.solutions/frontend/detective-client/ui';
 import {
@@ -41,6 +42,7 @@ import {
   SubscriptionUpgradeDialogComponent,
 } from './components/subscriptions/dialog';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
+import { UserGroupsAddEditDialogComponent, UserGroupsDeleteComponent } from './components/user-groups/dialog';
 
 import { AdminMaterialModule } from './admin.material.module';
 import { AdminRoutingModule } from './admin-routing.module';
@@ -63,9 +65,9 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     UsersComponent,
     UsersDeleteDialogComponent,
     UserEditDialogComponent,
-    GroupsComponent,
-    GroupsDeleteComponent,
-    GroupsAddEditDialogComponent,
+    UserGroupsComponent,
+    UserGroupsDeleteComponent,
+    UserGroupsAddEditDialogComponent,
     MaskingsComponent,
     MaskingAddEditDialogComponent,
     MaskingDeleteDialogComponent,
@@ -90,13 +92,11 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
         loader: langScopeLoader((lang: string, root: string) => import(`./${root}/${lang}.json`)),
       },
     },
-    ConnectionsService,
-    MaskingService,
+    CatalogService,
     SubscriptionService,
-    UsersService,
-    GetAllConnectionsGQL,
+    GetAllSourceConnectionsNonPaginatedGQL,
     GetTablesBySourceConnectionIdGQL,
-    GetConnectionByIdGQL,
+    GetSourceConnectionByIdGQL,
     CreateNewColumnMaskGQL,
     GetMaskingByIdGQL,
     UpdateMaskingGQL,
@@ -104,18 +104,21 @@ import { langScopeLoader } from '@detective.solutions/shared/i18n';
     DeleteMaskingGQL,
     DeleteRowMaskGQL,
     DeleteColumnMaskGQL,
-    GetAllMaskingsGQL,
     GetAllUserGroupsAsDropDownValuesGQL,
     GetAllColumnsGQL,
+    GetAllUsersCountGQL,
+    SearchSourceConnectionsByTenantGQL,
+    SearchMaskingsByTenantIdGQL,
+    SearchUserGroupMembersByTenantIdGQL,
+    SearchUserGroupsByTenantGQL,
+    SearchUsersByTenantGQL,
     CreateNewMaskingGQL,
-    GetAllUserGroupsGQL,
     GetUserGroupByIdGQL,
-    GetAllUsersGQL,
-    GetUserByIdGQL,
-    DeleteUserGQL,
+    GetAllUsersCountGQL,
+    DeleteUserByIdGQL,
     CreateUserGroupGQL,
     UpdateUserGroupGQL,
-    DeleteUserGroupGQL,
+    DeleteUserGroupByIdGQL,
     UpdateUserRoleGQL,
     GetMaskingByUserGroupIdGQL,
   ],

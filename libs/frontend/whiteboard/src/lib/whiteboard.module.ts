@@ -7,16 +7,21 @@ import {
 } from './services/internal-services';
 import {
   CodeEditorComponent,
+  DisplayNodeComponent,
+  DisplayNodeEffects,
   EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
   NodeSelectionHaloComponent,
   SidebarComponent,
   TableNodeComponent,
+  TableNodeEffects,
   TestLinkComponent,
   TopbarComponent,
+  WhiteboardLeaveDialogComponent,
 } from './components';
-import { GrabberDirective, IFrameTrackerDirective, ResizableDirective } from './directives';
+import { GrabberDirective,  ResizableDirective } from './directives';
+import { DisplayService, WhiteboardFacadeService } from './services';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
   WHITEBOARD_STORE_NAME,
@@ -34,9 +39,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SearchTablesByTenantGQL } from './graphql';
 import { StoreModule } from '@ngrx/store';
-import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardContextResolver } from './resolvers';
-import { WhiteboardFacadeService } from './services';
+import { WhiteboardLeaveGuard } from './guards';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
@@ -53,6 +57,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
       WhiteboardMetadataEffects,
       WhiteboardNodeEffects,
       TableNodeEffects,
+      DisplayNodeEffects,
     ]),
     StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
     TranslocoModule,
@@ -63,16 +68,18 @@ import { whiteboardFeatureReducers } from './state/reducers';
   declarations: [
     EmbeddingNodeComponent,
     HostComponent,
-    IFrameTrackerDirective,
     NodeHeaderComponent,
     NodeSelectionHaloComponent,
     SidebarComponent,
     TableNodeComponent,
+    EmbeddingNodeComponent,
+    DisplayNodeComponent,
     TestLinkComponent,
     TopbarComponent,
     CodeEditorComponent,
     ResizableDirective,
     GrabberDirective,
+    WhiteboardLeaveDialogComponent,
   ],
   providers: [
     BufferService,
@@ -83,6 +90,8 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WhiteboardFacadeService,
     WebSocketService,
     WhiteboardSelectionService,
+    DisplayService,
+    WhiteboardLeaveGuard,
     SearchTablesByTenantGQL,
     {
       provide: TRANSLOCO_SCOPE,

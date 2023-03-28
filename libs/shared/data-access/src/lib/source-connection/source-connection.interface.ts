@@ -2,7 +2,7 @@ import { ITable } from '../table';
 import { SourceConnectionStatus } from './source-connection-status.enum';
 
 export interface ISourceConnection {
-  xid: string;
+  id: string;
   name: string;
   description?: string;
   host?: string;

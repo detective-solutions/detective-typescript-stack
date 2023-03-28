@@ -1,5 +1,6 @@
 import {
   ICasefile,
+  IDisplayOccurrence,
   IEmbedding,
   ITableOccurrence,
   IUser,
@@ -18,12 +19,13 @@ export class CasefileDTO implements ICasefile {
     public thumbnail: string,
     public views: number,
     public author: UserDTO,
-    public editors: IUser[],
-    public lastUpdatedBy: IUser,
+    public editors: Partial<IUser>[],
+    public lastUpdatedBy: Partial<IUser>,
     public lastUpdated: string,
     public created: string,
     public tables: ITableOccurrence[],
     public queries: IUserQueryOccurrence[],
+    public displays: IDisplayOccurrence[],
     public embeddings: IEmbedding[]
   ) {}
 
@@ -35,12 +37,13 @@ export class CasefileDTO implements ICasefile {
       casefileInput.thumbnail ?? CasefileDTO.thumbnailPlaceholder,
       casefileInput.views,
       UserDTO.Build(casefileInput.author as IUser),
-      casefileInput.editors as IUser[],
+      casefileInput.editors,
       casefileInput.lastUpdatedBy,
       casefileInput.lastUpdated,
       casefileInput.created,
       casefileInput.tables,
       casefileInput.queries,
+      casefileInput.displays,
       casefileInput.embeddings
     );
   }

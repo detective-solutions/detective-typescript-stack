@@ -12,20 +12,14 @@ export interface IMaskingTableDef extends IAbstractTableDef {
 }
 
 export interface IMaskSubTableDataDef {
-  filterType: string;
   id: string;
+  filterType: string;
   columnName: string;
   visible: boolean;
   valueName: string;
   replaceType: string;
   customReplaceType: string;
   isNew: boolean;
-}
-
-export interface IMaskSubTableDef {
-  key: string;
-  type: string;
-  label: string;
 }
 
 export interface IMaskSubTableDataDropdown {

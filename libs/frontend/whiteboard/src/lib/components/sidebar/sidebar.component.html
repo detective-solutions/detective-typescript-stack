@@ -34,7 +34,7 @@
         <div class="assets-menu-separator"></div>
         <div class="assets-menu-body">
           <div class="assets-menu-scroll-wrapper">
-            <div *ngIf="isLoading" fxLayoutAlign="center center" class="assets-menu-spinner-wrapper">
+            <div *ngIf="isLoading$ | async" fxLayoutAlign="center center" class="assets-menu-spinner-wrapper">
               <mat-spinner color="accent" [diameter]="35"></mat-spinner>
             </div>
             <div
@@ -42,8 +42,9 @@
               #tableOccurrence
               draggable="true"
               (dragstart)="onDragStart($event)"
-              [attr.data-entity-id]="table.xid"
+              [attr.data-entity-id]="table.id"
               [attr.data-name]="table.name"
+              [attr.data-query]="table.baseQuery"
               fxLayoutAlign="start center"
               class="assets-menu-list-item"
             >

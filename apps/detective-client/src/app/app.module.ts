@@ -1,4 +1,4 @@
-import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
+import { APOLLO_FLAGS, APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -30,6 +30,13 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
   ],
   providers: [
     {
+      provide: APOLLO_FLAGS,
+      useValue: {
+        useInitialLoading: true,
+        useMutationLoading: true,
+      },
+    },
+    {
       provide: APOLLO_OPTIONS,
       useFactory(httpLink: HttpLink) {
         return {
@@ -40,7 +47,7 @@ import { offsetLimitPagination } from '@apollo/client/utilities';
             addTypename: false,
             typePolicies: {
               Query: {
-                keyFields: ['xid'],
+                keyFields: ['id'],
                 fields: {
                   queryCasefile: offsetLimitPagination(),
                   queryMasking: offsetLimitPagination(),

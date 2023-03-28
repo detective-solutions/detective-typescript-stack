@@ -1,11 +1,13 @@
 <div class="component-wrapper" [class.is-mobile]="isMobile$ | async">
   <div
-    *ngIf="(tableRows$ | async) && tableDataSource; else isLoading"
+    *ngIf="tableDataSource$ | async as tableDataSource; else isInitializing"
     class="table-container"
-    (scroll)="onScroll($event)"
+    infinite-scroll
+    [scrollWindow]="false"
+    (scrolled)="onScroll()"
   >
     <mat-table [dataSource]="tableDataSource">
-      <ng-container [matColumnDef]="column.id" *ngFor="let column of columnDefinitions">
+      <ng-container [matColumnDef]="column.id" *ngFor="let column of columnDefinitions; trackBy: trackColumnById">
         <mat-header-cell *matHeaderCellDef fxLayoutAlign="center center">
           {{ column.name }}
         </mat-header-cell>
@@ -19,8 +21,8 @@
       <mat-row *matRowDef="let row; columns: columnIds"></mat-row>
     </mat-table>
   </div>
-  <mat-progress-bar *ngIf="isFetchingMoreData" mode="query" color="accent"></mat-progress-bar>
-  <ng-template #isLoading>
+  <mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>
+  <ng-template #isInitializing>
     <div class="loading-spinner"></div>
   </ng-template>
 </div>

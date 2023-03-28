@@ -15,15 +15,15 @@ export class UpdateUserGroupGQL extends Mutation<Response> {
     mutation updateUserGroup($patch: UpdateUserGroupInput!) {
       updateUserGroup(input: $patch) {
         userGroup {
-          xid
+          id: xid
           name
           description
           members {
-            xid
+            id: xid
           }
           lastUpdated
           lastUpdatedBy {
-            xid
+            id: xid
           }
         }
       }

@@ -1,10 +1,14 @@
-import { AnyWhiteboardNode, ICachableCasefileForWhiteboard } from '@detective.solutions/shared/data-access';
+import {
+  AnyWhiteboardNode,
+  ICachableCasefileForWhiteboard,
+  IWhiteboardNodePropertiesUpdate,
+} from '@detective.solutions/shared/data-access';
+import { Update, createEntityAdapter } from '@ngrx/entity';
 import { WhiteboardGeneralActions, WhiteboardNodeActions } from '../actions';
 import { createReducer, on } from '@ngrx/store';
 
 import { IWhiteboardNodeState } from '../interfaces';
 import { TableNodeActions } from '../../components';
-import { createEntityAdapter } from '@ngrx/entity';
 import { serializeWhiteboardNodes } from '../../utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -34,7 +38,13 @@ export const whiteboardNodeReducer = createReducer(
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)
   ),
   on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdated, (state: IWhiteboardNodeState, action: any) =>
-    whiteboardNodeEntityAdapter.updateMany(action.updates, state)
+    whiteboardNodeEntityAdapter.updateMany(
+      // Update last modified date on each state modification
+      action.updates.map((update: Update<IWhiteboardNodePropertiesUpdate>) => {
+        return { id: update.id, changes: { lastUpdated: new Date().toISOString(), ...update.changes } };
+      }),
+      state
+    )
   ),
   on(WhiteboardNodeActions.WhiteboardNodePropertiesUpdatedRemotely, (state: IWhiteboardNodeState, action: any) =>
     whiteboardNodeEntityAdapter.updateMany(action.updates, state)

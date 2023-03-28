@@ -20,6 +20,7 @@ export class CacheService {
 
   readonly logger = new Logger(CacheService.name);
 
+  private timeoutCache: { casefileId: string; timeout: NodeJS.Timeout }[] = [];
   private client: RedisClientType<RedisDefaultModules>;
 
   constructor(private readonly clientService: RedisClientService, private readonly databaseService: DatabaseService) {
@@ -53,6 +54,7 @@ export class CacheService {
 
   async getCasefileById(casefileId: string): Promise<ICachableCasefileForWhiteboard> {
     this.logger.log(`Requesting casefile "${casefileId}" data from cache`);
+    this.removeTimeoutCacheById(casefileId);
     // Can't match Redis client return type with domain type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.client.json.get(casefileId) as any;
@@ -79,15 +81,24 @@ export class CacheService {
 
     // Check if active users are present & filter out the user that left
     let activeUsers = await this.getActiveUsersByCasefile(casefileId);
+
     if (!activeUsers) {
       return null;
     }
-    activeUsers = activeUsers.filter((user: IUserForWhiteboard) => user.id !== userId);
+
+    activeUsers = activeUsers.filter((user: IUserForWhiteboard) => !!user && user.id !== userId);
 
     // Handle case if no uses are active on a given casefile
     if (activeUsers.length === 0) {
-      await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
-      await this.deleteCasefile(casefileId);
+      // Create timeout to prevent deleting cache instantly if users return in the meantime
+      const casefileTimeout = setTimeout(async () => {
+        await this.databaseService.saveCasefile(await this.getCasefileById(casefileId));
+        await this.deleteCasefile(casefileId);
+        this.removeTimeoutCacheById(casefileId);
+      }, 5000);
+
+      // Save timeout temporarily to be able to remove it if a user returns to casefile
+      this.timeoutCache.push({ casefileId, timeout: casefileTimeout });
       return 'OK';
     }
 
@@ -171,9 +182,6 @@ export class CacheService {
           // Update regular property
           correspondingCachedNode[propertyToUpdate] = updateValue;
         }
-
-        this.logger.debug('Sending updated node to cache:');
-        this.logger.debug(correspondingCachedNode);
       }
     }
 
@@ -235,5 +243,14 @@ export class CacheService {
   private isNodeAlreadyBlocked(nodeToCheck: AnyWhiteboardNode, currentUserId: string): boolean {
     const blockedBy = nodeToCheck?.temporary?.blockedBy;
     return blockedBy && blockedBy !== currentUserId;
+  }
+
+  private removeTimeoutCacheById(casefileId: string) {
+    // Check if a deletion timeout exists for given id. If yes, remove it.
+    const timeoutCache = this.timeoutCache.find((timeoutCache) => timeoutCache.casefileId === casefileId);
+    if (timeoutCache) {
+      clearInterval(timeoutCache.timeout);
+      this.timeoutCache = this.timeoutCache.filter((timeoutCache) => timeoutCache.casefileId !== casefileId);
+    }
   }
 }

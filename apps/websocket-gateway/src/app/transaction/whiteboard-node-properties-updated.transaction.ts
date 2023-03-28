@@ -39,6 +39,6 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
   private handleFinalError(error: Error) {
     // TODO: Add mechanism to publish failed transaction to error topic
     this.logger.error(error);
-    throw new InternalServerErrorException(`Could not update node title property in casefile "${this.casefileId}"`);
+    throw new InternalServerErrorException(`Could not update node properties in casefile "${this.casefileId}"`);
   }
 }

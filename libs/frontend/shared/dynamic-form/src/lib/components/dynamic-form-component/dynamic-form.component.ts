@@ -12,11 +12,14 @@ import { UntypedFormGroup } from '@angular/forms';
 export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() formFieldDefinitions!: BaseFormField<string | boolean>[];
   @Input() optionalFieldsPanelName!: string;
+  @Input() enableSubFormForOptionalFields = false;
 
   form!: UntypedFormGroup;
 
   get requiredFormFields() {
-    return this.formFieldDefinitions.filter((formFieldDefinition) => formFieldDefinition.required);
+    return this.enableSubFormForOptionalFields
+      ? this.formFieldDefinitions.filter((formFieldDefinition) => formFieldDefinition.required)
+      : this.formFieldDefinitions;
   }
 
   get optionalFormFields() {

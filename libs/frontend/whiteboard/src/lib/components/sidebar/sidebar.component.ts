@@ -21,8 +21,9 @@ import { Store } from '@ngrx/store';
 import { selectWhiteboardContextState } from '../../state';
 
 interface IAssetsMenuTable {
-  xid: string;
+  id: string;
   name: string;
+  baseQuery: string;
   iconSrc: string;
 }
 
@@ -40,10 +41,10 @@ export class SidebarComponent implements OnInit {
   @ViewChild('assetsMenuIcon', { read: ElementRef }) assetsMenuIcon!: ElementRef;
   @ViewChild('assetsSearchInput', { read: ElementRef }) assetsSearchInput!: ElementRef;
 
+  isLoading$ = new Subject<boolean>();
   assetsMenuTables$ = new Subject<IAssetsMenuTable[]>();
 
   assetsSearchFormControl = new FormControl<string>('', { nonNullable: true });
-  isLoading = false;
 
   private searchTablesByTenantWatchQuery!: QueryRef<Response>;
   private readonly searchDebounceTime = 500;
@@ -67,7 +68,6 @@ export class SidebarComponent implements OnInit {
   onDragStart(event: DragEvent) {
     const isTable = this.tableOccurrence.find((elementRef: ElementRef) => elementRef.nativeElement === event.target);
     if (isTable) {
-      console.log(isTable.nativeElement.dataset);
       event.dataTransfer?.setDragImage(this.assetsMenuIcon.nativeElement, 0, 0);
       event.dataTransfer?.setData(
         'text/plain',
@@ -75,11 +75,11 @@ export class SidebarComponent implements OnInit {
           type: WhiteboardNodeType.TABLE,
           entityId: isTable.nativeElement.dataset.entityId,
           title: isTable.nativeElement.dataset.name,
+          baseQuery: isTable.nativeElement.dataset.query,
         })
       );
       return;
     }
-
     const isEmbedding = event.target === this.embedding.nativeElement;
     if (isEmbedding) {
       event.dataTransfer?.setData('text/plain', JSON.stringify({ type: WhiteboardNodeType.EMBEDDING }));
@@ -101,15 +101,18 @@ export class SidebarComponent implements OnInit {
     };
 
     if (!this.searchTablesByTenantWatchQuery) {
-      this.searchTablesByTenantWatchQuery = this.searchTablesByTenantGQL.watch(searchParameters);
+      this.searchTablesByTenantWatchQuery = this.searchTablesByTenantGQL.watch(searchParameters, {
+        notifyOnNetworkStatusChange: true,
+      });
       this.subscriptions.add(
         this.searchTablesByTenantWatchQuery.valueChanges
           .pipe(
-            tap(() => (this.isLoading = true)),
-            map((response: any) => response.data),
+            tap(({ loading }) => this.isLoading$.next(loading)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            filter((response: any) => response?.data),
             map(
-              (response: ISearchTablesByTenantGQLResponse) =>
-                response.querySourceConnection
+              ({ data }: { data: ISearchTablesByTenantGQLResponse }) =>
+                data.querySourceConnection
                   .map(SourceConnectionDTO.Build)
                   .filter((sourceConnection: SourceConnectionDTO) => sourceConnection.connectedTables.length > 0)
                   .map((sourceConnection: SourceConnectionDTO) =>
@@ -119,10 +122,7 @@ export class SidebarComponent implements OnInit {
                   .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
             )
           )
-          .subscribe((response: any) => {
-            this.assetsMenuTables$.next(response as IAssetsMenuTable[]);
-            this.isLoading = false;
-          })
+          .subscribe((response: IAssetsMenuTable[]) => this.assetsMenuTables$.next(response))
       );
     } else {
       this.searchTablesByTenantWatchQuery.refetch(searchParameters);

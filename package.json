@@ -8,7 +8,7 @@
   },
   "scripts": {
     "ng": "npx nx",
-    "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main",
+    "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2021 browser module main",
     "start": "npx nx serve",
     "build": "npx nx build --prod && npm run transloco:optimize",
     "test": "npx nx test",
@@ -72,6 +72,8 @@
     "jwt-decode": "3.1.2",
     "kafkajs": "2.2.3",
     "monaco-editor": "^0.34.1",
+    "ngx-infinite-scroll": "14.0.1",
+    "minio": "7.0.32",
     "passport": "0.5.3",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
@@ -144,6 +146,9 @@
       "npx nx affected:lint --uncommitted",
       "npx nx affected:test --uncommitted --parallel --maxParallel=5"
     ]
+  },
+  "scarfSettings": {
+    "enabled": false
   },
   "browserslist": [
     "last 1 Chrome version",

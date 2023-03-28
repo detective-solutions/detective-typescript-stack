@@ -10,12 +10,15 @@ export interface IGetUserGroupByIdGQLResponse {
 @Injectable()
 export class GetUserGroupByIdGQL extends Query<Response> {
   override document = gql`
-    query getUserGroupById($xid: String!) {
-      getUserGroup(xid: $xid) {
-        xid
+    query getUserGroupById($tenantId: String!, $userGroupId: String!) {
+      getUserGroup(xid: $userGroupId) {
+        id: xid
+        tenant(filter: { xid: { eq: $tenantId } }) {
+          id: xid
+        }
         name
         members {
-          xid
+          id: xid
           firstname
           lastname
           email

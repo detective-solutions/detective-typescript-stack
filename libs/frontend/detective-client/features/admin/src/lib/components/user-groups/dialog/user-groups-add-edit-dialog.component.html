@@ -1,0 +1,65 @@
+<div fxLayout="column" fxLayoutAlign="center center" *transloco="let t; read: 'admin.userGroups.addEditDialog'">
+  <h1 mat-dialog-title *ngIf="isAddDialog">{{ t('addDialogHeader') }}</h1>
+  <h1 mat-dialog-title *ngIf="!isAddDialog">{{ t('editDialogHeader') }}</h1>
+
+  <div *ngIf="isAddDialog; else editDialog" mat-dialog-content>
+    <dynamic-form [formFieldDefinitions]="addUserGroupFormFields"></dynamic-form>
+  </div>
+  <ng-template #editDialog>
+    <div mat-dialog-content>
+      <dynamic-form [formFieldDefinitions]="editUserGroupFormFields"></dynamic-form>
+    </div>
+  </ng-template>
+  <mat-form-field class="add-member-input" appearance="outline">
+    <mat-icon matPrefix>person_add</mat-icon>
+    <input
+      matInput
+      [formControl]="memberSearchFormControl"
+      [matAutocomplete]="auto"
+      type="text"
+      placeholder="Name"
+      aria-label="Name"
+    />
+    <mat-label>{{ t('addUserLabel') }}</mat-label>
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option
+        class="auto-complete-option"
+        *ngFor="let proposedNewMember of this.proposedNewMembers$ | async"
+        (click)="addUserGroupMemberRow(proposedNewMember)"
+      >
+        {{ proposedNewMember.firstname }} {{ proposedNewMember.lastname }} ({{ proposedNewMember.email }})
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="membersTableDataSource">
+      <ng-container *ngFor="let col of userGroupMembersTableColumnsSchema" [matColumnDef]="col.key">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ t(col.label) }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <div [ngSwitch]="col.type">
+            <ng-container *ngSwitchCase="'isEdit'">
+              <div class="btn-edit">
+                <button mat-button class="button-remove" (click)="removeUserGroupMemberRow(element.id)">
+                  {{ t('subTable.RemoveUserButton') }}
+                </button>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'text'">
+              <span>
+                {{ element[col.key] }}
+              </span>
+            </ng-container>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  <div mat-dialog-actions align="center">
+    <button mat-raised-button color="accent" (click)="submitUserGroup()">{{ t('saveButtonText') }}</button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="isLoading$ | async" mode="query" color="accent"></mat-progress-bar>

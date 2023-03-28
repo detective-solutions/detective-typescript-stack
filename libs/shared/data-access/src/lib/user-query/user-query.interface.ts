@@ -1,14 +1,13 @@
 import { ITable } from '../table';
-import { IUser } from '../user';
 
 export interface IUserQuery {
   id: string;
   code: string;
   utterance: string;
   parent: ITable;
-  author: IUser;
-  editors: IUser[];
-  lastUpdatedBy: IUser;
+  author: string;
+  editors: { id: string }[];
+  lastUpdatedBy: string;
   lastUpdated: string;
   created: string;
 }

@@ -1,21 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-
-export interface IMember {
-  xid: string;
-  firstname: string;
-  lastname: string;
-}
+import { UserGroupMember } from './user-group-member.type';
 
 export interface IUserGroup {
-  xid?: string;
+  id: string;
   name?: string;
   description?: string;
-  members?: IMember[];
-  memberCount?: {
-    count: number;
-  };
+  memberCount?: { count: number };
+  members?: UserGroupMember[];
   lastUpdated?: string;
-  tenant?: {
-    xid: string;
-  };
 }

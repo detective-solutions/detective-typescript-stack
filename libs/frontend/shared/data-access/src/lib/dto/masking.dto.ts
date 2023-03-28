@@ -1,36 +1,46 @@
-import { IMask, IMasking, IUserWithXid } from '@detective.solutions/shared/data-access';
+import { IMask, IMasking, ITenant, IUser, IUserGroup } from '@detective.solutions/shared/data-access';
 
 export class MaskingDTO implements IMasking {
+  get authorFullName(): string {
+    if (!this.author?.firstname || !this.author?.lastname) {
+      throw new Error('');
+    } else {
+      return `${this.author.firstname} ${this.author.lastname}`;
+    }
+  }
+  get lastEditorFullName(): string {
+    if (!this.lastUpdatedBy?.firstname || !this.lastUpdatedBy.lastname) {
+      throw new Error('');
+    } else {
+      return `${this.lastUpdatedBy.firstname} ${this.lastUpdatedBy.lastname}`;
+    }
+  }
+
   constructor(
-    public xid: string,
+    public id: string,
     public name: string,
-    public tenant: {
-      xid: string;
-    },
+    public tenant: Pick<ITenant, 'id'>,
     public description: string,
     public table: {
-      xid: string;
+      id: string;
       name: string;
       dataSource: {
-        xid: string;
+        id: string;
         name: string;
       };
     },
     public columns?: IMask[],
     public rows?: IMask[],
-    public groups?: {
-      xid: string;
-      name: string;
-    }[],
-    public author?: IUserWithXid,
-    public created?: string,
-    public lastUpdatedBy?: IUserWithXid,
-    public lastUpdated?: string
+    public groups?: Partial<IUserGroup>[] | undefined,
+    public author?: Partial<IUser> | undefined,
+    public created?: string | undefined,
+    public lastUpdatedBy?: Partial<IUser> | undefined,
+    public lastUpdated?: string | undefined
   ) {}
 
   static Build(maskingInput: IMasking) {
     return new MaskingDTO(
-      maskingInput.xid,
+      maskingInput.id,
       maskingInput.name,
       maskingInput.tenant,
       maskingInput.description,

@@ -7,7 +7,6 @@ import { ISidenavItem } from '@detective.solutions/frontend/detective-client/ui'
     [sidenavItems]="sidenavItems"
     [sidenavBottomItem]="sidenavBottomItem"
     [showTileToggle]="false"
-    [showSearchInput]="false"
   ></main-navigation>`,
 })
 export class AdminContainerComponent {
@@ -48,6 +47,6 @@ export class AdminContainerComponent {
     icon: 'arrow_back',
     translationKey: 'admin.navigation.sidenavBottomItem',
     route: '/home',
-    title: 'Go back to the home view',
+    title: 'admin.navigation.sidenavBottomItemTitle',
   };
 }

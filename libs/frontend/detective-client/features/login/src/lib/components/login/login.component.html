@@ -46,7 +46,6 @@
       <a fxLayoutAlign="center center" class="password-reset-link" [routerLink]="['/']">{{ t('passwordResetLink') }}</a>
     </mat-card-content>
     <mat-card-actions fxLayout="column" fxFlex="1 1 auto" fxLayoutAlign="center center">
-      <div *ngIf="loginError" class="mat-caption error">{{ loginError }}</div>
       <button mat-raised-button color="accent" (click)="login()">Login</button>
     </mat-card-actions>
   </mat-card>

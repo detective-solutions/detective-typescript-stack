@@ -3,15 +3,15 @@ import { IMaskSubTableDataDef } from './maskings-table.interface';
 
 export interface IMaskingCreateInput {
   masking: {
-    table: { xid: string };
-    groups: { xid: string }[];
+    id?: string;
+    table: { id: string };
+    groups: { id: string }[];
     name: string;
-    tenant: { xid: string };
+    tenant: { id: string };
     description: string;
-    xid?: string;
-    author?: { xid: string };
+    author?: { id: string };
     lastUpdated?: string;
-    lastUpdatedBy?: { xid: string };
+    lastUpdatedBy?: { id: string };
     created?: string;
     columns?: IMask[];
     rows?: IMask[];

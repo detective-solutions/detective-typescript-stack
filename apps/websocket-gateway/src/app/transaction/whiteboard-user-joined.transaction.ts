@@ -50,7 +50,7 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
   ): Promise<ICachableCasefileForWhiteboard> {
     // Add new connected user to casefile temporary data
     const isUserAlreadyCached = casefileData.temporary.activeUsers.some(
-      (activeUser: IUserForWhiteboard) => activeUser.id === newUserInfo.id
+      (activeUser: IUserForWhiteboard) => activeUser?.id === newUserInfo?.id
     );
     if (!isUserAlreadyCached) {
       casefileData.temporary.activeUsers.push(newUserInfo);

@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.5.0
         with:
           fetch-depth: 0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
@@ -30,11 +30,8 @@ jobs:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v3.0.1
 
-      - name: Install npm dependencies (without scripts)
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
-        run: npm rebuild && npm run prepare --if-present
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Lint affected files
         run: npx nx affected --target=lint --parallel=3
@@ -48,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.5.0
         with:
           fetch-depth: 0
 
@@ -73,20 +70,17 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.5.0
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
-      - name: Install npm dependencies (without scripts)
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
-        run: npm rebuild && npm run prepare --if-present
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Build ${{matrix.app}}
         run: npx nx build ${{matrix.app}} --prod && npm run transloco:optimize
@@ -110,7 +104,7 @@ jobs:
             BASE_TAG=${IMAGE_NAME}:${APP_VERSION}-${SANITIZED_BRANCH_NAME}
             TARGET_TAGS=${BASE_TAG}
           fi
-          echo "::set-output name=target-tags::${TARGET_TAGS}"
+          echo "target-tags=${TARGET_TAGS}" >> $GITHUB_OUTPUT
 
       - name: Login to quay.io
         uses: docker/login-action@v2.1.0
@@ -134,7 +128,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.5.0
 
       # PRs with event_name 'pull_request_target' always run in the PR target branch
       - name: Switch branch on PR
@@ -142,17 +136,14 @@ jobs:
         run: git checkout ${{github.event.pull_request.head.sha}}
 
       - name: Setup nodeJS
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{env.NODE_VERSION}}
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
 
-      - name: Install npm dependencies (without scripts)
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run npm scripts # Run scripts here to prevent access to NODE_AUTH_TOKEN
-        run: npm rebuild && npm run prepare --if-present
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Lint all apps
         run: npx nx run-many --all --target=lint --parallel=3

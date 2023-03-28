@@ -29,12 +29,28 @@ import {
   WhiteboardOptions,
 } from '@detective.solutions/shared/data-access';
 import {
+  ComponentCanDeactivate,
+  DisplayWhiteboardNode,
   EmbeddingWhiteboardNode,
   ForceDirectedGraph,
   IWhiteboardCollaborationCursor,
+  IWhiteboardNodeDragData,
   TableWhiteboardNode,
 } from '../../models';
-import { Subject, Subscription, combineLatest, debounceTime, delayWhen, filter, map, switchMap, take, tap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  combineLatest,
+  debounceTime,
+  delayWhen,
+  filter,
+  map,
+  of,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import {
   WhiteboardGeneralActions,
   WhiteboardMetadataActions,
@@ -45,13 +61,13 @@ import {
 } from '../../state';
 
 import { EditorEvent } from '../code-editor/models';
+import { DomSanitizer } from '@angular/platform-browser';
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 import { WHITEBOARD_NODE_SIBLING_ELEMENT_ID_PREFIX } from '../../utils';
 import { WhiteboardFacadeService } from '../../services';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -72,16 +88,17 @@ export interface CodeModel {
   styleUrls: ['./host.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
-  title = 'angular-code-editor';
-  yamlInputData = '';
-  appModuleTsData = '';
-  scssData = '';
 
-  private static readonly options: WhiteboardOptions = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
+  export class HostComponent implements OnInit, AfterViewInit, OnDestroy, ComponentCanDeactivate {
+    private static readonly options: WhiteboardOptions = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+
+    title = 'angular-code-editor';
+    yamlInputData = '';
+    appModuleTsData = '';
+    scssData = '';
 
   @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;
@@ -124,8 +141,9 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly whiteboardFacade: WhiteboardFacadeService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly overlayContainer: OverlayContainer,
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly sanitizer: DomSanitizer,
+    private readonly overlayContainer: OverlayContainer
   ) {
     // As the overlay is not part of Angular Material, we need to inject the theme class manually
     this.cdkOverlay = this.overlayContainer.getContainerElement();
@@ -160,18 +178,94 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
     this.whiteboardFacade.resetWhiteboard();
   }
 
+  canDeactivate(): boolean | Observable<boolean> {
+    return of(true);
+  }
+
   onElementDragOver(event: DragEvent) {
     event.preventDefault();
   }
 
   onElementDrop(event: DragEvent) {
+    event.preventDefault();
+    this.buildNodeByType(event);
+  }
+
+  buildNodeByType(event: DragEvent) {
     this.store
       .select(selectWhiteboardContextState)
       .pipe(take(1))
       .subscribe((context: IWhiteboardContextState) => {
+        const now = new Date().toISOString();
+        const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
+        const defaultMargin = 50;
+
+        let addedNode;
+        const defaultNodeConfig = {
+          id: uuidv4(),
+          x: convertedDOMPoint.x,
+          y: convertedDOMPoint.y,
+          width: 900,
+          height: 500,
+          locked: false,
+          lastUpdated: now,
+          lastUpdatedBy: context.userId,
+          created: now,
+          editors: [{ id: context.userId }],
+        };
+
+        const isFile = event.dataTransfer?.files && event.dataTransfer?.files.length !== 0;
+        if (isFile) {
+          for (let i = 0; i < event.dataTransfer.files.length; i++) {
+            const margin = i * (defaultMargin + defaultNodeConfig.width) || 0;
+            convertedDOMPoint.x += margin;
+
+            const fileToUpload = event.dataTransfer.files[i];
+            if (!fileToUpload) {
+              console.error(event);
+              throw new Error('Could not extract file from drag event');
+            }
+
+            addedNode = DisplayWhiteboardNode.Build({
+              ...defaultNodeConfig,
+              title: fileToUpload.name,
+              author: context.userId,
+              editors: [{ id: context.userId }],
+              temporary: { file: fileToUpload },
+            });
+          }
+        } else {
+          const dragData = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '') as IWhiteboardNodeDragData;
+          if (!dragData) {
+            throw new Error('Could not extract drag data for adding whiteboard node');
+          }
+
+          switch (dragData.type) {
+            case WhiteboardNodeType.TABLE: {
+              addedNode = TableWhiteboardNode.Build({
+                ...defaultNodeConfig,
+                title: dragData.title,
+                entity: {
+                  id: dragData.entityId,
+                  baseQuery: dragData.baseQuery,
+                },
+              });
+              break;
+            }
+            case WhiteboardNodeType.EMBEDDING: {
+              addedNode = EmbeddingWhiteboardNode.Build({
+                ...defaultNodeConfig,
+                title: '',
+                author: context.userId,
+                editors: [{ id: context.userId }],
+              });
+              break;
+            }
+          }
+        }
         this.store.dispatch(
           WhiteboardNodeActions.WhiteboardNodeAdded({
-            addedNode: this.buildNodeByType(event, context),
+            addedNode: addedNode as AnyWhiteboardNode,
             addedManually: true,
           })
         );
@@ -189,58 +283,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getCurrentCode(): string {
     return this.currentCode;
-  }
-
-  buildNodeByType(event: DragEvent, whiteboardContext: IWhiteboardContextState): AnyWhiteboardNode {
-    // TODO: Add interface for drag data transfer object
-    const dragDataTransfer = JSON.parse(event.dataTransfer?.getData('text/plain') ?? '');
-    if (!dragDataTransfer) {
-      console.error('Could not extract drag data for adding whiteboard node');
-    }
-    const now = formatDate(new Date());
-    const convertedDOMPoint = this.convertDOMToSVGCoordinates(event.clientX, event.clientY);
-
-    const defaultNodeWidth = 900;
-    const defaultNodeHeight = 500;
-
-    switch (dragDataTransfer.type) {
-      case WhiteboardNodeType.TABLE: {
-        return TableWhiteboardNode.Build({
-          id: uuidv4(),
-          title: dragDataTransfer.title,
-          x: convertedDOMPoint.x,
-          y: convertedDOMPoint.y,
-          width: defaultNodeWidth,
-          height: defaultNodeHeight,
-          locked: false,
-          lastUpdatedBy: whiteboardContext.userId,
-          lastUpdated: now,
-          created: now,
-          entity: {
-            id: dragDataTransfer.entityId,
-          },
-        });
-      }
-      case WhiteboardNodeType.EMBEDDING: {
-        return EmbeddingWhiteboardNode.Build({
-          id: uuidv4(),
-          title: '',
-          x: convertedDOMPoint.x,
-          y: convertedDOMPoint.y,
-          width: defaultNodeWidth,
-          height: defaultNodeHeight,
-          locked: false,
-          author: whiteboardContext.userId,
-          editors: [{ id: whiteboardContext.userId }],
-          lastUpdatedBy: whiteboardContext.userId,
-          lastUpdated: now,
-          created: now,
-        });
-      }
-      default: {
-        throw new Error(`Could initialize node for type ${dragDataTransfer?.type}`);
-      }
-    }
   }
 
   trackCollaborationCursorByUserId(_index: number, collaborationCursor: IWhiteboardCollaborationCursor) {
@@ -351,33 +393,6 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         })
     );
-
-    // Listen to WHITEBOARD_NODE_BLOCKED websocket message event
-    // this.subscriptions.add(
-    //   this.whiteboardFacade.getWebSocketSubjectAsync$
-    //     .pipe(
-    //       switchMap((webSocketSubject$) =>
-    //         combineLatest([
-    //           webSocketSubject$.on$(MessageEventType.WhiteboardNodeBlocked),
-    //           this.store.select(selectWhiteboardContextState).pipe(take(1)),
-    //         ])
-    //       ),
-    //       filter(([messageData, context]) => messageData.context.userId !== context.userId),
-    //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //       map(([messageData, _context]) => messageData)
-    //     )
-    //     .subscribe((messageData: IMessage<IWhiteboardNodeBlockUpdate>) =>
-    //       // Convert incoming message to ngRx Update type
-    //       this.store.dispatch(
-    //         WhiteboardNodeActions.WhiteboardNodeBlockedRemotely({
-    //           update: {
-    //             id: messageData.context.nodeId,
-    //             changes: messageData.body,
-    //           } as Update<IWhiteboardNodeBlockUpdate>,
-    //         })
-    //       )
-    //     )
-    // );
 
     // Listen to WHITEBOARD_NODE_PROPERTIES_UPDATED websocket message event
     this.subscriptions.add(

@@ -14,14 +14,15 @@ export class SearchTablesByTenantGQL extends Query<Response> {
       querySourceConnection(
         filter: { status: { eq: "${SourceConnectionStatus.AVAILABLE}" } }
       ) @cascade {
-        xid
+        id: xid
         tenant(filter: {xid: {eq: $tenantId } }) {
-          xid
+          id: xid
         }
         connectorName
         connectedTables(filter: { name: { regexp: $searchTerm } }) {
-          xid
+          id: xid
           name
+          baseQuery
         }
       }
     }

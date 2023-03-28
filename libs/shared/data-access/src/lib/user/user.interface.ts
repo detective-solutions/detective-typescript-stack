@@ -17,24 +17,3 @@ export interface IUser {
   lastUpdated?: string;
   created?: string;
 }
-
-export interface IUserWithXid {
-  xid: string;
-  email?: string;
-  tenantIds?: ITenant[];
-  role?: UserRole;
-  firstname?: string;
-  lastname?: string;
-  title?: string;
-  avatarUrl?: string;
-  userGroups?: IUserGroup[];
-  refreshTokenId?: string;
-  lastUpdatedBy?: IUser;
-  lastUpdated?: string;
-  created?: string;
-}
-
-export interface IDropDownUser {
-  xid: string;
-  name: string;
-}

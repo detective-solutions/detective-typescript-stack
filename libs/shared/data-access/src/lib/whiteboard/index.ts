@@ -1,5 +1,6 @@
 export * from './d3';
 export * from './embedding-node';
+export * from './display-node';
 export * from './table-node';
 export * from './user-query-node';
 
