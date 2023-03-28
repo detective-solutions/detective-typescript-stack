@@ -23,13 +23,15 @@ export class CustomAuthService extends AuthService {
   }
 
   protected loginProvider(email: string, password: string): Observable<IAuthServerResponse> {
-    return this.httpClient
-      .post<IAuthServerResponse>(this.loginUrl, {
-        email,
-        password,
+    return (
+      this.httpClient
+        .post<IAuthServerResponse>(this.loginUrl, {
+          email,
+          password,
+        })
         // Reset Apollo DB cache on login
-      })
-      .pipe(tap(() => this.apollo.client.resetStore()));
+        .pipe(tap(() => this.apollo.client.resetStore()))
+    );
   }
 
   protected logoutProvider(): Observable<void> {

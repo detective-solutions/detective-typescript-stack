@@ -55,7 +55,6 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
             map((updatedAuthStatus) => updatedAuthStatus.isAuthenticated)
           );
         } else if (!loginAllowed) {
-          this.authService.logout(true);
           this.router.navigate(
             ['login'],
             redirectUrl

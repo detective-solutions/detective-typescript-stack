@@ -25,6 +25,8 @@ export class WhiteboardUserLeftTransaction extends Transaction {
   private handleError(error: Error) {
     // TODO: Improve error handling with caching of transaction data & re-running mutations
     this.logger.error(error);
-    throw new InternalServerErrorException(`Could not add new user "${this.userId}" to casefile "${this.casefileId}"`);
+    throw new InternalServerErrorException(
+      `Could not remove active user "${this.userId}" from casefile "${this.casefileId}"`
+    );
   }
 }

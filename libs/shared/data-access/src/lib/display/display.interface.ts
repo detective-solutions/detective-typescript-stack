@@ -1,11 +1,8 @@
-export interface IEmbedding {
+export interface IDisplay {
   id: string;
-  title: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  locked: boolean;
+  fileName: string;
+  sourceType: string;
+  pageCount: number;
   author: string;
   editors: { id: string }[];
   lastUpdatedBy: string;

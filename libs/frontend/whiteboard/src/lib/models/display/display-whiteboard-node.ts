@@ -1,9 +1,8 @@
 import {
+  IDisplay,
   IDisplayNode,
   IDisplayNodeTemporaryData,
   IDisplayWhiteboardNode,
-  IFileHandle,
-  IUser,
   WhiteboardNodeType,
 } from '@detective.solutions/shared/data-access';
 
@@ -13,23 +12,21 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
   constructor(
     public id: string,
     public title: string,
-    public fileName: string,
-    public pageCount: number,
-    public currentIndex: number,
-    public pages: string[],
-    public currentLink: string,
-    public expires: Date,
     public x: number,
     public y: number,
     public width: number,
     public height: number,
     public locked: boolean,
-    public file: IFileHandle,
     public author: string,
-    public editors: IUser[],
+    public editors: { id: string }[],
     public lastUpdatedBy: string,
     public lastUpdated: string,
     public created: string,
+    public currentPageIndex: number | undefined,
+    public filePageUrls: string[] | undefined,
+    public pageCount: number | undefined,
+    public expires: string | undefined,
+    public entity: Partial<IDisplay> | undefined,
     public temporary: IDisplayNodeTemporaryData | undefined
   ) {}
 
@@ -38,23 +35,21 @@ export class DisplayWhiteboardNode implements IDisplayWhiteboardNode {
       return new DisplayWhiteboardNode(
         nodeInput.id,
         nodeInput.title,
-        nodeInput.fileName,
-        nodeInput.pageCount,
-        nodeInput.currentIndex,
-        nodeInput.pages,
-        nodeInput.currentLink,
-        nodeInput.expires,
         nodeInput.x,
         nodeInput.y,
         nodeInput.width,
         nodeInput.height,
         nodeInput.locked,
-        nodeInput.file,
         nodeInput.author,
         nodeInput.editors,
         nodeInput.lastUpdatedBy,
         nodeInput.lastUpdated,
         nodeInput.created,
+        nodeInput?.currentPageIndex ?? 0,
+        nodeInput?.filePageUrls ?? [],
+        nodeInput?.pageCount,
+        nodeInput?.expires,
+        nodeInput.entity,
         nodeInput?.temporary
       );
     } catch (e) {

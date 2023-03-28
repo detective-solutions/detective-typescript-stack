@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject, catchError, map, tap } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, Subject, catchError, map, tap } from 'rxjs';
 import { IAuthServerResponse, IJwtTokenPayload } from '@detective.solutions/shared/data-access';
 import { IAuthStatus, defaultAuthStatus } from '../interfaces/auth-status.interface';
 
@@ -55,6 +55,10 @@ export abstract class AuthService extends CacheService implements IAuthService {
           this.authStatus$.next(defaultAuthStatus);
         }
         this.isLoggingOut = false;
+      }),
+      catchError(() => {
+        this.isLoggingOut = false;
+        return EMPTY;
       })
     );
   }
@@ -100,14 +104,14 @@ export abstract class AuthService extends CacheService implements IAuthService {
     return true;
   }
 
+  clearAuthTokens() {
+    this.removeItem(AuthService.ACCESS_TOKEN_STORAGE_KEY);
+    this.removeItem(AuthService.REFRESH_TOKEN_STORAGE_KEY);
+  }
+
   protected setAuthTokens(accessToken: string, refreshToken: string) {
     this.setItem(AuthService.ACCESS_TOKEN_STORAGE_KEY, accessToken);
     this.setItem(AuthService.REFRESH_TOKEN_STORAGE_KEY, refreshToken);
-  }
-
-  protected clearAuthTokens() {
-    this.removeItem(AuthService.ACCESS_TOKEN_STORAGE_KEY);
-    this.removeItem(AuthService.REFRESH_TOKEN_STORAGE_KEY);
   }
 
   private getAuthStatusFromToken(): IAuthStatus {

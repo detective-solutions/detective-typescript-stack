@@ -1,4 +1,3 @@
-import { IUser } from '../user';
 import { IUserQuery } from './user-query.interface';
 
 export interface IUserQueryOccurrence {
@@ -10,7 +9,7 @@ export interface IUserQueryOccurrence {
   height: number;
   locked: boolean;
   author: string;
-  editors: IUser[];
+  editors: { id: string }[];
   lastUpdatedBy: string;
   lastUpdated: string;
   created: string;

@@ -1,9 +1,10 @@
-/* eslint-disable sort-imports */
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
+import { BehaviorSubject, take } from 'rxjs';
+import { Component, ViewEncapsulation } from '@angular/core';
+import { IDisplayNodeTemporaryData, IDisplayWhiteboardNode } from '@detective.solutions/shared/data-access';
 import { BaseNodeComponent } from '../base/base-node.component';
-import { WhiteboardNodeActions } from '../../../state';
-import { InitialSetup } from '../../../models';
+import { IDisplaySetupInformation } from '../../../models';
+import { LoadDisplayNodeData } from './state';
+import { WhiteboardNodePropertiesUpdated } from '../../../state/actions/whiteboard-node.actions';
 
 @Component({
   selector: '[displayNode]',
@@ -11,117 +12,109 @@ import { InitialSetup } from '../../../models';
   styleUrls: ['./display-node.component.scss', '../base/base-node.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DisplayNodeComponent extends BaseNodeComponent implements OnInit {
-  nodeValues: IDisplayWhiteboardNode = this.node as IDisplayWhiteboardNode;
+export class DisplayNodeComponent extends BaseNodeComponent {
+  isLoading$ = new BehaviorSubject<boolean>(true);
 
-  currentIndex!: number;
-  xid!: string;
-  pages!: string[];
-  currentLink!: string;
-  fileName!: string;
-  pageCount!: number;
-  expires: Date = new Date();
+  currentPageUrl!: string;
+
+  get currentPageIndex(): number {
+    return (this.node as IDisplayWhiteboardNode).currentPageIndex ?? 0;
+  }
+
+  get filePageUrls(): string[] {
+    return (this.node as IDisplayWhiteboardNode).filePageUrls ?? [];
+  }
+
+  get pageCount(): number {
+    return (this.node as IDisplayWhiteboardNode).entity?.pageCount ?? 0;
+  }
+
+  get expires(): string {
+    return (this.node as IDisplayWhiteboardNode).expires ?? new Date().toISOString();
+  }
+
+  get fileName(): string {
+    return (this.node as IDisplayWhiteboardNode).entity?.fileName ?? '';
+  }
+
+  get temporaryData(): IDisplayNodeTemporaryData | undefined {
+    return (this.node as IDisplayWhiteboardNode).temporary;
+  }
 
   protected override customOnInit() {
     this.subscriptions.add(
       this.nodeTitleBlur$.subscribe((updatedTitle: string) =>
         this.store.dispatch(
-          WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
+          WhiteboardNodePropertiesUpdated({
             updates: [{ id: this.node.id, changes: { title: updatedTitle } }],
           })
         )
       )
     );
 
-    this.setCurrentNodeValues();
-    this.refreshPages();
-  }
-
-  refreshPages() {
-    if (!this.checkForExpiry()) {
-      this.whiteboardFacade.getDisplayLocation(this.xid, this.fileName).subscribe((response: InitialSetup) => {
-        this.pages = response.pages ?? [''];
-        this.pageCount = response.pageCount ?? 0;
-        this.setExpiry(response.exp ?? '');
-        this.setImageLink();
-      });
-    }
-  }
-
-  checkForExpiry() {
-    if (this.expires < new Date()) {
-      return false;
+    const localFile = this.temporaryData?.file;
+    if (localFile && (localFile as File).size > 0) {
+      this.uploadFile(localFile);
     } else {
-      return true;
-    }
-  }
-
-  setCurrentNodeValues() {
-    this.currentIndex = (this.node as IDisplayWhiteboardNode).currentIndex;
-    this.pages = (this.node as IDisplayWhiteboardNode).pages;
-    this.fileName = (this.node as IDisplayWhiteboardNode).fileName;
-    this.xid = (this.node as IDisplayWhiteboardNode).id.split('-').join('');
-    this.currentLink = (this.node as IDisplayWhiteboardNode).currentLink;
-    this.pageCount = (this.node as IDisplayWhiteboardNode).pageCount;
-    this.expires = (this.node as IDisplayWhiteboardNode).expires;
-  }
-
-  setExpiry(date: string) {
-    const year = parseInt(date.slice(0, 4));
-    const month = parseInt(date.slice(5, 7));
-    const day = parseInt(date.slice(8, 10));
-    const hours = parseInt(date.slice(11, 13));
-    const minutes = parseInt(date.slice(14, 16));
-    const seconds = parseInt(date.slice(17, 19));
-
-    this.expires = new Date(year, month, day, hours, minutes, seconds);
-    this.store.dispatch(
-      WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
-        updates: [
-          {
-            id: this.node.id,
-            changes: {
-              expires: this.expires,
-            },
-          },
-        ],
-      })
-    );
-  }
-
-  setImageLink() {
-    if (this.pages.length === this.pageCount) {
-      this.currentLink = this.pages[this.currentIndex];
-
-      this.store.dispatch(
-        WhiteboardNodeActions.WhiteboardNodePropertiesUpdated({
-          updates: [
-            {
-              id: this.node.id,
-              changes: {
-                currentIndex: this.currentIndex,
-                currentLink: this.currentLink,
-              },
-            },
-          ],
-        })
-      );
+      this.refreshPages();
+      this.initializeWithExistingImage();
     }
   }
 
   previousPage() {
     this.refreshPages();
-    if (this.currentIndex > 0) {
-      this.currentIndex -= 1;
-      this.setImageLink();
+    if (this.currentPageIndex > 0) {
+      this.store.dispatch(
+        WhiteboardNodePropertiesUpdated({
+          updates: [{ id: this.node.id, changes: { currentPageIndex: this.currentPageIndex - 1 } }],
+        })
+      );
     }
   }
 
   nextPage() {
     this.refreshPages();
-    if (this.currentIndex < this.pageCount - 1) {
-      this.currentIndex += 1;
-      this.setImageLink();
+    if (this.currentPageIndex < this.pageCount - 1) {
+      this.store.dispatch(
+        WhiteboardNodePropertiesUpdated({
+          updates: [{ id: this.node.id, changes: { currentPageIndex: this.currentPageIndex + 1 } }],
+        })
+      );
     }
+  }
+
+  private uploadFile(localFile: File) {
+    this.store.dispatch(LoadDisplayNodeData({ nodeId: this.node.id, file: localFile }));
+  }
+
+  private initializeWithExistingImage() {
+    if (this.filePageUrls.length !== 0) {
+      this.currentPageUrl = this.filePageUrls[this.currentPageIndex];
+      this.isLoading$.next(false);
+    }
+  }
+
+  private refreshPages() {
+    if (this.isFileExpired()) {
+      this.whiteboardFacade
+        .requestNewPresignedUrl(this.node.id, this.fileName)
+        .pipe(take(1))
+        .subscribe((response: IDisplaySetupInformation) =>
+          this.store.dispatch(
+            WhiteboardNodePropertiesUpdated({
+              updates: [
+                {
+                  id: this.node.id,
+                  changes: { filePageUrls: response.pages, pageCount: response.pageCount, expires: response.exp },
+                },
+              ],
+            })
+          )
+        );
+    }
+  }
+
+  private isFileExpired() {
+    return this.expires && this.expires < new Date().toISOString();
   }
 }

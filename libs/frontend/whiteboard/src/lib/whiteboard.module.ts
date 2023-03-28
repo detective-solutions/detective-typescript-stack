@@ -7,14 +7,17 @@ import {
 } from './services/internal-services';
 import {
   DisplayNodeComponent,
+  DisplayNodeEffects,
   EmbeddingNodeComponent,
   HostComponent,
   NodeHeaderComponent,
   NodeSelectionHaloComponent,
   SidebarComponent,
   TableNodeComponent,
+  TableNodeEffects,
   TestLinkComponent,
   TopbarComponent,
+  WhiteboardLeaveDialogComponent,
 } from './components';
 import { DisplayService, WhiteboardFacadeService } from './services';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
@@ -33,8 +36,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SearchTablesByTenantGQL } from './graphql';
 import { StoreModule } from '@ngrx/store';
-import { TableNodeEffects } from './components/node-components/table/state';
 import { WhiteboardContextResolver } from './resolvers';
+import { WhiteboardLeaveGuard } from './guards';
 import { WhiteboardMaterialModule } from './whiteboard.material.module';
 import { WhiteboardRoutingModule } from './whiteboard-routing.module';
 import { langScopeLoader } from '@detective.solutions/shared/i18n';
@@ -50,6 +53,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
       WhiteboardMetadataEffects,
       WhiteboardNodeEffects,
       TableNodeEffects,
+      DisplayNodeEffects,
     ]),
     StoreModule.forFeature(WHITEBOARD_STORE_NAME, whiteboardFeatureReducers),
     TranslocoModule,
@@ -68,6 +72,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     DisplayNodeComponent,
     TestLinkComponent,
     TopbarComponent,
+    WhiteboardLeaveDialogComponent,
   ],
   providers: [
     BufferService,
@@ -79,6 +84,7 @@ import { whiteboardFeatureReducers } from './state/reducers';
     WebSocketService,
     WhiteboardSelectionService,
     DisplayService,
+    WhiteboardLeaveGuard,
     SearchTablesByTenantGQL,
     {
       provide: TRANSLOCO_SCOPE,

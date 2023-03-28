@@ -22,14 +22,14 @@ export const getCasefileByIdQuery = `
         height: TableOccurrence.height
         locked: TableOccurrence.locked
         TableOccurrence.lastUpdatedBy @normalize {
-          lastUpdateBy: User.xid
+          lastUpdatedBy: User.xid
         }
         lastUpdated: TableOccurrence.lastUpdated
         created: TableOccurrence.created
         entity: TableOccurrence.entity {
           id: Table.xid
           name: Table.name
-          description: Table.description
+          baseQuery: Table.baseQuery
         }
       }
       queries: Casefile.queries {
@@ -53,7 +53,31 @@ export const getCasefileByIdQuery = `
           code: UserQuery.code
         }
       }
-      embeddings: Casefile.embeddings @normalize {
+      displays: Casefile.displays {
+        id: DisplayOccurrence.xid
+        title: DisplayOccurrence.title
+        x: DisplayOccurrence.x
+        y: DisplayOccurrence.y
+        width: DisplayOccurrence.width
+        height: DisplayOccurrence.height
+        locked: DisplayOccurrence.locked
+        DisplayOccurrence.author @normalize {
+          author: User.xid
+        }
+        DisplayOccurrence.lastUpdatedBy @normalize {
+          lastUpdatedBy: User.xid
+        }
+        lastUpdated: DisplayOccurrence.lastUpdated
+        created: DisplayOccurrence.created
+        currentPageIndex: DisplayOccurrence.currentPageIndex
+        filePageUrls: DisplayOccurrence.filePageUrls
+        expires: DisplayOccurrence.expires
+        DisplayOccurrence.entity {
+          fileName: Display.fileName
+          pageCount: Display.pageCount
+        }
+      }
+      embeddings: Casefile.embeddings {
         id: Embedding.xid
         title: Embedding.title
         x: Embedding.x
@@ -61,10 +85,10 @@ export const getCasefileByIdQuery = `
         width: Embedding.width
         height: Embedding.height
         locked: Embedding.locked
-        Embedding.author {
+        Embedding.author @normalize {
           author: User.xid
         }
-        Embedding.lastUpdatedBy {
+        Embedding.lastUpdatedBy @normalize {
           lastUpdatedBy: User.xid
         }
         lastUpdated: Embedding.lastUpdated

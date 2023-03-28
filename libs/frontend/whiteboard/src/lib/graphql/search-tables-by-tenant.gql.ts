@@ -22,6 +22,7 @@ export class SearchTablesByTenantGQL extends Query<Response> {
         connectedTables(filter: { name: { regexp: $searchTerm } }) {
           id: xid
           name
+          baseQuery
         }
       }
     }

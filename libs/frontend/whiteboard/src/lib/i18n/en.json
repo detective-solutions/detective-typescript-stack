@@ -22,5 +22,10 @@
     "titleInputPlaceholder": "Insert title here",
     "blockedInfoTitle": "blocked by",
     "avatarAltText": "Avatar of blocking user"
+  },
+  "leaveDialog": {
+    "dialogText": "You are about to leave this casefile. Are you sure?",
+    "confirmButtonText": "Yes",
+    "cancelButtonText": "Take me back"
   }
 }

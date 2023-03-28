@@ -2,6 +2,7 @@ import {
   AnyWhiteboardNode,
   ICachableCasefileForWhiteboard,
   ICasefileForWhiteboard,
+  IDisplayWhiteboardNode,
   IEmbeddingWhiteboardNode,
   ITableWhiteboardNode,
   IUserForWhiteboard,
@@ -27,7 +28,6 @@ import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableExc
 import { DGraphGrpcClientService } from '@detective.solutions/backend/dgraph-grpc-client';
 import { TxnOptions } from 'dgraph-js';
 import { UserForWhiteboardDTO } from '@detective.solutions/backend/shared/data-access';
-import { formatDate } from '@detective.solutions/shared/utils';
 import { validateDto } from '@detective.solutions/backend/shared/utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -67,6 +67,7 @@ export class DatabaseService {
 
     this.logger.verbose(`Received data for casefile ${id}`);
     const casefileData = response[getCasefileByIdQueryName][0] as ICasefileForWhiteboard;
+
     await validateDto(CasefileForWhiteboardDTO, casefileData, this.logger);
 
     // Convert ICasefileForWhiteboard to ICachableCasefileForWhiteboard
@@ -84,6 +85,11 @@ export class DatabaseService {
         ...(casefileData.queries
           ? (casefileData.queries.map((node) => {
               return { ...node, type: WhiteboardNodeType.USER_QUERY };
+            }) as AnyWhiteboardNode[])
+          : []),
+        ...(casefileData.displays
+          ? (casefileData?.displays?.map((node) => {
+              return { ...node, type: WhiteboardNodeType.DISPLAY };
             }) as AnyWhiteboardNode[])
           : []),
         ...(casefileData.embeddings
@@ -175,6 +181,12 @@ export class DatabaseService {
             );
             break;
           }
+          case WhiteboardNodeType.DISPLAY: {
+            setMutations.push(
+              await this.getDisplayOccurrenceToCasefileMutation(casefileUid, node as IDisplayWhiteboardNode, index)
+            );
+            break;
+          }
           case WhiteboardNodeType.EMBEDDING: {
             setMutations.push(
               await this.getEmbeddingToCasefileMutation(casefileUid, node as IEmbeddingWhiteboardNode, index)
@@ -253,6 +265,38 @@ export class DatabaseService {
     };
   }
 
+  async getDisplayOccurrenceToCasefileMutation(
+    casefileUid: string,
+    displayWhiteboardNode: IDisplayWhiteboardNode,
+    index: number
+  ): Promise<Record<string, any> | null> {
+    const uid = await this.getUidByType(displayWhiteboardNode.id, 'DisplayOccurrence');
+    const basicMutationJson = await this.createBasicNodeInsertMutation(displayWhiteboardNode);
+    return {
+      uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}`,
+      ...basicMutationJson,
+      [`${displayWhiteboardNode.type}.currentFilePageIndex`]: displayWhiteboardNode.currentPageIndex,
+      [`${displayWhiteboardNode.type}.filePageUrls`]: displayWhiteboardNode.filePageUrls,
+      [`${displayWhiteboardNode.type}.expires`]: displayWhiteboardNode.expires,
+      [`${displayWhiteboardNode.type}.author`]: {
+        uid: (await this.getUidByType(displayWhiteboardNode.author, 'User')) ?? null,
+      },
+      [`${displayWhiteboardNode.type}.editors`]: displayWhiteboardNode.editors.map(async (editor: { id: string }) => {
+        return {
+          uid: (await this.getUidByType(editor.id, 'User')) ?? null,
+        };
+      }),
+      [`${displayWhiteboardNode.type}.entity`]: {
+        uid: (await this.getUidByType(displayWhiteboardNode.entity?.id, 'Display')) ?? null,
+        pageCount: displayWhiteboardNode.pageCount,
+      },
+      [`${displayWhiteboardNode.type}.casefile`]: {
+        uid: casefileUid,
+        'Casefile.displays': { uid: uid ?? `${DatabaseService.mutationNodeReference}_${index}` },
+      },
+    };
+  }
+
   async getEmbeddingToCasefileMutation(
     casefileUid: string,
     embeddingWhiteboardNode: IEmbeddingWhiteboardNode,
@@ -325,7 +369,7 @@ export class DatabaseService {
       [`${addedWhiteboardNode.type}.lastUpdatedBy`]: {
         uid: (await this.getUidByType(addedWhiteboardNode.lastUpdatedBy, 'User')) ?? null,
       },
-      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated ?? formatDate(new Date()),
+      [`${addedWhiteboardNode.type}.lastUpdated`]: addedWhiteboardNode.lastUpdated ?? new Date().toISOString(),
       [`${addedWhiteboardNode.type}.created`]: addedWhiteboardNode.created,
       'dgraph.type': addedWhiteboardNode.type,
     };

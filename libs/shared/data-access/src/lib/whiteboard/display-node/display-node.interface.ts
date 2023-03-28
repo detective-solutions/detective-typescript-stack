@@ -1,10 +1,10 @@
-import { IDisplay } from '../../display';
+import { IDisplayOccurrence } from '../../display';
 import { IGeneralWhiteboardNodeTemporaryData } from '..';
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
-
-export interface IDisplayNode extends IDisplay {
+export interface IDisplayNode extends IDisplayOccurrence {
   temporary?: IDisplayNodeTemporaryData;
 }
 
-export interface IDisplayNodeTemporaryData extends IGeneralWhiteboardNodeTemporaryData {}
+export interface IDisplayNodeTemporaryData extends IGeneralWhiteboardNodeTemporaryData {
+  file: File;
+}

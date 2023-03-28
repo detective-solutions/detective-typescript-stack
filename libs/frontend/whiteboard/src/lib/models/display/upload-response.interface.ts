@@ -1,11 +1,11 @@
-export interface UploadResponse {
+export interface IUploadResponse {
   success: boolean;
   xid: string;
-  setup: InitialSetup;
-  nodeType: 'table' | 'display';
+  setup: IDisplaySetupInformation;
+  nodeType: 'Display' | 'Table';
 }
 
-export interface InitialSetup {
+export interface IDisplaySetupInformation {
   pageCount?: number;
   pages?: string[];
   exp?: string;
