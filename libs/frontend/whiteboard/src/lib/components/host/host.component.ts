@@ -60,8 +60,8 @@ import {
   selectWhiteboardNodesBlockedByUserId,
 } from '../../state';
 
-import { EditorEvent } from '../code-editor/models';
 import { DomSanitizer } from '@angular/platform-browser';
+import { EditorEvent } from '../code-editor/models';
 import { IWhiteboardContextState } from '../../state/interfaces';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
@@ -88,17 +88,16 @@ export interface CodeModel {
   styleUrls: ['./host.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+export class HostComponent implements OnInit, AfterViewInit, OnDestroy, ComponentCanDeactivate {
+  private static readonly options: WhiteboardOptions = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
 
-  export class HostComponent implements OnInit, AfterViewInit, OnDestroy, ComponentCanDeactivate {
-    private static readonly options: WhiteboardOptions = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-
-    title = 'angular-code-editor';
-    yamlInputData = '';
-    appModuleTsData = '';
-    scssData = '';
+  title = 'angular-code-editor';
+  yamlInputData = '';
+  appModuleTsData = '';
+  scssData = '';
 
   @ViewChild('whiteboardContainer') whiteboardContainerElement!: ElementRef;
   @ViewChild('zoomContainer') zoomContainerElement!: ElementRef;

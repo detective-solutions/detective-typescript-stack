@@ -39,7 +39,7 @@ export class GrabberDirective {
   };
 
   readonly _boundDragging = (event: MouseEvent) => this._dragging(event);
-  readonly _boundDragEnd = (event: MouseEvent) => this._dragEnd(event);
+  readonly _boundDragEnd = () => this._dragEnd();
 
   constructor(private elm: ElementRef, @Host() @SkipSelf() private resizable: ResizableDirective) {}
 
@@ -48,7 +48,7 @@ export class GrabberDirective {
     this.resizable.dragging(diff);
   }
 
-  private _dragEnd(event: MouseEvent) {
+  private _dragEnd() {
     this._startOffsetX = 0;
     document.removeEventListener('mousemove', this._boundDragging);
     document.removeEventListener('mouseup', this._boundDragEnd);

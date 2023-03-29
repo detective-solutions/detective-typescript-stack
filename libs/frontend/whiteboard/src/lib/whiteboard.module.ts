@@ -20,8 +20,8 @@ import {
   TopbarComponent,
   WhiteboardLeaveDialogComponent,
 } from './components';
-import { GrabberDirective,  ResizableDirective } from './directives';
 import { DisplayService, WhiteboardFacadeService } from './services';
+import { GrabberDirective, ResizableDirective } from './directives';
 import { TRANSLOCO_SCOPE, TranslocoModule } from '@ngneat/transloco';
 import {
   WHITEBOARD_STORE_NAME,
