@@ -88,4 +88,8 @@ export class TableNodeComponent extends BaseNodeComponent {
       this.store.dispatch(LoadTableData({ node: { ...(this.node as ITableWhiteboardNode) } }));
     }
   }
+
+  toggleEditor() {
+    this.editorEvent.emit({ editorState: true, code: `SELECT * FROM 'myTable';` });
+  }
 }
