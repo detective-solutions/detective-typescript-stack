@@ -1,4 +1,4 @@
 export enum KafkaTopic {
-  QueryOutput = 'casefile',
+  QueryOutput = 'queries',
   QueryInput = 'masking',
 }
