@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v3.5.2
         with:
           fetch-depth: 0
 
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v3.5.2
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v3.5.2
 
       - name: Setup nodeJS
         uses: actions/setup-node@v3.6.0
@@ -128,7 +128,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v3.5.2
 
       # PRs with event_name 'pull_request_target' always run in the PR target branch
       - name: Switch branch on PR
