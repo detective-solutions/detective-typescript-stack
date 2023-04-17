@@ -3,6 +3,7 @@ import {
   IMessage,
   ITable,
   ITableWhiteboardNode,
+  KafkaTopic,
   MessageEventType,
   UserRole,
   WhiteboardNodeType,
@@ -16,14 +17,23 @@ import { WhiteboardNodeAddedTransaction } from './whiteboard-node-added.transact
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
-const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
-const mockWhiteboardWebSocketGateway = {
-  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
-};
-
 const addNodeMethodName = 'addNode';
+const getCasefileByIdMethodName = 'getCasefileById';
 const cacheServiceMock = {
   [addNodeMethodName]: jest.fn(),
+  [getCasefileByIdMethodName]: jest.fn(),
+};
+
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const sendPropagatedUnicastMessageMethodName = 'sendPropagatedUnicastMessage';
+const whiteboardWebSocketGatewayMock = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
+  [sendPropagatedUnicastMessageMethodName]: jest.fn(),
+};
+
+const produceKafkaEventMethodName = 'produceKafkaEvent';
+const kafkaEventProducerMock = {
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -51,7 +61,7 @@ const testMessageBody: ITableWhiteboardNode = {
   type: WhiteboardNodeType.TABLE,
 };
 
-const testEventPayload: IMessage<ITableWhiteboardNode> = {
+const testMessagePayload: IMessage<ITableWhiteboardNode> = {
   context: testMessageContext,
   body: testMessageBody,
 };
@@ -66,10 +76,10 @@ describe('WhiteboardNodeAddedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
+        { provide: WhiteboardWebSocketGateway, useValue: whiteboardWebSocketGatewayMock },
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -92,25 +102,25 @@ describe('WhiteboardNodeAddedTransaction', () => {
   describe('execute', () => {
     it('should correctly execute transaction', async () => {
       const sendPropagatedBroadcastMessageSpy = jest.spyOn(
-        mockWhiteboardWebSocketGateway,
+        whiteboardWebSocketGatewayMock,
         sendPropagatedBroadcastMessageMethodName
       );
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
 
-      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testEventPayload);
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
       await transaction.execute();
 
       expect(sendPropagatedBroadcastMessageSpy).toBeCalledTimes(1);
-      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testEventPayload);
+      expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
       expect(addNodeSpy).toBeCalledTimes(1);
-      expect(addNodeSpy).toBeCalledWith(testEventPayload.context.casefileId, testEventPayload.body);
+      expect(addNodeSpy).toBeCalledWith(testMessagePayload.context.casefileId, testMessagePayload.body);
     });
 
     it('should throw an InternalServerErrorException if the given message is missing a body', async () => {
       const sendPropagatedBroadcastMessageSpy = jest.spyOn(
-        mockWhiteboardWebSocketGateway,
+        whiteboardWebSocketGatewayMock,
         sendPropagatedBroadcastMessageMethodName
       );
       const addNodeSpy = jest.spyOn(cacheService, addNodeMethodName);
@@ -127,16 +137,44 @@ describe('WhiteboardNodeAddedTransaction', () => {
       expect(addNodeSpy).toBeCalledTimes(0);
     });
 
-    // TODO: Reactivate me
-    xit('should throw an InternalServerException if any error occurs during the transaction', async () => {
+    it('should re-execute transaction if the first try fails', async () => {
+      jest.spyOn(cacheService, addNodeMethodName).mockImplementationOnce(() => {
+        throw new Error();
+      });
+      const executionSpy = jest.spyOn(WhiteboardNodeAddedTransaction.prototype, 'execute');
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
+
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+      await transaction.execute();
+
+      expect(executionSpy).toBeCalledTimes(2);
+    });
+
+    it('should rollback transaction if the second try fails', async () => {
       jest.spyOn(cacheService, addNodeMethodName).mockImplementation(() => {
         throw new Error();
       });
+      jest.spyOn(cacheService, getCasefileByIdMethodName);
+      const executionSpy = jest.spyOn(WhiteboardNodeAddedTransaction.prototype, 'execute');
+      const sendPropagatedUnicastMessageSpy = jest.spyOn(
+        whiteboardWebSocketGateway,
+        sendPropagatedUnicastMessageMethodName
+      );
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
-      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testEventPayload);
+      const transaction = new WhiteboardNodeAddedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+      await transaction.execute();
 
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+      expect(executionSpy).toBeCalledTimes(2);
+      expect(sendPropagatedUnicastMessageSpy).toBeCalledWith({
+        context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
+        body: undefined,
+      });
+      expect(produceKafkaEventSpy).toBeCalledWith(KafkaTopic.Error, {
+        body: new Error(),
+        context: testMessageContext,
+      });
     });
   });
 });
