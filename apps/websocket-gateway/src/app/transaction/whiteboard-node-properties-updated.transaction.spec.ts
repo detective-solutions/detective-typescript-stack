@@ -2,6 +2,7 @@ import { CacheService, DatabaseService } from '../services';
 import {
   IMessage,
   IWhiteboardNodePropertiesUpdate,
+  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
@@ -14,13 +15,21 @@ import { WhiteboardNodePropertiesUpdatedTransaction } from './whiteboard-node-pr
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
+const updateNodePropertiesMethodName = 'updateNodeProperties';
+const getCasefileByIdMethodName = 'getCasefileById';
+const cacheServiceMock = { [updateNodePropertiesMethodName]: jest.fn(), [getCasefileByIdMethodName]: jest.fn() };
+
 const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const sendPropagatedUnicastMessageMethodName = 'sendPropagatedUnicastMessage';
 const mockWhiteboardWebSocketGateway = {
   [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
+  [sendPropagatedUnicastMessageMethodName]: jest.fn(),
 };
 
-const updateNodePropertiesMethodName = 'updateNodeProperties';
-const cacheServiceMock = { [updateNodePropertiesMethodName]: jest.fn() };
+const produceKafkaEventMethodName = 'produceKafkaEvent';
+const kafkaEventProducerMock = {
+  [produceKafkaEventMethodName]: jest.fn(),
+};
 
 const testMessageContext = {
   eventType: MessageEventType.WhiteboardNodePropertiesUpdated,
@@ -55,10 +64,10 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -101,8 +110,17 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       expect(sendPropagatedBroadcastMessageSpy).toBeCalledWith(testMessagePayload);
     });
 
-    // TODO: Reactivate me
-    xit('should retry the cache update if it fails once', async () => {
+    it('should throw an InternalServerException if the given message is missing a body', async () => {
+      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
+        context: testMessageContext,
+        body: undefined,
+      });
+      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
+
+      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should retry the cache update if it fails once', async () => {
       const sendPropagatedBroadcastMessageSpy = jest.spyOn(
         mockWhiteboardWebSocketGateway,
         sendPropagatedBroadcastMessageMethodName
@@ -136,37 +154,32 @@ describe('WhiteboardNodePropertiesUpdatedTransaction', () => {
       );
     });
 
-    // TODO: Reactivate me
-    xit('should throw an InternalServerException if the cache update fails at least twice', async () => {
-      jest.spyOn(cacheService, updateNodePropertiesMethodName).mockImplementation(() => {
-        throw new Error();
-      });
+    it('should rollback transaction if the second try fails', async () => {
+      const updateNodePropertiesSpy = jest
+        .spyOn(cacheService, updateNodePropertiesMethodName)
+        .mockImplementation(() => {
+          throw new Error();
+        });
+      const sendPropagatedUnicastMessageSpy = jest.spyOn(
+        mockWhiteboardWebSocketGateway,
+        sendPropagatedUnicastMessageMethodName
+      );
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-    });
+      await transaction.execute();
 
-    it('should throw an InternalServerException if the given message is missing a body', async () => {
-      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
-        context: testMessageContext,
+      expect(updateNodePropertiesSpy).toHaveBeenCalledTimes(2);
+      expect(sendPropagatedUnicastMessageSpy).toHaveBeenCalledWith({
+        context: { ...testMessageContext, eventType: MessageEventType.LoadWhiteboardData },
         body: undefined,
       });
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
-    });
-
-    // TODO: Reactivate me
-    xit('should throw an InternalServerException if the given message context is missing a node id', async () => {
-      const transaction = new WhiteboardNodePropertiesUpdatedTransaction(serviceRefs, {
+      expect(produceKafkaEventSpy).toBeCalledWith(KafkaTopic.Error, {
+        body: new Error(),
         context: testMessageContext,
-        body: [{ ...testMessagePayload, nodeId: undefined }],
       });
-      transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
-
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
     });
   });
 });
