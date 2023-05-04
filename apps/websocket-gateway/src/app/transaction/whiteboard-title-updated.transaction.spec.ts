@@ -71,7 +71,7 @@ describe('WhiteboardTitleUpdatedTransaction', () => {
     };
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
