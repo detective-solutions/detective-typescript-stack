@@ -69,6 +69,13 @@ export abstract class Transaction {
     this.logger.error(error);
     this.logger.error(logMessage);
 
+    // Collect all error messages in separate error topic
+    this.kafkaEventProducer.produceKafkaEvent(KafkaTopic.Error, {
+      context: this.messageContext,
+      body: error,
+    });
+    this.logger.error(`${this.logContext} Published error message to "${KafkaTopic.Error}" topic`);
+
     if (shouldExecuteAgain && !this.hasAlreadyExecuted) {
       this.hasAlreadyExecuted = true;
       await this.execute();
@@ -82,12 +89,5 @@ export abstract class Transaction {
         body: await this.cacheService.getCasefileById(this.messageContext.casefileId),
       });
     }
-
-    // Collect all error messages in separate error topic
-    this.kafkaEventProducer.produceKafkaEvent(KafkaTopic.Error, {
-      context: this.messageContext,
-      body: error,
-    });
-    this.logger.error(`${this.logContext} Published error message to "${KafkaTopic.Error}" topic`);
   }
 }
