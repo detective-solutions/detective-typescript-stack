@@ -2,11 +2,11 @@ import { CacheService, DatabaseService } from '../services';
 import {
   ICachableCasefileForWhiteboard,
   IMessage,
+  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
 
-import { InternalServerErrorException } from '@nestjs/common';
 import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
 import { TransactionServiceRefs } from '../models';
@@ -22,6 +22,11 @@ const cacheServiceMock = {
 const saveCasefileMethodName = 'saveCasefile';
 const databaseServiceMock = {
   [saveCasefileMethodName]: jest.fn(),
+};
+
+const produceKafkaEventMethodName = 'produceKafkaEvent';
+const kafkaEventProducerMock = {
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -55,10 +60,10 @@ describe('WhiteboardSaveTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
         { provide: CacheService, useValue: cacheServiceMock },
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -110,15 +115,23 @@ describe('WhiteboardSaveTransaction', () => {
       expect(saveCasefileSpy).toBeCalledTimes(0);
     });
 
-    it('should throw an InternalServerException if any error occurs during the transaction', async () => {
+    it('should retry the cache update if it fails once', async () => {
+      const executionSpy = jest.spyOn(WhiteboardSaveTransaction.prototype, 'execute');
       jest.spyOn(cacheService, getCasefileByIdMethodName).mockImplementation(() => {
         throw new Error();
       });
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
       const transaction = new WhiteboardSaveTransaction(serviceRefs, testMessagePayload);
       transaction.logger.localInstance.setLogLevels([]); // Disable logger for test run
 
-      await expect(transaction.execute()).rejects.toThrow(InternalServerErrorException);
+      await transaction.execute();
+
+      expect(executionSpy).toHaveBeenCalledTimes(2);
+      expect(produceKafkaEventSpy).toHaveBeenCalledWith(KafkaTopic.Error, {
+        body: new Error(),
+        context: testMessageContext,
+      });
     });
   });
 });

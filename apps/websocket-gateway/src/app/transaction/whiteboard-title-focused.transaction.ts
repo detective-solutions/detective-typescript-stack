@@ -21,13 +21,7 @@ export class WhiteboardTitleFocusedTransaction extends Transaction {
       this.broadcastMessage();
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error, `Could not update title of casefile "${this.casefileId}"`, false);
     }
-  }
-
-  private handleError(error: Error) {
-    // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
-    throw new InternalServerErrorException(`Could not update title of casefile "${this.casefileId}"`);
   }
 }

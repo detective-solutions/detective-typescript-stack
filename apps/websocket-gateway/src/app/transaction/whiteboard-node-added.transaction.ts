@@ -21,15 +21,7 @@ export class WhiteboardNodeAddedTransaction extends Transaction {
       this.logger.verbose(`Node "${this.nodeId}" was successfully added to casefile "${this.casefileId}"`);
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error, `There was an error adding node "${this.nodeId}" to casefile "${this.casefileId}"`);
     }
-  }
-
-  private handleError(error: Error) {
-    // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      `There was an error adding node "${this.nodeId}" to casefile "${this.casefileId}"`
-    );
   }
 }
