@@ -1,5 +1,5 @@
 import { CacheService, DatabaseService } from '../../services';
-import { IMessage, IMessageContext, KafkaTopic } from '@detective.solutions/shared/data-access';
+import { IMessage, IMessageContext, KafkaTopic, MessageEventType } from '@detective.solutions/shared/data-access';
 
 import { KafkaEventProducer } from '../../kafka';
 import { Logger } from '@nestjs/common';
@@ -26,6 +26,8 @@ export abstract class Transaction {
   timestamp: number;
   messageBody: any;
   logContext: string;
+
+  hasAlreadyExecuted = false;
 
   protected readonly missingMessageBodyErrorText =
     'Transaction cannot be executed due to missing message body information';
@@ -61,5 +63,31 @@ export abstract class Transaction {
   protected sendKafkaMessage(targetTopic: KafkaTopic) {
     this.kafkaEventProducer.produceKafkaEvent(targetTopic, this.message);
     this.logger.verbose(`${this.logContext} Broadcasted transaction information`);
+  }
+
+  protected async handleError(error: Error, logMessage: string, rollback = true, shouldExecuteAgain = true) {
+    this.logger.error(error);
+    this.logger.error(logMessage);
+
+    // Collect all error messages in separate error topic
+    this.kafkaEventProducer.produceKafkaEvent(KafkaTopic.Error, {
+      context: this.messageContext,
+      body: error,
+    });
+    this.logger.error(`${this.logContext} Published error message to "${KafkaTopic.Error}" topic`);
+
+    if (shouldExecuteAgain && !this.hasAlreadyExecuted) {
+      this.hasAlreadyExecuted = true;
+      await this.execute();
+      return; // If execution fails, this method will be invoked again, so this invocation has to be cancelled early
+    }
+
+    if (rollback) {
+      // Rollback sending client casefile state to latest cached version
+      this.whiteboardWebSocketGateway.sendPropagatedUnicastMessage({
+        context: { ...this.messageContext, eventType: MessageEventType.LoadWhiteboardData },
+        body: await this.cacheService.getCasefileById(this.messageContext.casefileId),
+      });
+    }
   }
 }

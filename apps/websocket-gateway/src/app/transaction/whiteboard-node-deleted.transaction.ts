@@ -20,13 +20,7 @@ export class WhiteboardNodeDeletedTransaction extends Transaction {
       this.broadcastMessage();
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error, `Could not delete node ${this.nodeId} from casefile ${this.casefileId}`);
     }
-  }
-
-  private handleError(error: Error) {
-    // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
-    throw new InternalServerErrorException(`Could not delete node ${this.nodeId} from casefile ${this.casefileId}`);
   }
 }

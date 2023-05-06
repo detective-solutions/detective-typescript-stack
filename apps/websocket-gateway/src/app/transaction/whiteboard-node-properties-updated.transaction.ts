@@ -17,11 +17,10 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
       throw new InternalServerErrorException(this.missingMessageBodyErrorText);
     }
 
-    for (const propertyUpdate of this.messageBody) {
-      await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
-    }
-
     try {
+      for (const propertyUpdate of this.messageBody) {
+        await validateDto(WhiteboardNodePropertyUpdateDTO, propertyUpdate, this.logger);
+      }
       await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
     } catch (error) {
       this.logger.error(error);
@@ -29,16 +28,10 @@ export class WhiteboardNodePropertiesUpdatedTransaction extends Transaction {
       try {
         await this.cacheService.updateNodeProperties(this.casefileId, this.userId, this.messageBody);
       } catch (error) {
-        this.handleFinalError(error);
+        this.handleError(error, `Could not update node properties in casefile "${this.casefileId}"`, true, false);
       }
     }
     this.broadcastMessage();
     this.logger.log(`${this.logContext} Transaction successful`);
-  }
-
-  private handleFinalError(error: Error) {
-    // TODO: Add mechanism to publish failed transaction to error topic
-    this.logger.error(error);
-    throw new InternalServerErrorException(`Could not update node properties in casefile "${this.casefileId}"`);
   }
 }

@@ -4,8 +4,8 @@ import {
   IUserForWhiteboard,
   MessageEventType,
 } from '@detective.solutions/shared/data-access';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
 
+import { Logger } from '@nestjs/common';
 import { Transaction } from './abstract';
 
 export class WhiteboardUserJoinedTransaction extends Transaction {
@@ -40,7 +40,8 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
 
       this.logger.log(`${this.logContext} Transaction successful`);
     } catch (error) {
-      this.handleError(error);
+      // Handle error without rollback because this task is not triggered by user action
+      this.handleError(error, `Could not add new user "${this.userId}" to casefile "${this.casefileId}"`, false);
     }
   }
 
@@ -68,11 +69,5 @@ export class WhiteboardUserJoinedTransaction extends Transaction {
     await this.cacheService.saveCasefile(casefileData);
     this.logger.log(`${this.logContext} Successfully created new cache for casefile "${casefileId}"`);
     return casefileData;
-  }
-
-  private handleError(error: Error) {
-    // TODO: Improve error handling with caching of transaction data & re-running mutations
-    this.logger.error(error);
-    throw new InternalServerErrorException(`Could not add new user "${this.userId}" to casefile "${this.casefileId}"`);
   }
 }

@@ -2,23 +2,16 @@ import { CacheService, DatabaseService } from '../services';
 import {
   ICachableCasefileForWhiteboard,
   IUserForWhiteboard,
+  KafkaTopic,
   MessageEventType,
   UserRole,
 } from '@detective.solutions/shared/data-access';
 
-import { InternalServerErrorException } from '@nestjs/common';
 import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
 import { WhiteboardUserJoinedTransaction } from './whiteboard-user-joined.transaction';
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
-
-const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
-const sendPropagatedUnicastMessageMethodName = 'sendPropagatedUnicastMessage';
-const mockWhiteboardWebSocketGateway = {
-  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
-  [sendPropagatedUnicastMessageMethodName]: jest.fn(),
-};
 
 const getCachedCasefileByIdMethodName = 'getCasefileById';
 const saveCasefileToCacheMethodName = 'saveCasefile';
@@ -34,6 +27,18 @@ const getWhiteboardUserByIdMethodName = 'getWhiteboardUserById';
 const databaseServiceMock = {
   [getCasefileByIdMethodName]: jest.fn(),
   [getWhiteboardUserByIdMethodName]: jest.fn(),
+};
+
+const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
+const sendPropagatedUnicastMessageMethodName = 'sendPropagatedUnicastMessage';
+const mockWhiteboardWebSocketGateway = {
+  [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
+  [sendPropagatedUnicastMessageMethodName]: jest.fn(),
+};
+
+const produceKafkaEventMethodName = 'produceKafkaEvent';
+const kafkaEventProducerMock = {
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -71,10 +76,10 @@ describe('WhiteboardUserJoinedTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
         { provide: DatabaseService, useValue: databaseServiceMock },
-        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
       ],
     }).compile();
 
@@ -254,12 +259,20 @@ describe('WhiteboardUserJoinedTransaction', () => {
       });
     });
 
-    it('should throw an InternalServerException if any error occurs during the transaction', async () => {
+    it('should retry the cache update if it fails once', async () => {
+      const executionSpy = jest.spyOn(WhiteboardUserJoinedTransaction.prototype, 'execute');
       jest.spyOn(cacheService, getCachedCasefileByIdMethodName).mockImplementation(() => {
         throw new Error();
       });
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
-      await expect(whiteboardUserJoinedTransaction.execute()).rejects.toThrow(InternalServerErrorException);
+      await whiteboardUserJoinedTransaction.execute();
+
+      expect(executionSpy).toHaveBeenCalledTimes(2);
+      expect(produceKafkaEventSpy).toHaveBeenCalledWith(KafkaTopic.Error, {
+        body: new Error(),
+        context: testMessageContext,
+      });
     });
   });
 });

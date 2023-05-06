@@ -1,21 +1,25 @@
 import { CacheService, DatabaseService } from '../services';
-import { MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
+import { KafkaTopic, MessageEventType, UserRole } from '@detective.solutions/shared/data-access';
 
-import { InternalServerErrorException } from '@nestjs/common';
 import { KafkaEventProducer } from '../kafka';
 import { Test } from '@nestjs/testing';
 import { WhiteboardUserLeftTransaction } from './whiteboard-user-left.transaction';
 import { WhiteboardWebSocketGateway } from '../websocket';
 import { v4 as uuidv4 } from 'uuid';
 
+const removeActiveWhiteboardUserMethodName = 'removeActiveUser';
+const cacheServiceMock = {
+  [removeActiveWhiteboardUserMethodName]: jest.fn(),
+};
+
 const sendPropagatedBroadcastMessageMethodName = 'sendPropagatedBroadcastMessage';
 const mockWhiteboardWebSocketGateway = {
   [sendPropagatedBroadcastMessageMethodName]: jest.fn(),
 };
 
-const removeActiveWhiteboardUserMethodName = 'removeActiveUser';
-const cacheServiceMock = {
-  [removeActiveWhiteboardUserMethodName]: jest.fn(),
+const produceKafkaEventMethodName = 'produceKafkaEvent';
+const kafkaEventProducerMock = {
+  [produceKafkaEventMethodName]: jest.fn(),
 };
 
 const testMessageContext = {
@@ -43,10 +47,10 @@ describe('WhiteboardUserLeftTransaction', () => {
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
         { provide: CacheService, useValue: cacheServiceMock },
+        { provide: WhiteboardWebSocketGateway, useValue: mockWhiteboardWebSocketGateway },
+        { provide: KafkaEventProducer, useValue: kafkaEventProducerMock },
         { provide: DatabaseService, useValue: {} }, // Needs to be mocked due to required serviceRefs
-        { provide: KafkaEventProducer, useValue: {} }, // Needs to be mocked due to required serviceRefs
       ],
     }).compile();
 
@@ -95,12 +99,20 @@ describe('WhiteboardUserLeftTransaction', () => {
       expect(sendPropagatedBroadcastMessageSpy).toHaveBeenLastCalledWith(testMessagePayload);
     });
 
-    it('should throw an InternalServerException if any error occurs during the transaction', async () => {
+    it('should retry the cache update if it fails once', async () => {
+      const executionSpy = jest.spyOn(WhiteboardUserLeftTransaction.prototype, 'execute');
       jest.spyOn(cacheService, removeActiveWhiteboardUserMethodName).mockImplementation(() => {
         throw new Error();
       });
+      const produceKafkaEventSpy = jest.spyOn(kafkaEventProducer, produceKafkaEventMethodName);
 
-      await expect(whiteboardUserLeftTransaction.execute()).rejects.toThrow(InternalServerErrorException);
+      await whiteboardUserLeftTransaction.execute();
+
+      expect(executionSpy).toHaveBeenCalledTimes(2);
+      expect(produceKafkaEventSpy).toHaveBeenCalledWith(KafkaTopic.Error, {
+        body: new Error(),
+        context: testMessageContext,
+      });
     });
   });
 });
