@@ -27,5 +27,8 @@
     "dialogText": "Du bist dabei die Casefile zu verlassen. Bist du dir sicher?",
     "confirmButtonText": "Ja",
     "cancelButtonText": "Ich will zurück"
+  },
+  "codeEditor": {
+    "runButtonText": "Ausführen"
   }
 }
