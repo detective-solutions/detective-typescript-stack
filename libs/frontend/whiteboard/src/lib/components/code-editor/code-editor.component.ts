@@ -1,5 +1,3 @@
-/* eslint-disable sort-imports */
-import 'ace-builds/src-noconflict/theme-dracula';
 import 'brace';
 import 'brace/mode/sql';
 

@@ -1,6 +1,3 @@
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/sql/sql';
-
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 
