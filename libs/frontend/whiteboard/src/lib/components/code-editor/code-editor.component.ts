@@ -14,8 +14,6 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { CdkDragMove } from '@angular/cdk/drag-drop';
-
 @Component({
   selector: 'code-editor',
   templateUrl: './code-editor.component.html',
@@ -31,8 +29,11 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
   @Input() prettify = true;
   editor!: Ace.Editor;
 
+  editorWidth = 700;
+  offsetX = 0;
+
   // https://github.com/ajaxorg/ace/wiki/Configuring-Ace
-  options = {
+  private readonly options = {
     showPrintMargin: false,
     highlightActiveLine: true,
     tabSize: 2,
@@ -41,16 +42,11 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
     fontFamily: "'Roboto Mono Regular', monospace",
   };
 
-  public editorWidth = 700;
-  offsetX = 0;
-
   ngAfterViewInit() {
-    this.initEditor_();
+    this.initEditor();
   }
-  onTextChange(text: string): void {
-    this.textChange.emit(text);
-  }
-  ngOnChanges(changes: SimpleChanges): void {
+
+  ngOnChanges(changes: SimpleChanges) {
     if (!this.editor) {
       return;
     }
@@ -58,10 +54,10 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
       if (Object.prototype.hasOwnProperty.call(changes, propName)) {
         switch (propName) {
           case 'text':
-            this.onExternalUpdate_();
+            this.onExternalUpdate();
             break;
           case 'mode':
-            this.onEditorModeChange_();
+            this.onEditorModeChange();
             break;
           default:
         }
@@ -69,37 +65,40 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  onResizeEditor(event: CdkDragMove) {
-    this.editorWidth += event.pointerPosition.x;
+  onTextChange(text: string) {
+    this.textChange.emit(text);
   }
 
   toggleVisibility() {
     this.editorArrowEvent.emit({ editorState: false });
   }
 
-  private initEditor_(): void {
+  private initEditor() {
     this.editor = edit(this.editorRef.nativeElement);
     this.editor.setOptions(this.options);
     this.editor.setValue(this.text, -1);
     this.editor.setReadOnly(this.readOnly);
     this.editor.setTheme('ace/theme/sqlserver');
-    this.setEditorMode_();
+    this.setEditorMode();
     this.editor.session.setUseWorker(false);
-    this.editor.on('change', () => this.onEditorTextChange_());
+    this.editor.on('change', () => this.onEditorTextChange());
   }
-  private onExternalUpdate_(): void {
-    const point = this.editor.getCursorPosition();
+
+  private onExternalUpdate() {
     this.editor.setValue(this.text, -1);
-    this.editor.moveCursorToPosition(point);
+    this.editor.moveCursorToPosition(this.editor.getCursorPosition());
   }
-  private onEditorTextChange_(): void {
+
+  private onEditorTextChange() {
     this.text = this.editor.getValue();
     this.onTextChange(this.text);
   }
-  private onEditorModeChange_(): void {
-    this.setEditorMode_();
+
+  private onEditorModeChange() {
+    this.setEditorMode();
   }
-  private setEditorMode_(): void {
+
+  private setEditorMode() {
     this.editor.getSession().setMode(`ace/mode/${this.mode}`);
   }
 }
