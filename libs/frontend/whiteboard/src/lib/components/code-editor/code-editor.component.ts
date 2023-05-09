@@ -78,7 +78,6 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
     this.editor.setOptions(this.options);
     this.editor.setValue(this.text, -1);
     this.editor.setReadOnly(this.readOnly);
-    this.editor.setTheme('ace/theme/sqlserver');
     this.setEditorMode();
     this.editor.session.setUseWorker(false);
     this.editor.on('change', () => this.onEditorTextChange());
