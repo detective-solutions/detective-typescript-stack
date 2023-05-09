@@ -272,8 +272,8 @@ export class HostComponent implements OnInit, AfterViewInit, OnDestroy, Componen
   }
 
   receivedEditorToggle(data: EditorEvent) {
-    this.editorVisibility = data.editorState ?? false;
-    this.currentCode = data.code ?? ' ';
+    this.editorVisibility = data.editorState;
+    this.currentCode = data.code ?? '';
   }
 
   receivedEditorToggleState(data: EditorEvent) {
