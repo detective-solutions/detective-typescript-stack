@@ -29,9 +29,6 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
   @Input() prettify = true;
   editor!: Ace.Editor;
 
-  editorWidth = 700;
-  offsetX = 0;
-
   // https://github.com/ajaxorg/ace/wiki/Configuring-Ace
   private readonly options = {
     showPrintMargin: false,
