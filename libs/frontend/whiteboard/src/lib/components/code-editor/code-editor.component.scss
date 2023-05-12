@@ -1,7 +1,9 @@
+$topbar-height: 50px;
+
 .editor-wrapper {
   width: 500px;
-  top: 54px;
-  float: right;
+  height: calc(100vh - $topbar-height);
+  top: $topbar-height - 3px;
   position: relative;
   z-index: 50;
 
@@ -33,9 +35,9 @@
       height: 40px;
       border-radius: 200px;
       position: absolute;
-      left: -80px;
-      top: 20px;
-      background-color: white;
+      left: -50px;
+      top: 10px;
+      background-color: transparent;
       border: none;
       cursor: pointer;
 
