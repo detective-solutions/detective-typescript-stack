@@ -73,6 +73,10 @@ export class CodeEditorComponent implements AfterViewInit, OnChanges {
     this.editorArrowEvent.emit({ editorState: false });
   }
 
+  sendQuery() {
+    console.log('Sent');
+  }
+
   private initEditor() {
     this.editor = edit(this.editorRef.nativeElement);
     this.editor.setOptions(this.options);

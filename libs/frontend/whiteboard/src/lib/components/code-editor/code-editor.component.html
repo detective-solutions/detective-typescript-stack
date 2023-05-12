@@ -8,7 +8,7 @@
   <div fxFlex class="editor-menu" *transloco="let t; read: 'whiteboard.codeEditor'">
     <button mat-raised-button color="accent">
       {{ t('runButtonText') }}
-      <span class="material-icons">play_arrow</span>
+      <span class="material-icons" (click)="sendQuery()">play_arrow</span>
     </button>
   </div>
 </div>
