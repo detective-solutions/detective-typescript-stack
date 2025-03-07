@@ -28,7 +28,7 @@ jobs:
           cache-dependency-path: ./package-lock.json
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3.0.1
+        uses: nrwl/nx-set-shas@v4.3.0
 
       - name: Install npm dependencies
         run: npm ci --no-audit --no-fund
